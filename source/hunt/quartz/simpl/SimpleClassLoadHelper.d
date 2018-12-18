@@ -19,10 +19,10 @@ module hunt.quartz.simpl.SimpleClassLoadHelper;
 
 import hunt.quartz.spi.ClassLoadHelper;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.io.InputStream;
+// import java.lang.reflect.AccessibleObject;
+// import java.lang.reflect.Method;
+// import java.net.URL;
+import hunt.io.common;
 
 /**
  * A <code>ClassLoadHelper</code> that simply calls <code>Class.forName(..)</code>.
@@ -35,79 +35,79 @@ import java.io.InputStream;
  * @author jhouse
  * @author pl47ypus
  */
-class SimpleClassLoadHelper : ClassLoadHelper {
+// class SimpleClassLoadHelper : ClassLoadHelper {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Interface.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    /**
-     * Called to give the ClassLoadHelper a chance to initialize itself,
-     * including the opportunity to "steal" the class loader off of the calling
-     * thread, which is the thread that is initializing Quartz.
-     */
-    void initialize() {
-    }
+//     /**
+//      * Called to give the ClassLoadHelper a chance to initialize itself,
+//      * including the opportunity to "steal" the class loader off of the calling
+//      * thread, which is the thread that is initializing Quartz.
+//      */
+//     void initialize() {
+//     }
 
-    /**
-     * Return the class with the given name.
-     */
-    Class<?> loadClass(string name) {
-        return Class.forName(name);
-    }
+//     /**
+//      * Return the class with the given name.
+//      */
+//     Class<?> loadClass(string name) {
+//         return Class.forName(name);
+//     }
 
-    @SuppressWarnings("unchecked")
-    <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
-        return (Class<? extends T>) loadClass(name);
-    }
+//     
+//     <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
+//         return (Class<? extends T>) loadClass(name);
+//     }
 
-    /**
-     * Finds a resource with a given name. This method returns null if no
-     * resource with this name is found.
-     * @param name name of the desired resource
-     * @return a java.net.URL object
-     */
-    URL getResource(string name) {
-        return getClassLoader().getResource(name);
-    }
+//     /**
+//      * Finds a resource with a given name. This method returns null if no
+//      * resource with this name is found.
+//      * @param name name of the desired resource
+//      * @return a java.net.URL object
+//      */
+//     URL getResource(string name) {
+//         return getClassLoader().getResource(name);
+//     }
 
-    /**
-     * Finds a resource with a given name. This method returns null if no
-     * resource with this name is found.
-     * @param name name of the desired resource
-     * @return a java.io.InputStream object
-     */
-    InputStream getResourceAsStream(string name) {
-        return getClassLoader().getResourceAsStream(name);
-    }
+//     /**
+//      * Finds a resource with a given name. This method returns null if no
+//      * resource with this name is found.
+//      * @param name name of the desired resource
+//      * @return a java.io.InputStream object
+//      */
+//     InputStream getResourceAsStream(string name) {
+//         return getClassLoader().getResourceAsStream(name);
+//     }
 
-    /**
-     * Enable sharing of the class-loader with 3rd party.
-     *
-     * @return the class-loader user be the helper.
-     */
-    ClassLoader getClassLoader() {
-        // To follow the same behavior of Class.forName(...) I had to play
-        // dirty (Supported by Sun, IBM & BEA JVMs)
-        try {
-            // Get a reference to this class' class-loader
-            ClassLoader cl = this.getClass().getClassLoader();
-            // Create a method instance representing the protected
-            // getCallerClassLoader method of class ClassLoader
-            Method mthd = ClassLoader.class.getDeclaredMethod(
-                    "getCallerClassLoader", new Class<?>[0]);
-            // Make the method accessible.
-            AccessibleObject.setAccessible(new AccessibleObject[] {mthd}, true);
-            // Try to get the caller's class-loader
-            return (ClassLoader)mthd.invoke(cl, new Object[0]);
-        } catch (Throwable all) {
-            // Use this class' class-loader
-            return this.getClass().getClassLoader();
-        }
-    }
+//     /**
+//      * Enable sharing of the class-loader with 3rd party.
+//      *
+//      * @return the class-loader user be the helper.
+//      */
+//     ClassLoader getClassLoader() {
+//         // To follow the same behavior of Class.forName(...) I had to play
+//         // dirty (Supported by Sun, IBM & BEA JVMs)
+//         try {
+//             // Get a reference to this class' class-loader
+//             ClassLoader cl = this.getClass().getClassLoader();
+//             // Create a method instance representing the protected
+//             // getCallerClassLoader method of class ClassLoader
+//             Method mthd = ClassLoader.class.getDeclaredMethod(
+//                     "getCallerClassLoader", new Class<?>[0]);
+//             // Make the method accessible.
+//             AccessibleObject.setAccessible(new AccessibleObject[] {mthd}, true);
+//             // Try to get the caller's class-loader
+//             return (ClassLoader)mthd.invoke(cl, new Object[0]);
+//         } catch (Throwable all) {
+//             // Use this class' class-loader
+//             return this.getClass().getClassLoader();
+//         }
+//     }
 
-}
+// }

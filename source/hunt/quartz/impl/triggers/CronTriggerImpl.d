@@ -20,7 +20,6 @@ module hunt.quartz.impl.triggers.CronTriggerImpl;
 import hunt.lang.exception;
 import hunt.time.util.Calendar;
 import std.datetime;
-import std.datetime : TimeZone;
 
 import hunt.quartz.CronExpression;
 import hunt.quartz.CronScheduleBuilder;
@@ -43,7 +42,7 @@ import hunt.quartz.TriggerUtils;
  * @author Sharada Jambula, James House
  * @author Contributions from Mads Henderson
  */
-class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, CoreTrigger {
+class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,7 +76,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
     private Date endTime = null;
     private Date nextFireTime = null;
     private Date previousFireTime = null;
-    private transient TimeZone timeZone = null;
+    private TimeZone timeZone = null;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,229 +96,229 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
      * will be set the the system's default time zone.
      * </p>
      */
-    CronTriggerImpl() {
+    this() {
         super();
         setStartTime(new Date());
         setTimeZone(TimeZone.getDefault());
     }
 
-    /**
-     * <p>
-     * Create a <code>CronTrigger</code> with the given name and default group.
-     * </p>
-     * 
-     * <p>
-     * The start-time will also be set to the current time, and the time zone
-     * will be set the the system's default time zone.
-     * </p>
-     * 
-     * @deprecated use a TriggerBuilder instead
-     */
-    deprecated("")
-    CronTriggerImpl(string name) {
-        this(name, null);
-    }
+    // /**
+    //  * <p>
+    //  * Create a <code>CronTrigger</code> with the given name and default group.
+    //  * </p>
+    //  * 
+    //  * <p>
+    //  * The start-time will also be set to the current time, and the time zone
+    //  * will be set the the system's default time zone.
+    //  * </p>
+    //  * 
+    //  * @deprecated use a TriggerBuilder instead
+    //  */
+    // deprecated("")
+    // this(string name) {
+    //     this(name, null);
+    // }
     
-    /**
-     * <p>
-     * Create a <code>CronTrigger</code> with the given name and group.
-     * </p>
-     * 
-     * <p>
-     * The start-time will also be set to the current time, and the time zone
-     * will be set the the system's default time zone.
-     * </p>
-     * 
-     * @deprecated use a TriggerBuilder instead
-     */
-    deprecated("")
-    CronTriggerImpl(string name, string group) {
-        super(name, group);
-        setStartTime(new Date());
-        setTimeZone(TimeZone.getDefault());
-    }
+    // /**
+    //  * <p>
+    //  * Create a <code>CronTrigger</code> with the given name and group.
+    //  * </p>
+    //  * 
+    //  * <p>
+    //  * The start-time will also be set to the current time, and the time zone
+    //  * will be set the the system's default time zone.
+    //  * </p>
+    //  * 
+    //  * @deprecated use a TriggerBuilder instead
+    //  */
+    // deprecated("")
+    // this(string name, string group) {
+    //     super(name, group);
+    //     setStartTime(new Date());
+    //     setTimeZone(TimeZone.getDefault());
+    // }
 
-    /**
-     * <p>
-     * Create a <code>CronTrigger</code> with the given name, group and
-     * expression.
-     * </p>
-     * 
-     * <p>
-     * The start-time will also be set to the current time, and the time zone
-     * will be set the the system's default time zone.
-     * </p>
-     * 
-     * @deprecated use a TriggerBuilder instead
-     */
-    deprecated("")
-    CronTriggerImpl(string name, string group, string cronExpression) {
+    // /**
+    //  * <p>
+    //  * Create a <code>CronTrigger</code> with the given name, group and
+    //  * expression.
+    //  * </p>
+    //  * 
+    //  * <p>
+    //  * The start-time will also be set to the current time, and the time zone
+    //  * will be set the the system's default time zone.
+    //  * </p>
+    //  * 
+    //  * @deprecated use a TriggerBuilder instead
+    //  */
+    // deprecated("")
+    // this(string name, string group, string cronExpression) {
         
-        super(name, group);
+    //     super(name, group);
 
-        setCronExpression(cronExpression);
+    //     setCronExpression(cronExpression);
 
-        setStartTime(new Date());
-        setTimeZone(TimeZone.getDefault());
-    }
+    //     setStartTime(new Date());
+    //     setTimeZone(TimeZone.getDefault());
+    // }
     
-    /**
-     * <p>
-     * Create a <code>CronTrigger</code> with the given name and group, and
-     * associated with the identified <code>{@link hunt.quartz.JobDetail}</code>.
-     * </p>
-     * 
-     * <p>
-     * The start-time will also be set to the current time, and the time zone
-     * will be set the the system's default time zone.
-     * </p>
-     * 
-     * @deprecated use a TriggerBuilder instead
-     */
-    deprecated("")
-    CronTriggerImpl(string name, string group, string jobName,
-            string jobGroup) {
-        super(name, group, jobName, jobGroup);
-        setStartTime(new Date());
-        setTimeZone(TimeZone.getDefault());
-    }
+    // /**
+    //  * <p>
+    //  * Create a <code>CronTrigger</code> with the given name and group, and
+    //  * associated with the identified <code>{@link hunt.quartz.JobDetail}</code>.
+    //  * </p>
+    //  * 
+    //  * <p>
+    //  * The start-time will also be set to the current time, and the time zone
+    //  * will be set the the system's default time zone.
+    //  * </p>
+    //  * 
+    //  * @deprecated use a TriggerBuilder instead
+    //  */
+    // deprecated("")
+    // this(string name, string group, string jobName,
+    //         string jobGroup) {
+    //     super(name, group, jobName, jobGroup);
+    //     setStartTime(new Date());
+    //     setTimeZone(TimeZone.getDefault());
+    // }
 
-    /**
-     * <p>
-     * Create a <code>CronTrigger</code> with the given name and group,
-     * associated with the identified <code>{@link hunt.quartz.JobDetail}</code>,
-     * and with the given "cron" expression.
-     * </p>
-     * 
-     * <p>
-     * The start-time will also be set to the current time, and the time zone
-     * will be set the the system's default time zone.
-     * </p>
-     * 
-     * @deprecated use a TriggerBuilder instead
-     */
-    deprecated("")
-    CronTriggerImpl(string name, string group, string jobName,
-            string jobGroup, string cronExpression) {
-        this(name, group, jobName, jobGroup, null, null, cronExpression,
-                TimeZone.getDefault());
-    }
+    // /**
+    //  * <p>
+    //  * Create a <code>CronTrigger</code> with the given name and group,
+    //  * associated with the identified <code>{@link hunt.quartz.JobDetail}</code>,
+    //  * and with the given "cron" expression.
+    //  * </p>
+    //  * 
+    //  * <p>
+    //  * The start-time will also be set to the current time, and the time zone
+    //  * will be set the the system's default time zone.
+    //  * </p>
+    //  * 
+    //  * @deprecated use a TriggerBuilder instead
+    //  */
+    // deprecated("")
+    // this(string name, string group, string jobName,
+    //         string jobGroup, string cronExpression) {
+    //     this(name, group, jobName, jobGroup, null, null, cronExpression,
+    //             TimeZone.getDefault());
+    // }
 
-    /**
-     * <p>
-     * Create a <code>CronTrigger</code> with the given name and group,
-     * associated with the identified <code>{@link hunt.quartz.JobDetail}</code>,
-     * and with the given "cron" expression resolved with respect to the <code>TimeZone</code>.
-     * </p>
-     * 
-     * @deprecated use a TriggerBuilder instead
-     */
-    deprecated("")
-    CronTriggerImpl(string name, string group, string jobName,
-            string jobGroup, string cronExpression, TimeZone timeZone) {
-        this(name, group, jobName, jobGroup, null, null, cronExpression,
-                timeZone);
-    }
+    // /**
+    //  * <p>
+    //  * Create a <code>CronTrigger</code> with the given name and group,
+    //  * associated with the identified <code>{@link hunt.quartz.JobDetail}</code>,
+    //  * and with the given "cron" expression resolved with respect to the <code>TimeZone</code>.
+    //  * </p>
+    //  * 
+    //  * @deprecated use a TriggerBuilder instead
+    //  */
+    // deprecated("")
+    // this(string name, string group, string jobName,
+    //         string jobGroup, string cronExpression, TimeZone timeZone) {
+    //     this(name, group, jobName, jobGroup, null, null, cronExpression,
+    //             timeZone);
+    // }
 
-    /**
-     * <p>
-     * Create a <code>CronTrigger</code> that will occur at the given time,
-     * until the given end time.
-     * </p>
-     * 
-     * <p>
-     * If null, the start-time will also be set to the current time, the time
-     * zone will be set the the system's default.
-     * </p>
-     * 
-     * @param startTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
-     *          to fire.
-     * @param endTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
-     *          to quit repeat firing.
-     * 
-     * @deprecated use a TriggerBuilder instead
-     */
-    deprecated("")
-    CronTriggerImpl(string name, string group, string jobName,
-            string jobGroup, Date startTime, Date endTime, string cronExpression) {
-        super(name, group, jobName, jobGroup);
+    // /**
+    //  * <p>
+    //  * Create a <code>CronTrigger</code> that will occur at the given time,
+    //  * until the given end time.
+    //  * </p>
+    //  * 
+    //  * <p>
+    //  * If null, the start-time will also be set to the current time, the time
+    //  * zone will be set the the system's default.
+    //  * </p>
+    //  * 
+    //  * @param startTime
+    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          to fire.
+    //  * @param endTime
+    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          to quit repeat firing.
+    //  * 
+    //  * @deprecated use a TriggerBuilder instead
+    //  */
+    // deprecated("")
+    // this(string name, string group, string jobName,
+    //         string jobGroup, Date startTime, Date endTime, string cronExpression) {
+    //     super(name, group, jobName, jobGroup);
 
-        setCronExpression(cronExpression);
+    //     setCronExpression(cronExpression);
 
-        if (startTime is null) {
-            startTime = new Date();
-        }
-        setStartTime(startTime);
-        if (endTime !is null) {
-            setEndTime(endTime);
-        }
-        setTimeZone(TimeZone.getDefault());
+    //     if (startTime is null) {
+    //         startTime = new Date();
+    //     }
+    //     setStartTime(startTime);
+    //     if (endTime !is null) {
+    //         setEndTime(endTime);
+    //     }
+    //     setTimeZone(TimeZone.getDefault());
 
-    }
+    // }
 
-    /**
-     * <p>
-     * Create a <code>CronTrigger</code> with fire time dictated by the
-     * <code>cronExpression</code> resolved with respect to the specified
-     * <code>timeZone</code> occurring from the <code>startTime</code> until
-     * the given <code>endTime</code>.
-     * </p>
-     * 
-     * <p>
-     * If null, the start-time will also be set to the current time. If null,
-     * the time zone will be set to the system's default.
-     * </p>
-     * 
-     * @param name
-     *          of the <code>Trigger</code>
-     * @param group
-     *          of the <code>Trigger</code>
-     * @param jobName
-     *          name of the <code>{@link hunt.quartz.JobDetail}</code>
-     *          executed on firetime
-     * @param jobGroup
-     *          group of the <code>{@link hunt.quartz.JobDetail}</code>
-     *          executed on firetime
-     * @param startTime
-     *          A <code>Date</code> set to the earliest time for the <code>Trigger</code>
-     *          to start firing.
-     * @param endTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
-     *          to quit repeat firing.
-     * @param cronExpression
-     *          A cron expression dictating the firing sequence of the <code>Trigger</code>
-     * @param timeZone
-     *          Specifies for which time zone the <code>cronExpression</code>
-     *          should be interpreted, i.e. the expression 0 0 10 * * ?, is
-     *          resolved to 10:00 am in this time zone.
-     * @throws ParseException
-     *           if the <code>cronExpression</code> is invalid.
-     * 
-     * @deprecated use a TriggerBuilder instead
-     */
-    deprecated("")
-    CronTriggerImpl(string name, string group, string jobName,
-            string jobGroup, Date startTime, Date endTime,
-            string cronExpression, TimeZone timeZone) {
-        super(name, group, jobName, jobGroup);
+    // /**
+    //  * <p>
+    //  * Create a <code>CronTrigger</code> with fire time dictated by the
+    //  * <code>cronExpression</code> resolved with respect to the specified
+    //  * <code>timeZone</code> occurring from the <code>startTime</code> until
+    //  * the given <code>endTime</code>.
+    //  * </p>
+    //  * 
+    //  * <p>
+    //  * If null, the start-time will also be set to the current time. If null,
+    //  * the time zone will be set to the system's default.
+    //  * </p>
+    //  * 
+    //  * @param name
+    //  *          of the <code>Trigger</code>
+    //  * @param group
+    //  *          of the <code>Trigger</code>
+    //  * @param jobName
+    //  *          name of the <code>{@link hunt.quartz.JobDetail}</code>
+    //  *          executed on firetime
+    //  * @param jobGroup
+    //  *          group of the <code>{@link hunt.quartz.JobDetail}</code>
+    //  *          executed on firetime
+    //  * @param startTime
+    //  *          A <code>Date</code> set to the earliest time for the <code>Trigger</code>
+    //  *          to start firing.
+    //  * @param endTime
+    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          to quit repeat firing.
+    //  * @param cronExpression
+    //  *          A cron expression dictating the firing sequence of the <code>Trigger</code>
+    //  * @param timeZone
+    //  *          Specifies for which time zone the <code>cronExpression</code>
+    //  *          should be interpreted, i.e. the expression 0 0 10 * * ?, is
+    //  *          resolved to 10:00 am in this time zone.
+    //  * @throws ParseException
+    //  *           if the <code>cronExpression</code> is invalid.
+    //  * 
+    //  * @deprecated use a TriggerBuilder instead
+    //  */
+    // deprecated("")
+    // this(string name, string group, string jobName,
+    //         string jobGroup, Date startTime, Date endTime,
+    //         string cronExpression, TimeZone timeZone) {
+    //     super(name, group, jobName, jobGroup);
 
-        setCronExpression(cronExpression);
+    //     setCronExpression(cronExpression);
 
-        if (startTime is null) {
-            startTime = new Date();
-        }
-        setStartTime(startTime);
-        if (endTime !is null) {
-            setEndTime(endTime);
-        }
-        if (timeZone is null) {
-            setTimeZone(TimeZone.getDefault());
-        } else {
-            setTimeZone(timeZone);
-        }
-    }
+    //     if (startTime is null) {
+    //         startTime = new Date();
+    //     }
+    //     setStartTime(startTime);
+    //     if (endTime !is null) {
+    //         setEndTime(endTime);
+    //     }
+    //     if (timeZone is null) {
+    //         setTimeZone(TimeZone.getDefault());
+    //     } else {
+    //         setTimeZone(timeZone);
+    //     }
+    // }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -329,14 +328,14 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    override
-    Object clone() {
-        CronTriggerImpl copy = (CronTriggerImpl) super.clone();
-        if (cronEx !is null) {
-            copy.setCronExpression(new CronExpression(cronEx));
-        }
-        return copy;
-    }
+    // override
+    // Object clone() {
+    //     CronTriggerImpl copy = (CronTriggerImpl) super.clone();
+    //     if (cronEx !is null) {
+    //         copy.setCronExpression(new CronExpression(cronEx));
+    //     }
+    //     return copy;
+    // }
 
     void setCronExpression(string cronExpression) {
         TimeZone origTz = getTimeZone();

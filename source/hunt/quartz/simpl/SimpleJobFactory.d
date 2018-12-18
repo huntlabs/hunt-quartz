@@ -44,8 +44,7 @@ class SimpleJobFactory : JobFactory {
         Class<? extends Job> jobClass = jobDetail.getJobClass();
         try {
             if(log.isDebugEnabled()) {
-                log.debug(
-                    "Producing instance of Job '" ~ jobDetail.getKey() + 
+                trace("Producing instance of Job '" ~ jobDetail.getKey().toString() ~ 
                     "', class=" ~ jobClass.getName());
             }
             
@@ -53,7 +52,7 @@ class SimpleJobFactory : JobFactory {
         } catch (Exception e) {
             SchedulerException se = new SchedulerException(
                     "Problem instantiating class '"
-                            + jobDetail.getJobClass().getName() ~ "'", e);
+                            ~ jobDetail.getJobClass().getName() ~ "'", e.msg);
             throw se;
         }
     }

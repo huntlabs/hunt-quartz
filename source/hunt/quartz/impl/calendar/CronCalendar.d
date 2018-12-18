@@ -2,7 +2,6 @@ module hunt.quartz.impl.calendar.CronCalendar;
 
 import hunt.lang.exception;
 import std.datetime;
-import std.datetime : TimeZone;
 
 import hunt.quartz.Calendar;
 import hunt.quartz.CronExpression;
@@ -33,7 +32,7 @@ class CronCalendar : BaseCalendar {
      *  
      * @param expression a string representation of the desired cron expression
      */
-    CronCalendar(string expression) {
+    this(string expression) {
         this(null, expression, null);
     }
 
@@ -46,7 +45,7 @@ class CronCalendar : BaseCalendar {
      *                     calendar functionality
      * @param expression   a string representation of the desired cron expression
      */
-    CronCalendar(Calendar baseCalendar,
+    this(Calendar baseCalendar,
             string expression) {
         this(baseCalendar, expression, null);
     }
@@ -66,19 +65,19 @@ class CronCalendar : BaseCalendar {
      *          <code>timeZone</code> is <code>null</code> then 
      *          <code>TimeZone.getDefault()</code> will be used.
      */
-    CronCalendar(Calendar baseCalendar,
+    this(Calendar baseCalendar,
             string expression, TimeZone timeZone) {
         super(baseCalendar);
         this.cronExpression = new CronExpression(expression);
         this.cronExpression.setTimeZone(timeZone);
     }
     
-    override
-    Object clone() {
-        CronCalendar clone = (CronCalendar) super.clone();
-        clone.cronExpression = new CronExpression(cronExpression);
-        return clone;
-    }
+    // override
+    // Object clone() {
+    //     CronCalendar clone = (CronCalendar) super.clone();
+    //     clone.cronExpression = new CronExpression(cronExpression);
+    //     return clone;
+    // }
 
     /**
      * Returns the time zone for which the <code>CronExpression</code> of

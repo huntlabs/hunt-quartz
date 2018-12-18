@@ -17,13 +17,16 @@
 
 module hunt.quartz.impl.QuartzServer;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+// import java.io.BufferedReader;
+// import java.io.InputStreamReader;
 
 import hunt.quartz.Scheduler;
 import hunt.quartz.SchedulerException;
 import hunt.quartz.SchedulerFactory;
 import hunt.quartz.listeners.SchedulerListenerSupport;
+
+import core.thread;
+import std.stdio;
 
 /**
  * <p>
@@ -72,7 +75,7 @@ class QuartzServer : SchedulerListenerSupport {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    QuartzServer() {
+    this() {
     }
 
     /*
@@ -93,27 +96,25 @@ class QuartzServer : SchedulerListenerSupport {
         } catch (Exception ignore) {
         }
 
-        System.out.println("\n*** The scheduler successfully started.");
+        writeln("\n*** The scheduler successfully started.");
 
         if (console) {
-            System.out.println("\n");
-            System.out
-                    .println("The scheduler will now run until you type \"exit\"");
-            System.out
-                    .println("   If it was configured to export itself via RMI,");
-            System.out.println("   then other process may now use it.");
+            writeln("\n");
+            writeln("The scheduler will now run until you type \"exit\"");
+            writeln("   If it was configured to export itself via RMI,");
+            writeln("   then other process may now use it.");
 
             BufferedReader rdr = new BufferedReader(new InputStreamReader(
                     System.in));
 
             while (true) {
-                System.out.print("Type 'exit' to shutdown the server: ");
-                if ("exit"== rdr.readLine()) {
+                writeln("Type 'exit' to shutdown the server: ");
+                if ("exit" == rdr.readLine()) {
                     break;
                 }
             }
 
-            System.out.println("\n...Shutting down server...");
+            writeln("\n...Shutting down server...");
 
             sched.shutdown(true);
         }
@@ -155,7 +156,7 @@ class QuartzServer : SchedulerListenerSupport {
      */
     override
     void schedulerShutdown() {
-        System.out.println("\n*** The scheduler is now shutdown.");
+        writeln("\n*** The scheduler is now shutdown.");
         sched = null;
     }
 

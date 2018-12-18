@@ -18,10 +18,9 @@
 
 module hunt.quartz.core.QuartzSchedulerThread;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+// import java.util.Random;
+// 
 
 import hunt.quartz.JobPersistenceException;
 import hunt.quartz.SchedulerException;
@@ -31,6 +30,9 @@ import hunt.quartz.spi.JobStore;
 import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.spi.TriggerFiredResult;
+
+import hunt.container.ArrayList;
+import hunt.container.List;
 import hunt.logging;
 
 
@@ -58,20 +60,20 @@ class QuartzSchedulerThread : Thread {
 
     private QuartzSchedulerResources qsRsrcs;
 
-    private final Object sigLock = new Object();
+    private Object sigLock;
 
     private bool signaled;
     private long signaledNextFireTime;
 
     private bool paused;
 
-    private AtomicBoolean halted;
+    private shared bool halted;
 
-    private Random random = new Random(DateTimeHelper.currentTimeMillis());
+    // private Random random = new Random(DateTimeHelper.currentTimeMillis());
 
     // When the scheduler finds there is no current trigger to fire, how long
     // it should wait until checking again...
-    private static long DEFAULT_IDLE_WAIT_TIME = 30L * 1000L;
+    private enum long DEFAULT_IDLE_WAIT_TIME = 30L * 1000L;
 
     private long idleWaitTime = DEFAULT_IDLE_WAIT_TIME;
 
@@ -93,7 +95,7 @@ class QuartzSchedulerThread : Thread {
      * with normal priority.
      * </p>
      */
-    QuartzSchedulerThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs) {
+    this(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs) {
         this(qs, qsRsrcs, qsRsrcs.getMakeSchedulerThreadDaemon(), Thread.NORM_PRIORITY);
     }
 
@@ -104,13 +106,14 @@ class QuartzSchedulerThread : Thread {
      * attributes.
      * </p>
      */
-    QuartzSchedulerThread(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs, bool setDaemon, int threadPrio) {
+    this(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs, bool setDaemon, int threadPrio) {
         super(qs.getSchedulerThreadGroup(), qsRsrcs.getThreadName());
+        sigLock = new Object();
         this.qs = qs;
         this.qsRsrcs = qsRsrcs;
         this.setDaemon(setDaemon);
         if(qsRsrcs.isThreadsInheritInitializersClassLoadContext()) {
-            log.info("QuartzSchedulerThread Inheriting ContextClassLoader of thread: " ~ Thread.getThis().name());
+            info("QuartzSchedulerThread Inheriting ContextClassLoader of thread: " ~ Thread.getThis().name());
             this.setContextClassLoader(Thread.getThis().getContextClassLoader());
         }
 
@@ -120,7 +123,7 @@ class QuartzSchedulerThread : Thread {
         // state
         // so processing doesn't start yet...
         paused = true;
-        halted = new AtomicBoolean(false);
+        halted = false;
     }
 
     /*
@@ -133,7 +136,7 @@ class QuartzSchedulerThread : Thread {
 
     void setIdleWaitTime(long waitTime) {
         idleWaitTime = waitTime;
-        idleWaitVariablness = (int) (waitTime * 0.2);
+        idleWaitVariablness = cast(int) (waitTime * 0.2);
     }
 
     private long getRandomizedIdleWaitTime() {
@@ -286,8 +289,8 @@ class QuartzSchedulerThread : Thread {
                         triggers = qsRsrcs.getJobStore().acquireNextTriggers(
                                 now + idleWaitTime, Math.min(availThreadCount, qsRsrcs.getMaxBatchSize()), qsRsrcs.getBatchTimeWindow());
                         acquiresFailed = 0;
-                        if (log.isDebugEnabled())
-                            log.debug("batch acquisition of " ~ (triggers is null ? 0 : triggers.size()) ~ " triggers");
+                        version(HUNT_DEBUG)
+                            trace("batch acquisition of " ~ (triggers is null ? 0 : triggers.size()) ~ " triggers");
                     } catch (JobPersistenceException jpe) {
                         if (acquiresFailed == 0) {
                             qs.notifySchedulerListenersError(
@@ -300,7 +303,7 @@ class QuartzSchedulerThread : Thread {
                     } catch (RuntimeException e) {
                         if (acquiresFailed == 0) {
                             error("quartzSchedulerThreadLoop: RuntimeException "
-                                    +e.getMessage(), e);
+                                    ~ e.msg, e);
                         }
                         if (acquiresFailed < Integer.MAX_VALUE)
                             acquiresFailed++;
@@ -440,8 +443,8 @@ class QuartzSchedulerThread : Thread {
         qsRsrcs = null;
     }
 
-    private static final long MIN_DELAY = 20;
-    private static final long MAX_DELAY = 600000;
+    private enum long MIN_DELAY = 20;
+    private enum long MAX_DELAY = 600000;
 
     private static long computeDelayForRepeatedErrors(JobStore jobStore, int acquiresFailed) {
         long delay;
@@ -467,7 +470,7 @@ class QuartzSchedulerThread : Thread {
             List!(OperableTrigger) triggers, long triggerTime) {
         if (isCandidateNewTimeEarlierWithinReason(triggerTime, true)) {
             // above call does a clearSignaledSchedulingChange()
-            for (OperableTrigger trigger : triggers) {
+            foreach(OperableTrigger trigger ; triggers) {
                 qsRsrcs.getJobStore().releaseAcquiredTrigger(trigger);
             }
             triggers.clear();

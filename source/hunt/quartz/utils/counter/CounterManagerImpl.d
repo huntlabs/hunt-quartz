@@ -16,8 +16,8 @@
 
 module hunt.quartz.utils.counter.CounterManagerImpl;
 
-import java.util.ArrayList;
-import java.util.List;
+import hunt.container.ArrayList;
+import hunt.container.List;
 import java.util.Timer;
 
 import hunt.quartz.utils.counter.sampled.SampledCounter;
@@ -34,29 +34,30 @@ class CounterManagerImpl : CounterManager {
 
     private Timer timer;
     private bool shutdown;
-    private List!(Counter) counters = new ArrayList!(Counter)();
+    private List!(Counter) counters;
 
     /**
      * Constructor that accepts a timer that will be used for scheduling sampled
      * counter if any is created
      */
-    CounterManagerImpl(Timer timer) {
+    this(Timer timer) {
         if (timer is null) {
             throw new IllegalArgumentException("Timer cannot be null");
         }
         this.timer = timer;
+        counters = new ArrayList!(Counter)();
     }
 
     /**
      * {@inheritDoc}
      */
-    synchronized void shutdown(bool killTimer) {
+    void shutdown(bool killTimer) {
         if (shutdown) {
             return;
         }
         try {
             // shutdown the counters of this counterManager
-            for (Counter counter : counters) {
+            foreach(Counter counter ; counters) {
                 if (counter instanceof SampledCounter) {
                     ((SampledCounter) counter).shutdown();
                 }
@@ -71,7 +72,7 @@ class CounterManagerImpl : CounterManager {
     /**
      * {@inheritDoc}
      */
-    synchronized Counter createCounter(CounterConfig config) {
+    Counter createCounter(CounterConfig config) {
         if (shutdown) {
             throw new IllegalStateException("counter manager is shutdown");
         }
@@ -79,8 +80,8 @@ class CounterManagerImpl : CounterManager {
             throw new NullPointerException("config cannot be null");
         }
         Counter counter = config.createCounter();
-        if (counter instanceof SampledCounterImpl) {
-            SampledCounterImpl sampledCounter = (SampledCounterImpl) counter;
+        SampledCounterImpl sampledCounter = cast(SampledCounterImpl) counter;
+        if (sampledCounter !is null) {
             timer.schedule(sampledCounter.getTimerTask(), sampledCounter.getIntervalMillis(), sampledCounter.getIntervalMillis());
         }
         counters.add(counter);
@@ -91,8 +92,8 @@ class CounterManagerImpl : CounterManager {
      * {@inheritDoc}
      */
     void shutdownCounter(Counter counter) {
-        if (counter instanceof SampledCounter) {
-            SampledCounter sc = (SampledCounter) counter;
+        SampledCounter sc = cast(SampledCounter) counter;
+        if (sc !is null) {
             sc.shutdown();
         }
     }

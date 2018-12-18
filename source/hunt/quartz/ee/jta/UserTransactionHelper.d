@@ -74,7 +74,7 @@ class UserTransactionHelper {
     /**
      * Do not allow the creation of an all static utility class.
      */
-    private UserTransactionHelper() {
+    private this() {
     }
 
     /*
@@ -114,105 +114,103 @@ class UserTransactionHelper {
      * UserTransaction is properly cleaned up.
      */
     static void returnUserTransaction(UserTransaction userTransaction) {
-        if ((userTransaction !is null) && 
-            (userTransaction instanceof UserTransactionWithContext)) {
-            UserTransactionWithContext userTransactionWithContext = 
-                (UserTransactionWithContext)userTransaction;
-            
+        UserTransactionWithContext userTransactionWithContext = 
+            cast(UserTransactionWithContext)userTransaction;
+        if (userTransactionWithContext !is null)) {
             userTransactionWithContext.closeContext();
         }
     }
+}
 
+
+/**
+ * This class wraps a UserTransaction with the InitialContext that was used
+ * to look it up, so that when the UserTransaction is returned to the 
+ * UserTransactionHelper the InitialContext can be closed.
+ */
+private class UserTransactionWithContext : UserTransaction {
+    InitialContext context;
+    UserTransaction userTransaction;
+    
+    this() {
+        try {
+            context = new InitialContext();
+        } catch (Throwable t) {
+            throw new SchedulerException(
+                "UserTransactionHelper failed to create InitialContext to lookup/create UserTransaction.", t);
+        }
+        
+        try {
+            userTransaction = cast(UserTransaction)context.lookup(userTxURL);
+        } catch (Throwable t) {
+            closeContext();
+            throw new SchedulerException(
+                "UserTransactionHelper could not lookup/create UserTransaction.",
+                t);
+        }
+        
+        if (userTransaction is null) {
+            closeContext();
+            throw new SchedulerException(
+                "UserTransactionHelper could not lookup/create UserTransaction from the InitialContext.");
+        }
+    }
 
     /**
-     * This class wraps a UserTransaction with the InitialContext that was used
-     * to look it up, so that when the UserTransaction is returned to the 
-     * UserTransactionHelper the InitialContext can be closed.
+     * Close the InitialContext that was used to lookup/create the
+     * underlying UserTransaction.
      */
-    private static class UserTransactionWithContext : UserTransaction {
-        InitialContext context;
-        UserTransaction userTransaction;
-        
-        UserTransactionWithContext() {
-            try {
-                context = new InitialContext();
-            } catch (Throwable t) {
-                throw new SchedulerException(
-                    "UserTransactionHelper failed to create InitialContext to lookup/create UserTransaction.", t);
+    void closeContext() {
+        try {
+            if (context !is null) {
+                context.close();
             }
-            
-            try {
-                userTransaction = (UserTransaction)context.lookup(userTxURL);
-            } catch (Throwable t) {
+        } catch (Throwable t) {
+            warning("Failed to close InitialContext used to get a UserTransaction.", t);
+        }
+        context = null;
+    }
+
+    /**
+     * When we are being garbage collected, make sure we were properly
+     * returned to the UserTransactionHelper.
+     */
+    override
+    protected void finalize() {
+        try {
+            if (context !is null) {
+                warning("UserTransaction was never returned to the UserTransactionHelper.");
                 closeContext();
-                throw new SchedulerException(
-                    "UserTransactionHelper could not lookup/create UserTransaction.",
-                    t);
             }
-            
-            if (userTransaction is null) {
-                closeContext();
-                throw new SchedulerException(
-                    "UserTransactionHelper could not lookup/create UserTransaction from the InitialContext.");
-            }
+        } finally {
+            super.finalize();
         }
+    }
 
-        /**
-         * Close the InitialContext that was used to lookup/create the
-         * underlying UserTransaction.
-         */
-        void closeContext() {
-            try {
-                if (context !is null) {
-                    context.close();
-                }
-            } catch (Throwable t) {
-                warning("Failed to close InitialContext used to get a UserTransaction.", t);
-            }
-            context = null;
-        }
+    
+    // Wrapper methods that just delegate to the underlying UserTransaction
+    
+    void begin() {
+        userTransaction.begin();
+    }
 
-        /**
-         * When we are being garbage collected, make sure we were properly
-         * returned to the UserTransactionHelper.
-         */
-        override
-        protected void finalize() {
-            try {
-                if (context !is null) {
-                    warning("UserTransaction was never returned to the UserTransactionHelper.");
-                    closeContext();
-                }
-            } finally {
-                super.finalize();
-            }
-        }
+    void commit() {
+        userTransaction.commit();        
+    }
 
-        
-        // Wrapper methods that just delegate to the underlying UserTransaction
-        
-        void begin() {
-            userTransaction.begin();
-        }
+    void rollback() {
+        userTransaction.rollback();
+    }
 
-        void commit() {
-            userTransaction.commit();        
-        }
+    void setRollbackOnly() {
+        userTransaction.setRollbackOnly();
+    }
 
-        void rollback() {
-            userTransaction.rollback();
-        }
+    int getStatus() {
+        return userTransaction.getStatus();
+    }
 
-        void setRollbackOnly() {
-            userTransaction.setRollbackOnly();
-        }
-
-        int getStatus() {
-            return userTransaction.getStatus();
-        }
-
-        void setTransactionTimeout(int seconds) {
-            userTransaction.setTransactionTimeout(seconds);
-        }
+    void setTransactionTimeout(int seconds) {
+        userTransaction.setTransactionTimeout(seconds);
     }
 }

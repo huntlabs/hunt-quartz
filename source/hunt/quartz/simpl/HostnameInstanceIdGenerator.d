@@ -16,10 +16,13 @@
  */
 module hunt.quartz.simpl.HostnameInstanceIdGenerator;
 
-import java.net.InetAddress;
-
+// import java.net.InetAddress;
+import hunt.quartz.exception;
 import hunt.quartz.SchedulerException;
 import hunt.quartz.spi.InstanceIdGenerator;
+
+import std.socket;
+import std.exception;
 
 /**
  * <p>
@@ -40,9 +43,10 @@ import hunt.quartz.spi.InstanceIdGenerator;
 class HostnameInstanceIdGenerator : InstanceIdGenerator {
     string generateInstanceId() {
         try {
-            return InetAddress.getLocalHost().getHostName();
+            // return InetAddress.getLocalHost().getHostName();
+            return Socket.hostName();
         } catch (Exception e) {
-            throw new SchedulerException("Couldn't get host name!", e);
+            throw new SchedulerException("Couldn't get host name!", e.msg);
         }
     }
 }

@@ -17,10 +17,11 @@
 
 module hunt.quartz.xml.ValidationException;
 
-import java.util.ArrayList;
-import java.container.Collection;
-import java.container.Collections;
-import java.util.Iterator;
+import hunt.container.ArrayList;
+import hunt.container.Collection;
+import hunt.container.Collections;
+import hunt.container.Iterator;
+import hunt.string;
 
 /**
  * Reports JobSchedulingDataLoader validation exceptions.
@@ -38,7 +39,7 @@ class ValidationException : Exception {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private Collection!(Exception) validationExceptions = new ArrayList!(Exception)();
+    private Collection!(Exception) validationExceptions;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,7 +52,7 @@ class ValidationException : Exception {
     /**
      * Constructor for ValidationException.
      */
-    ValidationException() {
+    this() {
         super();
     }
 
@@ -61,7 +62,7 @@ class ValidationException : Exception {
      * @param message
      *          exception message.
      */
-    ValidationException(string message) {
+    this(string message) {
         super(message);
     }
 
@@ -71,7 +72,7 @@ class ValidationException : Exception {
      * @param errors
      *          collection of validation exceptions.
      */
-    ValidationException(Collection!(Exception) errors) {
+    this(Collection!(Exception) errors) {
         this();
         this.validationExceptions = Collections
                 .unmodifiableCollection(validationExceptions);
@@ -87,11 +88,15 @@ class ValidationException : Exception {
      * @param errors
      *          collection of validation exceptions.
      */
-    ValidationException(string message, Collection!(Exception) errors) {
+    this(string message, Collection!(Exception) errors) {
         this(message);
         this.validationExceptions = Collections
                 .unmodifiableCollection(validationExceptions);
         initCause(errors.iterator().next());
+    }
+
+    private void initialize() {
+        validationExceptions = new ArrayList!(Exception)();
     }
 
     /*

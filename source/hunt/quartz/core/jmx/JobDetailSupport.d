@@ -3,7 +3,7 @@ module hunt.quartz.core.jmx.JobDetailSupport;
 // import static javax.management.openmbean.SimpleType.BOOLEAN;
 // import static javax.management.openmbean.SimpleType.STRING;
 
-// import java.util.ArrayList;
+// import hunt.container.ArrayList;
 // import hunt.container.Map;
 
 // import javax.management.openmbean.CompositeData;
@@ -61,7 +61,7 @@ module hunt.quartz.core.jmx.JobDetailSupport;
 //         jobDetail.setGroup((string) cData.get(ITEM_NAMES[i++]));
 //         jobDetail.setDescription((string) cData.get(ITEM_NAMES[i++]));
 //         Class<?> jobClass = Class.forName((string) cData.get(ITEM_NAMES[i++]));
-//         @SuppressWarnings("unchecked")
+//         
 //         Class<? extends Job> jobClassTyped = (Class<? extends Job>)jobClass;
 //         jobDetail.setJobClass(jobClassTyped);
 //         jobDetail.setJobDataMap(JobDataMapSupport.newJobDataMap((TabularData) cData.get(ITEM_NAMES[i++])));
@@ -85,11 +85,11 @@ module hunt.quartz.core.jmx.JobDetailSupport;
 //         jobDetail.setGroup((string) attrMap.get(ITEM_NAMES[i++]));
 //         jobDetail.setDescription((string) attrMap.get(ITEM_NAMES[i++]));
 //         Class<?> jobClass = Class.forName((string) attrMap.get(ITEM_NAMES[i++]));
-//         @SuppressWarnings("unchecked")
+//         
 //         Class<? extends Job> jobClassTyped = (Class<? extends Job>)jobClass;
 //         jobDetail.setJobClass(jobClassTyped);
 //         if(attrMap.containsKey(ITEM_NAMES[i])) {
-//             @SuppressWarnings("unchecked")
+//             
 //             Map!(string, Object) map = (Map!(string, Object))attrMap.get(ITEM_NAMES[i]); 
 //             jobDetail.setJobDataMap(JobDataMapSupport.newJobDataMap(map));
 //         }
@@ -131,7 +131,7 @@ module hunt.quartz.core.jmx.JobDetailSupport;
 //         TabularData tData = new TabularDataSupport(TABULAR_TYPE);
 //         if (jobDetails !is null) {
 //             ArrayList!(CompositeData) list = new ArrayList!(CompositeData)();
-//             for (JobDetail jobDetail : jobDetails) {
+//             foreach(JobDetail jobDetail ; jobDetails) {
 //                 list.add(toCompositeData(jobDetail));
 //             }
 //             tData.putAll(list.toArray(new CompositeData[list.size()]));

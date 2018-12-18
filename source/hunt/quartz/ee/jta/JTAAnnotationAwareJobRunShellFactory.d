@@ -63,7 +63,7 @@ class JTAAnnotationAwareJobRunShellFactory : JobRunShellFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    JTAAnnotationAwareJobRunShellFactory() {
+    this() {
     }
 
     /*

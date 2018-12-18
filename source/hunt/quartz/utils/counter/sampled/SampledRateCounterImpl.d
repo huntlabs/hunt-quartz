@@ -23,7 +23,7 @@ module hunt.quartz.utils.counter.sampled.SampledRateCounterImpl;
  * @since 1.8
  * 
  */
-class SampledRateCounterImpl : SampledCounterImpl implements SampledRateCounter {
+class SampledRateCounterImpl : SampledCounterImpl, SampledRateCounter {
   
 
     private enum string OPERATION_NOT_SUPPORTED_MSG = "This operation is not supported. Use SampledCounter Or Counter instead";
@@ -36,14 +36,14 @@ class SampledRateCounterImpl : SampledCounterImpl implements SampledRateCounter 
      * 
      * @param config
      */
-    SampledRateCounterImpl(SampledRateCounterConfig config) {
+    this(SampledRateCounterConfig config) {
         super(config);
     }
 
     /**
      * {@inheritDoc}
      */
-    synchronized void setValue(long numerator, long denominator) {
+    void setValue(long numerator, long denominator) {
         this.numeratorValue = numerator;
         this.denominatorValue = denominator;
     }
@@ -51,7 +51,7 @@ class SampledRateCounterImpl : SampledCounterImpl implements SampledRateCounter 
     /**
      * {@inheritDoc}
      */
-    synchronized void increment(long numerator, long denominator) {
+    void increment(long numerator, long denominator) {
         this.numeratorValue += numerator;
         this.denominatorValue += denominator;
     }
@@ -59,7 +59,7 @@ class SampledRateCounterImpl : SampledCounterImpl implements SampledRateCounter 
     /**
      * {@inheritDoc}
      */
-    synchronized void decrement(long numerator, long denominator) {
+    void decrement(long numerator, long denominator) {
         this.numeratorValue -= numerator;
         this.denominatorValue -= denominator;
     }
@@ -67,14 +67,14 @@ class SampledRateCounterImpl : SampledCounterImpl implements SampledRateCounter 
     /**
      * {@inheritDoc}
      */
-    synchronized void setDenominatorValue(long newValue) {
+    void setDenominatorValue(long newValue) {
         this.denominatorValue = newValue;
     }
 
     /**
      * {@inheritDoc}
      */
-    synchronized void setNumeratorValue(long newValue) {
+    void setNumeratorValue(long newValue) {
         this.numeratorValue = newValue;
     }
 
@@ -82,7 +82,7 @@ class SampledRateCounterImpl : SampledCounterImpl implements SampledRateCounter 
      * {@inheritDoc}
      */
     override
-    synchronized long getValue() {
+    long getValue() {
         return denominatorValue == 0 ? 0 : (numeratorValue / denominatorValue);
     }
 
@@ -90,7 +90,7 @@ class SampledRateCounterImpl : SampledCounterImpl implements SampledRateCounter 
      * {@inheritDoc}
      */
     override
-    synchronized long getAndReset() {
+    long getAndReset() {
         long prevVal = getValue();
         setValue(0, 0);
         return prevVal;
@@ -110,7 +110,7 @@ class SampledRateCounterImpl : SampledCounterImpl implements SampledRateCounter 
      * throws {@link UnsupportedOperationException}
      */
     override
-    synchronized void setValue(long newValue) {
+    void setValue(long newValue) {
         throw new UnsupportedOperationException(OPERATION_NOT_SUPPORTED_MSG);
     }
 

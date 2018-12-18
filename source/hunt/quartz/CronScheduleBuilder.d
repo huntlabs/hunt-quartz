@@ -204,7 +204,7 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
         if (daysOfWeek is null || daysOfWeek.length == 0)
             throw new IllegalArgumentException(
                     "You must specify at least one day of week.");
-        for (int dayOfWeek : daysOfWeek)
+        foreach(int dayOfWeek ; daysOfWeek)
             DateBuilder.validateDayOfWeek(dayOfWeek);
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);

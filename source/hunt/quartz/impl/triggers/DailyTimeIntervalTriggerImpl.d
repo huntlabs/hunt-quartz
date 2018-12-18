@@ -16,9 +16,6 @@
  */
 module hunt.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 
-import hunt.time.util.Calendar;
-import std.datetime;
-import hunt.comtainer.Set;
 
 import hunt.quartz.DailyTimeIntervalScheduleBuilder;
 import hunt.quartz.DailyTimeIntervalTrigger;
@@ -31,6 +28,11 @@ import hunt.quartz.SchedulerException;
 import hunt.quartz.TimeOfDay;
 import hunt.quartz.Trigger;
 import hunt.quartz.DateBuilder.IntervalUnit;
+
+import hunt.time.util.Calendar;
+import hunt.comtainer.Set;
+
+import std.datetime;
 
 /**
  * A concrete implementation of DailyTimeIntervalTrigger that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>
@@ -72,7 +74,7 @@ import hunt.quartz.DateBuilder.IntervalUnit;
  * @author James House
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
-class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger) implements DailyTimeIntervalTrigger, CoreTrigger {
+class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger), DailyTimeIntervalTrigger, CoreTrigger {
     
     
     /*
@@ -82,7 +84,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger) 
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = hunt.time.util.Calendar.getInstance().get(hunt.time.util.Calendar.YEAR) + 100;
+    // private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = hunt.time.util.Calendar.getInstance().get(hunt.time.util.Calendar.YEAR) + 100;
+    private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = 2018 + 100;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

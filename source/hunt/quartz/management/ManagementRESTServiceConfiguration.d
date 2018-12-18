@@ -15,6 +15,7 @@
  */
 module hunt.quartz.management.ManagementRESTServiceConfiguration;
 
+import std.string;
 
 /**
  * Configuration class of management REST services.

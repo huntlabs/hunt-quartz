@@ -26,10 +26,10 @@ import hunt.quartz.utils.Key;
  *  
  * @author jhouse
  */
-class EverythingMatcher<T extends Key<?>> implements Matcher!(T) {
+class EverythingMatcher(T) : Matcher!(T) {
   
     
-    protected EverythingMatcher() {
+    protected this() {
     }
     
     /**
@@ -55,12 +55,12 @@ class EverythingMatcher<T extends Key<?>> implements Matcher!(T) {
         if(obj is null)
             return false;
         
-        return obj.getClass()== getClass();
+        return typeid(obj) == typeid(this);
     }
 
     override
-    size_t toHash() @trusted nothrow() {
-        return getClass().getName().hashCode();
+    size_t toHash() @trusted nothrow {
+        return toHash(typeid(this).name); // getClass().getName().toHash();
     }
 
     

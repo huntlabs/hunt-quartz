@@ -17,10 +17,11 @@
 
 module hunt.quartz.impl.calendar.AnnualCalendar;
 
-import java.util.ArrayList;
-import java.container.Collections;
+import hunt.container.ArrayList;
+import hunt.container.Collections;
+import hunt.container.Iterator;
+import hunt.time.util.Calendar;
 import hunt.util.Comparator;
-import java.util.Iterator;
 import std.datetime : TimeZone;
 
 import hunt.quartz.Calendar;
@@ -36,43 +37,46 @@ import hunt.quartz.Calendar;
  * 
  * @author Juergen Donnerstag
  */
-class AnnualCalendar : BaseCalendar implements Calendar,
-        Serializable {
+class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
 
 
-    private ArrayList<hunt.time.util.Calendar> excludeDays = new ArrayList<hunt.time.util.Calendar>();
+    private ArrayList!(hunt.time.util.Calendar) excludeDays;
 
     // true, if excludeDays is sorted
     private bool dataSorted = false;
 
-    AnnualCalendar() {
+    this() {
     }
 
-    AnnualCalendar(Calendar baseCalendar) {
+    this(Calendar baseCalendar) {
         super(baseCalendar);
     }
 
-    AnnualCalendar(TimeZone timeZone) {
+    this(TimeZone timeZone) {
         super(timeZone);
     }
 
-    AnnualCalendar(Calendar baseCalendar, TimeZone timeZone) {
+    this(Calendar baseCalendar, TimeZone timeZone) {
         super(baseCalendar, timeZone);
     }
 
-    override
-    Object clone() {
-        AnnualCalendar clone = (AnnualCalendar) super.clone();
-        clone.excludeDays = new ArrayList<hunt.time.util.Calendar>(excludeDays);
-        return clone;
+    private void initialize() {
+        excludeDays = new ArrayList!(hunt.time.util.Calendar)();
     }
+
+    // override
+    // Object clone() {
+    //     AnnualCalendar clone = (AnnualCalendar) super.clone();
+    //     clone.excludeDays = new ArrayList!(hunt.time.util.Calendar)(excludeDays);
+    //     return clone;
+    // }
 
     /**
      * <p>
      * Get the array which defines the exclude-value of each day of month
      * </p>
      */
-    ArrayList<hunt.time.util.Calendar> getDaysExcluded() {
+    ArrayList!(hunt.time.util.Calendar) getDaysExcluded() {
         return excludeDays;
     }
 
@@ -84,12 +88,11 @@ class AnnualCalendar : BaseCalendar implements Calendar,
     bool isDayExcluded(hunt.time.util.Calendar day) {
 
         if (day is null) {
-            throw new IllegalArgumentException(
-                    "Parameter day must not be null");
+            throw new IllegalArgumentException("Parameter day must not be null");
         }
 
          // Check baseCalendar first
-        if (! super.isTimeIncluded(day.getTime().getTime())) {
+        if (!super.isTimeIncluded(day.getTime().getTime())) {
          return true;
         } 
         
@@ -101,7 +104,7 @@ class AnnualCalendar : BaseCalendar implements Calendar,
             dataSorted = true;
         }
 
-        Iterator<hunt.time.util.Calendar> iter = excludeDays.iterator();
+        Iterator!(hunt.time.util.Calendar) iter = excludeDays.iterator();
         while (iter.hasNext()) {
             hunt.time.util.Calendar cl = (hunt.time.util.Calendar) iter.next();
 
@@ -130,9 +133,9 @@ class AnnualCalendar : BaseCalendar implements Calendar,
      * should contain <code>hunt.time.util.Calendar</code> objects. 
      * </p>
      */
-    void setDaysExcluded(ArrayList<hunt.time.util.Calendar> days) {
+    void setDaysExcluded(ArrayList!(hunt.time.util.Calendar) days) {
         if (days is null) {
-            excludeDays = new ArrayList<hunt.time.util.Calendar>();
+            excludeDays = new ArrayList!(hunt.time.util.Calendar)();
         } else {
             excludeDays = days;
         }
@@ -187,7 +190,7 @@ class AnnualCalendar : BaseCalendar implements Calendar,
         
         // Since there is no guarantee that the given day is in the arraylist with the exact same year
         // search for the object based on month and day of month in the list and remove it
-        Iterator<hunt.time.util.Calendar> iter = excludeDays.iterator();
+        Iterator!(hunt.time.util.Calendar) iter = excludeDays.iterator();
         while (iter.hasNext()) {
             hunt.time.util.Calendar cl = (hunt.time.util.Calendar) iter.next();
 
@@ -261,7 +264,7 @@ class AnnualCalendar : BaseCalendar implements Calendar,
     }
 }
 
-class CalendarComparator : Comparator<hunt.time.util.Calendar>, Serializable {
+class CalendarComparator : Comparator!(hunt.time.util.Calendar), Serializable {
   
     
     CalendarComparator() {

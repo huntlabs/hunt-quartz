@@ -21,7 +21,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
   /**
    * System property to read the instanceId from
    */
-  public enum string SYSTEM_PROPERTY = "hunt.quartz.scheduler.instanceId";
+  enum string SYSTEM_PROPERTY = "hunt.quartz.scheduler.instanceId";
 
   private string prepend = null;
   private string postpend = null;
@@ -33,7 +33,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * to {@link #SYSTEM_PROPERTY}.
    * @throws SchedulerException Shouldn't a value be found
    */
-  public string generateInstanceId() {
+  string generateInstanceId() {
     string property = System.getProperty(getSystemPropertyName());
     if(property is null) {
       throw new SchedulerException("No value for '" ~ SYSTEM_PROPERTY
@@ -51,7 +51,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * A string of text to prepend (add to the beginning) to the instanceId 
    * found in the system property.
    */
-  public string getPrepend() {
+  string getPrepend() {
     return prepend;
   }
 
@@ -61,7 +61,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * 
    * @param prepend the value to prepend, or null if none is desired.
    */
-  public void setPrepend(string prepend) {
+  void setPrepend(string prepend) {
     this.prepend = prepend is null ?  null  : prepend.trim();
   }
     
@@ -69,7 +69,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * A string of text to postpend (add to the end) to the instanceId 
    * found in the system property.
    */
-  public string getPostpend() {
+  string getPostpend() {
     return postpend;
   }
 
@@ -79,7 +79,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * 
    * @param postpend the value to postpend, or null if none is desired.
    */
-  public void setPostpend(string postpend) {
+  void setPostpend(string postpend) {
     this.postpend = postpend is null ?  null : postpend.trim();
   }
 
@@ -89,7 +89,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * Defaults to {@link #SYSTEM_PROPERTY}.
    * 
    */  
-  public string getSystemPropertyName() {
+  string getSystemPropertyName() {
     return systemPropertyName;
   }
 
@@ -100,7 +100,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * 
    * @param systemPropertyName the system property name
    */
-  public void setSystemPropertyName(string systemPropertyName) {
+  void setSystemPropertyName(string systemPropertyName) {
     this.systemPropertyName = systemPropertyName is null ? SYSTEM_PROPERTY : systemPropertyName.trim();
   }
   

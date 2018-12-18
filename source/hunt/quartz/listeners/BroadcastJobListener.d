@@ -15,9 +15,9 @@
  */
 module hunt.quartz.listeners.BroadcastJobListener;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import hunt.container.Iterator;
+import hunt.container.LinkedList;
+import hunt.container.List;
 
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.JobExecutionException;
@@ -51,7 +51,7 @@ class BroadcastJobListener : JobListener {
      *
      * @param name the name of this instance
      */
-    BroadcastJobListener(string name) {
+    this(string name) {
         if(name is null) {
             throw new IllegalArgumentException("Listener name cannot be null!");
         }
@@ -65,7 +65,7 @@ class BroadcastJobListener : JobListener {
      * @param name the name of this instance
      * @param listeners the initial List of JobListeners to broadcast to.
      */
-    BroadcastJobListener(string name, List!(JobListener) listeners) {
+    this(string name, List!(JobListener) listeners) {
         this(name);
         this.listeners.addAll(listeners);
     }

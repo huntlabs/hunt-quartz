@@ -17,8 +17,12 @@
 
 module hunt.quartz.utils.Key;
 
-import java.util.UUID;
+// import java.util.UUID;
 
+import hunt.lang.common;
+
+import std.format;
+import std.uuid;
 
 /**
  * <p>
@@ -27,7 +31,7 @@ import java.util.UUID;
  * 
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
-class Key!(T)  implements Serializable, Comparable!(Key!(T)) {
+class Key(T) : Comparable!(Key!(T)) {
   
 
     /**
@@ -35,8 +39,8 @@ class Key!(T)  implements Serializable, Comparable!(Key!(T)) {
      */
     enum string DEFAULT_GROUP = "DEFAULT";
 
-    private final string name;
-    private final string group;
+    private string name;
+    private string group;
     
     
     /*
@@ -55,7 +59,7 @@ class Key!(T)  implements Serializable, Comparable!(Key!(T)) {
      * @param group
      *          the group
      */
-    Key(string name, string group) {
+    this(string name, string group) {
         if(name is null)
             throw new IllegalArgumentException("Name cannot be null.");
         this.name = name;
@@ -105,28 +109,28 @@ class Key!(T)  implements Serializable, Comparable!(Key!(T)) {
      */
     override
     string toString() {
-        return getGroup() + '.' + getName();
+        return getGroup() ~ "." ~ getName();
     }
 
     override
-    size_t toHash() @trusted nothrow() {
-        final int prime = 31;
+    size_t toHash() @trusted nothrow {
+        int prime = 31;
         int result = 1;
-        result = prime * result + ((group is null) ? 0 : group.hashCode());
-        result = prime * result + ((name is null) ? 0 : name.hashCode());
+        result = prime * result + ((group is null) ? 0 : group.toHash());
+        result = prime * result + ((name is null) ? 0 : name.toHash());
         return result;
     }
 
     override
     bool equals(Object obj) {
-        if (this == obj)
+        if (this is obj)
             return true;
         if (obj is null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        @SuppressWarnings("unchecked")
-        Key!(T) other = (Key!(T)) obj;
+        
+        Key!(T) other = cast(Key!(T)) obj;
         if (group is null) {
             if (other.group !is null)
                 return false;
@@ -140,7 +144,7 @@ class Key!(T)  implements Serializable, Comparable!(Key!(T)) {
         return true;
     }
 
-    int compareTo(Key!(T) o) {
+    int opCmp(Key!(T) o) {
         
         if(group== DEFAULT_GROUP && !o.group== DEFAULT_GROUP)
             return -1;
@@ -151,7 +155,7 @@ class Key!(T)  implements Serializable, Comparable!(Key!(T)) {
         if(r != 0)
             return r;
         
-        return name.compareTo(o.getName());
+        return name == o.getName();
     }
     
     static string createUniqueName(string group) {
@@ -161,6 +165,6 @@ class Key!(T)  implements Serializable, Comparable!(Key!(T)) {
         string n1 = UUID.randomUUID().toString();
         string n2 = UUID.nameUUIDFromBytes(group.getBytes()).toString();
         
-        return string.format("%s-%s", n2.substring(24), n1);
+        return format("%s-%s", n2[24 .. $], n1);
     }
 }

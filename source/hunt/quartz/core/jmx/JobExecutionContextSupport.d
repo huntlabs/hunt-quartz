@@ -6,8 +6,8 @@ module hunt.quartz.core.jmx.JobExecutionContextSupport;
 // import static javax.management.openmbean.SimpleType.LONG;
 // import static javax.management.openmbean.SimpleType.STRING;
 
-// import java.util.ArrayList;
-// import java.util.List;
+// import hunt.container.ArrayList;
+// import hunt.container.List;
 
 // import javax.management.openmbean.CompositeData;
 // import javax.management.openmbean.CompositeDataSupport;
@@ -90,7 +90,7 @@ module hunt.quartz.core.jmx.JobExecutionContextSupport;
 //             final List!(JobExecutionContext) executingJobs)
 // {
 //         List!(CompositeData) list = new ArrayList!(CompositeData)();
-//         for (JobExecutionContext executingJob : executingJobs) {
+//         foreach(JobExecutionContext executingJob ; executingJobs) {
 //             list.add(toCompositeData(executingJob));
 //         }
 //         TabularData td = new TabularDataSupport(TABULAR_TYPE);

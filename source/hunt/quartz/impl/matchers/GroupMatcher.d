@@ -25,7 +25,7 @@ import hunt.quartz.utils.Key;
  *  
  * @author jhouse
  */
-class GroupMatcher<T extends Key<?>> extends StringMatcher!(T) {
+class GroupMatcher(T) : StringMatcher!(T) {
   
 
     protected GroupMatcher(string compareTo, StringOperatorName compareWith) {
@@ -35,7 +35,7 @@ class GroupMatcher<T extends Key<?>> extends StringMatcher!(T) {
     /**
      * Create a GroupMatcher that matches groups equaling the given string.
      */
-    static <T extends Key!(T)> GroupMatcher!(T) groupEquals(string compareTo) {
+    static GroupMatcher!(T) groupEquals(T)(string compareTo) {
         return new GroupMatcher!(T)(compareTo, StringOperatorName.EQUALS);
     }
 
@@ -56,7 +56,7 @@ class GroupMatcher<T extends Key<?>> extends StringMatcher!(T) {
     /**
      * Create a GroupMatcher that matches groups starting with the given string.
      */
-    static <T extends Key!(T)> GroupMatcher!(T) groupStartsWith(string compareTo) {
+    static GroupMatcher!(T) groupStartsWith(T)(string compareTo) {
         return new GroupMatcher!(T)(compareTo, StringOperatorName.STARTS_WITH);
     }
 
@@ -77,7 +77,7 @@ class GroupMatcher<T extends Key<?>> extends StringMatcher!(T) {
     /**
      * Create a GroupMatcher that matches groups ending with the given string.
      */
-    static <T extends Key!(T)> GroupMatcher!(T) groupEndsWith(string compareTo) {
+    static GroupMatcher!(T) groupEndsWith(T)(string compareTo) {
         return new GroupMatcher!(T)(compareTo, StringOperatorName.ENDS_WITH);
     }
 
@@ -98,7 +98,7 @@ class GroupMatcher<T extends Key<?>> extends StringMatcher!(T) {
     /**
      * Create a GroupMatcher that matches groups containing the given string.
      */
-    static <T extends Key!(T)> GroupMatcher!(T) groupContains(string compareTo) {
+    static GroupMatcher!(T) groupContains(T)(string compareTo) {
         return new GroupMatcher!(T)(compareTo, StringOperatorName.CONTAINS);
     }
 
@@ -119,7 +119,7 @@ class GroupMatcher<T extends Key<?>> extends StringMatcher!(T) {
     /**
      * Create a GroupMatcher that matches groups starting with the given string.
      */
-    static <T extends Key!(T)> GroupMatcher!(T) anyGroup() {
+    static GroupMatcher!(T) anyGroup(T)() {
         return new GroupMatcher!(T)("", StringOperatorName.ANYTHING);
     }
 

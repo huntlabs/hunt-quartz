@@ -194,7 +194,7 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
 
                 // execute the job
                 try {
-                    log.debug("Calling execute on job " ~ jobDetail.getKey());
+                    trace("Calling execute on job " ~ jobDetail.getKey());
                     job.execute(jec);
                     endTime = DateTimeHelper.currentTimeMillis();
                 } catch (JobExecutionException jee) {

@@ -25,17 +25,17 @@ import hunt.quartz.utils.Key;
  *  
  * @author jhouse
  */
-class NameMatcher<T extends Key<?>> extends StringMatcher!(T) {
+class NameMatcher(T) : StringMatcher!(T) {
   
 
-    protected NameMatcher(string compareTo, StringOperatorName compareWith) {
+    protected this(string compareTo, StringOperatorName compareWith) {
         super(compareTo, compareWith);
     }
     
     /**
      * Create a NameMatcher that matches names equaling the given string.
      */
-    static <T extends Key<?>> NameMatcher!(T) nameEquals(string compareTo) {
+    static NameMatcher!(T) nameEquals(T)(string compareTo) {
         return new NameMatcher!(T)(compareTo, StringOperatorName.EQUALS);
     }
 
@@ -56,7 +56,7 @@ class NameMatcher<T extends Key<?>> extends StringMatcher!(T) {
     /**
      * Create a NameMatcher that matches names starting with the given string.
      */
-    static <U extends Key<?>> NameMatcher!(U) nameStartsWith(string compareTo) {
+    static NameMatcher!(U) nameStartsWith(U)(string compareTo) {
         return new NameMatcher!(U)(compareTo, StringOperatorName.STARTS_WITH);
     }
 
@@ -77,7 +77,7 @@ class NameMatcher<T extends Key<?>> extends StringMatcher!(T) {
     /**
      * Create a NameMatcher that matches names ending with the given string.
      */
-    static <U extends Key<?>> NameMatcher!(U) nameEndsWith(string compareTo) {
+    static NameMatcher!(U) nameEndsWith(U)(string compareTo) {
         return new NameMatcher!(U)(compareTo, StringOperatorName.ENDS_WITH);
     }
 
@@ -98,7 +98,7 @@ class NameMatcher<T extends Key<?>> extends StringMatcher!(T) {
     /**
      * Create a NameMatcher that matches names containing the given string.
      */
-    static <U extends Key<?>> NameMatcher!(U) nameContains(string compareTo) {
+    static NameMatcher!(U) nameContains(U)(string compareTo) {
         return new NameMatcher!(U)(compareTo, StringOperatorName.CONTAINS);
     }
 

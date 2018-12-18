@@ -17,11 +17,6 @@
 
 module hunt.quartz.impl.StdScheduler;
 
-import std.datetime;
-import java.util.List;
-import hunt.container.Map;
-import hunt.comtainer.Set;
-
 import hunt.quartz.Calendar;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobDetail;
@@ -40,6 +35,11 @@ import hunt.quartz.core.QuartzScheduler;
 import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.spi.JobFactory;
 
+import hunt.container.List;
+import hunt.container.Map;
+import hunt.comtainer.Set;
+
+import std.datetime;
 /**
  * <p>
  * An implementation of the <code>Scheduler</code> interface that directly
@@ -78,7 +78,7 @@ class StdScheduler : Scheduler {
      * <code>QuartzScheduler</code> instance, and with the given <code>SchedulingContext</code>.
      * </p>
      */
-    StdScheduler(QuartzScheduler sched) {
+    this(QuartzScheduler sched) {
         this.sched = sched;
     }
 

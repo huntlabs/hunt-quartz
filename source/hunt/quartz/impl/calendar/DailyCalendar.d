@@ -1,9 +1,9 @@
 module hunt.quartz.impl.calendar.DailyCalendar;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
+// import java.text.NumberFormat;
+import hunt.container.ArrayList;
 import hunt.time.util.Calendar;
-import java.util.StringTokenizer;
+import hunt.string.StringTokenizer;
 import std.datetime : TimeZone;
 
 /**
@@ -79,7 +79,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTime   a string representing the ending time for the
      *                          the time range
      */
-    DailyCalendar(string rangeStartingTime,
+    this(string rangeStartingTime,
                          string rangeEndingTime) {
         super();
         setTimeRange(rangeStartingTime, rangeEndingTime);
@@ -119,7 +119,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTime   a string representing the ending time for the
      *                          time range
      */
-    DailyCalendar(hunt.quartz.Calendar baseCalendar,
+    this(hunt.quartz.Calendar baseCalendar,
                          string rangeStartingTime,
                          string rangeEndingTime) {
         super(baseCalendar);
@@ -157,7 +157,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingMillis      the millisecond of the start of the time 
      *                               range
      */
-    DailyCalendar(int rangeStartingHourOfDay,
+    this(int rangeStartingHourOfDay,
                          int rangeStartingMinute,
                          int rangeStartingSecond,
                          int rangeStartingMillis,
@@ -212,7 +212,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingMillis      the millisecond of the start of the time 
      *                               range
      */
-    DailyCalendar(hunt.quartz.Calendar baseCalendar,
+    this(hunt.quartz.Calendar baseCalendar,
                          int rangeStartingHourOfDay,
                          int rangeStartingMinute,
                          int rangeStartingSecond,
@@ -259,7 +259,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingCalendar   a hunt.time.util.Calendar representing the ending
      *                              time for the time range
      */
-    DailyCalendar(
+    this(
                          Calendar rangeStartingCalendar,
                          Calendar rangeEndingCalendar) {
         super();
@@ -296,7 +296,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingCalendar   a hunt.time.util.Calendar representing the ending
      *                              time for the time range
      */
-    DailyCalendar(hunt.quartz.Calendar baseCalendar,
+    this(hunt.quartz.Calendar baseCalendar,
                          Calendar rangeStartingCalendar,
                          Calendar rangeEndingCalendar) {
         super(baseCalendar);
@@ -332,7 +332,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    DailyCalendar(long rangeStartingTimeInMillis,
+    this(long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
         super();
         setTimeRange(rangeStartingTimeInMillis, 
@@ -372,7 +372,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    DailyCalendar(hunt.quartz.Calendar baseCalendar,
+    this(hunt.quartz.Calendar baseCalendar,
                          long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
         super(baseCalendar);
@@ -403,7 +403,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    DailyCalendar(TimeZone timeZone,
+    this(TimeZone timeZone,
                          long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
         super(timeZone);
@@ -438,7 +438,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    DailyCalendar(hunt.quartz.Calendar baseCalendar,
+    this(hunt.quartz.Calendar baseCalendar,
                          TimeZone timeZone,
                          long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
@@ -447,11 +447,11 @@ class DailyCalendar : BaseCalendar {
                      rangeEndingTimeInMillis);
     }
 
-    override
-    Object clone() {
-        DailyCalendar clone = (DailyCalendar) super.clone();
-        return clone;
-    }
+    // override
+    // Object clone() {
+    //     DailyCalendar clone = (DailyCalendar) super.clone();
+    //     return clone;
+    // }
     
     /**
      * Determines whether the given time (in milliseconds) is 'included' by the

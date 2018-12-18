@@ -17,130 +17,130 @@
 
 module hunt.quartz.utils.DBConnectionManager;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
+// import java.sql.Connection;
+// import java.sql.SQLException;
+// import hunt.container.HashMap;
 
-/**
- * <p>
- * Manages a collection of ConnectionProviders, and provides transparent access
- * to their connections.
- * </p>
- * 
- * @see ConnectionProvider
- * @see PoolingConnectionProvider
- * @see JNDIConnectionProvider
- * @see hunt.quartz.utils.weblogic.WeblogicConnectionProvider
- * 
- * @author James House
- * @author Sharada Jambula
- * @author Mohammad Rezaei
- */
-class DBConnectionManager {
+// /**
+//  * <p>
+//  * Manages a collection of ConnectionProviders, and provides transparent access
+//  * to their connections.
+//  * </p>
+//  * 
+//  * @see ConnectionProvider
+//  * @see PoolingConnectionProvider
+//  * @see JNDIConnectionProvider
+//  * @see hunt.quartz.utils.weblogic.WeblogicConnectionProvider
+//  * 
+//  * @author James House
+//  * @author Sharada Jambula
+//  * @author Mohammad Rezaei
+//  */
+// class DBConnectionManager {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constants.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Constants.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    enum string DB_PROPS_PREFIX = "hunt.quartz.db.";
+//     enum string DB_PROPS_PREFIX = "hunt.quartz.db.";
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Data members.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    private static DBConnectionManager instance = new DBConnectionManager();
+//     private static DBConnectionManager instance = new DBConnectionManager();
 
-    private HashMap!(string, ConnectionProvider) providers = new HashMap!(string, ConnectionProvider)();
+//     private HashMap!(string, ConnectionProvider) providers = new HashMap!(string, ConnectionProvider)();
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constructors.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Constructors.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    /**
-     * <p>
-     * Private constructor
-     * </p>
-     *  
-     */
-    private DBConnectionManager() {
-    }
+//     /**
+//      * <p>
+//      * Private constructor
+//      * </p>
+//      *  
+//      */
+//     private DBConnectionManager() {
+//     }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Interface.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    void addConnectionProvider(string dataSourceName,
-            ConnectionProvider provider) {
-        this.providers.put(dataSourceName, provider);
-    }
+//     void addConnectionProvider(string dataSourceName,
+//             ConnectionProvider provider) {
+//         this.providers.put(dataSourceName, provider);
+//     }
 
-    /**
-     * Get a database connection from the DataSource with the given name.
-     * 
-     * @return a database connection
-     * @exception SQLException
-     *              if an error occurs, or there is no DataSource with the
-     *              given name.
-     */
-    Connection getConnection(string dsName) {
-        ConnectionProvider provider = providers.get(dsName);
-        if (provider is null) {
-            throw new SQLException("There is no DataSource named '"
-                    + dsName ~ "'");
-        }
+//     /**
+//      * Get a database connection from the DataSource with the given name.
+//      * 
+//      * @return a database connection
+//      * @exception SQLException
+//      *              if an error occurs, or there is no DataSource with the
+//      *              given name.
+//      */
+//     Connection getConnection(string dsName) {
+//         ConnectionProvider provider = providers.get(dsName);
+//         if (provider is null) {
+//             throw new SQLException("There is no DataSource named '"
+//                     + dsName ~ "'");
+//         }
 
-        return provider.getConnection();
-    }
+//         return provider.getConnection();
+//     }
 
-    /**
-     * Get the class instance.
-     * 
-     * @return an instance of this class
-     */
-    static DBConnectionManager getInstance() {
-        // since the instance variable is initialized at class loading time,
-        // it's not necessary to synchronize this method */
-        return instance;
-    }
+//     /**
+//      * Get the class instance.
+//      * 
+//      * @return an instance of this class
+//      */
+//     static DBConnectionManager getInstance() {
+//         // since the instance variable is initialized at class loading time,
+//         // it's not necessary to synchronize this method */
+//         return instance;
+//     }
 
-    /**
-     * Shuts down database connections from the DataSource with the given name,
-     * if applicable for the underlying provider.
-     *
-     * @exception SQLException
-     *              if an error occurs, or there is no DataSource with the
-     *              given name.
-     */
-    void shutdown(string dsName) {
+//     /**
+//      * Shuts down database connections from the DataSource with the given name,
+//      * if applicable for the underlying provider.
+//      *
+//      * @exception SQLException
+//      *              if an error occurs, or there is no DataSource with the
+//      *              given name.
+//      */
+//     void shutdown(string dsName) {
 
-        ConnectionProvider provider = (ConnectionProvider) providers
-        .get(dsName);
-        if (provider is null) {
-            throw new SQLException("There is no DataSource named '"
-                    + dsName ~ "'");
-        }
+//         ConnectionProvider provider = (ConnectionProvider) providers
+//         .get(dsName);
+//         if (provider is null) {
+//             throw new SQLException("There is no DataSource named '"
+//                     + dsName ~ "'");
+//         }
 
-        provider.shutdown();
+//         provider.shutdown();
 
-    }
+//     }
 
-    ConnectionProvider getConnectionProvider(string key) {
-        return providers.get(key);
-    }
-}
+//     ConnectionProvider getConnectionProvider(string key) {
+//         return providers.get(key);
+//     }
+// }

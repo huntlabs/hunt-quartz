@@ -33,8 +33,7 @@ import hunt.quartz.Calendar;
  *
  * @author Juergen Donnerstag
  */
-class MonthlyCalendar : BaseCalendar implements Calendar,
-        Serializable {
+class MonthlyCalendar : BaseCalendar, Calendar {
 
 
     private enum int MAX_DAYS_IN_MONTH = 31;
@@ -46,31 +45,31 @@ class MonthlyCalendar : BaseCalendar implements Calendar,
     // Will be set to true, if all week days are excluded
     private bool excludeAll = false;
 
-    MonthlyCalendar() {
+    this() {
         this(null, null);
     }
 
-    MonthlyCalendar(Calendar baseCalendar) {
+    this(Calendar baseCalendar) {
         this(baseCalendar, null);
     }
 
-    MonthlyCalendar(TimeZone timeZone) {
+    this(TimeZone timeZone) {
         this(null, timeZone);
     }
 
-    MonthlyCalendar(Calendar baseCalendar, TimeZone timeZone) {
+    this(Calendar baseCalendar, TimeZone timeZone) {
         super(baseCalendar, timeZone);
 
         // all days are included by default
         excludeAll = areAllDaysExcluded();
     }
 
-    override
-    Object clone() {
-        MonthlyCalendar clone = (MonthlyCalendar) super.clone();
-        clone.excludeDays = excludeDays.clone();
-        return clone;
-    }
+    // override
+    // Object clone() {
+    //     MonthlyCalendar clone = (MonthlyCalendar) super.clone();
+    //     clone.excludeDays = excludeDays.clone();
+    //     return clone;
+    // }
 
     /**
      * <p>
@@ -93,7 +92,7 @@ class MonthlyCalendar : BaseCalendar implements Calendar,
     bool isDayExcluded(int day) {
         if ((day < 1) || (day > MAX_DAYS_IN_MONTH)) {
             throw new IllegalArgumentException(
-                "The day parameter must be in the range of 1 to " ~ MAX_DAYS_IN_MONTH);
+                "The day parameter must be in the range of 1 to " ~ MAX_DAYS_IN_MONTH.to!string());
         }
 
         return excludeDays[day - 1];
@@ -113,7 +112,7 @@ class MonthlyCalendar : BaseCalendar implements Calendar,
 
         if (days.length < MAX_DAYS_IN_MONTH) {
             throw new IllegalArgumentException(
-                "The days parameter must have a length of at least " ~ MAX_DAYS_IN_MONTH ~ " elements.");
+                "The days parameter must have a length of at least " ~ MAX_DAYS_IN_MONTH.to!string() ~ " elements.");
         }
 
         excludeDays = days;
@@ -131,7 +130,7 @@ class MonthlyCalendar : BaseCalendar implements Calendar,
     void setDayExcluded(int day, bool exclude) {
         if ((day < 1) || (day > MAX_DAYS_IN_MONTH)) {
             throw new IllegalArgumentException(
-                "The day parameter must be in the range of 1 to " ~ MAX_DAYS_IN_MONTH);
+                "The day parameter must be in the range of 1 to " ~ MAX_DAYS_IN_MONTH.to!string());
         }
 
         excludeDays[day - 1] = exclude;

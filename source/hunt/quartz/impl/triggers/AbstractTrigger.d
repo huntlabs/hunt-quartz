@@ -18,8 +18,6 @@
 
 module hunt.quartz.impl.triggers.AbstractTrigger;
 
-import std.datetime;
-
 import hunt.quartz.Calendar;
 import hunt.quartz.CronTrigger;
 import hunt.quartz.JobDataMap;
@@ -35,6 +33,10 @@ import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.TriggerUtils;
 import hunt.quartz.spi.OperableTrigger;
+
+import hunt.lang.exception;
+import std.datetime;
+
 
 
 /**
@@ -61,7 +63,7 @@ import hunt.quartz.spi.OperableTrigger;
  * @author James House
  * @author Sharada Jambula
  */
-abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
+abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
 
 
     /*
@@ -84,7 +86,7 @@ abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
 
     private JobDataMap jobDataMap;
 
-    @SuppressWarnings("unused")
+    
     private bool volatility = false; // still here for serialization backward compatibility
 
     private string calendarName = null;
@@ -95,7 +97,7 @@ abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
 
     private int priority = DEFAULT_PRIORITY;
 
-    private transient TriggerKey key = null;
+    private TriggerKey key = null;
 
     /*
     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,7 +121,7 @@ abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
      * {@link Scheduler}.
      * </p>
      */
-    AbstractTrigger() {
+    this() {
         // do nothing...
     }
 
@@ -137,7 +139,7 @@ abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
      * @exception IllegalArgumentException
      *              if name is null or empty, or the group is an empty string.
      */
-    AbstractTrigger(string name) {
+    this(string name) {
         setName(name);
         setGroup(null);
     }
@@ -158,7 +160,7 @@ abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
      * @exception IllegalArgumentException
      *              if name is null or empty, or the group is an empty string.
      */
-    AbstractTrigger(string name, string group) {
+    this(string name, string group) {
         setName(name);
         setGroup(group);
     }
@@ -173,7 +175,7 @@ abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
      * @exception IllegalArgumentException
      *              if name is null or empty, or the group is an empty string.
      */
-    AbstractTrigger(string name, string group, string jobName, string jobGroup) {
+    this(string name, string group, string jobName, string jobGroup) {
         setName(name);
         setGroup(group);
         setJobName(jobName);
@@ -845,11 +847,11 @@ abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
 
 
     override
-    size_t toHash() @trusted nothrow() {
+    size_t toHash() @trusted nothrow {
         if(getKey() is null)
-            return super.hashCode();
+            return super.toHash();
         
-        return getKey().hashCode();
+        return getKey().toHash();
     }
 
     override

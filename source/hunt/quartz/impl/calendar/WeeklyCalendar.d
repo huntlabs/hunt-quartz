@@ -33,8 +33,7 @@ import hunt.quartz.Calendar;
  *
  * @author Juergen Donnerstag
  */
-class WeeklyCalendar : BaseCalendar implements Calendar,
-        Serializable {
+class WeeklyCalendar : BaseCalendar, Calendar {
 
     // An array to store the week days which are to be excluded.
     // hunt.time.util.Calendar.MONDAY etc. are used as index.
@@ -43,19 +42,19 @@ class WeeklyCalendar : BaseCalendar implements Calendar,
     // Will be set to true, if all week days are excluded
     private bool excludeAll = false;
 
-    WeeklyCalendar() {
+    this() {
         this(null, null);
     }
 
-    WeeklyCalendar(Calendar baseCalendar) {
+    this(Calendar baseCalendar) {
         this(baseCalendar, null);
     }
 
-    WeeklyCalendar(TimeZone timeZone) {
+    this(TimeZone timeZone) {
         super(null, timeZone);
     }
 
-    WeeklyCalendar(Calendar baseCalendar, TimeZone timeZone) {
+    this(Calendar baseCalendar, TimeZone timeZone) {
         super(baseCalendar, timeZone);
 
         excludeDays[hunt.time.util.Calendar.SUNDAY] = true;

@@ -41,7 +41,7 @@ class SampledCounterConfig : CounterConfig {
      * @param isResetOnSample
      *            true if the counter should be reset to 0 upon each sample
      */
-    SampledCounterConfig(int intervalSecs, int historySize, bool isResetOnSample, long initialValue) {
+    this(int intervalSecs, int historySize, bool isResetOnSample, long initialValue) {
         super(initialValue);
         if (intervalSecs < 1) {
             throw new IllegalArgumentException("Interval (" ~ intervalSecs ~ ") must be greater than or equal to 1");

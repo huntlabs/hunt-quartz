@@ -16,26 +16,29 @@ import hunt.quartz.utils.counter.sampled.SampledCounter;
 import hunt.quartz.utils.counter.sampled.SampledCounterConfig;
 import hunt.quartz.utils.counter.sampled.SampledRateCounterConfig;
 
-class SampledStatisticsImpl : SchedulerListenerSupport implements SampledStatistics, JobListener, SchedulerListener {
-    @SuppressWarnings("unused")
-    private final QuartzScheduler scheduler;
+class SampledStatisticsImpl : SchedulerListenerSupport, SampledStatistics, JobListener, SchedulerListener {
+    private QuartzScheduler scheduler;
     
     private enum string NAME = "QuartzSampledStatistics";
     
     private enum int DEFAULT_HISTORY_SIZE = 30;
     private enum int DEFAULT_INTERVAL_SECS = 1;
-    private final static SampledCounterConfig DEFAULT_SAMPLED_COUNTER_CONFIG = new SampledCounterConfig(DEFAULT_INTERVAL_SECS,
-            DEFAULT_HISTORY_SIZE, true, 0L);
-    @SuppressWarnings("unused")
-    private final static SampledRateCounterConfig DEFAULT_SAMPLED_RATE_COUNTER_CONFIG = new SampledRateCounterConfig(DEFAULT_INTERVAL_SECS,
-            DEFAULT_HISTORY_SIZE, true);
+    private __gshared SampledCounterConfig DEFAULT_SAMPLED_COUNTER_CONFIG;
+
+    // private __gshared SampledRateCounterConfig DEFAULT_SAMPLED_RATE_COUNTER_CONFIG = new SampledRateCounterConfig(DEFAULT_INTERVAL_SECS,
+    //         DEFAULT_HISTORY_SIZE, true);
 
     private CounterManager counterManager;
-    private final SampledCounter jobsScheduledCount;
-    private final SampledCounter jobsExecutingCount;
-    private final SampledCounter jobsCompletedCount;
+    private SampledCounter jobsScheduledCount;
+    private SampledCounter jobsExecutingCount;
+    private SampledCounter jobsCompletedCount;
+
+    shared static this() {
+        DEFAULT_SAMPLED_COUNTER_CONFIG = new SampledCounterConfig(DEFAULT_INTERVAL_SECS,
+            DEFAULT_HISTORY_SIZE, true, 0L);
+    }
     
-    SampledStatisticsImpl(QuartzScheduler scheduler) {
+    this(QuartzScheduler scheduler) {
         this.scheduler = scheduler;
         
         counterManager = new CounterManagerImpl(new Timer(NAME+"Timer"));
@@ -52,7 +55,7 @@ class SampledStatisticsImpl : SchedulerListenerSupport implements SampledStatist
     }
     
     private SampledCounter createSampledCounter(CounterConfig defaultCounterConfig) {
-        return (SampledCounter) counterManager.createCounter(defaultCounterConfig);
+        return cast(SampledCounter) counterManager.createCounter(defaultCounterConfig);
     }
     
     /**

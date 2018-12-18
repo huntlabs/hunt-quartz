@@ -17,10 +17,11 @@
 
 module hunt.quartz.impl.calendar.BaseCalendar;
 
-import std.datetime;
-import std.datetime : TimeZone;
-
 import hunt.quartz.Calendar;
+
+import hunt.time.util.Calendar;
+
+import std.datetime;
 
 /**
  * <p>
@@ -52,10 +53,10 @@ class BaseCalendar : Calendar, Serializable, Cloneable {
 
     private TimeZone timeZone;
 
-    BaseCalendar() {
+    this() {
     }
 
-    BaseCalendar(Calendar baseCalendar) {
+    this(Calendar baseCalendar) {
         setBaseCalendar(baseCalendar);
     }
 
@@ -63,7 +64,7 @@ class BaseCalendar : Calendar, Serializable, Cloneable {
      * @param timeZone The time zone to use for this Calendar, <code>null</code>
      * if <code>{@link TimeZone#getDefault()}</code> should be used
      */
-    BaseCalendar(TimeZone timeZone) {
+    this(TimeZone timeZone) {
         setTimeZone(timeZone);
     }
 
@@ -71,25 +72,25 @@ class BaseCalendar : Calendar, Serializable, Cloneable {
      * @param timeZone The time zone to use for this Calendar, <code>null</code>
      * if <code>{@link TimeZone#getDefault()}</code> should be used
      */
-    BaseCalendar(Calendar baseCalendar, TimeZone timeZone) {
+    this(Calendar baseCalendar, TimeZone timeZone) {
         setBaseCalendar(baseCalendar);
         setTimeZone(timeZone);
     }
 
-    override
-    Object clone()  {
-        try {
-            BaseCalendar clone = (BaseCalendar) super.clone();
-            if (getBaseCalendar() !is null) {
-                clone.baseCalendar = (Calendar) getBaseCalendar().clone();
-            }
-            if(getTimeZone() !is null)
-                clone.timeZone = (TimeZone) getTimeZone().clone();
-            return clone;
-        } catch (CloneNotSupportedException ex) {
-            throw new IncompatibleClassChangeError("Not Cloneable.");
-        }
-    }
+    // override
+    // Object clone()  {
+    //     try {
+    //         BaseCalendar clone = (BaseCalendar) super.clone();
+    //         if (getBaseCalendar() !is null) {
+    //             clone.baseCalendar = (Calendar) getBaseCalendar().clone();
+    //         }
+    //         if(getTimeZone() !is null)
+    //             clone.timeZone = (TimeZone) getTimeZone().clone();
+    //         return clone;
+    //     } catch (CloneNotSupportedException ex) {
+    //         throw new IncompatibleClassChangeError("Not Cloneable.");
+    //     }
+    // }
 
     /**
      * <p>

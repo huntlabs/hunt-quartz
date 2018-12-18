@@ -15,7 +15,7 @@
  */
 module hunt.quartz.listeners.JobChainingJobListener;
 
-import java.util.HashMap;
+import hunt.container.HashMap;
 import hunt.container.Map;
 
 import hunt.quartz.JobExecutionContext;
@@ -52,7 +52,7 @@ class JobChainingJobListener : JobListenerSupport {
      *
      * @param name the name of this instance
      */
-    JobChainingJobListener(string name) {
+    this(string name) {
         if(name is null) {
             throw new IllegalArgumentException("Listener name cannot be null!");
         }
@@ -93,12 +93,13 @@ class JobChainingJobListener : JobListenerSupport {
             return;
         }
 
-        info("Job '" ~ context.getJobDetail().getKey() ~ "' will now chain to Job '" ~ sj ~ "'");
+        info("Job '" ~ context.getJobDetail().getKey().toString() ~ 
+            "' will now chain to Job '" ~ sj.toString() ~ "'");
 
         try {
              context.getScheduler().triggerJob(sj);
         } catch(SchedulerException se) {
-            error("Error encountered during chaining to Job '" ~ sj ~ "'", se);
+            error("Error encountered during chaining to Job '" ~ sj.toString() ~ "'", se);
         }
     }
 }

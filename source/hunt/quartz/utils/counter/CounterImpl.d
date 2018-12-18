@@ -16,7 +16,7 @@
 
 module hunt.quartz.utils.counter.CounterImpl;
 
-import java.util.concurrent.atomic.AtomicLong;
+// import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A simple counter implementation
@@ -28,12 +28,12 @@ import java.util.concurrent.atomic.AtomicLong;
 class CounterImpl : Counter, Serializable {
   
     
-    private AtomicLong value;
+    private shared long value;
 
     /**
      * Default Constructor
      */
-    CounterImpl() {
+    this() {
         this(0L);
     }
 
@@ -42,7 +42,7 @@ class CounterImpl : Counter, Serializable {
      * 
      * @param initialValue
      */
-    CounterImpl(long initialValue) {
+    this(long initialValue) {
         this.value = new AtomicLong(initialValue);
     }
 

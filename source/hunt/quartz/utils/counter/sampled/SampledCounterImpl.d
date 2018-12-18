@@ -28,7 +28,7 @@ import hunt.quartz.utils.counter.CounterImpl;
  * @since 1.7
  * 
  */
-class SampledCounterImpl : CounterImpl implements SampledCounter {
+class SampledCounterImpl : CounterImpl, SampledCounter {
   
     
     private enum int MILLIS_PER_SEC = 1000;
@@ -50,7 +50,7 @@ class SampledCounterImpl : CounterImpl implements SampledCounter {
      * 
      * @param config
      */
-    SampledCounterImpl(SampledCounterConfig config) {
+    this(SampledCounterConfig config) {
         super(config.getInitialValue());
 
         this.intervalMillis = config.getIntervalSecs() * MILLIS_PER_SEC;

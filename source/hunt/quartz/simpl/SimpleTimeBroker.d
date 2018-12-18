@@ -43,32 +43,32 @@ import hunt.quartz.spi.TimeBroker;
  * 
  * @author James House
  */
-@SuppressWarnings("deprecation")
-class SimpleTimeBroker : TimeBroker {
+// 
+// class SimpleTimeBroker : TimeBroker {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Interface.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    /**
-     * <p>
-     * Get the current time, simply using <code>new Date()</code>.
-     * </p>
-     */
-    Date getCurrentTime() {
-        return new Date();
-    }
+//     /**
+//      * <p>
+//      * Get the current time, simply using <code>new Date()</code>.
+//      * </p>
+//      */
+//     Date getCurrentTime() {
+//         return new Date();
+//     }
 
-    void initialize() {
-        // do nothing...
-    }
+//     void initialize() {
+//         // do nothing...
+//     }
 
-    void shutdown() {
-        // do nothing...
-    }
+//     void shutdown() {
+//         // do nothing...
+//     }
 
-}
+// }

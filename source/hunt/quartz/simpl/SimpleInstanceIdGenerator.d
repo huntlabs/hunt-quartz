@@ -21,6 +21,9 @@ import java.net.InetAddress;
 import hunt.quartz.SchedulerException;
 import hunt.quartz.spi.InstanceIdGenerator;
 
+import std.conv;
+import std.socket;
+
 /**
  * The default InstanceIdGenerator used by Quartz when instance id is to be
  * automatically generated.  Instance id is of the form HOSTNAME + CURRENT_TIME.
@@ -31,7 +34,7 @@ import hunt.quartz.spi.InstanceIdGenerator;
 class SimpleInstanceIdGenerator : InstanceIdGenerator {
     string generateInstanceId() {
         try {
-            return InetAddress.getLocalHost().getHostName() + DateTimeHelper.currentTimeMillis();
+            return Socket.hostName() ~ DateTimeHelper.currentTimeMillis().to!string();
         } catch (Exception e) {
             throw new SchedulerException("Couldn't get host name!", e);
         }

@@ -24,8 +24,7 @@ import hunt.quartz.utils.Key;
  *  
  * @author jhouse
  */
-class AndMatcher<T extends Key<?>> implements Matcher!(T) {
-  
+class AndMatcher(T) : Matcher!(T) {
 
     protected Matcher!(T) leftOperand;
     protected Matcher!(T) rightOperand;
@@ -41,12 +40,11 @@ class AndMatcher<T extends Key<?>> implements Matcher!(T) {
     /**
      * Create an AndMatcher that depends upon the result of both of the given matchers.
      */
-    static <U extends Key<?>> AndMatcher!(U) and(Matcher!(U) leftOperand, Matcher!(U) rightOperand) {
+    static AndMatcher!(U) and(U)(Matcher!(U) leftOperand, Matcher!(U) rightOperand) {
         return new AndMatcher!(U)(leftOperand, rightOperand);
     }
 
     bool isMatch(T key) {
-
         return leftOperand.isMatch(key) && rightOperand.isMatch(key);
     }
 
@@ -59,13 +57,13 @@ class AndMatcher<T extends Key<?>> implements Matcher!(T) {
     }
 
     override
-    size_t toHash() @trusted nothrow() {
+    size_t toHash() @trusted nothrow {
         final int prime = 31;
         int result = 1;
         result = prime * result
-                + ((leftOperand is null) ? 0 : leftOperand.hashCode());
+                + ((leftOperand is null) ? 0 : leftOperand.toHash());
         result = prime * result
-                + ((rightOperand is null) ? 0 : rightOperand.hashCode());
+                + ((rightOperand is null) ? 0 : rightOperand.toHash());
         return result;
     }
 
@@ -77,7 +75,7 @@ class AndMatcher<T extends Key<?>> implements Matcher!(T) {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        AndMatcher<?> other = (AndMatcher<?>) obj;
+        AndMatcher!T other = cast(AndMatcher!T) obj;
         if (leftOperand is null) {
             if (other.leftOperand !is null)
                 return false;

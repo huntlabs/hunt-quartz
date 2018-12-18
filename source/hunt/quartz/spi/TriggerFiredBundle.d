@@ -67,7 +67,7 @@ class TriggerFiredBundle : java.io.Serializable {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    TriggerFiredBundle(JobDetail job, OperableTrigger trigger, Calendar cal,
+    this(JobDetail job, OperableTrigger trigger, Calendar cal,
             bool jobIsRecovering, Date fireTime, Date scheduledFireTime,
             Date prevFireTime, Date nextFireTime) {
         this.job = job;

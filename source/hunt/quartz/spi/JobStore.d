@@ -17,8 +17,8 @@
 
 module hunt.quartz.spi.JobStore;
 
-import java.container.Collection;
-import java.util.List;
+import hunt.container.Collection;
+import hunt.container.List;
 import hunt.container.Map;
 import hunt.comtainer.Set;
 
@@ -146,7 +146,7 @@ interface JobStore {
      */
     void storeJob(JobDetail newJob, bool replaceExisting);
 
-    void storeJobsAndTriggers(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace);
+    void storeJobsAndTriggers(Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace);
 
     /**
      * Remove (delete) the <code>{@link hunt.quartz.Job}</code> with the given

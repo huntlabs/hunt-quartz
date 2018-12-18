@@ -18,7 +18,7 @@
 
 module hunt.quartz.SchedulerFactory;
 
-import java.container.Collection;
+import hunt.container.Collection;
 
 /**
  * Provides a mechanism for obtaining client-usable handles to <code>Scheduler</code>

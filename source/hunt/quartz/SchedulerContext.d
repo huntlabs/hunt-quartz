@@ -52,7 +52,7 @@ class SchedulerContext : StringKeyDirtyFlagMap, Serializable {
      */
     // this(Map<?, ?> map) {
     //     this();
-    //     @SuppressWarnings("unchecked") // param must be a string key map.
+    //      // param must be a string key map.
     //     Map<string, ?> mapTyped = (Map<string, ?>)map;
     //     putAll(mapTyped);
     // }

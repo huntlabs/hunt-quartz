@@ -18,9 +18,6 @@
 
 module hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 
-import hunt.time.util.Calendar;
-import std.datetime;
-import std.datetime : TimeZone;
 
 import hunt.quartz.CalendarIntervalScheduleBuilder;
 import hunt.quartz.CalendarIntervalTrigger;
@@ -35,6 +32,8 @@ import hunt.quartz.SimpleTrigger;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerUtils;
 
+import hunt.time.util.Calendar;
+import std.datetime;
 
 /**
  * <p>A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>
@@ -64,7 +63,7 @@ import hunt.quartz.TriggerUtils;
  * 
  * @author James House
  */
-class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) implements CalendarIntervalTrigger, CoreTrigger {
+class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), CalendarIntervalTrigger, CoreTrigger {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,10 +72,9 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) im
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
-
     
-    private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = hunt.time.util.Calendar.getInstance().get(hunt.time.util.Calendar.YEAR) + 100;
+    private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = 2018 + 100; 
+    // hunt.time.util.Calendar.getInstance().get(hunt.time.util.Calendar.YEAR) +
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -121,7 +119,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) im
      * Create a <code>DateIntervalTrigger</code> with no settings.
      * </p>
      */
-    CalendarIntervalTriggerImpl() {
+    this() {
         super();
     }
 
@@ -131,7 +129,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) im
      * repeat at the the given interval.
      * </p>
      */
-    CalendarIntervalTriggerImpl(string name, IntervalUnit intervalUnit,  int repeatInterval) {
+    this(string name, IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, intervalUnit, repeatInterval);
     }
 
@@ -141,7 +139,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) im
      * repeat at the the given interval.
      * </p>
      */
-    CalendarIntervalTriggerImpl(string name, string group, IntervalUnit intervalUnit,
+    this(string name, string group, IntervalUnit intervalUnit,
             int repeatInterval) {
         this(name, group, new Date(), null, intervalUnit, repeatInterval);
     }
@@ -163,7 +161,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) im
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    CalendarIntervalTriggerImpl(string name, Date startTime,
+    this(string name, Date startTime,
             Date endTime, IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, startTime, endTime, intervalUnit, repeatInterval);
     }
@@ -185,7 +183,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) im
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    CalendarIntervalTriggerImpl(string name, string group, Date startTime,
+    this(string name, string group, Date startTime,
             Date endTime, IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group);
 
@@ -213,7 +211,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) im
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    CalendarIntervalTriggerImpl(string name, string group, string jobName,
+    this(string name, string group, string jobName,
             string jobGroup, Date startTime, Date endTime,  
             IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group, jobName, jobGroup);

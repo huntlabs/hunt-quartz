@@ -22,10 +22,10 @@ import hunt.logging;
 import hunt.quartz.SchedulerConfigException;
 import hunt.quartz.spi.ThreadPool;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import hunt.container.Iterator;
+import hunt.container.LinkedList;
+import hunt.container.List;
+
 
 /**
  * <p>
@@ -98,7 +98,7 @@ class SimpleThreadPool : ThreadPool {
      * @see #setThreadCount(int)
      * @see #setThreadPriority(int)
      */
-    SimpleThreadPool() {
+    this() {
     }
 
     /**
@@ -115,7 +115,7 @@ class SimpleThreadPool : ThreadPool {
      * 
      * @see java.lang.Thread
      */
-    SimpleThreadPool(int threadCount, int threadPriority) {
+    this(int threadCount, int threadPriority) {
         setThreadCount(threadCount);
         setThreadPriority(threadPriority);
     }
@@ -504,7 +504,7 @@ class SimpleThreadPool : ThreadPool {
          * flag is set.
          * </p>
          */
-        WorkerThread(SimpleThreadPool tp, ThreadGroup threadGroup, string name,
+        this(SimpleThreadPool tp, ThreadGroup threadGroup, string name,
                      int prio, bool isDaemon) {
 
             this(tp, threadGroup, name, prio, isDaemon, null);
@@ -516,7 +516,7 @@ class SimpleThreadPool : ThreadPool {
          * the thread (one time execution).
          * </p>
          */
-        WorkerThread(SimpleThreadPool tp, ThreadGroup threadGroup, string name,
+        this(SimpleThreadPool tp, ThreadGroup threadGroup, string name,
                      int prio, bool isDaemon, Runnable runnable) {
 
             super(threadGroup, name);
@@ -603,7 +603,7 @@ class SimpleThreadPool : ThreadPool {
                 }
             }
 
-            //if (log.isDebugEnabled())
+            //version(HUNT_DEBUG)
             try {
                 trace("WorkerThread is shut down.");
             } catch(Exception e) {

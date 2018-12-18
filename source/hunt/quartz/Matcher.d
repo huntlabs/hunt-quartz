@@ -31,7 +31,7 @@ interface Matcher<T extends Key<?>> extends Serializable {
 
     bool isMatch(T key);
  
-    size_t toHash() @trusted nothrow();
+    size_t toHash() @trusted nothrow;
 
     bool equals(Object obj);
 }

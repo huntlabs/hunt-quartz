@@ -15,6 +15,8 @@
  */
 module hunt.quartz.utils.StringKeyDirtyFlagMap;
 
+import hunt.quartz.utils.DirtyFlagMap;
+
 
 /**
  * <p>
@@ -30,7 +32,7 @@ module hunt.quartz.utils.StringKeyDirtyFlagMap;
 class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
     
     /**
-     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * @deprecated JDBCJobStores no longer prune out data.  If you
      * include non-Serializable values in the Map, you will now get an 
      * exception when attempting to store it in a database.
      */
@@ -54,7 +56,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
     }
 
     override
-    size_t toHash() @trusted nothrow()
+    size_t toHash() @trusted nothrow
     {
         return getWrappedMap().toHash();
     }
@@ -69,9 +71,9 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
     /**
      * Tell the <code>StringKeyDirtyFlagMap</code> that it should
      * allow non-<code>Serializable</code> values.  Enforces that the Map 
-     * doesn't already include transient data.
+     * doesn't already include data.
      * 
-     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * @deprecated JDBCJobStores no longer prune out data.  If you
      * include non-Serializable values in the Map, you will now get an 
      * exception when attempting to store it in a database.
      */
@@ -90,7 +92,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      * Whether the <code>StringKeyDirtyFlagMap</code> allows 
      * non-<code>Serializable</code> values.
      * 
-     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * @deprecated JDBCJobStores no longer prune out data.  If you
      * include non-Serializable values in the Map, you will now get an 
      * exception when attempting to store it in a database.
      */
@@ -101,9 +103,9 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
     /**
      * Determine whether any values in this Map do not implement 
      * <code>Serializable</code>.  Always returns false if this Map
-     * is flagged to not allow transient data.
+     * is flagged to not allow data.
      * 
-     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * @deprecated JDBCJobStores no longer prune out data.  If you
      * include non-Serializable values in the Map, you will now get an 
      * exception when attempting to store it in a database.
      */
@@ -125,9 +127,9 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
 
     /**
      * Removes any data values in the map that are non-Serializable.  Does 
-     * nothing if this Map does not allow transient data.
+     * nothing if this Map does not allow data.
      * 
-     * @deprecated JDBCJobStores no longer prune out transient data.  If you
+     * @deprecated JDBCJobStores no longer prune out data.  If you
      * include non-Serializable values in the Map, you will now get an 
      * exception when attempting to store it in a database.
      */

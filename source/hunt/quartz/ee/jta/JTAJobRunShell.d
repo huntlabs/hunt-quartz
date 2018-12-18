@@ -18,9 +18,9 @@
 
 module hunt.quartz.ee.jta.JTAJobRunShell;
 
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
+// import javax.transaction.Status;
+// import javax.transaction.SystemException;
+// import javax.transaction.UserTransaction;
 
 import hunt.quartz.Scheduler;
 import hunt.quartz.SchedulerException;
@@ -47,7 +47,7 @@ class JTAJobRunShell : JobRunShell {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    private final Integer transactionTimeout;
+    private int transactionTimeout;
 
     private UserTransaction ut;
 
@@ -64,7 +64,7 @@ class JTAJobRunShell : JobRunShell {
      * Create a JTAJobRunShell instance with the given settings.
      * </p>
      */
-    JTAJobRunShell(Scheduler scheduler, TriggerFiredBundle bndle) {
+    this(Scheduler scheduler, TriggerFiredBundle bndle) {
         super(scheduler, bndle);
         this.transactionTimeout = null;
     }
@@ -74,7 +74,7 @@ class JTAJobRunShell : JobRunShell {
      * Create a JTAJobRunShell instance with the given settings.
      * </p>
      */
-    JTAJobRunShell(Scheduler scheduler, TriggerFiredBundle bndle, int timeout) {
+    this(Scheduler scheduler, TriggerFiredBundle bndle, int timeout) {
         super(scheduler, bndle);
         this.transactionTimeout = timeout;
     }

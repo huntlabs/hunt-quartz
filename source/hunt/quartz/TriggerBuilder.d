@@ -93,7 +93,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
      * 
      * @return a Trigger that meets the specifications of the builder.
      */
-    // @SuppressWarnings("unchecked")
+    // 
     T build() {
 
         if(scheduleBuilder is null)
@@ -266,7 +266,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
      * @see CronScheduleBuilder
      * @see CalendarIntervalScheduleBuilder
      */
-    // @SuppressWarnings("unchecked")
+    // 
     TriggerBuilder!(SBT) withSchedule(SBT)(ScheduleBuilder!(SBT) schedBuilder) if(is(SBT : T)) {
         this.scheduleBuilder = schedBuilder;
         return cast(TriggerBuilder!(SBT)) this;

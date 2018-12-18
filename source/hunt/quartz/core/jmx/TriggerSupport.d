@@ -5,9 +5,9 @@ module hunt.quartz.core.jmx.TriggerSupport;
 // import static javax.management.openmbean.SimpleType.STRING;
 
 // import hunt.lang.exception;
-// import java.util.ArrayList;
+// import hunt.container.ArrayList;
 // import std.datetime;
-// import java.util.List;
+// import hunt.container.List;
 // import hunt.container.Map;
 
 // import javax.management.openmbean.CompositeData;
@@ -101,7 +101,7 @@ module hunt.quartz.core.jmx.TriggerSupport;
 //         TabularData tData = new TabularDataSupport(TABULAR_TYPE);
 //         if (triggers !is null) {
 //             ArrayList!(CompositeData) list = new ArrayList!(CompositeData)();
-//             for (Trigger trigger : triggers) {
+//             foreach(Trigger trigger ; triggers) {
 //                 list.add(toCompositeData(trigger));
 //             }
 //             tData.putAll(list.toArray(new CompositeData[list.size()]));
@@ -151,7 +151,7 @@ module hunt.quartz.core.jmx.TriggerSupport;
 //             trigger.setPriority(((Integer)attrMap.get("priority")).intValue());
 //         }
 //         if(attrMap.containsKey("jobDataMap")) {
-//             @SuppressWarnings("unchecked") // cast as expected.
+//              // cast as expected.
 //             Map!(string, Object) mapTyped = (Map!(string, Object))attrMap.get("jobDataMap");
 //             trigger.setJobDataMap(JobDataMapSupport.newJobDataMap(mapTyped));
 //         }

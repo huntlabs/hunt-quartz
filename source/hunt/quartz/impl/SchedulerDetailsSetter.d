@@ -15,68 +15,68 @@
  */
 module hunt.quartz.impl.SchedulerDetailsSetter;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+// import java.lang.reflect.InvocationTargetException;
+// import java.lang.reflect.Method;
+// import java.lang.reflect.Modifier;
 
-import hunt.logging;
+// import hunt.logging;
 
-import hunt.quartz.SchedulerException;
+// import hunt.quartz.SchedulerException;
 
-/**
- * This utility calls methods reflectively on the given objects even though the
- * methods are likely on a proper interface (ThreadPool, JobStore, etc). The
- * motivation is to be tolerant of older implementations that have not been
- * updated for the changes in the interfaces (eg. LocalTaskExecutorThreadPool in
- * spring quartz helpers)
- *
- * @author teck
- */
-class SchedulerDetailsSetter {
+// /**
+//  * This utility calls methods reflectively on the given objects even though the
+//  * methods are likely on a proper interface (ThreadPool, JobStore, etc). The
+//  * motivation is to be tolerant of older implementations that have not been
+//  * updated for the changes in the interfaces (eg. LocalTaskExecutorThreadPool in
+//  * spring quartz helpers)
+//  *
+//  * @author teck
+//  */
+// class SchedulerDetailsSetter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerDetailsSetter.class);
+//     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerDetailsSetter.class);
 
-    private SchedulerDetailsSetter() {
-        //
-    }
+//     private SchedulerDetailsSetter() {
+//         //
+//     }
 
-    static void setDetails(Object target, string schedulerName,
-            string schedulerId) {
-        set(target, "setInstanceName", schedulerName);
-        set(target, "setInstanceId", schedulerId);
-    }
+//     static void setDetails(Object target, string schedulerName,
+//             string schedulerId) {
+//         set(target, "setInstanceName", schedulerName);
+//         set(target, "setInstanceId", schedulerId);
+//     }
 
-    private static void set(Object target, string method, string value) {
-        final Method setter;
+//     private static void set(Object target, string method, string value) {
+//         final Method setter;
 
-        try {
-            setter = target.getClass().getMethod(method, string.class);
-        } catch (SecurityException e) {
-            LOGGER.error("A SecurityException occured: " ~ e.getMessage(), e);
-            return;
-        } catch (NoSuchMethodException e) {
-            // This probably won't happen since the interface has the method
-            LOGGER.warn(target.getClass().getName()
-                    ~ " does not contain public method " ~ method ~ "(string)");
-            return;
-        }
+//         try {
+//             setter = target.getClass().getMethod(method, string.class);
+//         } catch (SecurityException e) {
+//             LOGGER.error("A SecurityException occured: " ~ e.getMessage(), e);
+//             return;
+//         } catch (NoSuchMethodException e) {
+//             // This probably won't happen since the interface has the method
+//             LOGGER.warn(target.getClass().getName()
+//                     ~ " does not contain public method " ~ method ~ "(string)");
+//             return;
+//         }
 
-        if (Modifier.isAbstract(setter.getModifiers())) {
-            // expected if method not implemented (but is present on
-            // interface)
-            LOGGER.warn(target.getClass().getName()
-                    ~ " does not implement " ~ method
-                    ~ "(string)");
-            return;
-        }
+//         if (Modifier.isAbstract(setter.getModifiers())) {
+//             // expected if method not implemented (but is present on
+//             // interface)
+//             LOGGER.warn(target.getClass().getName()
+//                     ~ " does not implement " ~ method
+//                     ~ "(string)");
+//             return;
+//         }
 
-        try {
-            setter.invoke(target, value);
-        } catch (InvocationTargetException ite) {
-            throw new SchedulerException(ite.getTargetException());
-        } catch (Exception e) {
-            throw new SchedulerException(e);
-        }
-    }
+//         try {
+//             setter.invoke(target, value);
+//         } catch (InvocationTargetException ite) {
+//             throw new SchedulerException(ite.getTargetException());
+//         } catch (Exception e) {
+//             throw new SchedulerException(e);
+//         }
+//     }
 
-}
+// }

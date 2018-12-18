@@ -17,8 +17,8 @@
 
 module hunt.quartz.spi.ClassLoadHelper;
 
-import java.net.URL;
-import java.io.InputStream;
+// import java.net.URL;
+import hunt.io.common;
 
 /**
  * An interface for classes wishing to provide the service of loading classes
@@ -43,7 +43,7 @@ interface ClassLoadHelper {
      * @return the requested class.
      * @throws ClassNotFoundException if the class can be found in the classpath.
      */
-    Class<?> loadClass(string name);
+    TypeInfo_Class loadClass(string name);
 
     /**
      * Return the class of the given type with the given name.
@@ -52,7 +52,7 @@ interface ClassLoadHelper {
      * @return the requested class.
      * @throws ClassNotFoundException if the class can be found in the classpath.
      */
-    <T> Class<? extends T> loadClass(string name, Class!(T) clazz);
+    // <T> Class<? extends T> loadClass(string name, Class!(T) clazz);
     
     /**
      * Finds a resource with a given name. This method returns null if no

@@ -59,7 +59,7 @@ class JTAJobRunShellFactory : JobRunShellFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    JTAJobRunShellFactory() {
+    this() {
     }
 
     /*

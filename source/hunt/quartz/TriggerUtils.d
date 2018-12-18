@@ -19,8 +19,8 @@
 module hunt.quartz.TriggerUtils;
 
 import std.datetime;
-import java.util.LinkedList;
-import java.util.List;
+import hunt.container.LinkedList;
+import hunt.container.List;
 
 import hunt.quartz.spi.OperableTrigger;
 

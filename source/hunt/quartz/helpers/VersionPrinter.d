@@ -27,25 +27,25 @@ import hunt.quartz.core.QuartzScheduler;
  * 
  * @author James House
  */
-class VersionPrinter {
+// class VersionPrinter {
 
-    /**
-     * Private constructor because this is a pure utility class.
-     */
-    private VersionPrinter() {
-    }
+//     /**
+//      * Private constructor because this is a pure utility class.
+//      */
+//     private VersionPrinter() {
+//     }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Interface.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    static void main(string[] args) {
-        System.out.println("Quartz version: " ~ QuartzScheduler.getVersionMajor()
-                ~ "." ~ QuartzScheduler.getVersionMinor() ~ "."
-                + QuartzScheduler.getVersionIteration());
-    }
-}
+//     static void main(string[] args) {
+//         writeln("Quartz version: " ~ QuartzScheduler.getVersionMajor()
+//                 ~ "." ~ QuartzScheduler.getVersionMinor() ~ "."
+//                 + QuartzScheduler.getVersionIteration());
+//     }
+// }

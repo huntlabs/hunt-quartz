@@ -17,7 +17,6 @@
 
 module hunt.quartz.jobs.DirectoryScanListener;
 
-import java.io.File;
 
 /**
  * Interface for objects wishing to receive a 'call-back' from a 
@@ -36,5 +35,5 @@ interface DirectoryScanListener {
      * @param updatedFiles The set of files that were updated/added since the
      * last scan of the directory
      */
-    void filesUpdatedOrAdded(File[] updatedFiles);
+    void filesUpdatedOrAdded(string[] updatedFiles);
 }

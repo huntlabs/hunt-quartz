@@ -17,8 +17,8 @@
 
 module hunt.quartz.impl.SchedulerRepository;
 
-import java.container.Collection;
-import java.util.HashMap;
+import hunt.container.Collection;
+import hunt.container.HashMap;
 
 import hunt.quartz.Scheduler;
 import hunt.quartz.SchedulerException;
@@ -54,7 +54,7 @@ class SchedulerRepository {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private SchedulerRepository() {
+    private this() {
         schedulers = new HashMap!(string, Scheduler)();
     }
 
@@ -76,7 +76,7 @@ class SchedulerRepository {
 
     synchronized void bind(Scheduler sched) {
 
-        if ((Scheduler) schedulers.get(sched.getSchedulerName()) !is null) {
+        if (cast(Scheduler) schedulers.get(sched.getSchedulerName()) !is null) {
             throw new SchedulerException("Scheduler with name '"
                     + sched.getSchedulerName() ~ "' already exists.");
         }

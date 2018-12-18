@@ -25,7 +25,7 @@ module hunt.quartz.utils.counter.CounterConfig;
  */
 class CounterConfig {
 
-    private final long initialValue;
+    private long initialValue;
 
     /**
      * Creates a config with the initial value

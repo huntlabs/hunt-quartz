@@ -16,6 +16,7 @@
 
 module hunt.quartz.utils.counter.sampled.TimeStampedCounterValue;
 
+import std.conv;
 
 /**
  * A counter value at a particular time instance
@@ -23,11 +24,11 @@ module hunt.quartz.utils.counter.sampled.TimeStampedCounterValue;
  * @author <a href="mailto:asanoujam@terracottatech.com">Abhishek Sanoujam</a>
  * @since 1.8
  */
-class TimeStampedCounterValue : Serializable {
+class TimeStampedCounterValue { //  : Serializable
   
     
-    private final long counterValue;
-    private final long timestamp;
+    private long counterValue;
+    private long timestamp;
 
     /**
      * Constructor accepting the value of both timestamp and the counter value.
@@ -35,7 +36,7 @@ class TimeStampedCounterValue : Serializable {
      * @param timestamp
      * @param value
      */
-    TimeStampedCounterValue(long timestamp, long value) {
+    this(long timestamp, long value) {
         this.timestamp = timestamp;
         this.counterValue = value;
     }
@@ -63,7 +64,7 @@ class TimeStampedCounterValue : Serializable {
      */
     override
     string toString() {
-        return "value: " ~ this.counterValue ~ ", timestamp: " ~ this.timestamp;
+        return "value: " ~ this.counterValue.to!string() ~ ", timestamp: " ~ this.timestamp.to!string();
     }
 
 }

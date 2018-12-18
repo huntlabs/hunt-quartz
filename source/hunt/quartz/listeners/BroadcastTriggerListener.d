@@ -15,9 +15,9 @@
  */
 module hunt.quartz.listeners.BroadcastTriggerListener;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import hunt.container.Iterator;
+import hunt.container.LinkedList;
+import hunt.container.List;
 
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.Trigger;
@@ -51,7 +51,7 @@ class BroadcastTriggerListener : TriggerListener {
      *
      * @param name the name of this instance
      */
-    BroadcastTriggerListener(string name) {
+    this(string name) {
         if(name is null) {
             throw new IllegalArgumentException("Listener name cannot be null!");
         }
@@ -65,7 +65,7 @@ class BroadcastTriggerListener : TriggerListener {
      * @param name the name of this instance
      * @param listeners the initial List of TriggerListeners to broadcast to.
      */
-    BroadcastTriggerListener(string name, List!(TriggerListener) listeners) {
+    this(string name, List!(TriggerListener) listeners) {
         this(name);
         this.listeners.addAll(listeners);
     }

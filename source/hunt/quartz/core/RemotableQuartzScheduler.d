@@ -18,12 +18,8 @@
 
 module hunt.quartz.core.RemotableQuartzScheduler;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import std.datetime;
-import java.util.List;
-import hunt.container.Map;
-import hunt.comtainer.Set;
+// import java.rmi.Remote;
+// import java.rmi.RemoteException;
 
 import hunt.quartz.Calendar;
 import hunt.quartz.JobDataMap;
@@ -38,6 +34,12 @@ import hunt.quartz.UnableToInterruptJobException;
 import hunt.quartz.Trigger.TriggerState;
 import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.spi.OperableTrigger;
+
+import hunt.container.List;
+import hunt.container.Map;
+import hunt.comtainer.Set;
+
+import std.datetime;
 
 /**
  * @author James House
@@ -78,13 +80,13 @@ interface RemotableQuartzScheduler : Remote {
 
     int numJobsExecuted();
 
-    Class<?> getJobStoreClass();
+    TypeInfo_Class getJobStoreClass();
 
     bool supportsPersistence();
 
     bool isClustered();
 
-    Class<?> getThreadPoolClass();
+    TypeInfo_Class getThreadPoolClass();
 
     int getThreadPoolSize();
 
@@ -136,7 +138,7 @@ interface RemotableQuartzScheduler : Remote {
 
     Set!(JobKey) getJobKeys(GroupMatcher!(JobKey) matcher);
 
-    List<? extends Trigger> getTriggersOfJob(JobKey jobKey);
+    List!(Trigger) getTriggersOfJob(JobKey jobKey);
 
     List!(string) getTriggerGroupNames();
 
@@ -168,9 +170,9 @@ interface RemotableQuartzScheduler : Remote {
  
     bool deleteJobs(List!(JobKey) jobKeys);
 
-    void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace);
+    void scheduleJobs(Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace);
 
-    void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, bool replace);
+    void scheduleJob(JobDetail jobDetail, Set!(Trigger) triggersForJob, bool replace);
 
     bool unscheduleJobs(List!(TriggerKey) triggerKeys);
     

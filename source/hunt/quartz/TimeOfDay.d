@@ -163,7 +163,7 @@ class TimeOfDay {
     }
 
     override
-    size_t toHash() @trusted nothrow() {
+    size_t toHash() @trusted nothrow {
         return (hour + 1) ^ (minute + 1) ^ (second + 1);
     }
     

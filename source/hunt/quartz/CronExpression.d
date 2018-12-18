@@ -22,11 +22,11 @@ import hunt.lang.exception;
 import hunt.time.util.Calendar;
 import hunt.time.util.Locale;
 // import std.datetime;
-// import java.util.HashMap;
-// import java.util.Iterator;
+// import hunt.container.HashMap;
+// import hunt.container.Iterator;
 // import hunt.container.Map;
 // import java.util.SortedSet;
-// import java.util.StringTokenizer;
+// import hunt.string.StringTokenizer;
 // import java.util.TreeSet;
 import std.datetime;
 
@@ -208,12 +208,16 @@ final class CronExpression : Serializable, Cloneable {
     protected enum int YEAR = 6;
     protected enum int ALL_SPEC_INT = 99; // '*'
     protected enum int NO_SPEC_INT = 98; // '?'
-    protected static final Integer ALL_SPEC = ALL_SPEC_INT;
-    protected static final Integer NO_SPEC = NO_SPEC_INT;
+    protected enum int ALL_SPEC = ALL_SPEC_INT;
+    protected enum int NO_SPEC = NO_SPEC_INT;
     
-    protected static final Map!(string, Integer) monthMap = new HashMap!(string, Integer)(20);
-    protected static final Map!(string, Integer) dayMap = new HashMap!(string, Integer)(60);
-    static {
+    protected __gshared Map!(string, int) monthMap;
+    protected __gshared Map!(string, int) dayMap;
+
+    shared static this() {
+        monthMap = new HashMap!(string, int)(20);
+        dayMap = new HashMap!(string, int)(60);
+
         monthMap.put("JAN", 0);
         monthMap.put("FEB", 1);
         monthMap.put("MAR", 2);
@@ -236,24 +240,24 @@ final class CronExpression : Serializable, Cloneable {
         dayMap.put("SAT", 7);
     }
 
-    private final string cronExpression;
+    private string cronExpression;
     private TimeZone timeZone = null;
-    protected transient TreeSet!(Integer) seconds;
-    protected transient TreeSet!(Integer) minutes;
-    protected transient TreeSet!(Integer) hours;
-    protected transient TreeSet!(Integer) daysOfMonth;
-    protected transient TreeSet!(Integer) months;
-    protected transient TreeSet!(Integer) daysOfWeek;
-    protected transient TreeSet!(Integer) years;
+    protected TreeSet!(int) seconds;
+    protected TreeSet!(int) minutes;
+    protected TreeSet!(int) hours;
+    protected TreeSet!(int) daysOfMonth;
+    protected TreeSet!(int) months;
+    protected TreeSet!(int) daysOfWeek;
+    protected TreeSet!(int) years;
 
-    protected transient bool lastdayOfWeek = false;
-    protected transient int nthdayOfWeek = 0;
-    protected transient bool lastdayOfMonth = false;
-    protected transient bool nearestWeekday = false;
-    protected transient int lastdayOffset = 0;
-    protected transient bool expressionParsed = false;
+    protected bool lastdayOfWeek = false;
+    protected int nthdayOfWeek = 0;
+    protected bool lastdayOfMonth = false;
+    protected bool nearestWeekday = false;
+    protected int lastdayOffset = 0;
+    protected bool expressionParsed = false;
     
-    enum int MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR) + 100;
+    enum int MAX_YEAR = 2018 +  100; // Calendar.getInstance().get(Calendar.YEAR) + 
 
     /**
      * Constructs a new <CODE>CronExpression</CODE> based on the specified 
@@ -439,25 +443,25 @@ final class CronExpression : Serializable, Cloneable {
         try {
 
             if (seconds is null) {
-                seconds = new TreeSet!(Integer)();
+                seconds = new TreeSet!(int)();
             }
             if (minutes is null) {
-                minutes = new TreeSet!(Integer)();
+                minutes = new TreeSet!(int)();
             }
             if (hours is null) {
-                hours = new TreeSet!(Integer)();
+                hours = new TreeSet!(int)();
             }
             if (daysOfMonth is null) {
-                daysOfMonth = new TreeSet!(Integer)();
+                daysOfMonth = new TreeSet!(int)();
             }
             if (months is null) {
-                months = new TreeSet!(Integer)();
+                months = new TreeSet!(int)();
             }
             if (daysOfWeek is null) {
-                daysOfWeek = new TreeSet!(Integer)();
+                daysOfWeek = new TreeSet!(int)();
             }
             if (years is null) {
-                years = new TreeSet!(Integer)();
+                years = new TreeSet!(int)();
             }
 
             int exprOn = SECOND;
@@ -498,8 +502,8 @@ final class CronExpression : Serializable, Cloneable {
                 storeExpressionVals(0, "*", YEAR);
             }
 
-            TreeSet!(Integer) dow = getSet(DAY_OF_WEEK);
-            TreeSet!(Integer) dom = getSet(DAY_OF_MONTH);
+            TreeSet!(int) dow = getSet(DAY_OF_WEEK);
+            TreeSet!(int) dom = getSet(DAY_OF_MONTH);
 
             // Copying the logic from the UnsupportedOperationException below
             bool dayOfMSpec = !dom.contains(NO_SPEC);
@@ -567,7 +571,7 @@ final class CronExpression : Serializable, Cloneable {
                     } else if (c == '#') {
                         try {
                             i += 4;
-                            nthdayOfWeek = Integer.parseInt(s.substring(i));
+                            nthdayOfWeek = int.parseInt(s.substring(i));
                             if (nthdayOfWeek < 1 || nthdayOfWeek > 5) {
                                 throw new Exception();
                             }
@@ -677,7 +681,7 @@ final class CronExpression : Serializable, Cloneable {
             }
             return i;
         } else if (c >= '0' && c <= '9') {
-            int val = Integer.parseInt(string.valueOf(c));
+            int val = int.parseInt(string.valueOf(c));
             i++;
             if (i >= s.length()) {
                 addToSet(val, -1, -1, type);
@@ -732,7 +736,7 @@ final class CronExpression : Serializable, Cloneable {
             } else {
                 throw new ParseException("'L' option is not valid here. (pos=" ~ i ~ ")", i);
             }
-            TreeSet!(Integer) set = getSet(type);
+            TreeSet!(int) set = getSet(type);
             set.add(val);
             i++;
             return i;
@@ -746,7 +750,7 @@ final class CronExpression : Serializable, Cloneable {
             }
             if(val > 31)
                 throw new ParseException("The 'W' option does not make sense with values larger than 31 (max number of days in a month)", i); 
-            TreeSet!(Integer) set = getSet(type);
+            TreeSet!(int) set = getSet(type);
             set.add(val);
             i++;
             return i;
@@ -758,7 +762,7 @@ final class CronExpression : Serializable, Cloneable {
             }
             i++;
             try {
-                nthdayOfWeek = Integer.parseInt(s.substring(i));
+                nthdayOfWeek = int.parseInt(s.substring(i));
                 if (nthdayOfWeek < 1 || nthdayOfWeek > 5) {
                     throw new Exception();
                 }
@@ -768,7 +772,7 @@ final class CronExpression : Serializable, Cloneable {
                         i);
             }
 
-            TreeSet!(Integer) set = getSet(type);
+            TreeSet!(int) set = getSet(type);
             set.add(val);
             i++;
             return i;
@@ -777,7 +781,7 @@ final class CronExpression : Serializable, Cloneable {
         if (c == '-') {
             i++;
             c = s.charAt(i);
-            int v = Integer.parseInt(string.valueOf(c));
+            int v = int.parseInt(string.valueOf(c));
             end = v;
             i++;
             if (i >= s.length()) {
@@ -793,7 +797,7 @@ final class CronExpression : Serializable, Cloneable {
             if (i < s.length() && ((c = s.charAt(i)) == '/')) {
                 i++;
                 c = s.charAt(i);
-                int v2 = Integer.parseInt(string.valueOf(c));
+                int v2 = int.parseInt(string.valueOf(c));
                 i++;
                 if (i >= s.length()) {
                     addToSet(val, end, v2, type);
@@ -823,7 +827,7 @@ final class CronExpression : Serializable, Cloneable {
 
             i++;
             c = s.charAt(i);
-            int v2 = Integer.parseInt(string.valueOf(c));
+            int v2 = int.parseInt(string.valueOf(c));
             i++;
             if (i >= s.length()) {
                 checkIncrementRange(v2, type, i);
@@ -892,7 +896,7 @@ final class CronExpression : Serializable, Cloneable {
         return buf.toString();
     }
 
-    protected string getExpressionSetSummary(java.util.Set!(Integer) set) {
+    protected string getExpressionSetSummary(java.util.Set!(int) set) {
 
         if (set.contains(NO_SPEC)) {
             return "?";
@@ -903,10 +907,10 @@ final class CronExpression : Serializable, Cloneable {
 
         StringBuilder buf = new StringBuilder();
 
-        Iterator!(Integer) itr = set.iterator();
+        Iterator!(int) itr = set.iterator();
         bool first = true;
         while (itr.hasNext()) {
-            Integer iVal = itr.next();
+            int iVal = itr.next();
             string val = iVal.toString();
             if (!first) {
                 buf.append(",");
@@ -918,7 +922,7 @@ final class CronExpression : Serializable, Cloneable {
         return buf.toString();
     }
 
-    protected string getExpressionSetSummary(java.util.ArrayList!(Integer) list) {
+    protected string getExpressionSetSummary(java.util.ArrayList!(int) list) {
 
         if (list.contains(NO_SPEC)) {
             return "?";
@@ -929,10 +933,10 @@ final class CronExpression : Serializable, Cloneable {
 
         StringBuilder buf = new StringBuilder();
 
-        Iterator!(Integer) itr = list.iterator();
+        Iterator!(int) itr = list.iterator();
         bool first = true;
         while (itr.hasNext()) {
-            Integer iVal = itr.next();
+            int iVal = itr.next();
             string val = iVal.toString();
             if (!first) {
                 buf.append(",");
@@ -962,7 +966,7 @@ final class CronExpression : Serializable, Cloneable {
 
     protected void addToSet(int val, int end, int incr, int type) {
         
-        TreeSet!(Integer) set = getSet(type);
+        TreeSet!(int) set = getSet(type);
 
         if (type == SECOND || type == MINUTE) {
             if ((val < 0 || val > 59 || end > 59) && (val != ALL_SPEC_INT)) {
@@ -1092,7 +1096,7 @@ final class CronExpression : Serializable, Cloneable {
         }
     }
 
-    TreeSet!(Integer) getSet(int type) {
+    TreeSet!(int) getSet(int type) {
         switch (type) {
             case SECOND:
                 return seconds;
@@ -1127,18 +1131,18 @@ final class CronExpression : Serializable, Cloneable {
         ValueSet val = new ValueSet();
         
         val.pos = (i < s.length()) ? i : i + 1;
-        val.value = Integer.parseInt(s1.toString());
+        val.value = int.parseInt(s1.toString());
         return val;
     }
 
     protected int getNumericValue(string s, int i) {
         int endOfVal = findNextWhiteSpace(i, s);
         string val = s.substring(i, endOfVal);
-        return Integer.parseInt(val);
+        return int.parseInt(val);
     }
 
     protected int getMonthNumber(string s) {
-        Integer integer = monthMap.get(s);
+        int integer = monthMap.get(s);
 
         if (integer is null) {
             return -1;
@@ -1148,7 +1152,7 @@ final class CronExpression : Serializable, Cloneable {
     }
 
     protected int getDayOfWeekNumber(string s) {
-        Integer integer = dayMap.get(s);
+        int integer = dayMap.get(s);
 
         if (integer is null) {
             return -1;
@@ -1184,7 +1188,7 @@ final class CronExpression : Serializable, Cloneable {
                 return null;
             }
 
-            SortedSet!(Integer) st = null;
+            SortedSet!(int) st = null;
             int t = 0;
 
             int sec = cl.get(Calendar.SECOND);

@@ -31,6 +31,8 @@ import hunt.quartz.StatefulJob;
 import hunt.quartz.Trigger;
 import hunt.quartz.utils.ClassUtils;
 
+import hunt.lang.exception;
+import std.conv;
 
 /**
  * <p>
@@ -61,8 +63,8 @@ import hunt.quartz.utils.ClassUtils;
  * @author James House
  * @author Sharada Jambula
  */
-@SuppressWarnings("deprecation")
-class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
+
+class JobDetailImpl : JobDetail { // Cloneable, 
 
     
     /*
@@ -79,7 +81,7 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
 
     private string description;
 
-    private Class<? extends Job> jobClass;
+    private TypeInfo_Class jobClass;
 
     private JobDataMap jobDataMap;
 
@@ -87,7 +89,7 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
 
     private bool shouldRecover = false;
 
-    private transient JobKey key = null;
+    private JobKey key = null;
 
     /*
     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,7 +111,7 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
      * placed into a {@link Scheduler}
      * </p>
      */
-    JobDetailImpl() {
+    this() {
         // do nothing...
     }
 
@@ -124,7 +126,7 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
      *              
      * @deprecated use {@link JobBuilder}              
      */
-    JobDetailImpl(string name, Class<? extends Job> jobClass) {
+    this(string name, TypeInfo_Class jobClass) {
         this(name, null, jobClass);
     }
 
@@ -141,7 +143,7 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
      *              
      * @deprecated use {@link JobBuilder}              
      */
-    JobDetailImpl(string name, string group, Class<? extends Job> jobClass) {
+    this(string name, string group, TypeInfo_Class jobClass) {
         setName(name);
         setGroup(group);
         setJobClass(jobClass);
@@ -160,7 +162,7 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
      *              
      * @deprecated use {@link JobBuilder}              
      */
-    JobDetailImpl(string name, string group, Class<? extends Job> jobClass,
+    this(string name, string group, TypeInfo_Class jobClass,
                      bool durability, bool recover) {
         setName(name);
         setGroup(group);
@@ -289,7 +291,7 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
     /* (non-Javadoc)
      * @see hunt.quartz.JobDetailI#getJobClass()
      */
-    Class<? extends Job> getJobClass() {
+    TypeInfo_Class getJobClass() {
         return jobClass;
     }
 
@@ -301,15 +303,15 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
      * @exception IllegalArgumentException
      *              if jobClass is null or the class is not a <code>Job</code>.
      */
-    void setJobClass(Class<? extends Job> jobClass) {
+    void setJobClass(TypeInfo_Class jobClass) {
         if (jobClass is null) {
             throw new IllegalArgumentException("Job class cannot be null.");
         }
 
-        if (!Job.class.isAssignableFrom(jobClass)) {
-            throw new IllegalArgumentException(
-                    "Job class must implement the Job interface.");
-        }
+        // if (!Job.class.isAssignableFrom(jobClass)) {
+        //     throw new IllegalArgumentException(
+        //             "Job class must implement the Job interface.");
+        // }
 
         this.jobClass = jobClass;
     }
@@ -375,16 +377,18 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
      * @return whether the associated Job class carries the {@link PersistJobDataAfterExecution} annotation.
      */
     bool isPersistJobDataAfterExecution() {
-
-        return ClassUtils.isAnnotationPresent(jobClass, PersistJobDataAfterExecution.class);
+        implementationMissing(false);
+        return false;
+        // return ClassUtils.isAnnotationPresent(jobClass, PersistJobDataAfterExecution.class);
     }
 
     /**
      * @return whether the associated Job class carries the {@link DisallowConcurrentExecution} annotation.
      */
     bool isConcurrentExectionDisallowed() {
-        
-        return ClassUtils.isAnnotationPresent(jobClass, DisallowConcurrentExecution.class);
+        implementationMissing(false);
+        return false;        
+        // return ClassUtils.isAnnotationPresent(jobClass, DisallowConcurrentExecution.class);
     }
 
     /* (non-Javadoc)
@@ -402,24 +406,22 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
     override
     string toString() {
         return "JobDetail '" ~ getFullName() ~ "':  jobClass: '"
-                + ((getJobClass() is null) ? null : getJobClass().getName())
-                ~ " concurrentExectionDisallowed: " ~ isConcurrentExectionDisallowed() 
-                ~ " persistJobDataAfterExecution: " ~ isPersistJobDataAfterExecution() 
-                ~ " isDurable: " ~ isDurable() ~ " requestsRecovers: " ~ requestsRecovery();
+                ~ ((getJobClass() is null) ? "null" : getJobClass().name())
+                ~ " concurrentExectionDisallowed: " ~ isConcurrentExectionDisallowed().to!string() 
+                ~ " persistJobDataAfterExecution: " ~ isPersistJobDataAfterExecution().to!string() 
+                ~ " isDurable: " ~ isDurable().to!string() ~ " requestsRecovers: " ~ requestsRecovery().to!string();
     }
 
     override
     bool equals(Object obj) {
-        if (!(obj instanceof JobDetail)) {
-            return false;
-        }
-
         JobDetail other = (JobDetail) obj;
+        if(other is null)
+            return false;
 
         if(other.getKey() is null || getKey() is null)
             return false;
         
-        if (!other.getKey()== getKey()) {
+        if (!other.getKey() == getKey()) {
             return false;
         }
             
@@ -427,25 +429,25 @@ class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
     }
 
     override
-    size_t toHash() @trusted nothrow() {
+    size_t toHash() @trusted nothrow {
         JobKey key = getKey();
-        return key is null ? 0 : getKey().hashCode();
+        return key is null ? 0 : getKey().toHash();
     }
     
-    override
-    Object clone() {
-        JobDetailImpl copy;
-        try {
-            copy = (JobDetailImpl) super.clone();
-            if (jobDataMap !is null) {
-                copy.jobDataMap = (JobDataMap) jobDataMap.clone();
-            }
-        } catch (CloneNotSupportedException ex) {
-            throw new IncompatibleClassChangeError("Not Cloneable.");
-        }
+    // override
+    // Object clone() {
+    //     JobDetailImpl copy;
+    //     try {
+    //         copy = (JobDetailImpl) super.clone();
+    //         if (jobDataMap !is null) {
+    //             copy.jobDataMap = (JobDataMap) jobDataMap.clone();
+    //         }
+    //     } catch (CloneNotSupportedException ex) {
+    //         throw new IncompatibleClassChangeError("Not Cloneable.");
+    //     }
 
-        return copy;
-    }
+    //     return copy;
+    // }
 
     JobBuilder getJobBuilder() {
         JobBuilder b = JobBuilder.newJob()

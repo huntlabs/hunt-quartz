@@ -53,11 +53,11 @@ class SchedulerSignalerImpl : SchedulerSignaler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    SchedulerSignalerImpl(QuartzScheduler sched, QuartzSchedulerThread schedThread) {
+    this(QuartzScheduler sched, QuartzSchedulerThread schedThread) {
         this.sched = sched;
         this.schedThread = schedThread;
         
-        log.info("Initialized Scheduler Signaller of type: " ~ getClass());
+        info("Initialized Scheduler Signaller of type: " ~ typeid(this).name);
     }
 
     /*
@@ -72,8 +72,7 @@ class SchedulerSignalerImpl : SchedulerSignaler {
         try {
             sched.notifyTriggerListenersMisfired(trigger);
         } catch (SchedulerException se) {
-            sched.error(
-                    "Error notifying listeners of trigger misfire.", se);
+            sched.error("Error notifying listeners of trigger misfire.", se);
             sched.notifySchedulerListenersError(
                     "Error notifying listeners of trigger misfire.", se);
         }

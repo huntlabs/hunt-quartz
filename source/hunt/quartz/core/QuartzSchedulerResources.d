@@ -18,14 +18,19 @@
 
 module hunt.quartz.core.QuartzSchedulerResources;
 
-import java.util.ArrayList;
-import java.util.List;
+import hunt.container.ArrayList;
+import hunt.container.List;
 
 import hunt.quartz.management.ManagementRESTServiceConfiguration;
 import hunt.quartz.spi.JobStore;
 import hunt.quartz.spi.SchedulerPlugin;
 import hunt.quartz.spi.ThreadExecutor;
 import hunt.quartz.spi.ThreadPool;
+
+import hunt.string;
+
+import std.array;
+import std.string;
 
 /**
  * <p>
@@ -73,7 +78,7 @@ class QuartzSchedulerResources {
 
     private JobRunShellFactory jobRunShellFactory;
 
-    private List!(SchedulerPlugin) schedulerPlugins = new ArrayList!(SchedulerPlugin)(10);
+    private List!(SchedulerPlugin) schedulerPlugins;
     
     private bool makeSchedulerThreadDaemon = false;
 
@@ -109,8 +114,9 @@ class QuartzSchedulerResources {
      * Create an instance with no properties initialized.
      * </p>
      */
-    QuartzSchedulerResources() {
+    this() {
         // do nothing...
+        schedulerPlugins = new ArrayList!(SchedulerPlugin)(10);
     }
 
     /*
@@ -170,7 +176,7 @@ class QuartzSchedulerResources {
      *              if name is null or empty.
      */
     void setInstanceId(string instanceId) {
-        if (instanceId is null || instanceId.trim().length() == 0) {
+        if (instanceId.empty()) {
             throw new IllegalArgumentException(
                     "Scheduler instanceId cannot be empty.");
         }
@@ -292,8 +298,7 @@ class QuartzSchedulerResources {
      * @see #CREATE_REGISTRY_NEVER
      */
     void setRMICreateRegistryStrategy(string rmiCreateRegistryStrategy) {
-        if (rmiCreateRegistryStrategy is null
-                || rmiCreateRegistryStrategy.trim().length() == 0) {
+        if (rmiCreateRegistryStrategy.empty()) {
             rmiCreateRegistryStrategy = CREATE_REGISTRY_NEVER;
         } else if (rmiCreateRegistryStrategy.equalsIgnoreCase("true")) {
             rmiCreateRegistryStrategy = CREATE_REGISTRY_AS_NEEDED;
@@ -536,7 +541,7 @@ class QuartzSchedulerResources {
      */
     static string generateJMXObjectName(string schedName, string schedInstId) {
         return "quartz:type=QuartzScheduler" ~ ",name="
-            + schedName.replaceAll(":|=|\n", ".")
+            ~ schedName.replaceAll(":|=|\n", ".")
             ~ ",instance=" ~ schedInstId;
     }
 

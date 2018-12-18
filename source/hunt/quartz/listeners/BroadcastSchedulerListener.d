@@ -1,8 +1,8 @@
 module hunt.quartz.listeners.BroadcastSchedulerListener;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import hunt.container.Iterator;
+import hunt.container.LinkedList;
+import hunt.container.List;
 
 import hunt.quartz.JobDetail;
 import hunt.quartz.JobKey;
@@ -28,7 +28,7 @@ class BroadcastSchedulerListener : SchedulerListener {
 
     private List!(SchedulerListener) listeners;
 
-    BroadcastSchedulerListener() {
+    this() {
         listeners = new LinkedList!(SchedulerListener)();
     }
 
@@ -37,7 +37,7 @@ class BroadcastSchedulerListener : SchedulerListener {
      *
      * @param listeners the initial List of SchedulerListeners to broadcast to.
      */
-    BroadcastSchedulerListener(List!(SchedulerListener) listeners) {
+    this(List!(SchedulerListener) listeners) {
         this();
         this.listeners.addAll(listeners);
     }

@@ -17,7 +17,8 @@
 
 module hunt.quartz.jobs.ee.jms.JmsJobException;
 
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
+
 
 /**
  * The JmsJobException is used to indicate an error during sending of a
@@ -28,15 +29,15 @@ import hunt.quartz.SchedulerException;
  */
 final class JmsJobException : SchedulerException {
 
-    JmsJobException(final string message) {
+    this(string message) {
         super(message);
     }
 
-    JmsJobException(final string message, final Throwable cause) {
+    this(string message, Throwable cause) {
         super(message, cause);
     }
 
-    JmsJobException(final Throwable cause) {
+    this(Throwable cause) {
         super(cause);
     }
 

@@ -17,122 +17,122 @@
 
 module hunt.quartz.jobs.ee.jms.SendDestinationMessageJob;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.naming.Context;
+// import javax.jms.Connection;
+// import javax.jms.ConnectionFactory;
+// import javax.jms.Destination;
+// import javax.jms.Message;
+// import javax.jms.MessageProducer;
+// import javax.jms.Session;
+// import javax.naming.Context;
 
-import hunt.quartz.Job;
-import hunt.quartz.JobDataMap;
-import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+// import hunt.quartz.Job;
+// import hunt.quartz.JobDataMap;
+// import hunt.quartz.JobExecutionContext;
+// import hunt.quartz.JobExecutionException;
 
-/**
- * <p>
- * A <code>Job</code> that sends a <code>javax.jms.Message</code> to a
- * <code>javax.jms.Destination</code>. Note, this class can only be used in a
- * JMS-based environment.
- * 
- * <p>
- * The following properties are expected to be provided in the
- * <code>JobDataMap</code>:
- * 
- * <ul>
- * <li><code>JMS_CONNECTION_FACTORY_JNDI</code> - The JNDI name of the JMS
- * Connection Factory.</li>
- * <li><code>JMS_DESTINATION_JNDI</code> - The JNDI name of the JMS
- * destination.</li>
- * <li><code>JMS_USE_TXN</code> - Whether or not to use a transacted
- * <code>javax.jms.Session</code>.</li>
- * <li><code>JMS_ACK_MODE</code> - The acknowledgement mode for the
- * <code>javax.jms.Session</code>.</li>
- * <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class
- * name for the <code>JmsMessageFactory</code>.</li>
- * </ul>
- * 
- * <p>
- * The following properties are optional
- * 
- * <ul>
- * <li><code>JMS_USER</code> - The JMS user for secure destinations.
- * <li><code>JMS_PASSWORD</code> - The JMS password for secure destinations.
- * </ul>
- * 
- * <p>
- * The following properties can be used for JNDI support:
- * 
- * <ul>
- * <li><code>INITIAL_CONTEXT_FACTORY</code> - The java.naming.factory.initial
- * setting for JNDI.
- * <li><code>PROVIDER_URL</code> - The java.naming.provider.url for JNDI.
- * </ul>
- * 
- * @see JmsMessageFactory
- * 
- * @author Fernando Ribeiro
- * @author Weston M. Price
- * @author Frank Van Uffelen
- */
-final class SendDestinationMessageJob : Job {
+// /**
+//  * <p>
+//  * A <code>Job</code> that sends a <code>javax.jms.Message</code> to a
+//  * <code>javax.jms.Destination</code>. Note, this class can only be used in a
+//  * JMS-based environment.
+//  * 
+//  * <p>
+//  * The following properties are expected to be provided in the
+//  * <code>JobDataMap</code>:
+//  * 
+//  * <ul>
+//  * <li><code>JMS_CONNECTION_FACTORY_JNDI</code> - The JNDI name of the JMS
+//  * Connection Factory.</li>
+//  * <li><code>JMS_DESTINATION_JNDI</code> - The JNDI name of the JMS
+//  * destination.</li>
+//  * <li><code>JMS_USE_TXN</code> - Whether or not to use a transacted
+//  * <code>javax.jms.Session</code>.</li>
+//  * <li><code>JMS_ACK_MODE</code> - The acknowledgement mode for the
+//  * <code>javax.jms.Session</code>.</li>
+//  * <li><code>JMS_MSG_FACTORY_CLASS_NAME</code> - The implementation class
+//  * name for the <code>JmsMessageFactory</code>.</li>
+//  * </ul>
+//  * 
+//  * <p>
+//  * The following properties are optional
+//  * 
+//  * <ul>
+//  * <li><code>JMS_USER</code> - The JMS user for secure destinations.
+//  * <li><code>JMS_PASSWORD</code> - The JMS password for secure destinations.
+//  * </ul>
+//  * 
+//  * <p>
+//  * The following properties can be used for JNDI support:
+//  * 
+//  * <ul>
+//  * <li><code>INITIAL_CONTEXT_FACTORY</code> - The java.naming.factory.initial
+//  * setting for JNDI.
+//  * <li><code>PROVIDER_URL</code> - The java.naming.provider.url for JNDI.
+//  * </ul>
+//  * 
+//  * @see JmsMessageFactory
+//  * 
+//  * @author Fernando Ribeiro
+//  * @author Weston M. Price
+//  * @author Frank Van Uffelen
+//  */
+// final class SendDestinationMessageJob : Job {
 
-    void execute(final JobExecutionContext jobCtx) {
-        Connection conn = null;
+//     void execute(final JobExecutionContext jobCtx) {
+//         Connection conn = null;
 
-        Session sess = null;
+//         Session sess = null;
 
-        MessageProducer producer = null;
+//         MessageProducer producer = null;
 
-        try {
-            final JobDataMap dataMap = jobCtx.getMergedJobDataMap();
+//         try {
+//             final JobDataMap dataMap = jobCtx.getMergedJobDataMap();
 
-            final Context namingCtx = JmsHelper.getInitialContext(dataMap);
+//             final Context namingCtx = JmsHelper.getInitialContext(dataMap);
 
-            final ConnectionFactory connFactory = (ConnectionFactory) namingCtx
-                    .lookup(dataMap
-                            .getString(JmsHelper.JMS_CONNECTION_FACTORY_JNDI));
+//             final ConnectionFactory connFactory = (ConnectionFactory) namingCtx
+//                     .lookup(dataMap
+//                             .getString(JmsHelper.JMS_CONNECTION_FACTORY_JNDI));
 
-            if (!JmsHelper.isDestinationSecure(dataMap)) {
-                conn = connFactory.createConnection();
-            } else {
-                final string user = dataMap.getString(JmsHelper.JMS_USER);
+//             if (!JmsHelper.isDestinationSecure(dataMap)) {
+//                 conn = connFactory.createConnection();
+//             } else {
+//                 final string user = dataMap.getString(JmsHelper.JMS_USER);
 
-                final string password = dataMap
-                        .getString(JmsHelper.JMS_PASSWORD);
+//                 final string password = dataMap
+//                         .getString(JmsHelper.JMS_PASSWORD);
 
-                conn = connFactory.createConnection(user, password);
-            }
+//                 conn = connFactory.createConnection(user, password);
+//             }
 
-            final bool useTransaction = JmsHelper.useTransaction(dataMap);
+//             final bool useTransaction = JmsHelper.useTransaction(dataMap);
 
-            final int ackMode = dataMap.getInt(JmsHelper.JMS_ACK_MODE);
+//             final int ackMode = dataMap.getInt(JmsHelper.JMS_ACK_MODE);
 
-            sess = conn.createSession(useTransaction, ackMode);
+//             sess = conn.createSession(useTransaction, ackMode);
 
-            final Destination destination = (Destination) namingCtx
-                    .lookup(dataMap.getString(JmsHelper.JMS_DESTINATION_JNDI));
+//             final Destination destination = (Destination) namingCtx
+//                     .lookup(dataMap.getString(JmsHelper.JMS_DESTINATION_JNDI));
 
-            producer = sess.createProducer(destination);
+//             producer = sess.createProducer(destination);
 
-            final JmsMessageFactory messageFactory = JmsHelper
-                    .getMessageFactory(dataMap
-                            .getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME));
+//             final JmsMessageFactory messageFactory = JmsHelper
+//                     .getMessageFactory(dataMap
+//                             .getString(JmsHelper.JMS_MSG_FACTORY_CLASS_NAME));
 
-            final Message msg = messageFactory.createMessage(dataMap, sess);
+//             final Message msg = messageFactory.createMessage(dataMap, sess);
 
-            producer.send(msg);
-        } catch (final Exception e) {
-            throw new JobExecutionException(e);
-        } finally {
-            JmsHelper.closeResource(producer);
+//             producer.send(msg);
+//         } catch (final Exception e) {
+//             throw new JobExecutionException(e);
+//         } finally {
+//             JmsHelper.closeResource(producer);
 
-            JmsHelper.closeResource(sess);
+//             JmsHelper.closeResource(sess);
 
-            JmsHelper.closeResource(conn);
-        }
+//             JmsHelper.closeResource(conn);
+//         }
 
-    }
+//     }
 
-}
+// }

@@ -18,17 +18,17 @@
 
 module hunt.quartz.core.QuartzScheduler;
 
-// import java.io.InputStream;
+// import hunt.io.common;
 // import java.lang.management.ManagementFactory;
 // import java.rmi.RemoteException;
 // import java.rmi.registry.LocateRegistry;
 // import java.rmi.registry.Registry;
 // import java.rmi.server.UnicastRemoteObject;
-// import java.util.ArrayList;
-// import java.container.Collection;
-// import java.util.HashMap;
-// import java.util.LinkedList;
-// import java.util.List;
+// import hunt.container.ArrayList;
+// import hunt.container.Collection;
+// import hunt.container.HashMap;
+// import hunt.container.LinkedList;
+// import hunt.container.List;
 // import hunt.container.Map;
 // import java.util.Properties;
 // import java.util.Random;
@@ -128,7 +128,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         //         }
         //     }
         // } catch (Exception e) {
-        //     error("Error loading version info from quartz-build.properties.", e);
+        //     error("Error loading version info from quartz-build.properties.", e.msg);
         // } finally {
         //     if(is !is null) {
         //         try { is.close(); } catch(Exception ignore) {}
@@ -242,7 +242,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
                 registerJMX();
             } catch (Exception e) {
                 throw new SchedulerException(
-                        "Unable to register scheduler with MBeanServer.", e);
+                        "Unable to register scheduler with MBeanServer.", e.msg);
             }
         }
 
@@ -285,7 +285,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         // } catch (Exception e) {
         // throw new
         // SchedulerException("Unable to start the scheduler management REST service",
-        // e);
+        // e.msg);
         // }
         // }
 
@@ -674,7 +674,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         // standaloneRestServer.stop();
         // }
         // } catch (Exception e) {
-        // warn("Failed to shutdown the ManagementRESTService", e);
+        // warn("Failed to shutdown the ManagementRESTService", e.msg);
         // } finally {
         // if (removeMgmtSvr) {
         // MGMT_SVR_BY_BIND.remove(registeredManagementServerBind);
@@ -699,7 +699,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
                         ((InterruptableJob)job.getJobInstance()).interrupt();
                     } catch (Throwable e) {
                         // do nothing, this was just a courtesy effort
-                        warn("Encountered error when interrupting job {} during shutdown: {}", job.getJobDetail().getKey(), e);
+                        warn("Encountered error when interrupting job {} during shutdown: {}", job.getJobDetail().getKey(), e.msg);
                     }
             }
         }
@@ -950,7 +950,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         bool result = false;
         
         List<? extends Trigger> triggers = getTriggersOfJob(jobKey);
-        for (Trigger trigger : triggers) {
+        foreach(Trigger trigger ; triggers) {
             if (!unscheduleJob(trigger.getKey())) {
                 StringBuilder sb = new StringBuilder().append(
                         "Unable to unschedule trigger [").append(
@@ -1134,7 +1134,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * now) - with a non-trigger.
      * </p>
      */
-    @SuppressWarnings("deprecation")
+    
     void triggerJob(JobKey jobKey, JobDataMap data) {
         validateState();
 
@@ -1211,7 +1211,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         Collection!(string) pausedGroups = resources.getJobStore().pauseTriggers(matcher);
         notifySchedulerThread(0L);
-        for (string pausedGroup : pausedGroups) {
+        foreach(string pausedGroup ; pausedGroups) {
             notifySchedulerListenersPausedTriggers(pausedGroup);
         }
     }
@@ -1247,7 +1247,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         
         Collection!(string) pausedGroups = resources.getJobStore().pauseJobs(groupMatcher);
         notifySchedulerThread(0L);
-        for (string pausedGroup : pausedGroups) {
+        foreach(string pausedGroup ; pausedGroups) {
             notifySchedulerListenersPausedJobs(pausedGroup);
         }
     }
@@ -1293,7 +1293,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         Collection!(string) pausedGroups = resources.getJobStore().resumeTriggers(matcher);
         notifySchedulerThread(0L);
-        for (string pausedGroup : pausedGroups) {
+        foreach(string pausedGroup ; pausedGroups) {
             notifySchedulerListenersResumedTriggers(pausedGroup);
         }
     }
@@ -1345,7 +1345,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         
         Collection!(string) resumedGroups = resources.getJobStore().resumeJobs(matcher);
         notifySchedulerThread(0L);
-        for (string pausedGroup : resumedGroups) {
+        foreach(string pausedGroup ; resumedGroups) {
             notifySchedulerListenersResumedJobs(pausedGroup);
         }
     }
@@ -1839,7 +1839,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "TriggerListener '" ~ tl.getName()
-                                ~ "' threw exception: " ~ e.getMessage(), e);
+                                ~ "' threw exception: " ~ e.getMessage(), e.msg);
                 throw se;
             }
         }
@@ -1861,7 +1861,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "TriggerListener '" ~ tl.getName()
-                                ~ "' threw exception: " ~ e.getMessage(), e);
+                                ~ "' threw exception: " ~ e.getMessage(), e.msg);
                 throw se;
             }
         }
@@ -1881,7 +1881,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "TriggerListener '" ~ tl.getName()
-                                ~ "' threw exception: " ~ e.getMessage(), e);
+                                ~ "' threw exception: " ~ e.getMessage(), e.msg);
                 throw se;
             }
         }
@@ -1900,7 +1900,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "JobListener '" ~ jl.getName() ~ "' threw exception: "
-                                ~ e.msg, e);
+                                ~ e.msg, e.msg);
                 throw se;
             }
         }
@@ -1919,7 +1919,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "JobListener '" ~ jl.getName() ~ "' threw exception: "
-                        ~ e.msg, e);
+                        ~ e.msg, e.msg);
                 throw se;
             }
         }
@@ -1939,7 +1939,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "JobListener '" ~ jl.getName() ~ "' threw exception: "
-                                ~ e.msg, e);
+                                ~ e.msg, e.msg);
                 throw se;
             }
         }
@@ -1955,7 +1955,7 @@ J     *
                 sl.schedulerError(msg, se);
             } catch (Exception e) {
                 error("Error while notifying SchedulerListener of error: ",
-                                e);
+                                e.msg);
                 error("  Original error (for notification) was: " ~ msg, se);
             }
         }
@@ -1970,9 +1970,8 @@ J     *
             try {
                 sl.jobScheduled(trigger);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of scheduled job."
-                                ~ "  Triger=" ~ trigger.getKey(), e);
+                error("Error while notifying SchedulerListener of scheduled job."
+                                ~ "  Triger=" ~ trigger.getKey(), e.msg);
             }
         }
     }
@@ -1989,9 +1988,8 @@ J     *
                 else
                     sl.jobUnscheduled(triggerKey);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of unscheduled job."
-                                ~ "  Triger=" ~ (triggerKey is null ? "ALL DATA" : triggerKey), e);
+                error("Error while notifying SchedulerListener of unscheduled job."
+                                ~ "  Triger=" ~ (triggerKey is null ? "ALL DATA" : triggerKey), e.msg);
             }
         }
     }
@@ -2005,9 +2003,8 @@ J     *
             try {
                 sl.triggerFinalized(trigger);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of finalized trigger."
-                                ~ "  Triger=" ~ trigger.getKey(), e);
+                error("Error while notifying SchedulerListener of finalized trigger."
+                                ~ "  Triger=" ~ trigger.getKey(), e.msg);
             }
         }
     }
@@ -2021,9 +2018,8 @@ J     *
             try {
                 sl.triggerPaused(triggerKey);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of paused trigger: "
-                                + triggerKey, e);
+                error("Error while notifying SchedulerListener of paused trigger: "
+                                + triggerKey, e.msg);
             }
         }
     }
@@ -2037,9 +2033,8 @@ J     *
             try {
                 sl.triggersPaused(group);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of paused trigger group."
-                                + group, e);
+                error("Error while notifying SchedulerListener of paused trigger group."
+                                ~ group, e.msg);
             }
         }
     }
@@ -2053,9 +2048,8 @@ J     *
             try {
                 sl.triggerResumed(key);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of resumed trigger: "
-                                + key, e);
+                error("Error while notifying SchedulerListener of resumed trigger: "
+                                ~ key.toString(), e.msg);
             }
         }
     }
@@ -2069,9 +2063,8 @@ J     *
             try {
                 sl.triggersResumed(group);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of resumed group: "
-                                + group, e);
+                error("Error while notifying SchedulerListener of resumed group: "
+                                ~ group, e.msg);
             }
         }
     }
@@ -2085,9 +2078,8 @@ J     *
             try {
                 sl.jobPaused(key);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of paused job: "
-                                + key, e);
+                error("Error while notifying SchedulerListener of paused job: "
+                                ~ key.toString(), e.msg);
             }
         }
     }
@@ -2101,9 +2093,8 @@ J     *
             try {
                 sl.jobsPaused(group);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of paused job group: "
-                                + group, e);
+                error("Error while notifying SchedulerListener of paused job group: "
+                                ~ group, e.msg);
             }
         }
     }
@@ -2117,9 +2108,8 @@ J     *
             try {
                 sl.jobResumed(key);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of resumed job: "
-                                + key, e);
+                error("Error while notifying SchedulerListener of resumed job: "
+                                ~ key.toString(), e.msg);
             }
         }
     }
@@ -2133,9 +2123,8 @@ J     *
             try {
                 sl.jobsResumed(group);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of resumed job group: "
-                                + group, e);
+                error("Error while notifying SchedulerListener of resumed job group: "
+                                ~ group, e.msg);
             }
         }
     }
@@ -2149,9 +2138,8 @@ J     *
             try {
                 sl.schedulerInStandbyMode();
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of inStandByMode.",
-                        e);
+                error("Error while notifying SchedulerListener of inStandByMode.",
+                        e.msg);
             }
         }
     }
@@ -2165,9 +2153,8 @@ J     *
             try {
                 sl.schedulerStarted();
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of startup.",
-                        e);
+                error("Error while notifying SchedulerListener of startup.",
+                        e.msg);
             }
         }
     }
@@ -2177,13 +2164,12 @@ J     *
         List!(SchedulerListener) schedListeners = buildSchedulerListenerList();
 
         // notify all scheduler listeners
-        for (SchedulerListener sl : schedListeners) {
+        foreach(SchedulerListener sl ; schedListeners) {
             try {
                 sl.schedulerStarting();
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of startup.",
-                        e);
+                error("Error while notifying SchedulerListener of startup.",
+                        e.msg);
             }
         }
     }
@@ -2197,9 +2183,8 @@ J     *
             try {
                 sl.schedulerShutdown();
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of shutdown.",
-                        e);
+                error("Error while notifying SchedulerListener of shutdown.",
+                        e.msg);
             }
         }
     }
@@ -2213,9 +2198,8 @@ J     *
             try {
                 sl.schedulerShuttingdown();
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of shutdown.",
-                        e);
+                error("Error while notifying SchedulerListener of shutdown.",
+                        e.msg);
             }
         }
     }
@@ -2229,9 +2213,8 @@ J     *
             try {
                 sl.jobAdded(jobDetail);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of JobAdded.",
-                        e);
+                error("Error while notifying SchedulerListener of JobAdded.",
+                        e.msg);
             }
         }
     }
@@ -2245,9 +2228,8 @@ J     *
             try {
                 sl.jobDeleted(jobKey);
             } catch (Exception e) {
-                error(
-                        "Error while notifying SchedulerListener of JobAdded.",
-                        e);
+                error("Error while notifying SchedulerListener of JobAdded.",
+                        e.msg);
             }
         }
     }
@@ -2291,16 +2273,17 @@ J     *
         
         foreach(JobExecutionContext jec ; jobs) {
             jobDetail = jec.getJobDetail();
-            if (jobKey== jobDetail.getKey()) {
+            if (jobKey == jobDetail.getKey()) {
                 job = jec.getJobInstance();
-                if (job instanceof InterruptableJob) {
-                    ((InterruptableJob)job).interrupt();
+                InterruptableJob j = cast(InterruptableJob)job;
+                if (j !is null) {
+                    j.interrupt();
                     interrupted = true;
                 } else {
                     throw new UnableToInterruptJobException(
-                            "Job " ~ jobDetail.getKey() +
+                            "Job " ~ jobDetail.getKey().toString() ~
                             " can not be interrupted, since it does not implement " ~                        
-                            InterruptableJob.class.getName());
+                            typeid(InterruptableJob).name);
                 }
             }                        
         }
@@ -2327,14 +2310,15 @@ J     *
         foreach(JobExecutionContext jec ; jobs) {
             if (jec.getFireInstanceId()== fireInstanceId) {
                 job = jec.getJobInstance();
-                if (job instanceof InterruptableJob) {
-                    ((InterruptableJob)job).interrupt();
+                InterruptableJob j = cast(InterruptableJob)job;
+                if (j !is null) {
+                    j.interrupt();
                     return true;
                 } else {
                     throw new UnableToInterruptJobException(
-                        "Job " ~ jec.getJobDetail().getKey() +
+                        "Job " ~ jec.getJobDetail().getKey().toString() ~
                         " can not be interrupted, since it does not implement " ~                        
-                        InterruptableJob.class.getName());
+                        typeid(InterruptableJob).name);
                 }
             }                        
         }
@@ -2367,7 +2351,7 @@ J     *
 /////////////////////////////////////////////////////////////////////////////
 
 class ErrorLogger : SchedulerListenerSupport {
-    ErrorLogger() {
+    this() {
     }
     
     override
@@ -2384,15 +2368,16 @@ class ErrorLogger : SchedulerListenerSupport {
 /////////////////////////////////////////////////////////////////////////////
 
 class ExecutingJobsManager : JobListener {
-    HashMap!(string, JobExecutionContext) executingJobs = new HashMap!(string, JobExecutionContext)();
+    HashMap!(string, JobExecutionContext) executingJobs;
 
-    AtomicInteger numJobsFired = new AtomicInteger(0);
+    shared int numJobsFired = 0;
 
-    ExecutingJobsManager() {
+    this() {
+        executingJobs = new HashMap!(string, JobExecutionContext)();
     }
 
     string getName() {
-        return getClass().getName();
+        return typeid(this).name;
     }
 
     int getNumJobsCurrentlyExecuting() {
@@ -2406,14 +2391,14 @@ class ExecutingJobsManager : JobListener {
 
         synchronized (executingJobs) {
             executingJobs
-                    .put(((OperableTrigger)context.getTrigger()).getFireInstanceId(), context);
+                    .put((cast(OperableTrigger)context.getTrigger()).getFireInstanceId(), context);
         }
     }
 
     void jobWasExecuted(JobExecutionContext context,
             JobExecutionException jobException) {
         synchronized (executingJobs) {
-            executingJobs.remove(((OperableTrigger)context.getTrigger()).getFireInstanceId());
+            executingJobs.remove((cast(OperableTrigger)context.getTrigger()).getFireInstanceId());
         }
     }
 

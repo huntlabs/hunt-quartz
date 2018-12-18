@@ -17,7 +17,7 @@
 
 module hunt.quartz.ListenerManager;
 
-import java.util.List;
+import hunt.container.List;
 
 /**
  * Client programs may be interested in the 'listener' interfaces that are

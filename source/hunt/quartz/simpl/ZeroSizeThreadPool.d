@@ -66,7 +66,7 @@ class ZeroSizeThreadPool : ThreadPool {
      * Create a new <code>ZeroSizeThreadPool</code>.
      * </p>
      */
-    ZeroSizeThreadPool() {
+    this() {
     }
 
     /*

@@ -123,6 +123,6 @@ interface MutableTrigger : Trigger {
     void setMisfireInstruction(int misfireInstruction);
 
 
-    Object clone();
+    // Object clone();
 
 }

@@ -1,5 +1,7 @@
 module hunt.quartz.spi.TriggerFiredResult;
 
+import std.exception;
+
 /**
  * @author lorban
  */
@@ -9,19 +11,19 @@ class TriggerFiredResult {
 
   private Exception exception;
 
-  public TriggerFiredResult(TriggerFiredBundle triggerFiredBundle) {
+  this(TriggerFiredBundle triggerFiredBundle) {
     this.triggerFiredBundle = triggerFiredBundle;
   }
 
-  public TriggerFiredResult(Exception exception) {
+  this(Exception exception) {
     this.exception = exception;
   }
 
-  public TriggerFiredBundle getTriggerFiredBundle() {
+  TriggerFiredBundle getTriggerFiredBundle() {
     return triggerFiredBundle;
   }
 
-  public Exception getException() {
+  Exception getException() {
     return exception;
   }
 }

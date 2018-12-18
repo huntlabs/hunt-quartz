@@ -17,10 +17,7 @@
 
 module hunt.quartz.impl.DirectSchedulerFactory;
 
-import java.container.Collection;
-import java.util.Iterator;
-import hunt.container.Map;
-import java.util.Map.Entry;
+// import java.util.Map.Entry;
 
 import hunt.quartz.Scheduler;
 import hunt.quartz.SchedulerException;
@@ -36,6 +33,10 @@ import hunt.quartz.spi.JobStore;
 import hunt.quartz.spi.SchedulerPlugin;
 import hunt.quartz.spi.ThreadExecutor;
 import hunt.quartz.spi.ThreadPool;
+
+import hunt.container.Collection;
+import hunt.container.Iterator;
+import hunt.container.Map;
 import hunt.logging;
 
 
@@ -62,7 +63,7 @@ import hunt.logging;
  * </p>
  *
  * <pre>
- *  public void createScheduler(string schedulerName, string schedulerInstanceId, ThreadPool threadPool, JobStore jobStore, string rmiRegistryHost, int rmiRegistryPort)
+ *  void createScheduler(string schedulerName, string schedulerInstanceId, ThreadPool threadPool, JobStore jobStore, string rmiRegistryHost, int rmiRegistryPort)
  * </pre>
  *
  *
@@ -105,15 +106,13 @@ class DirectSchedulerFactory : SchedulerFactory {
 
     enum string DEFAULT_SCHEDULER_NAME = "SimpleQuartzScheduler";
 
-    private static final bool DEFAULT_JMX_EXPORT = false;
+    private enum bool DEFAULT_JMX_EXPORT = false;
 
     private enum string DEFAULT_JMX_OBJECTNAME = null;
 
-    private static final DefaultThreadExecutor DEFAULT_THREAD_EXECUTOR = new DefaultThreadExecutor();
-
     private enum int DEFAULT_BATCH_MAX_SIZE = 1;
 
-    private static final long DEFAULT_BATCH_TIME_WINDOW = 0L;
+    private enum long DEFAULT_BATCH_TIME_WINDOW = 0L;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,7 +124,8 @@ class DirectSchedulerFactory : SchedulerFactory {
 
     private bool initialized = false;
 
-    private static DirectSchedulerFactory instance = new DirectSchedulerFactory();
+    private __gshared DefaultThreadExecutor DEFAULT_THREAD_EXECUTOR;
+    private __gshared DirectSchedulerFactory instance;
 
 
     /*
@@ -135,12 +135,16 @@ class DirectSchedulerFactory : SchedulerFactory {
      *
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
+    shared static this() {
+        DEFAULT_THREAD_EXECUTOR = new DefaultThreadExecutor();
+        instance = new DirectSchedulerFactory();
+    }
 
 
     /**
      * Constructor
      */
-    protected DirectSchedulerFactory() {
+    protected this() {
     }
 
     /*

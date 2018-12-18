@@ -3,9 +3,9 @@ module hunt.quartz.core.jmx.CronTriggerSupport;
 // import static javax.management.openmbean.SimpleType.STRING;
 
 // import hunt.lang.exception;
-// import java.util.ArrayList;
+// import hunt.container.ArrayList;
 // import java.util.Arrays;
-// import java.util.List;
+// import hunt.container.List;
 // import hunt.container.Map;
 // import std.datetime : TimeZone;
 
@@ -92,7 +92,7 @@ module hunt.quartz.core.jmx.CronTriggerSupport;
 //         TabularData tData = new TabularDataSupport(TABULAR_TYPE);
 //         if (triggers !is null) {
 //             ArrayList!(CompositeData) list = new ArrayList!(CompositeData)();
-//             for (CronTrigger trigger : triggers) {
+//             foreach(CronTrigger trigger ; triggers) {
 //                 list.add(toCompositeData(trigger));
 //             }
 //             tData.putAll(list.toArray(new CompositeData[list.size()]));

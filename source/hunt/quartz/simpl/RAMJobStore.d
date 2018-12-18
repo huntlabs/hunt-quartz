@@ -17,16 +17,16 @@
 
 module hunt.quartz.simpl.RAMJobStore;
 
-import java.util.ArrayList;
-import java.container.Collection;
-import java.container.Collections;
+import hunt.container.ArrayList;
+import hunt.container.Collection;
+import hunt.container.Collections;
 import hunt.util.Comparator;
 import std.datetime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import hunt.container.HashMap;
+import hunt.container.HashSet;
+import hunt.container.Iterator;
+import hunt.container.LinkedList;
+import hunt.container.List;
 import hunt.container.Map;
 import hunt.comtainer.Set;
 import java.util.TreeSet;
@@ -57,7 +57,7 @@ import hunt.quartz.spi.TriggerFiredResult;
 import hunt.logging;
 
 
-import static hunt.quartz.impl.matchers.EverythingMatcher.allTriggers;
+import hunt.quartz.impl.matchers.EverythingMatcher;
 
 /**
  * <p>
@@ -174,7 +174,7 @@ class RAMJobStore : JobStore {
      * 
      * @param misfireThreshold the new misfire threshold
      */
-    @SuppressWarnings("UnusedDeclaration")
+    
     void setMisfireThreshold(long misfireThreshold) {
         if (misfireThreshold < 1) {
             throw new IllegalArgumentException("Misfire threshold must be larger than 0");
@@ -207,17 +207,17 @@ class RAMJobStore : JobStore {
         synchronized (lock) {
             // unschedule jobs (delete triggers)
             List!(string) lst = getTriggerGroupNames();
-            for (string group: lst) {
+            foreach(string group; lst) {
                 Set!(TriggerKey) keys = getTriggerKeys(GroupMatcher.triggerGroupEquals(group));
-                for (TriggerKey key: keys) {
+                foreach(TriggerKey key; keys) {
                     removeTrigger(key);
                 }
             }
             // delete jobs
             lst = getJobGroupNames();
-            for (string group: lst) {
+            foreach(string group; lst) {
                 Set!(JobKey) keys = getJobKeys(GroupMatcher.jobGroupEquals(group));
-                for (JobKey key: keys) {
+                foreach(JobKey key; keys) {
                     removeJob(key);
                 }
             }
@@ -312,7 +312,7 @@ class RAMJobStore : JobStore {
 
         synchronized (lock) {
             List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
-            for (OperableTrigger trig: triggersOfJob) {
+            foreach(OperableTrigger trig; triggersOfJob) {
                 this.removeTrigger(trig.getKey());
                 found = true;
             }
@@ -1105,10 +1105,10 @@ class RAMJobStore : JobStore {
                     }
             }
 
-            for (string pausedGroup : pausedGroups) {
+            foreach(string pausedGroup ; pausedGroups) {
                 Set!(TriggerKey) keys = getTriggerKeys(GroupMatcher.triggerGroupEquals(pausedGroup));
 
-                for (TriggerKey key: keys) {
+                foreach(TriggerKey key; keys) {
                     pauseTrigger(key);
                 }
             }
@@ -1127,7 +1127,7 @@ class RAMJobStore : JobStore {
     void pauseJob(JobKey jobKey) {
         synchronized (lock) {
             List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
-            for (OperableTrigger trigger: triggersOfJob) {
+            foreach(OperableTrigger trigger; triggersOfJob) {
                 pauseTrigger(trigger.getKey());
             }
         }
@@ -1167,10 +1167,10 @@ class RAMJobStore : JobStore {
                     }
             }
 
-            for (string groupName : pausedGroups) {
+            foreach(string groupName ; pausedGroups) {
                 for (JobKey jobKey: getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                     List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
-                    for (OperableTrigger trigger: triggersOfJob) {
+                    foreach(OperableTrigger trigger; triggersOfJob) {
                         pauseTrigger(trigger.getKey());
                     }
                 }
@@ -1242,7 +1242,7 @@ class RAMJobStore : JobStore {
         synchronized (lock) {
             Set!(TriggerKey) keys = getTriggerKeys(matcher);
 
-            for (TriggerKey triggerKey: keys) {
+            foreach(TriggerKey triggerKey; keys) {
                 groups.add(triggerKey.getGroup());
                 if(triggersByKey.get(triggerKey) !is null) {
                     string jobGroup = triggersByKey.get(triggerKey).jobKey.getGroup();
@@ -1264,13 +1264,13 @@ class RAMJobStore : JobStore {
                     }
                     break;
                 default :
-                    for (string group : pausedTriggerGroups) {
+                    foreach(string group ; pausedTriggerGroups) {
                         if(operator.evaluate(group, matcherGroup)) {
                             pausedGroups.add(group);
                         }
                     }
             }
-            for (string pausedGroup : pausedGroups) {
+            foreach(string pausedGroup ; pausedGroups) {
                 pausedTriggerGroups.remove(pausedGroup);
             }
         }
@@ -1295,7 +1295,7 @@ class RAMJobStore : JobStore {
 
         synchronized (lock) {
             List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
-            for (OperableTrigger trigger: triggersOfJob) {
+            foreach(OperableTrigger trigger; triggersOfJob) {
                 resumeTrigger(trigger.getKey());
             }
         }
@@ -1319,19 +1319,19 @@ class RAMJobStore : JobStore {
         synchronized (lock) {
             Set!(JobKey) keys = getJobKeys(matcher);
 
-            for (string pausedJobGroup : pausedJobGroups) {
+            foreach(string pausedJobGroup ; pausedJobGroups) {
                 if(matcher.getCompareWithOperator().evaluate(pausedJobGroup, matcher.getCompareToValue())) {
                     resumedGroups.add(pausedJobGroup);
                 }
             }
 
-            for (string resumedGroup : resumedGroups) {
+            foreach(string resumedGroup ; resumedGroups) {
                 pausedJobGroups.remove(resumedGroup);
             }
 
-            for (JobKey key: keys) {
+            foreach(JobKey key; keys) {
                 List!(OperableTrigger) triggersOfJob = getTriggersForJob(key);
-                for (OperableTrigger trigger: triggersOfJob) {
+                foreach(OperableTrigger trigger; triggersOfJob) {
                     resumeTrigger(trigger.getKey());
                 }
             }
@@ -1359,7 +1359,7 @@ class RAMJobStore : JobStore {
         synchronized (lock) {
             List!(string) names = getTriggerGroupNames();
 
-            for (string name: names) {
+            foreach(string name; names) {
                 pauseTriggers(GroupMatcher.triggerGroupEquals(name));
             }
         }
@@ -1534,7 +1534,7 @@ class RAMJobStore : JobStore {
         synchronized (lock) {
             List!(TriggerFiredResult) results = new ArrayList!(TriggerFiredResult)();
 
-            for (OperableTrigger trigger : firedTriggers) {
+            foreach(OperableTrigger trigger ; firedTriggers) {
                 TriggerWrapper tw = triggersByKey.get(trigger.getKey());
                 // was the trigger deleted since being acquired?
                 if (tw is null || tw.trigger is null) {
@@ -1569,7 +1569,7 @@ class RAMJobStore : JobStore {
 
                 if (job.isConcurrentExectionDisallowed()) {
                     ArrayList!(TriggerWrapper) trigs = getTriggerWrappersForJob(job.getKey());
-                    for (TriggerWrapper ttw : trigs) {
+                    foreach(TriggerWrapper ttw ; trigs) {
                         if (ttw.state == TriggerWrapper.STATE_WAITING) {
                             ttw.state = TriggerWrapper.STATE_BLOCKED;
                         }
@@ -1684,7 +1684,7 @@ class RAMJobStore : JobStore {
 
     protected void setAllTriggersOfJobToState(JobKey jobKey, int state) {
         ArrayList!(TriggerWrapper) tws = getTriggerWrappersForJob(jobKey);
-        for (TriggerWrapper tw : tws) {
+        foreach(TriggerWrapper tw ; tws) {
             tw.state = state;
             if (state != TriggerWrapper.STATE_WAITING) {
                 timeTriggers.remove(tw);
@@ -1692,7 +1692,7 @@ class RAMJobStore : JobStore {
         }
     }
     
-    @SuppressWarnings("UnusedDeclaration")
+    
     protected string peekTriggers() {
 
         StringBuilder str = new StringBuilder();
@@ -1705,7 +1705,7 @@ class RAMJobStore : JobStore {
         str.append(" | ");
 
         synchronized (lock) {
-            for (TriggerWrapper timeTrigger : timeTriggers) {
+            foreach(TriggerWrapper timeTrigger ; timeTriggers) {
                 str.append(timeTrigger.trigger.getKey().getName());
                 str.append("->");
             }
@@ -1753,10 +1753,14 @@ class RAMJobStore : JobStore {
  * Helper Classes. * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
-class TriggerWrapperComparator : Comparator!(TriggerWrapper), java.io.Serializable {
+class TriggerWrapperComparator : Comparator!(TriggerWrapper) { // , java.io.Serializable
   
 
-    TriggerTimeComparator ttc = new TriggerTimeComparator();
+    TriggerTimeComparator ttc;
+
+    this() {
+        ttc = new TriggerTimeComparator();
+    }
     
     int compare(TriggerWrapper trig1, TriggerWrapper trig2) {
         return ttc.compare(trig1.trigger, trig2.trigger);
@@ -1764,12 +1768,13 @@ class TriggerWrapperComparator : Comparator!(TriggerWrapper), java.io.Serializab
 
     override
     bool equals(Object obj) {
-        return (obj instanceof TriggerWrapperComparator);
+        TriggerWrapperComparator c = cast(TriggerWrapperComparator)obj;
+        return c !is null;
     }
 
     override
-    size_t toHash() @trusted nothrow() {
-        return super.hashCode();
+    size_t toHash() @trusted nothrow {
+        return super.toHash();
     }
 }
 
@@ -1779,16 +1784,16 @@ class JobWrapper {
 
     JobDetail jobDetail;
 
-    JobWrapper(JobDetail jobDetail) {
+    this(JobDetail jobDetail) {
         this.jobDetail = jobDetail;
         key = jobDetail.getKey();
     }
 
     override
     bool equals(Object obj) {
-        if (obj instanceof JobWrapper) {
-            JobWrapper jw = (JobWrapper) obj;
-            if (jw.key== this.key) {
+        JobWrapper jw = cast(JobWrapper) obj;
+        if (jw !is null) {
+            if (jw.key == this.key) {
                 return true;
             }
         }
@@ -1797,8 +1802,8 @@ class JobWrapper {
     }
     
     override
-    size_t toHash() @trusted nothrow() {
-        return key.hashCode(); 
+    size_t toHash() @trusted nothrow {
+        return key.toHash(); 
     }
 }
 
@@ -1816,7 +1821,7 @@ class TriggerWrapper {
 
     enum int STATE_ACQUIRED = 1;
 
-    @SuppressWarnings("UnusedDeclaration")
+    
     enum int STATE_EXECUTING = 2;
 
     enum int STATE_COMPLETE = 3;
@@ -1829,7 +1834,7 @@ class TriggerWrapper {
 
     enum int STATE_ERROR = 7;
     
-    TriggerWrapper(OperableTrigger trigger) {
+    this(OperableTrigger trigger) {
         if(trigger is null)
             throw new IllegalArgumentException("Trigger cannot be null!");
         this.trigger = trigger;
@@ -1839,9 +1844,9 @@ class TriggerWrapper {
 
     override
     bool equals(Object obj) {
-        if (obj instanceof TriggerWrapper) {
-            TriggerWrapper tw = (TriggerWrapper) obj;
-            if (tw.key== this.key) {
+        TriggerWrapper tw = (TriggerWrapper) obj;
+        if (tw !is null) {
+            if (tw.key == this.key) {
                 return true;
             }
         }
@@ -1850,8 +1855,8 @@ class TriggerWrapper {
     }
 
     override
-    size_t toHash() @trusted nothrow() {
-        return key.hashCode(); 
+    size_t toHash() @trusted nothrow {
+        return key.toHash(); 
     }
 
     

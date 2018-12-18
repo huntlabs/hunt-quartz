@@ -24,19 +24,18 @@ import hunt.quartz.utils.Key;
  *  
  * @author jhouse
  */
-class KeyMatcher<T extends Key<?>> implements Matcher!(T) {
+class KeyMatcher(T) : Matcher!(T) {
   
-
     protected T compareTo;
     
-    protected KeyMatcher(T compareTo) {
+    protected this(T compareTo) {
         this.compareTo = compareTo;
     }
     
     /**
      * Create a KeyMatcher that matches Keys that equal the given key. 
      */
-    static <U extends Key<?>> KeyMatcher!(U) keyEquals(U compareTo) {
+    static KeyMatcher!(U) keyEquals(U)(U compareTo) {
         return new KeyMatcher!(U)(compareTo);
     }
 
@@ -50,11 +49,11 @@ class KeyMatcher<T extends Key<?>> implements Matcher!(T) {
     }
 
     override
-    size_t toHash() @trusted nothrow() {
+    size_t toHash() @trusted nothrow {
         final int prime = 31;
         int result = 1;
         result = prime * result
-                + ((compareTo is null) ? 0 : compareTo.hashCode());
+                + ((compareTo is null) ? 0 : compareTo.toHash());
         return result;
     }
 
@@ -66,7 +65,7 @@ class KeyMatcher<T extends Key<?>> implements Matcher!(T) {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        KeyMatcher<?> other = (KeyMatcher<?>) obj;
+        KeyMatcher!T other = cast(KeyMatcher!T) obj;
         if (compareTo is null) {
             if (other.compareTo !is null)
                 return false;

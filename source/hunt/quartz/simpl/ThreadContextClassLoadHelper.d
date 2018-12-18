@@ -19,8 +19,8 @@ module hunt.quartz.simpl.ThreadContextClassLoadHelper;
 
 import hunt.quartz.spi.ClassLoadHelper;
 
-import java.net.URL;
-import java.io.InputStream;
+// import java.net.URL;
+import hunt.io.common;
 
 /**
  * A <code>ClassLoadHelper</code> that uses either the current thread's
@@ -35,63 +35,63 @@ import java.io.InputStream;
  * @author jhouse
  * @author pl47ypus
  */
-class ThreadContextClassLoadHelper : ClassLoadHelper {
+// class ThreadContextClassLoadHelper : ClassLoadHelper {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Interface.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    /**
-     * Called to give the ClassLoadHelper a chance to initialize itself,
-     * including the opportunity to "steal" the class loader off of the calling
-     * thread, which is the thread that is initializing Quartz.
-     */
-    void initialize() {
-    }
+//     /**
+//      * Called to give the ClassLoadHelper a chance to initialize itself,
+//      * including the opportunity to "steal" the class loader off of the calling
+//      * thread, which is the thread that is initializing Quartz.
+//      */
+//     void initialize() {
+//     }
 
-    /**
-     * Return the class with the given name.
-     */
-    Class<?> loadClass(string name) {
-        return getClassLoader().loadClass(name);
-    }
+//     /**
+//      * Return the class with the given name.
+//      */
+//     Class<?> loadClass(string name) {
+//         return getClassLoader().loadClass(name);
+//     }
 
-    @SuppressWarnings("unchecked")
-    <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
-        return (Class<? extends T>) loadClass(name);
-    }
+//     
+//     <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
+//         return (Class<? extends T>) loadClass(name);
+//     }
     
-    /**
-     * Finds a resource with a given name. This method returns null if no
-     * resource with this name is found.
-     * @param name name of the desired resource
-     * @return a java.net.URL object
-     */
-    URL getResource(string name) {
-        return getClassLoader().getResource(name);
-    }
+//     /**
+//      * Finds a resource with a given name. This method returns null if no
+//      * resource with this name is found.
+//      * @param name name of the desired resource
+//      * @return a java.net.URL object
+//      */
+//     URL getResource(string name) {
+//         return getClassLoader().getResource(name);
+//     }
 
-    /**
-     * Finds a resource with a given name. This method returns null if no
-     * resource with this name is found.
-     * @param name name of the desired resource
-     * @return a java.io.InputStream object
-     */
-    InputStream getResourceAsStream(string name) {
-        return getClassLoader().getResourceAsStream(name);
-    }
+//     /**
+//      * Finds a resource with a given name. This method returns null if no
+//      * resource with this name is found.
+//      * @param name name of the desired resource
+//      * @return a java.io.InputStream object
+//      */
+//     InputStream getResourceAsStream(string name) {
+//         return getClassLoader().getResourceAsStream(name);
+//     }
 
-    /**
-     * Enable sharing of the class-loader with 3rd party.
-     *
-     * @return the class-loader user be the helper.
-     */
-    ClassLoader getClassLoader() {
-        return Thread.getThis().getContextClassLoader();
-    }
+//     /**
+//      * Enable sharing of the class-loader with 3rd party.
+//      *
+//      * @return the class-loader user be the helper.
+//      */
+//     ClassLoader getClassLoader() {
+//         return Thread.getThis().getContextClassLoader();
+//     }
 
-}
+// }

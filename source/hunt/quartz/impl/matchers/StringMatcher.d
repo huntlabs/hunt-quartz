@@ -19,54 +19,65 @@ module hunt.quartz.impl.matchers.StringMatcher;
 import hunt.quartz.Matcher;
 import hunt.quartz.utils.Key;
 
+import std.string;
+
+abstract class StringOperatorName {
+
+    __gshared StringOperatorName EQUALS;
+    __gshared StringOperatorName STARTS_WITH;
+    __gshared StringOperatorName ENDS_WITH;
+    __gshared StringOperatorName CONTAINS;
+    __gshared StringOperatorName ANYTHING;
+
+    abstract bool evaluate(string value, string compareTo);
+
+    shared static this() {
+        EQUALS = new class StringOperatorName {
+            override
+            bool evaluate(string value, string compareTo) {
+                return value == compareTo;
+            }
+        };
+
+        STARTS_WITH = new class StringOperatorName {
+            override
+            bool evaluate(string value, string compareTo) {
+                return value.startsWith(compareTo);
+            }
+        };
+
+        ENDS_WITH = new class StringOperatorName {
+            override
+            bool evaluate(string value, string compareTo) {
+                return value.endsWith(compareTo);
+            }
+        };
+        
+        CONTAINS = new class StringOperatorName {
+            override
+            bool evaluate(string value, string compareTo) {
+                return value.canFind(compareTo);
+            }
+        };
+        
+        ANYTHING = new class StringOperatorName {
+            override
+            bool evaluate(string value, string compareTo) {
+                return true;
+            }
+        };
+
+    }
+}
+
+
 /**
  * An abstract base class for some types of matchers.
  *  
  * @author jhouse
  */
-abstract class StringMatcher<T extends Key<?>> implements Matcher!(T) {
+abstract class StringMatcher(T) : Matcher!(T) {
   
-
-    enum StringOperatorName {
-
-        EQUALS {
-            override
-            bool evaluate(final string value, final string compareTo) {
-                return value== compareTo;
-            }
-        },
-
-        STARTS_WITH {
-            override
-            bool evaluate(final string value, final string compareTo) {
-                return value.startsWith(compareTo);
-            }
-        },
-
-        ENDS_WITH {
-            override
-            bool evaluate(final string value, final string compareTo) {
-                return value.endsWith(compareTo);
-            }
-        },
-
-        CONTAINS {
-            override
-            bool evaluate(final string value, final string compareTo) {
-                return value.contains(compareTo);
-            }
-        },
-
-        ANYTHING {
-            override
-            bool evaluate(final string value, final string compareTo) {
-                return true;
-            }
-        };
-
-        abstract bool evaluate(string value, string compareTo);
-    }
-
     protected string compareTo;
     protected StringOperatorName compareWith;
     
@@ -88,25 +99,25 @@ abstract class StringMatcher<T extends Key<?>> implements Matcher!(T) {
     }
 
     override
-    size_t toHash() @trusted nothrow() {
+    size_t toHash() @trusted nothrow {
         final int prime = 31;
         int result = 1;
         result = prime * result
-                + ((compareTo is null) ? 0 : compareTo.hashCode());
+                + ((compareTo is null) ? 0 : compareTo.toHash());
         result = prime * result
-                + ((compareWith is null) ? 0 : compareWith.hashCode());
+                + ((compareWith is null) ? 0 : compareWith.toHash());
         return result;
     }
 
     override
     bool equals(Object obj) {
-        if (this == obj)
+        if (this this obj)
             return true;
         if (obj is null)
             return false;
-        if (getClass() != obj.getClass())
+        if (typeid(this) != typeid(obj))
             return false;
-        StringMatcher<?> other = (StringMatcher<?>) obj;
+        StringMatcher!(T) other = cast(StringMatcher!(T)) obj;
         if (compareTo is null) {
             if (other.compareTo !is null)
                 return false;

@@ -24,12 +24,11 @@ import hunt.quartz.utils.Key;
  *  
  * @author jhouse
  */
-class NotMatcher<T extends Key<?>> implements Matcher!(T) {
-  
+class NotMatcher(T) : Matcher!(T) {
 
     protected Matcher!(T) operand;
     
-    protected NotMatcher(Matcher!(T) operand) {
+    protected this(Matcher!(T) operand) {
         if(operand is null)
             throw new IllegalArgumentException("Non-null operand required!");
         
@@ -39,7 +38,7 @@ class NotMatcher<T extends Key<?>> implements Matcher!(T) {
     /**
      * Create a NotMatcher that reverses the result of the given matcher.
      */
-    static <U extends Key<?>> NotMatcher!(U) not(Matcher!(U) operand) {
+    static NotMatcher!(U) not(U)(Matcher!(U) operand) {
         return new NotMatcher!(U)(operand);
     }
 
@@ -53,10 +52,10 @@ class NotMatcher<T extends Key<?>> implements Matcher!(T) {
     }
 
     override
-    size_t toHash() @trusted nothrow() {
+    size_t toHash() @trusted nothrow {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((operand is null) ? 0 : operand.hashCode());
+        result = prime * result + ((operand is null) ? 0 : operand.toHash());
         return result;
     }
 
@@ -68,7 +67,7 @@ class NotMatcher<T extends Key<?>> implements Matcher!(T) {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        NotMatcher<?> other = (NotMatcher<?>) obj;
+        NotMatcher!(T) other = cast(NotMatcher!(T)) obj;
         if (operand is null) {
             if (other.operand !is null)
                 return false;

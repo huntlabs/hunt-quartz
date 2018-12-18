@@ -27,8 +27,8 @@ import hunt.quartz.utils.counter.Counter;
  */
 class SampledRateCounterConfig : SampledCounterConfig {
 
-    private final long initialNumeratorValue;
-    private final long initialDenominatorValue;
+    private long initialNumeratorValue;
+    private long initialDenominatorValue;
 
     /**
      * Constructor accepting the interval time in seconds, history-size and
@@ -39,7 +39,7 @@ class SampledRateCounterConfig : SampledCounterConfig {
      * @param historySize
      * @param isResetOnSample
      */
-    SampledRateCounterConfig(int intervalSecs, int historySize, bool isResetOnSample) {
+    this(int intervalSecs, int historySize, bool isResetOnSample) {
         this(intervalSecs, historySize, isResetOnSample, 0, 0);
     }
 
@@ -54,7 +54,7 @@ class SampledRateCounterConfig : SampledCounterConfig {
      * @param initialNumeratorValue
      * @param initialDenominatorValue
      */
-    SampledRateCounterConfig(int intervalSecs, int historySize, bool isResetOnSample, long initialNumeratorValue,
+    this(int intervalSecs, int historySize, bool isResetOnSample, long initialNumeratorValue,
             long initialDenominatorValue) {
         super(intervalSecs, historySize, isResetOnSample, 0);
         this.initialNumeratorValue = initialNumeratorValue;

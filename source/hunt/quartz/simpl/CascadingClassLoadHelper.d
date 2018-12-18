@@ -17,10 +17,11 @@
 
 module hunt.quartz.simpl.CascadingClassLoadHelper;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.net.URL;
-import java.io.InputStream;
+import hunt.container.Iterator;
+import hunt.container.LinkedList;
+
+// import java.net.URL;
+import hunt.io.common;
 
 import hunt.quartz.spi.ClassLoadHelper;
 
@@ -132,7 +133,7 @@ class CascadingClassLoadHelper : ClassLoadHelper {
         return clazz;
     }
 
-    @SuppressWarnings("unchecked")
+    
     <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
         return (Class<? extends T>) loadClass(name);
     }

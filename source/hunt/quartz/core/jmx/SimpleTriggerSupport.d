@@ -4,9 +4,9 @@ module hunt.quartz.core.jmx.SimpleTriggerSupport;
 // import static javax.management.openmbean.SimpleType.LONG;
 
 // import hunt.lang.exception;
-// import java.util.ArrayList;
+// import hunt.container.ArrayList;
 // import java.util.Arrays;
-// import java.util.List;
+// import hunt.container.List;
 // import hunt.container.Map;
 
 // import javax.management.openmbean.CompositeData;
@@ -93,7 +93,7 @@ module hunt.quartz.core.jmx.SimpleTriggerSupport;
 //         TabularData tData = new TabularDataSupport(TABULAR_TYPE);
 //         if (triggers !is null) {
 //             ArrayList!(CompositeData) list = new ArrayList!(CompositeData)();
-//             for (SimpleTrigger trigger : triggers) {
+//             foreach(SimpleTrigger trigger ; triggers) {
 //                 list.add(toCompositeData(trigger));
 //             }
 //             tData.putAll(list.toArray(new CompositeData[list.size()]));

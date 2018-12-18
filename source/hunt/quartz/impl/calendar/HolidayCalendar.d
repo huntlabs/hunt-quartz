@@ -17,7 +17,7 @@
 
 module hunt.quartz.impl.calendar.HolidayCalendar;
 
-import java.container.Collections;
+import hunt.container.Collections;
 import std.datetime;
 import java.util.SortedSet;
 import std.datetime : TimeZone;

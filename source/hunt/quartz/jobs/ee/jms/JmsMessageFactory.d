@@ -17,34 +17,34 @@
 
 module hunt.quartz.jobs.ee.jms.JmsMessageFactory;
 
-import javax.jms.Message;
-import javax.jms.Session;
+// import javax.jms.Message;
+// import javax.jms.Session;
 
-import hunt.quartz.JobDataMap;
+// import hunt.quartz.JobDataMap;
 
-/**
- * The JmsMessageFactory interface allows for the creation of a
- * <code>javax.jms.Message</code>. This interface is used in constructing a
- * <code>javax.jms.Message</code> that is to be sent upon execution of a JMS
- * enabled job.
- * 
- * @see SendDestinationMessageJob
- * @see SendQueueMessageJob
- * @see SendTopicMessageJob
- * 
- * @author Weston M. Price
- */
-interface JmsMessageFactory {
+// /**
+//  * The JmsMessageFactory interface allows for the creation of a
+//  * <code>javax.jms.Message</code>. This interface is used in constructing a
+//  * <code>javax.jms.Message</code> that is to be sent upon execution of a JMS
+//  * enabled job.
+//  * 
+//  * @see SendDestinationMessageJob
+//  * @see SendQueueMessageJob
+//  * @see SendTopicMessageJob
+//  * 
+//  * @author Weston M. Price
+//  */
+// interface JmsMessageFactory {
 
-    /**
-     * Creates a <code>javax.jms.Message</code>.
-     * 
-     * @param jobDataMap
-     *            the <code>JobDataMap</code>
-     * @param session
-     *            the <code>javax.jms.Session</code>
-     * 
-     * @return the <code>javax.jms.Message</code>
-     */
-    Message createMessage(JobDataMap jobDataMap, Session session);
-}
+//     /**
+//      * Creates a <code>javax.jms.Message</code>.
+//      * 
+//      * @param jobDataMap
+//      *            the <code>JobDataMap</code>
+//      * @param session
+//      *            the <code>javax.jms.Session</code>
+//      * 
+//      * @return the <code>javax.jms.Message</code>
+//      */
+//     Message createMessage(JobDataMap jobDataMap, Session session);
+// }
