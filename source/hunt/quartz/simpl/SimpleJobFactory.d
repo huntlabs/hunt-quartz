@@ -16,8 +16,8 @@
  */
 module hunt.quartz.simpl.SimpleJobFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.Job;
 import hunt.quartz.JobDetail;
 import hunt.quartz.Scheduler;
@@ -34,15 +34,11 @@ import hunt.quartz.spi.TriggerFiredBundle;
  * 
  * @author jhouse
  */
-class SimpleJobFactory implements JobFactory {
+class SimpleJobFactory : JobFactory {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
     
-    protected Logger getLog() {
-        return log;
-    }
     
-    Job newJob(TriggerFiredBundle bundle, Scheduler Scheduler) throws SchedulerException {
+    Job newJob(TriggerFiredBundle bundle, Scheduler Scheduler) {
 
         JobDetail jobDetail = bundle.getJobDetail();
         Class<? extends Job> jobClass = jobDetail.getJobClass();

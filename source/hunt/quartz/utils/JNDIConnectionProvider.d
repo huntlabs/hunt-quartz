@@ -26,8 +26,8 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * <p>
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author Patrick Lightbody
  * @author Srinivas Venkatarangaiah
  */
-class JNDIConnectionProvider implements ConnectionProvider {
+class JNDIConnectionProvider : ConnectionProvider {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,7 +63,6 @@ class JNDIConnectionProvider implements ConnectionProvider {
 
     private bool alwaysLookup = false;
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,9 +109,6 @@ class JNDIConnectionProvider implements ConnectionProvider {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected Logger getLog() {
-        return log;
-    }
 
     private void init() {
 
@@ -123,7 +119,7 @@ class JNDIConnectionProvider implements ConnectionProvider {
 
                 datasource = (DataSource) ctx.lookup(url);
             } catch (Exception e) {
-                getLog().error(
+                error(
                         "Error looking up datasource: " ~ e.getMessage(), e);
             } finally {
                 if (ctx !is null) {
@@ -133,7 +129,7 @@ class JNDIConnectionProvider implements ConnectionProvider {
         }
     }
 
-    Connection getConnection() throws SQLException {
+    Connection getConnection() {
         Context ctx = null;
         try {
             Object ds = this.datasource;
@@ -181,11 +177,11 @@ class JNDIConnectionProvider implements ConnectionProvider {
     /* 
      * @see hunt.quartz.utils.ConnectionProvider#shutdown()
      */
-    void shutdown() throws SQLException {
+    void shutdown() {
         // do nothing
     }
 
-    void initialize() throws SQLException {
+    void initialize() {
         // do nothing, already initialized during constructor call
     }
 }

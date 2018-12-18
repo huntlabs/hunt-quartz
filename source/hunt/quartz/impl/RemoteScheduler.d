@@ -55,7 +55,7 @@ import hunt.quartz.spi.JobFactory;
  * 
  * @author James House
  */
-class RemoteScheduler implements Scheduler {
+class RemoteScheduler : Scheduler {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -102,8 +102,7 @@ class RemoteScheduler implements Scheduler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected RemotableQuartzScheduler getRemoteScheduler()
-        throws SchedulerException {
+    protected RemotableQuartzScheduler getRemoteScheduler() {
         if (rsched !is null) {
             return rsched;
         }
@@ -116,7 +115,7 @@ class RemoteScheduler implements Scheduler {
         } catch (Exception e) {
             SchedulerException initException = new SchedulerException(
                     "Could not get handle to remote scheduler: "
-                            + e.getMessage(), e);
+                            ~ e.msg, e);
             throw initException;
         }
 
@@ -135,7 +134,7 @@ class RemoteScheduler implements Scheduler {
      * Returns the name of the <code>Scheduler</code>.
      * </p>
      */
-    string getSchedulerName() throws SchedulerException {
+    string getSchedulerName() {
         try {
             return getRemoteScheduler().getSchedulerName();
         } catch (RemoteException re) {
@@ -149,7 +148,7 @@ class RemoteScheduler implements Scheduler {
      * Returns the instance Id of the <code>Scheduler</code>.
      * </p>
      */
-    string getSchedulerInstanceId() throws SchedulerException {
+    string getSchedulerInstanceId() {
         try {
             return getRemoteScheduler().getSchedulerInstanceId();
         } catch (RemoteException re) {
@@ -158,7 +157,7 @@ class RemoteScheduler implements Scheduler {
         }
     }
 
-    SchedulerMetaData getMetaData() throws SchedulerException {
+    SchedulerMetaData getMetaData() {
         try {
             RemotableQuartzScheduler sched = getRemoteScheduler();
             return new SchedulerMetaData(getSchedulerName(),
@@ -180,7 +179,7 @@ class RemoteScheduler implements Scheduler {
      * Returns the <code>SchedulerContext</code> of the <code>Scheduler</code>.
      * </p>
      */
-    SchedulerContext getContext() throws SchedulerException {
+    SchedulerContext getContext() {
         try {
             return getRemoteScheduler().getSchedulerContext();
         } catch (RemoteException re) {
@@ -200,7 +199,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void start() throws SchedulerException {
+    void start() {
         try {
             getRemoteScheduler().start();
         } catch (RemoteException re) {
@@ -214,7 +213,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void startDelayed(int seconds) throws SchedulerException {
+    void startDelayed(int seconds) {
         try {
             getRemoteScheduler().startDelayed(seconds);
         } catch (RemoteException re) {
@@ -228,7 +227,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void standby() throws SchedulerException {
+    void standby() {
         try {
             getRemoteScheduler().standby();
         } catch (RemoteException re) {
@@ -251,7 +250,7 @@ class RemoteScheduler implements Scheduler {
      * @see #isShutdown()
      * @see #isInStandbyMode()
      */    
-    bool isStarted() throws SchedulerException {
+    bool isStarted() {
         try {
             return (getRemoteScheduler().runningSince() !is null);
         } catch (RemoteException re) {
@@ -265,7 +264,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    bool isInStandbyMode() throws SchedulerException {
+    bool isInStandbyMode() {
         try {
             return getRemoteScheduler().isInStandbyMode();
         } catch (RemoteException re) {
@@ -279,7 +278,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void shutdown() throws SchedulerException {
+    void shutdown() {
         try {
             string schedulerName = getSchedulerName();
             
@@ -297,8 +296,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void shutdown(bool waitForJobsToComplete)
-        throws SchedulerException {
+    void shutdown(bool waitForJobsToComplete) {
         try {
             string schedulerName = getSchedulerName();
             
@@ -316,7 +314,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    bool isShutdown() throws SchedulerException {
+    bool isShutdown() {
         try {
             return getRemoteScheduler().isShutdown();
         } catch (RemoteException re) {
@@ -330,7 +328,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    List!(JobExecutionContext) getCurrentlyExecutingJobs() throws SchedulerException {
+    List!(JobExecutionContext) getCurrentlyExecutingJobs() {
         try {
             return getRemoteScheduler().getCurrentlyExecutingJobs();
         } catch (RemoteException re) {
@@ -350,8 +348,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Date scheduleJob(JobDetail jobDetail, Trigger trigger)
-        throws SchedulerException {
+    Date scheduleJob(JobDetail jobDetail, Trigger trigger) {
         try {
             return getRemoteScheduler().scheduleJob(jobDetail,
                     trigger);
@@ -366,7 +363,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Date scheduleJob(Trigger trigger) throws SchedulerException {
+    Date scheduleJob(Trigger trigger) {
         try {
             return getRemoteScheduler().scheduleJob(trigger);
         } catch (RemoteException re) {
@@ -380,8 +377,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void addJob(JobDetail jobDetail, bool replace)
-        throws SchedulerException {
+    void addJob(JobDetail jobDetail, bool replace) {
         try {
             getRemoteScheduler().addJob(jobDetail, replace);
         } catch (RemoteException re) {
@@ -390,8 +386,7 @@ class RemoteScheduler implements Scheduler {
         }
     }
 
-    void addJob(JobDetail jobDetail, bool replace, bool storeNonDurableWhileAwaitingScheduling)
-            throws SchedulerException {
+    void addJob(JobDetail jobDetail, bool replace, bool storeNonDurableWhileAwaitingScheduling) {
         try {
             getRemoteScheduler().addJob(jobDetail, replace, storeNonDurableWhileAwaitingScheduling);
         } catch (RemoteException re) {
@@ -400,7 +395,7 @@ class RemoteScheduler implements Scheduler {
         }
     }
 
-    bool deleteJobs(List!(JobKey) jobKeys) throws SchedulerException {
+    bool deleteJobs(List!(JobKey) jobKeys) {
         try {
             return getRemoteScheduler().deleteJobs(jobKeys);
         } catch (RemoteException re) {
@@ -409,7 +404,7 @@ class RemoteScheduler implements Scheduler {
         }
     }
 
-    void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace) throws SchedulerException {
+    void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace) {
             try {
                 getRemoteScheduler().scheduleJobs(triggersAndJobs, replace);
             } catch (RemoteException re) {
@@ -418,7 +413,7 @@ class RemoteScheduler implements Scheduler {
             }
     }
     
-    void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, bool replace) throws SchedulerException {
+    void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, bool replace) {
         try {
             getRemoteScheduler().scheduleJob(jobDetail, triggersForJob, replace);
         } catch (RemoteException re) {
@@ -427,8 +422,7 @@ class RemoteScheduler implements Scheduler {
         }
     }
 
-    bool unscheduleJobs(List!(TriggerKey) triggerKeys)
-            throws SchedulerException {
+    bool unscheduleJobs(List!(TriggerKey) triggerKeys) {
         try {
             return getRemoteScheduler().unscheduleJobs(triggerKeys);
         } catch (RemoteException re) {
@@ -442,8 +436,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    bool deleteJob(JobKey jobKey)
-        throws SchedulerException {
+    bool deleteJob(JobKey jobKey) {
         try {
             return getRemoteScheduler()
                     .deleteJob(jobKey);
@@ -458,8 +451,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    bool unscheduleJob(TriggerKey triggerKey)
-        throws SchedulerException {
+    bool unscheduleJob(TriggerKey triggerKey) {
         try {
             return getRemoteScheduler().unscheduleJob(triggerKey);
         } catch (RemoteException re) {
@@ -474,7 +466,7 @@ class RemoteScheduler implements Scheduler {
      * </p>
      */
     Date rescheduleJob(TriggerKey triggerKey,
-            Trigger newTrigger) throws SchedulerException {
+            Trigger newTrigger) {
         try {
             return getRemoteScheduler().rescheduleJob(triggerKey,
                     newTrigger);
@@ -490,8 +482,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void triggerJob(JobKey jobKey)
-        throws SchedulerException {
+    void triggerJob(JobKey jobKey) {
         triggerJob(jobKey, null);
     }
     
@@ -500,8 +491,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void triggerJob(JobKey jobKey, JobDataMap data)
-        throws SchedulerException {
+    void triggerJob(JobKey jobKey, JobDataMap data) {
         try {
             getRemoteScheduler().triggerJob(jobKey, data);
         } catch (RemoteException re) {
@@ -515,8 +505,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void pauseTrigger(TriggerKey triggerKey)
-        throws SchedulerException {
+    void pauseTrigger(TriggerKey triggerKey) {
         try {
             getRemoteScheduler()
                     .pauseTrigger(triggerKey);
@@ -531,7 +520,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void pauseTriggers(GroupMatcher!(TriggerKey) matcher) throws SchedulerException {
+    void pauseTriggers(GroupMatcher!(TriggerKey) matcher) {
         try {
             getRemoteScheduler().pauseTriggers(matcher);
         } catch (RemoteException re) {
@@ -545,8 +534,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void pauseJob(JobKey jobKey)
-        throws SchedulerException {
+    void pauseJob(JobKey jobKey) {
         try {
             getRemoteScheduler().pauseJob(jobKey);
         } catch (RemoteException re) {
@@ -560,7 +548,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void pauseJobs(GroupMatcher!(JobKey) matcher) throws SchedulerException {
+    void pauseJobs(GroupMatcher!(JobKey) matcher) {
         try {
             getRemoteScheduler().pauseJobs(matcher);
         } catch (RemoteException re) {
@@ -574,8 +562,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void resumeTrigger(TriggerKey triggerKey)
-        throws SchedulerException {
+    void resumeTrigger(TriggerKey triggerKey) {
         try {
             getRemoteScheduler().resumeTrigger(triggerKey);
         } catch (RemoteException re) {
@@ -589,7 +576,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void resumeTriggers(GroupMatcher!(TriggerKey) matcher) throws SchedulerException {
+    void resumeTriggers(GroupMatcher!(TriggerKey) matcher) {
         try {
             getRemoteScheduler().resumeTriggers(matcher);
         } catch (RemoteException re) {
@@ -603,8 +590,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void resumeJob(JobKey jobKey)
-        throws SchedulerException {
+    void resumeJob(JobKey jobKey) {
         try {
             getRemoteScheduler().resumeJob(jobKey);
         } catch (RemoteException re) {
@@ -618,7 +604,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void resumeJobs(GroupMatcher!(JobKey) matcher) throws SchedulerException {
+    void resumeJobs(GroupMatcher!(JobKey) matcher) {
         try {
             getRemoteScheduler().resumeJobs(matcher);
         } catch (RemoteException re) {
@@ -632,7 +618,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void pauseAll() throws SchedulerException {
+    void pauseAll() {
         try {
             getRemoteScheduler().pauseAll();
         } catch (RemoteException re) {
@@ -646,7 +632,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void resumeAll() throws SchedulerException {
+    void resumeAll() {
         try {
             getRemoteScheduler().resumeAll();
         } catch (RemoteException re) {
@@ -660,7 +646,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    List!(string) getJobGroupNames() throws SchedulerException {
+    List!(string) getJobGroupNames() {
         try {
             return getRemoteScheduler().getJobGroupNames();
         } catch (RemoteException re) {
@@ -674,7 +660,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Set!(JobKey) getJobKeys(GroupMatcher!(JobKey) matcher) throws SchedulerException {
+    Set!(JobKey) getJobKeys(GroupMatcher!(JobKey) matcher) {
         try {
             return getRemoteScheduler().getJobKeys(matcher);
         } catch (RemoteException re) {
@@ -688,8 +674,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    List<? extends Trigger> getTriggersOfJob(JobKey jobKey)
-        throws SchedulerException {
+    List<? extends Trigger> getTriggersOfJob(JobKey jobKey) {
         try {
             return getRemoteScheduler().getTriggersOfJob(jobKey);
         } catch (RemoteException re) {
@@ -703,7 +688,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    List!(string) getTriggerGroupNames() throws SchedulerException {
+    List!(string) getTriggerGroupNames() {
         try {
             return getRemoteScheduler().getTriggerGroupNames();
         } catch (RemoteException re) {
@@ -717,7 +702,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Set!(TriggerKey) getTriggerKeys(GroupMatcher!(TriggerKey) matcher) throws SchedulerException {
+    Set!(TriggerKey) getTriggerKeys(GroupMatcher!(TriggerKey) matcher) {
         try {
             return getRemoteScheduler().getTriggerKeys(matcher);
         } catch (RemoteException re) {
@@ -731,8 +716,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    JobDetail getJobDetail(JobKey jobKey)
-        throws SchedulerException {
+    JobDetail getJobDetail(JobKey jobKey) {
         try {
             return getRemoteScheduler().getJobDetail(jobKey);
         } catch (RemoteException re) {
@@ -746,7 +730,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    bool checkExists(JobKey jobKey) throws SchedulerException {
+    bool checkExists(JobKey jobKey) {
         try {
             return getRemoteScheduler().checkExists(jobKey);
         } catch (RemoteException re) {
@@ -760,7 +744,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    bool checkExists(TriggerKey triggerKey) throws SchedulerException {
+    bool checkExists(TriggerKey triggerKey) {
         try {
             return getRemoteScheduler().checkExists(triggerKey);
         } catch (RemoteException re) {
@@ -774,7 +758,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void clear() throws SchedulerException {
+    void clear() {
         try {
             getRemoteScheduler().clear();
         } catch (RemoteException re) {
@@ -788,8 +772,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Trigger getTrigger(TriggerKey triggerKey)
-        throws SchedulerException {
+    Trigger getTrigger(TriggerKey triggerKey) {
         try {
             return getRemoteScheduler().getTrigger(triggerKey);
         } catch (RemoteException re) {
@@ -803,8 +786,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    TriggerState getTriggerState(TriggerKey triggerKey)
-        throws SchedulerException {
+    TriggerState getTriggerState(TriggerKey triggerKey) {
         try {
             return getRemoteScheduler().getTriggerState(triggerKey);
         } catch (RemoteException re) {
@@ -818,8 +800,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void resetTriggerFromErrorState(TriggerKey triggerKey)
-            throws SchedulerException {
+    void resetTriggerFromErrorState(TriggerKey triggerKey) {
         try {
             getRemoteScheduler().resetTriggerFromErrorState(triggerKey);
         } catch (RemoteException re) {
@@ -836,8 +817,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    void addCalendar(string calName, Calendar calendar, bool replace, bool updateTriggers)
-        throws SchedulerException {
+    void addCalendar(string calName, Calendar calendar, bool replace, bool updateTriggers) {
         try {
             getRemoteScheduler().addCalendar(calName, calendar,
                     replace, updateTriggers);
@@ -852,7 +832,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    bool deleteCalendar(string calName) throws SchedulerException {
+    bool deleteCalendar(string calName) {
         try {
             return getRemoteScheduler().deleteCalendar(calName);
         } catch (RemoteException re) {
@@ -866,7 +846,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Calendar getCalendar(string calName) throws SchedulerException {
+    Calendar getCalendar(string calName) {
         try {
             return getRemoteScheduler().getCalendar(calName);
         } catch (RemoteException re) {
@@ -880,7 +860,7 @@ class RemoteScheduler implements Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    List!(string) getCalendarNames() throws SchedulerException {
+    List!(string) getCalendarNames() {
         try {
             return getRemoteScheduler().getCalendarNames();
         } catch (RemoteException re) {
@@ -892,7 +872,7 @@ class RemoteScheduler implements Scheduler {
     /** 
      * @see hunt.quartz.Scheduler#getPausedTriggerGroups()
      */
-    Set!(string) getPausedTriggerGroups() throws SchedulerException {
+    Set!(string) getPausedTriggerGroups() {
         try {
             return getRemoteScheduler().getPausedTriggerGroups();
         } catch (RemoteException re) {
@@ -909,7 +889,7 @@ class RemoteScheduler implements Scheduler {
     ///////////////////////////////////////////////////////////////////////////
 
 
-    ListenerManager getListenerManager() throws SchedulerException {
+    ListenerManager getListenerManager() {
         throw new SchedulerException(
             "Operation not supported for remote schedulers.");
     }
@@ -917,7 +897,7 @@ class RemoteScheduler implements Scheduler {
     /**
      * @see hunt.quartz.Scheduler#interrupt(JobKey)
      */
-    bool interrupt(JobKey jobKey) throws UnableToInterruptJobException  {
+    bool interrupt(JobKey jobKey) {
         try {
             return getRemoteScheduler().interrupt(jobKey);
         } catch (RemoteException re) {
@@ -928,7 +908,7 @@ class RemoteScheduler implements Scheduler {
         }
     }
 
-    bool interrupt(string fireInstanceId) throws UnableToInterruptJobException {
+    bool interrupt(string fireInstanceId) {
         try {
             return getRemoteScheduler().interrupt(fireInstanceId);
         } catch (RemoteException re) {
@@ -942,7 +922,7 @@ class RemoteScheduler implements Scheduler {
     /**
      * @see hunt.quartz.Scheduler#setJobFactory(hunt.quartz.spi.JobFactory)
      */
-    void setJobFactory(JobFactory factory) throws SchedulerException {
+    void setJobFactory(JobFactory factory) {
         throw new SchedulerException(
                 "Operation not supported for remote schedulers.");
     }

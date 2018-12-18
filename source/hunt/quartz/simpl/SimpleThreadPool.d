@@ -17,8 +17,8 @@
 
 module hunt.quartz.simpl.SimpleThreadPool;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.SchedulerConfigException;
 import hunt.quartz.spi.ThreadPool;
 
@@ -46,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author James House
  * @author Juergen Donnerstag
  */
-class SimpleThreadPool implements ThreadPool {
+class SimpleThreadPool : ThreadPool {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,7 +79,6 @@ class SimpleThreadPool implements ThreadPool {
 
     private string threadNamePrefix;
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
     
     private string schedulerInstanceName;
 
@@ -129,9 +128,6 @@ class SimpleThreadPool implements ThreadPool {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    Logger getLog() {
-        return log;
-    }
 
     int getPoolSize() {
         return getThreadCount();
@@ -233,7 +229,7 @@ class SimpleThreadPool implements ThreadPool {
         schedulerInstanceName = schedName;
     }
 
-    void initialize() throws SchedulerConfigException {
+    void initialize() {
 
         if(workers !is null && workers.size() > 0) // already initialized...
             return;
@@ -248,10 +244,10 @@ class SimpleThreadPool implements ThreadPool {
         }
 
         if(isThreadsInheritGroupOfInitializingThread()) {
-            threadGroup = Thread.currentThread().getThreadGroup();
+            threadGroup = Thread.getThis().getThreadGroup();
         } else {
             // follow the threadGroup tree to the root thread group.
-            threadGroup = Thread.currentThread().getThreadGroup();
+            threadGroup = Thread.getThis().getThreadGroup();
             ThreadGroup parent = threadGroup;
             while ( !parent.getName().equals("main") ) {
                 threadGroup = parent;
@@ -265,9 +261,9 @@ class SimpleThreadPool implements ThreadPool {
 
 
         if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
-            getLog().info(
+            info(
                     "Job execution threads will use class loader of thread: "
-                            + Thread.currentThread().getName());
+                            + Thread.getThis().name());
         }
 
         // create the worker threads and start them
@@ -291,7 +287,7 @@ class SimpleThreadPool implements ThreadPool {
                 getThreadPriority(),
                 isMakeThreadsDaemons());
             if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
-                wt.setContextClassLoader(Thread.currentThread()
+                wt.setContextClassLoader(Thread.getThis()
                         .getContextClassLoader());
             }
             workers.add(wt);
@@ -325,7 +321,7 @@ class SimpleThreadPool implements ThreadPool {
     void shutdown(bool waitForJobsToComplete) {
 
         synchronized (nextRunnableLock) {
-            getLog().debug("Shutting down threadpool...");
+            trace("Shutting down threadpool...");
 
             isShutdown = true;
 
@@ -362,7 +358,7 @@ class SimpleThreadPool implements ThreadPool {
                     while (busyWorkers.size() > 0) {
                         WorkerThread wt = (WorkerThread) busyWorkers.getFirst();
                         try {
-                            getLog().debug(
+                            trace(
                                     "Waiting for thread " ~ wt.getName()
                                             ~ " to shut down");
 
@@ -386,13 +382,13 @@ class SimpleThreadPool implements ThreadPool {
                     }
                 } finally {
                     if (interrupted) {
-                        Thread.currentThread().interrupt();
+                        Thread.getThis().interrupt();
                     }
                 }
 
-                getLog().debug("No executing jobs remaining, all threads stopped.");
+                trace("No executing jobs remaining, all threads stopped.");
             }
-            getLog().debug("Shutdown of threadpool complete.");
+            trace("Shutdown of threadpool complete.");
         }
     }
 
@@ -576,13 +572,13 @@ class SimpleThreadPool implements ThreadPool {
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called
                     try {
-                        getLog().error("Worker thread was interrupt()'ed.", unblock);
+                        error("Worker thread was interrupt()'ed.", unblock);
                     } catch(Exception e) {
                         // ignore to help with a tomcat glitch
                     }
                 } catch (Throwable exceptionInRunnable) {
                     try {
-                        getLog().error("Error while executing the Runnable: ",
+                        error("Error while executing the Runnable: ",
                             exceptionInRunnable);
                     } catch(Exception e) {
                         // ignore to help with a tomcat glitch
@@ -609,7 +605,7 @@ class SimpleThreadPool implements ThreadPool {
 
             //if (log.isDebugEnabled())
             try {
-                getLog().debug("WorkerThread is shut down.");
+                trace("WorkerThread is shut down.");
             } catch(Exception e) {
                 // ignore to help with a tomcat glitch
             }

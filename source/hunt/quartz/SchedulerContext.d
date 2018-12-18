@@ -37,23 +37,23 @@ import hunt.quartz.utils.StringKeyDirtyFlagMap;
  * 
  * @author James House
  */
-class SchedulerContext : StringKeyDirtyFlagMap implements Serializable {
+class SchedulerContext : StringKeyDirtyFlagMap, Serializable {
   
   
     /**
      * Create an empty <code>SchedulerContext</code>.
      */
-    SchedulerContext() {
+    this() {
         super(15);
     }
 
     /**
      * Create a <code>SchedulerContext</code> with the given data.
      */
-    SchedulerContext(Map<?, ?> map) {
-        this();
-        @SuppressWarnings("unchecked") // param must be a string key map.
-        Map<string, ?> mapTyped = (Map<string, ?>)map;
-        putAll(mapTyped);
-    }
+    // this(Map<?, ?> map) {
+    //     this();
+    //     @SuppressWarnings("unchecked") // param must be a string key map.
+    //     Map<string, ?> mapTyped = (Map<string, ?>)map;
+    //     putAll(mapTyped);
+    // }
 }

@@ -18,7 +18,7 @@
 
 module hunt.quartz.Trigger;
 
-import java.util.Comparator;
+import hunt.util.Comparator;
 import std.datetime;
 
 
@@ -53,7 +53,7 @@ import std.datetime;
  * 
  * @author James House
  */
-interface Trigger : Serializable, Cloneable, Comparable!(Trigger) {
+interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable, 
 
     
     enum TriggerState { NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED }
@@ -287,7 +287,7 @@ interface Trigger : Serializable, Cloneable, Comparable!(Trigger) {
      * value first), if the priorities are the same, then they are sorted
      * by key.
      */
-    class TriggerTimeComparator implements Comparator!(Trigger), Serializable {
+    class TriggerTimeComparator : Comparator!(Trigger), Serializable {
       
         
         // This static method exists for comparator in TC clustered quartz

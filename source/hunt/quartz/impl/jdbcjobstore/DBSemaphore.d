@@ -19,18 +19,17 @@ module hunt.quartz.impl.jdbcjobstore.DBSemaphore;
 import java.sql.Connection;
 import java.util.HashSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * Base class for database based lock handlers for providing thread/resource locking 
  * in order to protect resources from being altered by multiple threads at the 
  * same time.
  */
-abstract class DBSemaphore implements Semaphore, Constants,
+abstract class DBSemaphore : Semaphore, Constants,
     StdJDBCConstants, TablePrefixAware {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,9 +74,6 @@ abstract class DBSemaphore implements Semaphore, Constants,
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected Logger getLog() {
-        return log;
-    }
 
     private HashSet!(string) getThreadLocks() {
         HashSet!(string) threadLocks = lockOwners.get();
@@ -99,13 +95,12 @@ abstract class DBSemaphore implements Semaphore, Constants,
      * 
      * @return true if the lock was obtained.
      */
-    bool obtainLock(Connection conn, string lockName)
-        throws LockException {
+    bool obtainLock(Connection conn, string lockName) {
 
         if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" ~ lockName ~ "' is desired by: "
-                        + Thread.currentThread().getName());
+                        + Thread.getThis().name());
         }
         if (!isLockOwner(lockName)) {
 
@@ -114,7 +109,7 @@ abstract class DBSemaphore implements Semaphore, Constants,
             if(log.isDebugEnabled()) {
                 log.debug(
                     "Lock '" ~ lockName ~ "' given to: "
-                            + Thread.currentThread().getName());
+                            + Thread.getThis().name());
             }
             getThreadLocks().add(lockName);
             //getThreadLocksObtainer().put(lockName, new
@@ -122,7 +117,7 @@ abstract class DBSemaphore implements Semaphore, Constants,
         } else if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" ~ lockName ~ "' Is already owned by: "
-                        + Thread.currentThread().getName());
+                        + Thread.getThis().name());
         }
 
         return true;
@@ -136,17 +131,17 @@ abstract class DBSemaphore implements Semaphore, Constants,
     void releaseLock(string lockName) {
 
         if (isLockOwner(lockName)) {
-            if(getLog().isDebugEnabled()) {
-                getLog().debug(
+            version(HUNT_DEBUG) {
+                trace(
                     "Lock '" ~ lockName ~ "' returned by: "
-                            + Thread.currentThread().getName());
+                            + Thread.getThis().name());
             }
             getThreadLocks().remove(lockName);
             //getThreadLocksObtainer().remove(lockName);
-        } else if (getLog().isDebugEnabled()) {
-            getLog().warn(
+        } else version(HUNT_DEBUG) {
+            warning(
                 "Lock '" ~ lockName ~ "' attempt to return by: "
-                        + Thread.currentThread().getName()
+                        + Thread.getThis().name()
                         ~ " -- but not owner!",
                 new Exception("stack-trace of wrongful returner"));
         }

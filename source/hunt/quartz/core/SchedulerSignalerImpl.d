@@ -18,8 +18,8 @@
 
 module hunt.quartz.core.SchedulerSignalerImpl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.JobKey;
 import hunt.quartz.SchedulerException;
 import hunt.quartz.Trigger;
@@ -31,9 +31,8 @@ import hunt.quartz.spi.SchedulerSignaler;
  * 
  * @author jhouse
  */
-class SchedulerSignalerImpl implements SchedulerSignaler {
+class SchedulerSignalerImpl : SchedulerSignaler {
 
-    Logger log = LoggerFactory.getLogger(SchedulerSignalerImpl.class);
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,7 +72,7 @@ class SchedulerSignalerImpl implements SchedulerSignaler {
         try {
             sched.notifyTriggerListenersMisfired(trigger);
         } catch (SchedulerException se) {
-            sched.getLog().error(
+            sched.error(
                     "Error notifying listeners of trigger misfire.", se);
             sched.notifySchedulerListenersError(
                     "Error notifying listeners of trigger misfire.", se);

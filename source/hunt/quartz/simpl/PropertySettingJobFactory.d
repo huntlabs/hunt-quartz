@@ -64,7 +64,7 @@ class PropertySettingJobFactory : SimpleJobFactory {
     private bool throwIfNotFound = false;
     
     override
-    Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
+    Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) {
 
         Job job = super.newJob(bundle, scheduler);
         
@@ -78,7 +78,7 @@ class PropertySettingJobFactory : SimpleJobFactory {
         return job;
     }
     
-    protected void setBeanProps(Object obj, JobDataMap data) throws SchedulerException {
+    protected void setBeanProps(Object obj, JobDataMap data) {
 
         BeanInfo bi = null;
         try {
@@ -218,20 +218,20 @@ class PropertySettingJobFactory : SimpleJobFactory {
         }
     }
      
-    private void handleError(string message) throws SchedulerException {
+    private void handleError(string message) {
         handleError(message, null);
     }
     
-    private void handleError(string message, Exception e) throws SchedulerException {
+    private void handleError(string message, Exception e) {
         if (isThrowIfPropertyNotFound()) {
             throw new SchedulerException(message, e);
         }
         
         if (isWarnIfPropertyNotFound()) {
             if (e is null) {
-                getLog().warn(message);
+                warning(message);
             } else {
-                getLog().warn(message, e);
+                warning(message, e);
             }
         }
     }

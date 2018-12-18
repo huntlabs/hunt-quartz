@@ -18,6 +18,8 @@
 
 module hunt.quartz.core.JobRunShellFactory;
 
+import hunt.quartz.core.JobRunShell;
+
 import hunt.quartz.Scheduler;
 import hunt.quartz.SchedulerConfigException;
 import hunt.quartz.SchedulerException;

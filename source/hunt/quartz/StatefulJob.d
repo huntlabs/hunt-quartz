@@ -45,8 +45,8 @@ module hunt.quartz.StatefulJob;
  * 
  * @author James House
  */
-@PersistJobDataAfterExecution
-@DisallowConcurrentExecution
+// @PersistJobDataAfterExecution
+// @DisallowConcurrentExecution
 interface StatefulJob : Job {
 
     /*

@@ -21,8 +21,8 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * <p>
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @see hunt.quartz.impl.jdbcjobstore.JobStoreSupport#getConnection()
  * @see hunt.quartz.impl.jdbcjobstore.JobStoreCMT#getNonManagedTXConnection()
  */
-class AttributeRestoringConnectionInvocationHandler implements InvocationHandler {
+class AttributeRestoringConnectionInvocationHandler : InvocationHandler {
     private Connection conn;
     
     private bool overwroteOriginalAutoCommitValue;
@@ -56,12 +56,8 @@ class AttributeRestoringConnectionInvocationHandler implements InvocationHandler
         this.conn = conn;
     }
 
-    protected Logger getLog() {
-        return LoggerFactory.getLogger(getClass());
-    }
     
-    Object invoke(Object proxy, Method method, Object[] args)
-        throws Throwable {
+    Object invoke(Object proxy, Method method, Object[] args) {
         if (method.getName().equals("setAutoCommit")) {
             setAutoCommit(((Boolean)args[0]).booleanValue());
         } else if (method.getName().equals("setTransactionIsolation")) {
@@ -86,7 +82,7 @@ class AttributeRestoringConnectionInvocationHandler implements InvocationHandler
      * the original mode.  The connection's original auto commit mode is restored
      * when the connection is closed.
      */
-    void setAutoCommit(bool autoCommit) throws SQLException {
+    void setAutoCommit(bool autoCommit) {
         bool currentAutoCommitValue = conn.getAutoCommit();
             
         if (autoCommit != currentAutoCommitValue) {
@@ -104,7 +100,7 @@ class AttributeRestoringConnectionInvocationHandler implements InvocationHandler
      * the original level.  The connection's original transaction isolation level is 
      * restored when the connection is closed.
      */
-    void setTransactionIsolation(int level) throws SQLException {
+    void setTransactionIsolation(int level) {
         int currentLevel = conn.getTransactionIsolation();
         
         if (level != currentLevel) {
@@ -141,7 +137,7 @@ class AttributeRestoringConnectionInvocationHandler implements InvocationHandler
                 conn.setAutoCommit(originalAutoCommitValue);
             }
         } catch (Throwable t) {
-            getLog().warn("Failed restore connection's original auto commit setting.", t);
+            warning("Failed restore connection's original auto commit setting.", t);
         }
         
         try {    
@@ -149,7 +145,7 @@ class AttributeRestoringConnectionInvocationHandler implements InvocationHandler
                 conn.setTransactionIsolation(originalTxIsolationValue);
             }
         } catch (Throwable t) {
-            getLog().warn("Failed restore connection's original transaction isolation setting.", t);
+            warning("Failed restore connection's original transaction isolation setting.", t);
         }
     }
     
@@ -158,7 +154,7 @@ class AttributeRestoringConnectionInvocationHandler implements InvocationHandler
      * attributes of the wrapped connection to their original values (if they
      * were overwritten), before finally actually closing the wrapped connection.
      */
-    void close() throws SQLException {
+    void close() {
         restoreOriginalAtributes();
         
         conn.close();

@@ -28,8 +28,8 @@ import hunt.quartz.JobExecutionException;
 import hunt.quartz.PersistJobDataAfterExecution;
 import hunt.quartz.SchedulerContext;
 import hunt.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * Inspects a directory and compares whether any files' "last modified dates" 
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 @DisallowConcurrentExecution
 @PersistJobDataAfterExecution
-class DirectoryScanJob implements Job {
+class DirectoryScanJob : Job {
 
     /**
      * <code>JobDataMap</code> key with which to specify the directory to be 
@@ -75,7 +75,6 @@ class DirectoryScanJob implements Job {
 
     private enum string LAST_MODIFIED_TIME = "LAST_MODIFIED_TIME";
     
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     DirectoryScanJob() {
     }
@@ -83,7 +82,7 @@ class DirectoryScanJob implements Job {
     /** 
      * @see hunt.quartz.Job#execute(hunt.quartz.JobExecutionContext)
      */
-    void execute(JobExecutionContext context) throws JobExecutionException {
+    void execute(JobExecutionContext context) {
         JobDataMap mergedJobDataMap = context.getMergedJobDataMap();
         SchedulerContext schedCtxt = null;
         try {
@@ -120,7 +119,7 @@ class DirectoryScanJob implements Job {
         if(mergedJobDataMap.containsKey(MINIMUM_UPDATE_AGE)) {
             minAge = mergedJobDataMap.getLong(MINIMUM_UPDATE_AGE);
         }
-        long maxAgeDate = System.currentTimeMillis() - minAge;
+        long maxAgeDate = DateTimeHelper.currentTimeMillis() - minAge;
         
         File[] updatedFiles = getUpdatedOrNewFiles(dirName, lastDate, maxAgeDate);
 
@@ -130,7 +129,7 @@ class DirectoryScanJob implements Job {
         }
         
         long latestMod = lastDate;
-        for(File updFile: updatedFiles) {
+        foreach(File updFile; updatedFiles) {
             long lm = updFile.lastModified();
             latestMod = (lm > latestMod) ? lm : latestMod;
         }

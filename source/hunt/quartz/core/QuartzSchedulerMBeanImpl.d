@@ -84,8 +84,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
      * 
      * @throws NotCompliantMBeanException
      */
-    protected QuartzSchedulerMBeanImpl(QuartzScheduler scheduler)
-            throws NotCompliantMBeanException {
+    protected QuartzSchedulerMBeanImpl(QuartzScheduler scheduler) {
         super(QuartzSchedulerMBean.class);
         this.scheduler = scheduler;
         this.scheduler.addInternalJobListener(this);
@@ -94,7 +93,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         this.sampledStatisticsEnabled = false;
     }
 
-    TabularData getCurrentlyExecutingJobs() throws Exception {
+    TabularData getCurrentlyExecutingJobs() {
         try {
             List!(JobExecutionContext) currentlyExecutingJobs = scheduler.getCurrentlyExecutingJobs();
             return JobExecutionContextSupport.toTabularData(currentlyExecutingJobs);
@@ -103,7 +102,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    TabularData getAllJobDetails() throws Exception {
+    TabularData getAllJobDetails() {
         try {
             List!(JobDetail) detailList = new ArrayList!(JobDetail)();
             for (string jobGroupName : scheduler.getJobGroupNames()) {
@@ -117,7 +116,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    List!(CompositeData) getAllTriggers() throws Exception {
+    List!(CompositeData) getAllTriggers() {
         try {
             List!(Trigger) triggerList = new ArrayList!(Trigger)();
             for (string triggerGroupName : scheduler.getTriggerGroupNames()) {
@@ -131,7 +130,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    void addJob(CompositeData jobDetail, bool replace) throws Exception {
+    void addJob(CompositeData jobDetail, bool replace) {
         try {
             scheduler.addJob(JobDetailSupport.newJobDetail(jobDetail), replace);
         } catch (Exception e) {
@@ -139,7 +138,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    private static void invokeSetter(Object target, string attribute, Object value) throws Exception {
+    private static void invokeSetter(Object target, string attribute, Object value) {
         string setterName = "set" ~ Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
         Class<?>[] argTypes = {value.getClass()};
         Method setter = findMethod(target.getClass(), setterName, argTypes);
@@ -164,7 +163,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
     }
     
     private static Method findMethod(Class<?> targetType, string methodName,
-            Class<?>[] argTypes) throws IntrospectionException {
+            Class<?>[] argTypes) {
         BeanInfo beanInfo = Introspector.getBeanInfo(targetType);
         if (beanInfo !is null) {
             for(MethodDescriptor methodDesc: beanInfo.getMethodDescriptors()) {
@@ -188,7 +187,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
     }
     
     void scheduleBasicJob(Map!(string, Object) jobDetailInfo,
-            Map!(string, Object) triggerInfo) throws Exception {
+            Map!(string, Object) triggerInfo) {
         try {
             JobDetail jobDetail = JobDetailSupport.newJobDetail(jobDetailInfo);
             OperableTrigger trigger = TriggerSupport.newTrigger(triggerInfo);
@@ -202,7 +201,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
     }
 
     void scheduleJob(Map!(string, Object) abstractJobInfo,
-            Map!(string, Object) abstractTriggerInfo) throws Exception {
+            Map!(string, Object) abstractTriggerInfo) {
         try {
             string triggerClassName = (string) abstractTriggerInfo.remove("triggerClass");
             if(triggerClassName is null) {
@@ -259,7 +258,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
     }
     
     void scheduleJob(string jobName, string jobGroup,
-            Map!(string, Object) abstractTriggerInfo) throws Exception {
+            Map!(string, Object) abstractTriggerInfo) {
         try {
             JobKey jobKey = new JobKey(jobName, jobGroup);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
@@ -297,7 +296,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
     
-    void addJob(Map!(string, Object) abstractJobInfo,    bool replace) throws Exception {
+    void addJob(Map!(string, Object) abstractJobInfo,    bool replace) {
         try {
             string jobDetailClassName = (string) abstractJobInfo.remove("jobDetailClass");
             if(jobDetailClassName is null) {
@@ -339,7 +338,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
     
-    void deleteCalendar(string calendarName) throws Exception {
+    void deleteCalendar(string calendarName) {
         try {
             scheduler.deleteCalendar(calendarName);
         } catch(Exception e) {
@@ -347,7 +346,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    bool deleteJob(string jobName, string jobGroupName) throws Exception {
+    bool deleteJob(string jobName, string jobGroupName) {
         try {
             return scheduler.deleteJob(jobKey(jobName, jobGroupName));
         } catch (Exception e) {
@@ -355,7 +354,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    List!(string) getCalendarNames()    throws Exception {
+    List!(string) getCalendarNames() {
         try {
             return scheduler.getCalendarNames();
         } catch (Exception e) {
@@ -363,8 +362,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    CompositeData getJobDetail(string jobName, string jobGroupName)
-      throws Exception {
+    CompositeData getJobDetail(string jobName, string jobGroupName) {
         try {
             JobDetail jobDetail = scheduler.getJobDetail(jobKey(jobName, jobGroupName));
             return JobDetailSupport.toCompositeData(jobDetail);
@@ -373,7 +371,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    List!(string) getJobGroupNames()    throws Exception {
+    List!(string) getJobGroupNames() {
         try {
             return scheduler.getJobGroupNames();
         } catch (Exception e) {
@@ -381,7 +379,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    List!(string) getJobNames(string groupName) throws Exception {
+    List!(string) getJobNames(string groupName) {
         try {
             List!(string) jobNames = new ArrayList!(string)();
             for(JobKey key: scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
@@ -397,7 +395,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         return scheduler.getJobStoreClass().getName();
     }
 
-    Set!(string) getPausedTriggerGroups() throws Exception {
+    Set!(string) getPausedTriggerGroups() {
         try {
             return scheduler.getPausedTriggerGroups();
         } catch (Exception e) {
@@ -405,7 +403,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    CompositeData getTrigger(string name, string groupName) throws Exception {
+    CompositeData getTrigger(string name, string groupName) {
         try {
             Trigger trigger = scheduler.getTrigger(triggerKey(name, groupName));
             return TriggerSupport.toCompositeData(trigger);
@@ -414,7 +412,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    List!(string) getTriggerGroupNames()    throws Exception {
+    List!(string) getTriggerGroupNames() {
         try {
             return scheduler.getTriggerGroupNames();
         } catch (Exception e) {
@@ -422,7 +420,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    List!(string) getTriggerNames(string groupName) throws Exception {
+    List!(string) getTriggerNames(string groupName) {
         try {
             List!(string) triggerNames = new ArrayList!(string)();
             for(TriggerKey key: scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName))) {
@@ -434,7 +432,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    string getTriggerState(string triggerName, string triggerGroupName) throws Exception {
+    string getTriggerState(string triggerName, string triggerGroupName) {
         try {
             TriggerKey triggerKey = triggerKey(triggerName, triggerGroupName);
             TriggerState ts = scheduler.getTriggerState(triggerKey);
@@ -444,7 +442,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    List!(CompositeData) getTriggersOfJob(string jobName, string jobGroupName) throws Exception {
+    List!(CompositeData) getTriggersOfJob(string jobName, string jobGroupName) {
         try {
             JobKey jobKey = jobKey(jobName, jobGroupName);
             return TriggerSupport.toCompositeList(scheduler.getTriggersOfJob(jobKey));
@@ -453,7 +451,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    bool interruptJob(string jobName, string jobGroupName) throws Exception {
+    bool interruptJob(string jobName, string jobGroupName) {
         try {
             return scheduler.interrupt(jobKey(jobName, jobGroupName));
         } catch (Exception e) {
@@ -461,7 +459,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    bool interruptJob(string fireInstanceId) throws Exception {
+    bool interruptJob(string fireInstanceId) {
         try {
             return scheduler.interrupt(fireInstanceId);
         } catch (Exception e) {
@@ -470,7 +468,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
     }
 
     Date scheduleJob(string jobName, string jobGroup,
-            string triggerName, string triggerGroup) throws Exception {
+            string triggerName, string triggerGroup) {
         try {
             JobKey jobKey = jobKey(jobName, jobGroup);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
@@ -488,7 +486,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    bool unscheduleJob(string triggerName, string triggerGroup) throws Exception {
+    bool unscheduleJob(string triggerName, string triggerGroup) {
         try {
             return scheduler.unscheduleJob(triggerKey(triggerName, triggerGroup));
         } catch (Exception e) {
@@ -496,7 +494,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-   void clear() throws Exception {
+   void clear() {
        try {
            scheduler.clear();
         } catch (Exception e) {
@@ -516,7 +514,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         return scheduler.isStarted();
     }
 
-    void start() throws Exception {
+    void start() {
         try {
             scheduler.start();
         } catch (Exception e) {
@@ -552,7 +550,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         return scheduler.getThreadPoolSize();
     }
 
-    void pauseJob(string jobName, string jobGroup) throws Exception {
+    void pauseJob(string jobName, string jobGroup) {
         try {
             scheduler.pauseJob(jobKey(jobName, jobGroup));
         } catch (Exception e) {
@@ -560,7 +558,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    void pauseJobs(GroupMatcher!(JobKey) matcher) throws Exception {
+    void pauseJobs(GroupMatcher!(JobKey) matcher) {
         try {
             scheduler.pauseJobs(matcher);
         } catch (Exception e) {
@@ -568,27 +566,27 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
     
-    void pauseJobGroup(string jobGroup) throws Exception {
+    void pauseJobGroup(string jobGroup) {
         pauseJobs(GroupMatcher.<JobKey>groupEquals(jobGroup));
     }
 
-    void pauseJobsStartingWith(string jobGroupPrefix) throws Exception {
+    void pauseJobsStartingWith(string jobGroupPrefix) {
         pauseJobs(GroupMatcher.<JobKey>groupStartsWith(jobGroupPrefix));
     }
 
-    void pauseJobsEndingWith(string jobGroupSuffix) throws Exception {
+    void pauseJobsEndingWith(string jobGroupSuffix) {
         pauseJobs(GroupMatcher.<JobKey>groupEndsWith(jobGroupSuffix));
     }
 
-    void pauseJobsContaining(string jobGroupToken) throws Exception {
+    void pauseJobsContaining(string jobGroupToken) {
         pauseJobs(GroupMatcher.<JobKey>groupContains(jobGroupToken));
     }
 
-    void pauseJobsAll() throws Exception {
+    void pauseJobsAll() {
         pauseJobs(GroupMatcher.anyJobGroup());
     }
 
-    void pauseAllTriggers() throws Exception {
+    void pauseAllTriggers() {
         try {
             scheduler.pauseAll();
         } catch (Exception e) {
@@ -596,7 +594,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    private void pauseTriggers(GroupMatcher!(TriggerKey) matcher) throws Exception {
+    private void pauseTriggers(GroupMatcher!(TriggerKey) matcher) {
         try {
             scheduler.pauseTriggers(matcher);
         } catch (Exception e) {
@@ -604,27 +602,27 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
     
-    void pauseTriggerGroup(string triggerGroup) throws Exception {
+    void pauseTriggerGroup(string triggerGroup) {
         pauseTriggers(GroupMatcher.<TriggerKey>groupEquals(triggerGroup));
     }
 
-    void pauseTriggersStartingWith(string triggerGroupPrefix) throws Exception {
+    void pauseTriggersStartingWith(string triggerGroupPrefix) {
         pauseTriggers(GroupMatcher.<TriggerKey>groupStartsWith(triggerGroupPrefix));
     }
 
-    void pauseTriggersEndingWith(string triggerGroupSuffix) throws Exception {
+    void pauseTriggersEndingWith(string triggerGroupSuffix) {
         pauseTriggers(GroupMatcher.<TriggerKey>groupEndsWith(triggerGroupSuffix));
     }
 
-    void pauseTriggersContaining(string triggerGroupToken) throws Exception {
+    void pauseTriggersContaining(string triggerGroupToken) {
         pauseTriggers(GroupMatcher.<TriggerKey>groupContains(triggerGroupToken));
     }
 
-    void pauseTriggersAll() throws Exception {
+    void pauseTriggersAll() {
         pauseTriggers(GroupMatcher.anyTriggerGroup());
     }
 
-    void pauseTrigger(string triggerName, string triggerGroup) throws Exception {
+    void pauseTrigger(string triggerName, string triggerGroup) {
         try {
             scheduler.pauseTrigger(triggerKey(triggerName, triggerGroup));
         } catch (Exception e) {
@@ -632,7 +630,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    void resumeAllTriggers() throws Exception {
+    void resumeAllTriggers() {
         try {
             scheduler.resumeAll();
         } catch (Exception e) {
@@ -640,7 +638,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    void resumeJob(string jobName, string jobGroup) throws Exception {
+    void resumeJob(string jobName, string jobGroup) {
         try {
             scheduler.resumeJob(jobKey(jobName, jobGroup));
         } catch (Exception e) {
@@ -648,7 +646,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    void resumeJobs(GroupMatcher!(JobKey) matcher) throws Exception {
+    void resumeJobs(GroupMatcher!(JobKey) matcher) {
         try {
             scheduler.resumeJobs(matcher);
         } catch (Exception e) {
@@ -656,27 +654,27 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    void resumeJobGroup(string jobGroup) throws Exception {
+    void resumeJobGroup(string jobGroup) {
         resumeJobs(GroupMatcher.<JobKey>groupEquals(jobGroup));
     }
 
-    void resumeJobsStartingWith(string jobGroupPrefix) throws Exception {
+    void resumeJobsStartingWith(string jobGroupPrefix) {
         resumeJobs(GroupMatcher.<JobKey>groupStartsWith(jobGroupPrefix));
     }
 
-    void resumeJobsEndingWith(string jobGroupSuffix) throws Exception {
+    void resumeJobsEndingWith(string jobGroupSuffix) {
         resumeJobs(GroupMatcher.<JobKey>groupEndsWith(jobGroupSuffix));
     }
 
-    void resumeJobsContaining(string jobGroupToken) throws Exception {
+    void resumeJobsContaining(string jobGroupToken) {
         resumeJobs(GroupMatcher.<JobKey>groupContains(jobGroupToken));
     }
 
-    void resumeJobsAll() throws Exception {
+    void resumeJobsAll() {
         resumeJobs(GroupMatcher.anyJobGroup());
     }
 
-    void resumeTrigger(string triggerName, string triggerGroup) throws Exception {
+    void resumeTrigger(string triggerName, string triggerGroup) {
         try {
             scheduler.resumeTrigger(triggerKey(triggerName, triggerGroup));
         } catch (Exception e) {
@@ -684,7 +682,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    private void resumeTriggers(GroupMatcher!(TriggerKey) matcher) throws Exception {
+    private void resumeTriggers(GroupMatcher!(TriggerKey) matcher) {
         try {
             scheduler.resumeTriggers(matcher);
         } catch (Exception e) {
@@ -692,28 +690,27 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
     
-    void resumeTriggerGroup(string triggerGroup) throws Exception {
+    void resumeTriggerGroup(string triggerGroup) {
         resumeTriggers(GroupMatcher.<TriggerKey>groupEquals(triggerGroup));
     }
 
-    void resumeTriggersStartingWith(string triggerGroupPrefix) throws Exception {
+    void resumeTriggersStartingWith(string triggerGroupPrefix) {
         resumeTriggers(GroupMatcher.<TriggerKey>groupStartsWith(triggerGroupPrefix));
     }
 
-    void resumeTriggersEndingWith(string triggerGroupSuffix) throws Exception {
+    void resumeTriggersEndingWith(string triggerGroupSuffix) {
         resumeTriggers(GroupMatcher.<TriggerKey>groupEndsWith(triggerGroupSuffix));
     }
 
-    void resumeTriggersContaining(string triggerGroupToken) throws Exception {
+    void resumeTriggersContaining(string triggerGroupToken) {
         resumeTriggers(GroupMatcher.<TriggerKey>groupContains(triggerGroupToken));
     }
 
-    void resumeTriggersAll() throws Exception {
+    void resumeTriggersAll() {
         resumeTriggers(GroupMatcher.anyTriggerGroup());
     }
 
-    void triggerJob(string jobName, string jobGroup, Map!(string, string) jobDataMap)
-            throws Exception {
+    void triggerJob(string jobName, string jobGroup, Map!(string, string) jobDataMap) {
         try {
             scheduler.triggerJob(jobKey(jobName, jobGroup), new JobDataMap(jobDataMap));
         } catch (Exception e) {
@@ -721,7 +718,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
         }
     }
 
-    void triggerJob(CompositeData trigger) throws Exception {
+    void triggerJob(CompositeData trigger) {
         try {
             scheduler.triggerJob(TriggerSupport.newTrigger(trigger));
         } catch (Exception e) {
@@ -914,7 +911,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
      */
     void sendNotification(string eventType, Object data, string msg) {
         Notification notif = new Notification(eventType, this, sequenceNumber
-                .incrementAndGet(), System.currentTimeMillis(), msg);
+                .incrementAndGet(), DateTimeHelper.currentTimeMillis(), msg);
         if (data !is null) {
             notif.setUserData(data);
         }
@@ -953,8 +950,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
     /**
      * @see javax.management.NotificationBroadcaster#removeNotificationListener(javax.management.NotificationListener)
      */
-    void removeNotificationListener(NotificationListener listener)
-            throws ListenerNotFoundException {
+    void removeNotificationListener(NotificationListener listener) {
         emitter.removeNotificationListener(listener);
     }
 
@@ -963,8 +959,7 @@ class QuartzSchedulerMBeanImpl : StandardMBean implements
      *      javax.management.NotificationFilter, java.lang.Object)
      */
     void removeNotificationListener(NotificationListener notif,
-            NotificationFilter filter, Object callBack)
-            throws ListenerNotFoundException {
+            NotificationFilter filter, Object callBack) {
         emitter.removeNotificationListener(notif, filter, callBack);
     }
 

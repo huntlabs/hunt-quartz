@@ -24,7 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import hunt.quartz.spi.ClassLoadHelper;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * <p>
@@ -57,8 +57,7 @@ class MSSQLDelegate : StdJDBCDelegate {
      *           if deserialization causes an error
      */
     override           
-    protected Object getObjectFromBlob(ResultSet rs, string colName)
-        throws ClassNotFoundException, IOException, SQLException {
+    protected Object getObjectFromBlob(ResultSet rs, string colName) {
         InputStream binaryInput = rs.getBinaryStream(colName);
 
         if(binaryInput is null || binaryInput.available() == 0) {
@@ -78,8 +77,7 @@ class MSSQLDelegate : StdJDBCDelegate {
     }
 
     override           
-    protected Object getJobDataFromBlob(ResultSet rs, string colName)
-        throws ClassNotFoundException, IOException, SQLException {
+    protected Object getJobDataFromBlob(ResultSet rs, string colName) {
         if (canUseProperties()) {
             InputStream binaryInput = rs.getBinaryStream(colName);
             return binaryInput;

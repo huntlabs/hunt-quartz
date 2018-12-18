@@ -39,7 +39,7 @@ import hunt.quartz.Trigger.CompletedExecutionInstruction;
  *
  * @author James House (jhouse AT revolition DOT net)
  */
-class BroadcastTriggerListener implements TriggerListener {
+class BroadcastTriggerListener : TriggerListener {
 
     private string name;
     private List!(TriggerListener) listeners;

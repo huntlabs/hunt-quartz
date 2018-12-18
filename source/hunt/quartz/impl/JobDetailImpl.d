@@ -62,7 +62,7 @@ import hunt.quartz.utils.ClassUtils;
  * @author Sharada Jambula
  */
 @SuppressWarnings("deprecation")
-class JobDetailImpl implements Cloneable, java.io.Serializable, JobDetail {
+class JobDetailImpl : Cloneable, java.io.Serializable, JobDetail {
 
     
     /*

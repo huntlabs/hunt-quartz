@@ -24,7 +24,7 @@ import java.sql.SQLException;
 
 import hunt.quartz.JobKey;
 import hunt.quartz.spi.ClassLoadHelper;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * Quartz JDBC delegate for DB2 v6 databases. <code>select count(name)</code>
@@ -60,7 +60,7 @@ class DB2v6Delegate : StdJDBCDelegate {
             ~ " WHERE " ~ COL_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
     override
-    int selectNumJobs(Connection conn) throws SQLException {
+    int selectNumJobs(Connection conn) {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -81,7 +81,7 @@ class DB2v6Delegate : StdJDBCDelegate {
     }
 
     override           
-    int selectNumTriggersForJob(Connection conn, JobKey jobKey) throws SQLException {
+    int selectNumTriggersForJob(Connection conn, JobKey jobKey) {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -103,7 +103,7 @@ class DB2v6Delegate : StdJDBCDelegate {
     }
 
     override
-    int selectNumTriggers(Connection conn) throws SQLException {
+    int selectNumTriggers(Connection conn) {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -124,7 +124,7 @@ class DB2v6Delegate : StdJDBCDelegate {
     }
 
     override           
-    int selectNumCalendars(Connection conn) throws SQLException {
+    int selectNumCalendars(Connection conn) {
         PreparedStatement ps = null;
         ResultSet rs = null;
 

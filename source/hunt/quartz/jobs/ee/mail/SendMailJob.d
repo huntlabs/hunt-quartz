@@ -30,8 +30,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobExecutionContext;
@@ -48,9 +48,8 @@ import hunt.quartz.JobExecutionException;
  * 
  * @author James House
  */
-class SendMailJob implements Job {
+class SendMailJob : Job {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -121,14 +120,13 @@ class SendMailJob implements Job {
     /**
      * @see hunt.quartz.Job#execute(hunt.quartz.JobExecutionContext)
      */
-    void execute(JobExecutionContext context)
-        throws JobExecutionException {
+    void execute(JobExecutionContext context) {
 
         JobDataMap data = context.getMergedJobDataMap();
 
         MailInfo mailInfo = populateMailInfo(data, createMailInfo());
         
-        getLog().info("Sending message " ~ mailInfo);
+        info("Sending message " ~ mailInfo);
 
         try {
             MimeMessage mimeMessage = prepareMimeMessage(mailInfo);
@@ -141,12 +139,8 @@ class SendMailJob implements Job {
 
     }
 
-    protected Logger getLog() {
-        return log;
-    }
 
-    protected MimeMessage prepareMimeMessage(MailInfo mailInfo)
-        throws MessagingException {
+    protected MimeMessage prepareMimeMessage(MailInfo mailInfo) {
         Session session = getMailSession(mailInfo);
 
         MimeMessage mimeMessage = new MimeMessage(session);
@@ -174,8 +168,7 @@ class SendMailJob implements Job {
         return mimeMessage;
     }
     
-    protected void setMimeMessageContent(MimeMessage mimeMessage, MailInfo mailInfo) 
-        throws MessagingException {
+    protected void setMimeMessageContent(MimeMessage mimeMessage, MailInfo mailInfo) {
         if (mailInfo.getContentType() is null) {
             mimeMessage.setText(mailInfo.getMessage());
         } else {
@@ -183,7 +176,7 @@ class SendMailJob implements Job {
         }
     }
 
-    protected Session getMailSession(final MailInfo mailInfo) throws MessagingException {
+    protected Session getMailSession(final MailInfo mailInfo) {
         Properties properties = new Properties();
         properties.put("mail.smtp.host", mailInfo.getSmtpHost());
         

@@ -119,7 +119,7 @@ class SampledCounterImpl : CounterImpl implements SampledCounter {
             sample = getValue();
         }
 
-        final long now = System.currentTimeMillis();
+        final long now = DateTimeHelper.currentTimeMillis();
         TimeStampedCounterValue timedSample = new TimeStampedCounterValue(now, sample);
 
         history.push(timedSample);

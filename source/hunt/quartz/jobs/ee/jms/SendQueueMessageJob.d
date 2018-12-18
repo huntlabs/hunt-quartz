@@ -69,10 +69,9 @@ import hunt.quartz.JobExecutionException;
 * 
 *
 */
-final class SendQueueMessageJob implements Job {
+final class SendQueueMessageJob : Job {
 
-    void execute(final JobExecutionContext jobCtx)
-            throws JobExecutionException {
+    void execute(final JobExecutionContext jobCtx) {
         QueueConnection conn = null;
 
         QueueSession sess = null;

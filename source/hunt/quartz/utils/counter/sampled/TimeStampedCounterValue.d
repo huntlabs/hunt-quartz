@@ -23,7 +23,7 @@ module hunt.quartz.utils.counter.sampled.TimeStampedCounterValue;
  * @author <a href="mailto:asanoujam@terracottatech.com">Abhishek Sanoujam</a>
  * @since 1.8
  */
-class TimeStampedCounterValue implements Serializable {
+class TimeStampedCounterValue : Serializable {
   
     
     private final long counterValue;

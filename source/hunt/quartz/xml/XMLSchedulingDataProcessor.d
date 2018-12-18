@@ -60,8 +60,8 @@ import hunt.quartz.DateBuilder.IntervalUnit;
 import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.spi.ClassLoadHelper;
 import hunt.quartz.spi.MutableTrigger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -86,7 +86,7 @@ import javax.xml.bind.DatatypeConverter;
  * 
  * @since Quartz 1.8
  */
-class XMLSchedulingDataProcessor implements ErrorHandler {
+class XMLSchedulingDataProcessor : ErrorHandler {
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -138,7 +138,6 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
     private DocumentBuilder docBuilder = null;
     private XPath xpath = null;
     
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,7 +153,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @param clh               class-loader helper to share with digester.
      * @throws ParserConfigurationException if the XML parser cannot be configured as needed. 
      */
-    XMLSchedulingDataProcessor(ClassLoadHelper clh) throws ParserConfigurationException {
+    XMLSchedulingDataProcessor(ClassLoadHelper clh) {
         this.classLoadHelper = clh;
         initDocumentParser();
     }
@@ -163,7 +162,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * Initializes the XML parser.
      * @throws ParserConfigurationException 
      */
-    protected void initDocumentParser() throws ParserConfigurationException  {
+    protected void initDocumentParser() {
 
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -358,7 +357,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * "quartz_jobs.xml" in the current working directory).
      *  
      */
-    protected void processFile() throws Exception {
+    protected void processFile() {
         processFile(QUARTZ_XML_DEFAULT_FILE_NAME);
     }
 
@@ -368,7 +367,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @param fileName
      *          meta data file name.
      */
-    protected void processFile(string fileName) throws Exception {
+    protected void processFile(string fileName) {
         processFile(fileName, getSystemIdForFileName(fileName));
     }
 
@@ -442,8 +441,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @param systemId
      *          system ID.
      */
-    protected void processFile(string fileName, string systemId)
-        throws ValidationException, ParserConfigurationException,
+    protected void processFile(string fileName, string systemId) ParserConfigurationException,
             SAXException, IOException, SchedulerException,
             ClassNotFoundException, ParseException, XPathException {
 
@@ -468,8 +466,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @param systemId
      *          system ID.
      */
-    void processStreamAndScheduleJobs(InputStream stream, string systemId, Scheduler sched)
-        throws ValidationException, ParserConfigurationException,
+    void processStreamAndScheduleJobs(InputStream stream, string systemId, Scheduler sched) ParserConfigurationException,
             SAXException, XPathException, IOException, SchedulerException,
             ClassNotFoundException, ParseException {
 
@@ -488,7 +485,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
     }
     
     @SuppressWarnings("ConstantConditions")
-    protected void process(InputSource is) throws SAXException, IOException, ParseException, XPathException, ClassNotFoundException {
+    protected void process(InputSource is) {
         
         // load the document 
         Document document = docBuilder.parse(is);
@@ -662,7 +659,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
             //QTZ-273 : use of DatatypeConverter.parseDateTime() instead of SimpleDateFormat
             Date triggerStartTime;
             if(startTimeFutureSecsString !is null)
-                triggerStartTime = new Date(System.currentTimeMillis() + (Long.valueOf(startTimeFutureSecsString) * 1000L));
+                triggerStartTime = new Date(DateTimeHelper.currentTimeMillis() + (Long.valueOf(startTimeFutureSecsString) * 1000L));
             else 
                 triggerStartTime = (startTimeString is null || startTimeString.length() == 0 ? new Date() : DatatypeConverter.parseDateTime(startTimeString).getTime());
             Date triggerEndTime = endTimeString is null || endTimeString.length() == 0 ? null : DatatypeConverter.parseDateTime(endTimeString).getTime();
@@ -775,7 +772,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
         }
     }
     
-    protected string getTrimmedToNullString(XPath xpathToElement, string elementName, Node parentNode) throws XPathExpressionException {
+    protected string getTrimmedToNullString(XPath xpathToElement, string elementName, Node parentNode) {
         string str = (string) xpathToElement.evaluate(elementName,
                 parentNode, XPathConstants.STRING);
         
@@ -788,7 +785,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
         return str;
     }
 
-    protected Boolean getBoolean(XPath xpathToElement, string elementName, Document document) throws XPathExpressionException {
+    protected Boolean getBoolean(XPath xpathToElement, string elementName, Document document) {
         
         Node directive = (Node) xpathToElement.evaluate(elementName, document, XPathConstants.NODE);
 
@@ -809,7 +806,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * <p>Note that we will set overWriteExistingJobs after the default xml is parsed. 
      */
     void processFileAndScheduleJobs(Scheduler sched,
-            bool overWriteExistingJobs) throws Exception {
+            bool overWriteExistingJobs) {
         string fileName = QUARTZ_XML_DEFAULT_FILE_NAME;
         processFile(fileName, getSystemIdForFileName(fileName));
         // The overWriteExistingJobs flag was set by processFile() -> prepForProcessing(), then by xml parsing, and then now
@@ -826,7 +823,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @param fileName
      *          meta data file name.
      */
-    void processFileAndScheduleJobs(string fileName, Scheduler sched) throws Exception {
+    void processFileAndScheduleJobs(string fileName, Scheduler sched) {
         processFileAndScheduleJobs(fileName, getSystemIdForFileName(fileName), sched);
     }
     
@@ -837,7 +834,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @param fileName
      *          meta data file name.
      */
-    void processFileAndScheduleJobs(string fileName, string systemId, Scheduler sched) throws Exception {
+    void processFileAndScheduleJobs(string fileName, string systemId, Scheduler sched) {
         processFile(fileName, systemId);
         executePreProcessCommands(sched);
         scheduleJobs(sched);
@@ -886,7 +883,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
         
         Map!(JobKey, List!(MutableTrigger)) triggersByFQJobName = new HashMap!(JobKey, List!(MutableTrigger))();
         
-        for(MutableTrigger trigger: triggers) {
+        foreach(MutableTrigger trigger; triggers) {
             List!(MutableTrigger) triggersOfJob = triggersByFQJobName.get(trigger.getJobKey());
             if(triggersOfJob is null) {
                 triggersOfJob = new LinkedList!(MutableTrigger)();
@@ -898,10 +895,9 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
         return triggersByFQJobName;
     }
     
-    protected void executePreProcessCommands(Scheduler scheduler) 
-        throws SchedulerException {
+    protected void executePreProcessCommands(Scheduler scheduler) {
         
-        for(string group: jobGroupsToDelete) {
+        foreach(string group; jobGroupsToDelete) {
             if(group.equals("*")) {
                 log.info("Deleting all jobs in ALL groups.");
                 for (string groupName : scheduler.getJobGroupNames()) {
@@ -922,7 +918,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
             }
         }
         
-        for(string group: triggerGroupsToDelete) {
+        foreach(string group; triggerGroupsToDelete) {
             if(group.equals("*")) {
                 log.info("Deleting all triggers in ALL groups.");
                 for (string groupName : scheduler.getTriggerGroupNames()) {
@@ -943,14 +939,14 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
             }
         }
         
-        for(JobKey key: jobsToDelete) {
+        foreach(JobKey key; jobsToDelete) {
             if(!jobGroupsToNeverDelete.contains(key.getGroup())) {
                 log.info("Deleting job: {}", key);
                 scheduler.deleteJob(key);
             } 
         }
         
-        for(TriggerKey key: triggersToDelete) {
+        foreach(TriggerKey key; triggersToDelete) {
             if(!triggerGroupsToNeverDelete.contains(key.getGroup())) {
                 log.info("Deleting trigger: {}", key);
                 scheduler.unscheduleJob(key);
@@ -968,8 +964,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      *              there is an internal Scheduler error.
      */
     @SuppressWarnings("ConstantConditions")
-    protected void scheduleJobs(Scheduler sched)
-        throws SchedulerException {
+    protected void scheduleJobs(Scheduler sched) {
         
         List!(JobDetail) jobs = new LinkedList!(JobDetail)(getLoadedJobs());
         List!(MutableTrigger) triggers = new LinkedList!(MutableTrigger)( getLoadedTriggers());
@@ -1101,7 +1096,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
         }
         
         // add triggers that weren't associated with a new job... (those we already handled were removed above)
-        for(MutableTrigger trigger: triggers) {
+        foreach(MutableTrigger trigger; triggers) {
             
             if(trigger.getStartTime() is null) {
                 trigger.setStartTime(new Date());
@@ -1162,7 +1157,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @exception SAXException
      *              Any SAX exception, possibly wrapping another exception.
      */
-    void warning(SAXParseException e) throws SAXException {
+    void warning(SAXParseException e) {
         addValidationException(e);
     }
 
@@ -1176,7 +1171,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @exception SAXException
      *              Any SAX exception, possibly wrapping another exception.
      */
-    void error(SAXParseException e) throws SAXException {
+    void error(SAXParseException e) {
         addValidationException(e);
     }
 
@@ -1190,7 +1185,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @exception SAXException
      *              Any SAX exception, possibly wrapping another exception.
      */
-    void fatalError(SAXParseException e) throws SAXException {
+    void fatalError(SAXParseException e) {
         addValidationException(e);
     }
 
@@ -1218,7 +1213,7 @@ class XMLSchedulingDataProcessor implements ErrorHandler {
      * @exception ValidationException
      *              DTD validation exception.
      */
-    protected void maybeThrowValidationException() throws ValidationException {
+    protected void maybeThrowValidationException() {
         if (validationExceptions.size() > 0) {
             throw new ValidationException("Encountered " ~ validationExceptions.size() ~ " validation exceptions.", validationExceptions);
         }

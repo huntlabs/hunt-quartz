@@ -44,7 +44,7 @@ import hunt.quartz.spi.TimeBroker;
  * @author James House
  */
 @SuppressWarnings("deprecation")
-class SimpleTimeBroker implements TimeBroker {
+class SimpleTimeBroker : TimeBroker {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,7 +63,7 @@ class SimpleTimeBroker implements TimeBroker {
         return new Date();
     }
 
-    void initialize() throws SchedulerConfigException {
+    void initialize() {
         // do nothing...
     }
 

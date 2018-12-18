@@ -22,7 +22,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.sql.*;
 import hunt.quartz.spi.ClassLoadHelper;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * <p> This is a driver delegate for the CUBRID JDBC driver. For Quartz 2.x </p>
@@ -47,8 +47,7 @@ class CUBRIDDelegate : StdJDBCDelegate {
      * @throws IOException if deserialization causes an error
      */
     override
-    protected Object getObjectFromBlob(ResultSet rs, string colName)
-            throws ClassNotFoundException, IOException, SQLException {
+    protected Object getObjectFromBlob(ResultSet rs, string colName) {
 
         Object obj = null;
         InputStream binaryInput;
@@ -71,8 +70,7 @@ class CUBRIDDelegate : StdJDBCDelegate {
     }
 
     override
-    protected Object getJobDataFromBlob(ResultSet rs, string colName)
-            throws ClassNotFoundException, IOException, SQLException {
+    protected Object getJobDataFromBlob(ResultSet rs, string colName) {
 
         if (canUseProperties()) {
             InputStream binaryInput;
@@ -100,8 +98,7 @@ class CUBRIDDelegate : StdJDBCDelegate {
      * explicitly support storing bytes in this way.
      */
     override
-    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos)
-            throws SQLException {
+    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) {
         
         byte[] byteArray;
         if (baos is null) {

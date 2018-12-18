@@ -22,7 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import hunt.quartz.spi.ClassLoadHelper;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * Quartz JDBC delegate for DB2 v7 databases.
@@ -47,7 +47,7 @@ class DB2v7Delegate : StdJDBCDelegate {
      * DB2 v7 database.
      */
     override           
-    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) throws SQLException {
+    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) {
         ps.setObject(index, ((baos is null) ? null : baos.toByteArray()), java.sql.Types.BLOB);
     }
 
@@ -56,7 +56,7 @@ class DB2v7Delegate : StdJDBCDelegate {
      * This translates the bool to 1/0 for true/false.
      */
     override           
-    protected void setBoolean(PreparedStatement ps, int index, bool val) throws SQLException {
+    protected void setBoolean(PreparedStatement ps, int index, bool val) {
         ps.setString(index, ((val) ? "1" : "0"));
     }
     

@@ -76,7 +76,7 @@ import hunt.quartz.JobExecutionException;
  * @author Joel Shellman
  * @author <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
  */
-class EJBInvokerJob implements Job {
+class EJBInvokerJob : Job {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -123,8 +123,7 @@ class EJBInvokerJob implements Job {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    void execute(JobExecutionContext context)
-        throws JobExecutionException {
+    void execute(JobExecutionContext context) {
         JobDataMap dataMap = context.getMergedJobDataMap();
 
         string ejb = dataMap.getString(EJB_JNDI_NAME_KEY);
@@ -247,8 +246,7 @@ class EJBInvokerJob implements Job {
         }
     }
 
-    protected InitialContext getInitialContext(JobDataMap jobDataMap)
-        throws NamingException {
+    protected InitialContext getInitialContext(JobDataMap jobDataMap) {
         Hashtable!(string, string) params = new Hashtable!(string, string)(2);
         
         string initialContextFactory =

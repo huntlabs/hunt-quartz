@@ -125,7 +125,7 @@ final class Util {
     }
     
     
-    static void setBeanProps(Object obj, string[] propNames, Object[] propValues)  throws JobPersistenceException {
+    static void setBeanProps(Object obj, string[] propNames, Object[] propValues) {
         
         if(propNames is null || propNames.length == 0)
             return;

@@ -75,7 +75,7 @@ class StdRowLockSemaphore : DBSemaphore {
      * Execute the SQL select for update that will lock the proper database row.
      */
     override
-    protected void executeSQL(Connection conn, final string lockName, final string expandedSQL, final string expandedInsertSQL) throws LockException {
+    protected void executeSQL(Connection conn, final string lockName, final string expandedSQL, final string expandedInsertSQL) {
         PreparedStatement ps = null;
         ResultSet rs = null;
         SQLException initCause = null;
@@ -88,16 +88,16 @@ class StdRowLockSemaphore : DBSemaphore {
                 ps = conn.prepareStatement(expandedSQL);
                 ps.setString(1, lockName);
                 
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug(
+                version(HUNT_DEBUG) {
+                    trace(
                         "Lock '" ~ lockName ~ "' is being obtained: " ~ 
-                        Thread.currentThread().getName());
+                        Thread.getThis().name());
                 }
                 rs = ps.executeQuery();
                 if (!rs.next()) {
-                    getLog().debug(
+                    trace(
                             "Inserting new lock row for lock: '" ~ lockName ~ "' being obtained by thread: " ~ 
-                            Thread.currentThread().getName());
+                            Thread.getThis().name());
                     rs.close();
                     rs = null;
                     ps.close();
@@ -113,7 +113,7 @@ class StdRowLockSemaphore : DBSemaphore {
                             try {
                                 Thread.sleep(1000L);
                             } catch (InterruptedException ignore) {
-                                Thread.currentThread().interrupt();
+                                Thread.getThis().interrupt();
                             }
                             // try again ...
                             continue;
@@ -137,10 +137,10 @@ class StdRowLockSemaphore : DBSemaphore {
                 if(initCause is null)
                     initCause = sqle;
                 
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug(
+                version(HUNT_DEBUG) {
+                    trace(
                         "Lock '" ~ lockName ~ "' was not obtained by: " ~ 
-                        Thread.currentThread().getName() + (count < 3 ? " - will try again." : ""));
+                        Thread.getThis().name() + (count < 3 ? " - will try again." : ""));
                 }
                 
                 if(count < 3) {
@@ -148,7 +148,7 @@ class StdRowLockSemaphore : DBSemaphore {
                     try {
                         Thread.sleep(1000L);
                     } catch (InterruptedException ignore) {
-                        Thread.currentThread().interrupt();
+                        Thread.getThis().interrupt();
                     }
                     // try again ...
                     continue;

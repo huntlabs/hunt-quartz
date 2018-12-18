@@ -28,10 +28,10 @@ import hunt.quartz.spi.InstanceIdGenerator;
  * @see InstanceIdGenerator
  * @see HostnameInstanceIdGenerator
  */
-class SimpleInstanceIdGenerator implements InstanceIdGenerator {
-    string generateInstanceId() throws SchedulerException {
+class SimpleInstanceIdGenerator : InstanceIdGenerator {
+    string generateInstanceId() {
         try {
-            return InetAddress.getLocalHost().getHostName() + System.currentTimeMillis();
+            return InetAddress.getLocalHost().getHostName() + DateTimeHelper.currentTimeMillis();
         } catch (Exception e) {
             throw new SchedulerException("Couldn't get host name!", e);
         }

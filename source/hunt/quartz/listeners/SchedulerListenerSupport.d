@@ -21,8 +21,8 @@ import hunt.quartz.SchedulerException;
 import hunt.quartz.SchedulerListener;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * A helpful abstract base class for implementors of 
@@ -36,16 +36,12 @@ import org.slf4j.LoggerFactory;
  * 
  * @see hunt.quartz.SchedulerListener
  */
-abstract class SchedulerListenerSupport implements SchedulerListener {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+abstract class SchedulerListenerSupport : SchedulerListener {
 
     /**
      * Get the <code>{@link org.slf4j.Logger}</code> for this
      * class's category.  This should be used by subclasses for logging.
      */
-    protected Logger getLog() {
-        return log;
-    }
 
     void jobAdded(JobDetail jobDetail) {
     }

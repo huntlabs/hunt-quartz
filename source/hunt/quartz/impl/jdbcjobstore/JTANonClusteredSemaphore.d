@@ -26,8 +26,8 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * Provides in memory thread/resource locking that is JTA 
@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @see hunt.quartz.impl.jdbcjobstore.SimpleSemaphore
  */
-class JTANonClusteredSemaphore implements Semaphore {
+class JTANonClusteredSemaphore : Semaphore {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,7 +76,6 @@ class JTANonClusteredSemaphore implements Semaphore {
 
     HashSet!(string) locks = new HashSet!(string)();
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private string transactionManagerJNDIName = DEFAULT_TRANSACTION_MANANGER_LOCATION;
     
@@ -89,9 +88,6 @@ class JTANonClusteredSemaphore implements Semaphore {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected Logger getLog() {
-        return log;
-    }
 
     void setTransactionManagerJNDIName(string transactionManagerJNDIName) {
         this.transactionManagerJNDIName = transactionManagerJNDIName;
@@ -112,21 +108,21 @@ class JTANonClusteredSemaphore implements Semaphore {
      * 
      * @return true if the lock was obtained.
      */
-    synchronized bool obtainLock(Connection conn, string lockName) throws LockException {
+    synchronized bool obtainLock(Connection conn, string lockName) {
 
         lockName = lockName.intern();
 
         if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" ~ lockName ~ "' is desired by: "
-                        + Thread.currentThread().getName());
+                        + Thread.getThis().name());
         }
 
         if (!isLockOwner(conn, lockName)) {
             if(log.isDebugEnabled()) {
                 log.debug(
                     "Lock '" ~ lockName ~ "' is being obtained: "
-                            + Thread.currentThread().getName());
+                            + Thread.getThis().name());
             }
             
             while (locks.contains(lockName)) {
@@ -136,7 +132,7 @@ class JTANonClusteredSemaphore implements Semaphore {
                     if(log.isDebugEnabled()) {
                         log.debug(
                             "Lock '" ~ lockName ~ "' was not obtained by: "
-                                    + Thread.currentThread().getName());
+                                    + Thread.getThis().name());
                     }
                 }
             }
@@ -155,7 +151,7 @@ class JTANonClusteredSemaphore implements Semaphore {
             if(log.isDebugEnabled()) {
                 log.debug(
                     "Lock '" ~ lockName ~ "' given to: "
-                            + Thread.currentThread().getName());
+                            + Thread.getThis().name());
             }
             
             
@@ -164,7 +160,7 @@ class JTANonClusteredSemaphore implements Semaphore {
         } else if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" ~ lockName ~ "' already owned by: "
-                        + Thread.currentThread().getName()
+                        + Thread.getThis().name()
                         ~ " -- but not owner!",
                 new Exception("stack-trace of wrongful returner"));
         }
@@ -204,7 +200,7 @@ class JTANonClusteredSemaphore implements Semaphore {
      * Release the lock on the identified resource if it is held by the calling
      * thread, unless currently in a JTA transaction.
      */
-    synchronized void releaseLock(string lockName) throws LockException {
+    synchronized void releaseLock(string lockName) {
         releaseLock(lockName, false);
     }
     
@@ -221,7 +217,7 @@ class JTANonClusteredSemaphore implements Semaphore {
      *      is false.
      */
     protected synchronized void releaseLock(
-        string lockName, bool fromSynchronization) throws LockException {
+        string lockName, bool fromSynchronization) {
         lockName = lockName.intern();
 
         if (isLockOwner(null, lockName)) {
@@ -229,10 +225,10 @@ class JTANonClusteredSemaphore implements Semaphore {
             if (fromSynchronization == false) {
                 Transaction t = getTransaction();
                 if (t !is null) {
-                    if(getLog().isDebugEnabled()) {
-                        getLog().debug(
+                    version(HUNT_DEBUG) {
+                        trace(
                             "Lock '" ~ lockName ~ "' is in a JTA transaction.  " ~ 
-                            "Return deferred by: " ~ Thread.currentThread().getName());
+                            "Return deferred by: " ~ Thread.getThis().name());
                     }
                     
                     // If we are still in a transaction, then we don't want to 
@@ -241,18 +237,18 @@ class JTANonClusteredSemaphore implements Semaphore {
                 }
             }
             
-            if(getLog().isDebugEnabled()) {
-                getLog().debug(
+            version(HUNT_DEBUG) {
+                trace(
                     "Lock '" ~ lockName ~ "' returned by: "
-                            + Thread.currentThread().getName());
+                            + Thread.getThis().name());
             }
             getThreadLocks().remove(lockName);
             locks.remove(lockName);
             this.notify();
-        } else if (getLog().isDebugEnabled()) {
-            getLog().debug(
+        } else version(HUNT_DEBUG) {
+            trace(
                 "Lock '" ~ lockName ~ "' attempt to return by: "
-                        + Thread.currentThread().getName()
+                        + Thread.getThis().name()
                         ~ " -- but not owner!",
                 new Exception("stack-trace of wrongful returner"));
         }
@@ -280,7 +276,7 @@ class JTANonClusteredSemaphore implements Semaphore {
      * <code>{@link javax.transaction.Transaction}</code> so that the lock
      * will be released when the transaction completes.
      */
-    private class SemaphoreSynchronization implements Synchronization {
+    private class SemaphoreSynchronization : Synchronization {
         private string lockName;
         
         SemaphoreSynchronization(string lockName) {

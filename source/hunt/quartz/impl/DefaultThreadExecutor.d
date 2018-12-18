@@ -24,7 +24,7 @@ import hunt.quartz.spi.ThreadExecutor;
  * @author matt.accola
  * @version $Revision$ $Date$
  */
-class DefaultThreadExecutor implements ThreadExecutor {
+class DefaultThreadExecutor : ThreadExecutor {
 
     void initialize() {
     }

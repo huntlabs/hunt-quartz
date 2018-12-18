@@ -25,8 +25,8 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobExecutionContext;
@@ -64,11 +64,10 @@ import hunt.quartz.JobExecutionException;
  * @author James Nelson (jmn@provident-solutions.com) -- Provident Solutions LLC
  * 
  */
-class JMXInvokerJob implements Job {
+class JMXInvokerJob : Job {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
-    void execute(JobExecutionContext context) throws JobExecutionException {
+    void execute(JobExecutionContext context) {
         try {
             Object[] params=null;
             string[] types=null;
@@ -150,7 +149,7 @@ class JMXInvokerJob implements Job {
             context.setResult(invoke(objName, objMethod, params, types));
         } catch (Exception e) {
             string m = "Caught a " ~ e.getClass().getName() ~ " exception : " ~ e.getMessage();
-            getLog().error(m, e);
+            error(m, e);
             throw new JobExecutionException(m, e, false);
         }
     }
@@ -168,7 +167,7 @@ class JMXInvokerJob implements Job {
         return (string[])l.toArray(new string[l.size()]);
     }
 
-    private Object invoke(string objectName, string method, Object[] params, string[] types) throws Exception {
+    private Object invoke(string objectName, string method, Object[] params, string[] types) {
         MBeanServer server = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
         ObjectName mbean = new ObjectName(objectName);
 
@@ -176,12 +175,9 @@ class JMXInvokerJob implements Job {
             throw new Exception("Can't find mbean server");
         }
 
-        getLog().info("invoking " ~ method);
+        info("invoking " ~ method);
         return server.invoke(mbean, method, params, types);
     }
 
-    protected Logger getLog() {
-        return log;
-    }
 
 }

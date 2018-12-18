@@ -29,8 +29,8 @@ import hunt.quartz.JobExecutionException;
 import hunt.quartz.PersistJobDataAfterExecution;
 import hunt.quartz.SchedulerContext;
 import hunt.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * Inspects a file and compares whether it's "last modified date" has changed
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 @DisallowConcurrentExecution
 @PersistJobDataAfterExecution
-class FileScanJob implements Job {
+class FileScanJob : Job {
 
     /**
      * <code>JobDataMap</code> key with which to specify 
@@ -75,7 +75,6 @@ class FileScanJob implements Job {
 
     private enum string LAST_MODIFIED_TIME = "LAST_MODIFIED_TIME";
     
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     FileScanJob() {
     }
@@ -83,7 +82,7 @@ class FileScanJob implements Job {
     /** 
      * @see hunt.quartz.Job#execute(hunt.quartz.JobExecutionContext)
      */
-    void execute(JobExecutionContext context) throws JobExecutionException {
+    void execute(JobExecutionContext context) {
         JobDataMap mergedJobDataMap = context.getMergedJobDataMap();
         SchedulerContext schedCtxt = null;
         try {
@@ -120,7 +119,7 @@ class FileScanJob implements Job {
         if(mergedJobDataMap.containsKey(MINIMUM_UPDATE_AGE)) {
             minAge = mergedJobDataMap.getLong(MINIMUM_UPDATE_AGE);
         }
-        long maxAgeDate = System.currentTimeMillis() + minAge;
+        long maxAgeDate = DateTimeHelper.currentTimeMillis() + minAge;
         
         
         long newDate = getLastModifiedDate(fileName);
@@ -143,7 +142,7 @@ class FileScanJob implements Job {
     }
     
     protected long getLastModifiedDate(string fileName) {
-        URL resource = Thread.currentThread().getContextClassLoader().getResource(fileName);
+        URL resource = Thread.getThis().getContextClassLoader().getResource(fileName);
         
         // Get the absolute path.
         string filePath = (resource is null) ? fileName : URLDecoder.decode(resource.getFile()); ;

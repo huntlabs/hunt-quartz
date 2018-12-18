@@ -862,7 +862,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger) implements SimpleTrigg
      *           set.
      */
     override
-    void validate() throws SchedulerException {
+    void validate() {
         super.validate();
 
         if (repeatCount != 0 && repeatInterval < 1) {

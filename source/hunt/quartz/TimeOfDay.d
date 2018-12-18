@@ -32,7 +32,7 @@ import std.datetime : TimeZone;
  * @author James House
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
-class TimeOfDay implements Serializable {
+class TimeOfDay {
 
 
     private final int hour;
@@ -47,7 +47,7 @@ class TimeOfDay implements Serializable {
      * @param second The second of the minute, between 0 and 59.
      * @throws IllegalArgumentException if one or more of the input values is out of their valid range.
      */
-    TimeOfDay(int hour, int minute, int second) {
+    this(int hour, int minute, int second) {
         this.hour = hour;
         this.minute = minute;
         this.second = second;
@@ -61,7 +61,7 @@ class TimeOfDay implements Serializable {
      * @param minute The minute of the hour, between 0 and 59.
      * @throws IllegalArgumentException if one or more of the input values is out of their valid range.
      */
-    TimeOfDay(int hour, int minute) {
+    this(int hour, int minute) {
         this.hour = hour;
         this.minute = minute;
         this.second = 0;

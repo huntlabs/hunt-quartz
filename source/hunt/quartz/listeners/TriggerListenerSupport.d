@@ -15,8 +15,8 @@
  */
 module hunt.quartz.listeners.TriggerListenerSupport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.TriggerListener;
 import hunt.quartz.Trigger;
 import hunt.quartz.JobExecutionContext;
@@ -39,16 +39,12 @@ import hunt.quartz.Trigger.CompletedExecutionInstruction;
  * 
  * @see hunt.quartz.TriggerListener
  */
-abstract class TriggerListenerSupport implements TriggerListener {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+abstract class TriggerListenerSupport : TriggerListener {
 
     /**
      * Get the <code>{@link org.slf4j.Logger}</code> for this
      * class's category.  This should be used by subclasses for logging.
      */
-    protected Logger getLog() {
-        return log;
-    }
 
     void triggerFired(Trigger trigger, JobExecutionContext context) {
     }

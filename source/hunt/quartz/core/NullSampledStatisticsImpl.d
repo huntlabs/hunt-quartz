@@ -1,6 +1,6 @@
 module hunt.quartz.core.NullSampledStatisticsImpl;
 
-class NullSampledStatisticsImpl implements SampledStatistics {
+class NullSampledStatisticsImpl : SampledStatistics {
     long getJobsCompletedMostRecentSample() {
         return 0;
     }

@@ -48,7 +48,7 @@ import hunt.quartz.utils.Key;
  * 
  * <p>
  * <code>Job</code> s are to be created by the 'client program', by defining
- * a class that implements the <code>{@link hunt.quartz.Job}</code>
+ * a class that : the <code>{@link hunt.quartz.Job}</code>
  * interface. <code>{@link JobDetail}</code> objects are then created (also
  * by the client) to define a individual instances of the <code>Job</code>.
  * <code>JobDetail</code> instances can then be registered with the <code>Scheduler</code>
@@ -871,7 +871,7 @@ interface Scheduler {
      * If more than one instance of the identified job is currently executing,
      * the <code>InterruptableJob#interrupt()</code> method will be called on
      * each instance.  However, there is a limitation that in the case that  
-     * <code>interrupt()</code> on one instances throws an exception, all 
+     * <code>interrupt()</code> on one instances 
      * remaining  instances (that have not yet been interrupted) will not have 
      * their <code>interrupt()</code> method called.
      * </p>

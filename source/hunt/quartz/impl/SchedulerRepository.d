@@ -74,7 +74,7 @@ class SchedulerRepository {
         return inst;
     }
 
-    synchronized void bind(Scheduler sched) throws SchedulerException {
+    synchronized void bind(Scheduler sched) {
 
         if ((Scheduler) schedulers.get(sched.getSchedulerName()) !is null) {
             throw new SchedulerException("Scheduler with name '"

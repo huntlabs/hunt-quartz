@@ -48,7 +48,7 @@ import hunt.quartz.spi.ClassLoadHelper;
  * @author jhouse
  * @author pl47ypus
  */
-class CascadingClassLoadHelper implements ClassLoadHelper {
+class CascadingClassLoadHelper : ClassLoadHelper {
 
     
     /*
@@ -84,7 +84,7 @@ class CascadingClassLoadHelper implements ClassLoadHelper {
         loadHelpers.add(new ThreadContextClassLoadHelper());
         loadHelpers.add(new InitThreadContextClassLoadHelper());
         
-        for(ClassLoadHelper loadHelper: loadHelpers) {
+        foreach(ClassLoadHelper loadHelper; loadHelpers) {
             loadHelper.initialize();
         }
     }
@@ -92,7 +92,7 @@ class CascadingClassLoadHelper implements ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    Class<?> loadClass(string name) throws ClassNotFoundException {
+    Class<?> loadClass(string name) {
 
         if (bestCandidate !is null) {
             try {
@@ -133,8 +133,7 @@ class CascadingClassLoadHelper implements ClassLoadHelper {
     }
 
     @SuppressWarnings("unchecked")
-    <T> Class<? extends T> loadClass(string name, Class!(T) clazz)
-            throws ClassNotFoundException {
+    <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
         return (Class<? extends T>) loadClass(name);
     }
     
@@ -217,7 +216,7 @@ class CascadingClassLoadHelper implements ClassLoadHelper {
      */
     ClassLoader getClassLoader() {
         return (this.bestCandidate is null) ?
-                Thread.currentThread().getContextClassLoader() :
+                Thread.getThis().getContextClassLoader() :
                 this.bestCandidate.getClassLoader();
     }
 

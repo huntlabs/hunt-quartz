@@ -17,8 +17,8 @@
 
 module hunt.quartz.simpl.ZeroSizeThreadPool;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.SchedulerConfigException;
 import hunt.quartz.spi.ThreadPool;
 
@@ -42,7 +42,7 @@ import hunt.quartz.spi.ThreadPool;
  * 
  * @author Wayne Fay
  */
-class ZeroSizeThreadPool implements ThreadPool {
+class ZeroSizeThreadPool : ThreadPool {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,7 +52,6 @@ class ZeroSizeThreadPool implements ThreadPool {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,15 +77,12 @@ class ZeroSizeThreadPool implements ThreadPool {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    Logger getLog() {
-        return log;
-    }
 
     int getPoolSize() {
         return 0;
     }
 
-    void initialize() throws SchedulerConfigException {
+    void initialize() {
     }
 
     void shutdown() {
@@ -94,7 +90,7 @@ class ZeroSizeThreadPool implements ThreadPool {
     }
 
     void shutdown(bool waitForJobsToComplete) {
-        getLog().debug("shutdown complete");
+        trace("shutdown complete");
     }
 
     bool runInThread(Runnable runnable) {

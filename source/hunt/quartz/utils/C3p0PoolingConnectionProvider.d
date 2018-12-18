@@ -43,7 +43,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  * @author James House
  * @author Mohammad Rezaei
  */
-class C3p0PoolingConnectionProvider implements PoolingConnectionProvider {
+class C3p0PoolingConnectionProvider : PoolingConnectionProvider {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,7 +101,7 @@ class C3p0PoolingConnectionProvider implements PoolingConnectionProvider {
 
     C3p0PoolingConnectionProvider(string dbDriver, string dbURL,
                                          string dbUser, string dbPassword, int maxConnections,
-                                         string dbValidationQuery) throws SQLException, SchedulerException {
+                                         string dbValidationQuery) {
         initialize(
                 dbDriver, dbURL, dbUser, dbPassword,
                 maxConnections, DEFAULT_DB_MAX_CACHED_STATEMENTS_PER_CONNECTION, dbValidationQuery, false, 50, 0);
@@ -126,7 +126,7 @@ class C3p0PoolingConnectionProvider implements PoolingConnectionProvider {
      * @param config
      *            configuration properties
      */
-    C3p0PoolingConnectionProvider(Properties config) throws SchedulerException, SQLException {
+    C3p0PoolingConnectionProvider(Properties config) {
         PropertiesParser cfg = new PropertiesParser(config);
         initialize(
                 cfg.getStringProperty(DB_DRIVER),
@@ -164,7 +164,7 @@ class C3p0PoolingConnectionProvider implements PoolingConnectionProvider {
             string dbValidationQuery,
             bool validateOnCheckout,
             int idleValidationSeconds,
-            int maxIdleSeconds) throws SQLException, SchedulerException {
+            int maxIdleSeconds) {
         if (dbURL is null) {
             throw new SQLException(
                     "DBPool could not be created: DB URL cannot be null");
@@ -219,15 +219,15 @@ class C3p0PoolingConnectionProvider implements PoolingConnectionProvider {
         return datasource;
     }
 
-    Connection getConnection() throws SQLException {
+    Connection getConnection() {
         return datasource.getConnection();
     }
 
-    void shutdown() throws SQLException {
+    void shutdown() {
         datasource.close();
     }
 
-    void initialize() throws SQLException {
+    void initialize() {
         // do nothing, already initialized during constructor call
     }
 }

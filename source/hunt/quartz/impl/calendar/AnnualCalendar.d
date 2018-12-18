@@ -19,7 +19,7 @@ module hunt.quartz.impl.calendar.AnnualCalendar;
 
 import java.util.ArrayList;
 import java.container.Collections;
-import java.util.Comparator;
+import hunt.util.Comparator;
 import java.util.Iterator;
 import std.datetime : TimeZone;
 
@@ -261,7 +261,7 @@ class AnnualCalendar : BaseCalendar implements Calendar,
     }
 }
 
-class CalendarComparator implements Comparator<hunt.time.util.Calendar>, Serializable {
+class CalendarComparator : Comparator<hunt.time.util.Calendar>, Serializable {
   
     
     CalendarComparator() {

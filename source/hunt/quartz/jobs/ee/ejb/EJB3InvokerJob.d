@@ -50,8 +50,7 @@ import hunt.quartz.JobExecutionException;
 class EJB3InvokerJob : EJBInvokerJob {
 
     override
-    void execute(JobExecutionContext context)
-            throws JobExecutionException {
+    void execute(JobExecutionContext context) {
         JobDataMap dataMap = context.getMergedJobDataMap();
 
         string ejb = dataMap.getString(EJB_JNDI_NAME_KEY);

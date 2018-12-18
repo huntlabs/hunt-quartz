@@ -42,7 +42,7 @@ import hunt.quartz.Calendar;
  * @author Juergen Donnerstag
  * @author James House
  */
-class BaseCalendar implements Calendar, Serializable, Cloneable {
+class BaseCalendar : Calendar, Serializable, Cloneable {
 
 
     // <p>A optional base calendar.</p>

@@ -29,7 +29,7 @@ import hunt.quartz.TriggerKey;
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 import hunt.quartz.spi.OperableTrigger;
 
-class SimpleTriggerPersistenceDelegate implements TriggerPersistenceDelegate, StdJDBCConstants {
+class SimpleTriggerPersistenceDelegate : TriggerPersistenceDelegate, StdJDBCConstants {
 
     protected string tablePrefix;
     protected string schedNameLiteral;
@@ -47,7 +47,7 @@ class SimpleTriggerPersistenceDelegate implements TriggerPersistenceDelegate, St
         return ((trigger instanceof SimpleTriggerImpl) && !((SimpleTriggerImpl)trigger).hasAdditionalProperties());
     }
 
-    int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) throws SQLException {
+    int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
         PreparedStatement ps = null;
 
         try {
@@ -61,7 +61,7 @@ class SimpleTriggerPersistenceDelegate implements TriggerPersistenceDelegate, St
         }
     }
 
-    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) throws SQLException, IOException {
+    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
         SimpleTrigger simpleTrigger = (SimpleTrigger)trigger;
         
@@ -81,7 +81,7 @@ class SimpleTriggerPersistenceDelegate implements TriggerPersistenceDelegate, St
         }
     }
 
-    TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) throws SQLException {
+    TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
 
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -114,7 +114,7 @@ class SimpleTriggerPersistenceDelegate implements TriggerPersistenceDelegate, St
         }
     }
 
-    int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) throws SQLException, IOException {
+    int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
         SimpleTrigger simpleTrigger = (SimpleTrigger)trigger;
         

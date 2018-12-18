@@ -17,11 +17,11 @@
 
 module hunt.quartz.PersistJobDataAfterExecution;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+// import java.lang.annotation.Documented;
+// import java.lang.annotation.ElementType;
+// import java.lang.annotation.Retention;
+// import java.lang.annotation.RetentionPolicy;
+// import java.lang.annotation.Target;
 
 /**
  * An annotation that marks a {@link Job} class as one that makes updates to its
@@ -36,9 +36,9 @@ import java.lang.annotation.Target;
  * 
  * @author jhouse
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface PersistJobDataAfterExecution {
+// @Documented
+// @Retention(RetentionPolicy.RUNTIME)
+// @Target(ElementType.TYPE)
+// public @interface PersistJobDataAfterExecution {
 
-}
+// }

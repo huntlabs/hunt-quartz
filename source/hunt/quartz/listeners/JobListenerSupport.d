@@ -15,8 +15,8 @@
  */
 module hunt.quartz.listeners.JobListenerSupport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.JobListener;
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.JobExecutionException;
@@ -38,16 +38,12 @@ import hunt.quartz.JobExecutionException;
  * 
  * @see hunt.quartz.JobListener
  */
-abstract class JobListenerSupport implements JobListener {
-    private final Logger log = LoggerFactory.getLogger(getClass());
+abstract class JobListenerSupport : JobListener {
 
     /**
      * Get the <code>{@link org.slf4j.Logger}</code> for this
      * class's category.  This should be used by subclasses for logging.
      */
-    protected Logger getLog() {
-        return log;
-    }
 
     void jobToBeExecuted(JobExecutionContext context) {
     }

@@ -938,7 +938,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger) im
      *           set.
      */
     override
-    void validate() throws SchedulerException {
+    void validate() {
         super.validate();
         
         if (repeatInterval < 1) {

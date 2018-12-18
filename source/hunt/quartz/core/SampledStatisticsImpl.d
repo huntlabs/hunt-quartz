@@ -30,7 +30,7 @@ class SampledStatisticsImpl : SchedulerListenerSupport implements SampledStatist
     private final static SampledRateCounterConfig DEFAULT_SAMPLED_RATE_COUNTER_CONFIG = new SampledRateCounterConfig(DEFAULT_INTERVAL_SECS,
             DEFAULT_HISTORY_SIZE, true);
 
-    private volatile CounterManager counterManager;
+    private CounterManager counterManager;
     private final SampledCounter jobsScheduledCount;
     private final SampledCounter jobsExecutingCount;
     private final SampledCounter jobsCompletedCount;

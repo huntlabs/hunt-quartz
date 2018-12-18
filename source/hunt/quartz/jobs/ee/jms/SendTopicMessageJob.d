@@ -75,10 +75,9 @@ import hunt.quartz.JobExecutionException;
  * @author Fernando Ribeiro
  * @author Weston M. Price
  */
-final class SendTopicMessageJob implements Job {
+final class SendTopicMessageJob : Job {
 
-    void execute(final JobExecutionContext jobCtx)
-            throws JobExecutionException {
+    void execute(final JobExecutionContext jobCtx) {
         TopicConnection conn = null;
 
         TopicSession sess = null;

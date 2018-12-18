@@ -124,7 +124,7 @@ class PropertiesParser {
         return (val is null) ? def : Boolean.valueOf(val).booleanValue();
     }
 
-    byte getByteProperty(string name) throws NumberFormatException {
+    byte getByteProperty(string name) {
         string val = getStringProperty(name);
         if (val is null) {
             throw new NumberFormatException(" null string");
@@ -137,8 +137,7 @@ class PropertiesParser {
         }
     }
 
-    byte getByteProperty(string name, byte def)
-        throws NumberFormatException {
+    byte getByteProperty(string name, byte def) {
         string val = getStringProperty(name);
         if (val is null) {
             return def;
@@ -160,7 +159,7 @@ class PropertiesParser {
         return  (param is null) ? def : param.charAt(0);
     }
 
-    double getDoubleProperty(string name) throws NumberFormatException {
+    double getDoubleProperty(string name) {
         string val = getStringProperty(name);
         if (val is null) {
             throw new NumberFormatException(" null string");
@@ -173,8 +172,7 @@ class PropertiesParser {
         }
     }
 
-    double getDoubleProperty(string name, double def)
-        throws NumberFormatException {
+    double getDoubleProperty(string name, double def) {
         string val = getStringProperty(name);
         if (val is null) {
             return def;
@@ -187,7 +185,7 @@ class PropertiesParser {
         }
     }
 
-    float getFloatProperty(string name) throws NumberFormatException {
+    float getFloatProperty(string name) {
         string val = getStringProperty(name);
         if (val is null) {
             throw new NumberFormatException(" null string");
@@ -200,8 +198,7 @@ class PropertiesParser {
         }
     }
 
-    float getFloatProperty(string name, float def)
-        throws NumberFormatException {
+    float getFloatProperty(string name, float def) {
         string val = getStringProperty(name);
         if (val is null) {
             return def;
@@ -214,7 +211,7 @@ class PropertiesParser {
         }
     }
 
-    int getIntProperty(string name) throws NumberFormatException {
+    int getIntProperty(string name) {
         string val = getStringProperty(name);
         if (val is null) {
             throw new NumberFormatException(" null string");
@@ -227,8 +224,7 @@ class PropertiesParser {
         }
     }
 
-    int getIntProperty(string name, int def)
-        throws NumberFormatException {
+    int getIntProperty(string name, int def) {
         string val = getStringProperty(name);
         if (val is null) {
             return def;
@@ -241,12 +237,11 @@ class PropertiesParser {
         }
     }
 
-    int[] getIntArrayProperty(string name) throws NumberFormatException {
+    int[] getIntArrayProperty(string name) {
         return getIntArrayProperty(name, null);
     }
 
-    int[] getIntArrayProperty(string name, int[] def)
-        throws NumberFormatException {
+    int[] getIntArrayProperty(string name, int[] def) {
         string vals = getStringProperty(name);
         if (vals is null) {
             return def;
@@ -273,7 +268,7 @@ class PropertiesParser {
         }
     }
 
-    long getLongProperty(string name) throws NumberFormatException {
+    long getLongProperty(string name) {
         string val = getStringProperty(name);
         if (val is null) {
             throw new NumberFormatException(" null string");
@@ -286,8 +281,7 @@ class PropertiesParser {
         }
     }
 
-    long getLongProperty(string name, long def)
-        throws NumberFormatException {
+    long getLongProperty(string name, long def) {
         string val = getStringProperty(name);
         if (val is null) {
             return def;
@@ -300,7 +294,7 @@ class PropertiesParser {
         }
     }
 
-    short getShortProperty(string name) throws NumberFormatException {
+    short getShortProperty(string name) {
         string val = getStringProperty(name);
         if (val is null) {
             throw new NumberFormatException(" null string");
@@ -313,8 +307,7 @@ class PropertiesParser {
         }
     }
 
-    short getShortProperty(string name, short def)
-        throws NumberFormatException {
+    short getShortProperty(string name, short def) {
         string val = getStringProperty(name);
         if (val is null) {
             return def;

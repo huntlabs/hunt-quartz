@@ -25,7 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import hunt.quartz.spi.ClassLoadHelper;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * <p>
@@ -58,8 +58,7 @@ class PostgreSQLDelegate : StdJDBCDelegate {
      *           if deserialization causes an error
      */
     override           
-    protected Object getObjectFromBlob(ResultSet rs, string colName)
-        throws ClassNotFoundException, IOException, SQLException {
+    protected Object getObjectFromBlob(ResultSet rs, string colName) {
         InputStream binaryInput = null;
         byte[] bytes = rs.getBytes(colName);
         
@@ -81,8 +80,7 @@ class PostgreSQLDelegate : StdJDBCDelegate {
     }
 
     override           
-    protected Object getJobDataFromBlob(ResultSet rs, string colName)
-        throws ClassNotFoundException, IOException, SQLException {
+    protected Object getJobDataFromBlob(ResultSet rs, string colName) {
         if (canUseProperties()) {
             InputStream binaryInput = null;
             byte[] bytes = rs.getBytes(colName);

@@ -749,7 +749,7 @@ abstract class AbstractTrigger!(T extends Trigger) implements OperableTrigger {
      *           if a required property (such as Name, Group, Class) is not
      *           set.
      */
-    void validate() throws SchedulerException {
+    void validate() {
         if (name is null) {
             throw new SchedulerException("Trigger's name cannot be null");
         }

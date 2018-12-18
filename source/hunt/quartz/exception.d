@@ -3,11 +3,6 @@ module hunt.quartz.exception;
 import hunt.lang.exception;
 
 
-class JobPersistenceException : Exception {
-    mixin BasicExceptionCtors;
-}
-
-
 
 class SchedulerException : Exception {
     mixin BasicExceptionCtors;
@@ -45,4 +40,119 @@ class SchedulerException : Exception {
             return super.toString() ~ " [See nested exception: " ~ cause.toString() ~ "]";
         }
     }
+}
+
+class VetoedException : Exception {
+    mixin BasicExceptionCtors;
+}
+
+class JobPersistenceException : SchedulerException {
+    mixin BasicExceptionCtors;
+}
+
+class SchedulerConfigException : SchedulerException {
+    mixin BasicExceptionCtors;
+}
+
+class UnableToInterruptJobException : SchedulerException {
+    mixin BasicExceptionCtors;
+}
+
+
+
+class JobExecutionException : SchedulerException {
+
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Data members.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+    private bool refire = false;
+
+    private bool unscheduleTrigg = false;
+
+    private bool unscheduleAllTriggs = false;
+
+    mixin BasicExceptionCtors;
+
+    /**
+     * <p>
+     * Create a JobExcecutionException with the 're-fire immediately' flag set
+     * to the given value.
+     * </p>
+     */
+    this(bool refireImmediately) {
+        refire = refireImmediately;
+    }
+
+    /**
+     * <p>
+     * Create a JobExcecutionException with the given underlying exception, and
+     * the 're-fire immediately' flag set to the given value.
+     * </p>
+     */
+    this(Throwable cause, bool refireImmediately) {
+        super(cause);
+
+        refire = refireImmediately;
+    }
+
+    
+    /**
+     * <p>
+     * Create a JobExcecutionException with the given message, and underlying
+     * exception, and the 're-fire immediately' flag set to the given value.
+     * </p>
+     */
+    this(string msg, Throwable cause, bool refireImmediately) {
+        super(msg, cause);
+
+        refire = refireImmediately;
+    }
+    
+    /**
+     * Create a JobExcecutionException with the given message and the 're-fire 
+     * immediately' flag set to the given value.
+     */
+    this(string msg, bool refireImmediately) {
+        super(msg);
+
+        refire = refireImmediately;
+    }
+
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Interface.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+    void setRefireImmediately(bool refire) {
+        this.refire = refire;
+    }
+
+    bool refireImmediately() {
+        return refire;
+    }
+
+    void setUnscheduleFiringTrigger(bool unscheduleTrigg) {
+        this.unscheduleTrigg = unscheduleTrigg;
+    }
+
+    bool unscheduleFiringTrigger() {
+        return unscheduleTrigg;
+    }
+
+    void setUnscheduleAllTriggers(bool unscheduleAllTriggs) {
+        this.unscheduleAllTriggs = unscheduleAllTriggs;
+    }
+
+    bool unscheduleAllTriggers() {
+        return unscheduleAllTriggs;
+    }
+
 }

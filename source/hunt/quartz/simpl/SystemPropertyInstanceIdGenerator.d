@@ -16,7 +16,7 @@ import hunt.quartz.spi.InstanceIdGenerator;
  *
  * @author Alex Snaps
  */
-class SystemPropertyInstanceIdGenerator implements InstanceIdGenerator {
+class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
 
   /**
    * System property to read the instanceId from
@@ -33,7 +33,7 @@ class SystemPropertyInstanceIdGenerator implements InstanceIdGenerator {
    * to {@link #SYSTEM_PROPERTY}.
    * @throws SchedulerException Shouldn't a value be found
    */
-  public string generateInstanceId() throws SchedulerException {
+  public string generateInstanceId() {
     string property = System.getProperty(getSystemPropertyName());
     if(property is null) {
       throw new SchedulerException("No value for '" ~ SYSTEM_PROPERTY

@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobExecutionContext;
@@ -52,9 +52,8 @@ import hunt.quartz.JobExecutionException;
  * @author James House
  * @author Steinar Overbeck Cook
  */
-class NativeJob implements Job {
+class NativeJob : Job {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,8 +104,7 @@ class NativeJob implements Job {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    void execute(JobExecutionContext context)
-        throws JobExecutionException {
+    void execute(JobExecutionContext context) {
 
         JobDataMap data = context.getMergedJobDataMap();
         
@@ -132,11 +130,8 @@ class NativeJob implements Job {
         
     }
 
-    protected Logger getLog() {
-        return log;
-    }
     
-    private Integer runNativeCommand(string command, string parameters, bool wait, bool consumeStreams) throws JobExecutionException {
+    private Integer runNativeCommand(string command, string parameters, bool wait, bool consumeStreams) {
 
         string[] cmd;
         string[] args = new string[2];
@@ -170,7 +165,7 @@ class NativeJob implements Job {
 
             Runtime rt = Runtime.getRuntime();
             // Executes the command
-            getLog().info("About to run " ~ cmd[0] ~ " " ~ cmd[1] ~ " " ~ (cmd.length>2 ? cmd[2] : "") ~ " ..."); 
+            info("About to run " ~ cmd[0] ~ " " ~ cmd[1] ~ " " ~ (cmd.length>2 ? cmd[2] : "") ~ " ..."); 
             Process proc = rt.exec(cmd);
             // Consumes the stdout from the process
             StreamConsumer stdoutConsumer = new StreamConsumer(proc.getInputStream(), "stdout");
@@ -225,13 +220,13 @@ class NativeJob implements Job {
 
                 while ((line = br.readLine()) !is null) {
                     if(type.equalsIgnoreCase("stderr")) {
-                        getLog().warn(type ~ ">" ~ line);
+                        warning(type ~ ">" ~ line);
                     } else {
-                        getLog().info(type ~ ">" ~ line);
+                        info(type ~ ">" ~ line);
                     }
                 }
             } catch (IOException ioe) {
-                getLog().error("Error consuming " ~ type ~ " stream of spawned process.", ioe);
+                error("Error consuming " ~ type ~ " stream of spawned process.", ioe);
             } finally {
                 if(br !is null) {
                     try { br.close(); } catch(Exception ignore) {}

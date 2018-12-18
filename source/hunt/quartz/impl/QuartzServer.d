@@ -83,8 +83,7 @@ class QuartzServer : SchedulerListenerSupport {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    void serve(SchedulerFactory schedFact, bool console)
-        throws Exception {
+    void serve(SchedulerFactory schedFact, bool console) {
         sched = schedFact.getScheduler();
 
         sched.start();
@@ -168,7 +167,7 @@ class QuartzServer : SchedulerListenerSupport {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    static void main(string[] args) throws Exception {
+    static void main(string[] args) {
 
         //    //Configure Log4J
         //    org.apache.log4j.PropertyConfigurator.configure(

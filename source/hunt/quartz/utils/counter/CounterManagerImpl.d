@@ -30,7 +30,7 @@ import hunt.quartz.utils.counter.sampled.SampledCounterImpl;
  * @since 1.8
  * 
  */
-class CounterManagerImpl implements CounterManager {
+class CounterManagerImpl : CounterManager {
 
     private Timer timer;
     private bool shutdown;

@@ -39,7 +39,7 @@ import java.util.Properties;
  *
  * @author Ludovic Orban
  */
-class HikariCpPoolingConnectionProvider implements PoolingConnectionProvider {
+class HikariCpPoolingConnectionProvider : PoolingConnectionProvider {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +75,7 @@ class HikariCpPoolingConnectionProvider implements PoolingConnectionProvider {
 
     HikariCpPoolingConnectionProvider(string dbDriver, string dbURL,
                                              string dbUser, string dbPassword, int maxConnections,
-                                             string dbValidationQuery) throws SQLException, SchedulerException {
+                                             string dbValidationQuery) {
         initialize(
                 dbDriver, dbURL, dbUser, dbPassword,
                 maxConnections, dbValidationQuery, 0);
@@ -100,7 +100,7 @@ class HikariCpPoolingConnectionProvider implements PoolingConnectionProvider {
      * @param config
      *            configuration properties
      */
-    HikariCpPoolingConnectionProvider(Properties config) throws SchedulerException, SQLException {
+    HikariCpPoolingConnectionProvider(Properties config) {
         PropertiesParser cfg = new PropertiesParser(config);
         initialize(
                 cfg.getStringProperty(DB_DRIVER),
@@ -132,7 +132,7 @@ class HikariCpPoolingConnectionProvider implements PoolingConnectionProvider {
             string dbPassword,
             int maxConnections,
             string dbValidationQuery,
-            int maxIdleSeconds) throws SQLException, SchedulerException {
+            int maxIdleSeconds) {
         if (dbURL is null) {
             throw new SQLException(
                     "DBPool could not be created: DB URL cannot be null");
@@ -176,15 +176,15 @@ class HikariCpPoolingConnectionProvider implements PoolingConnectionProvider {
         return datasource;
     }
 
-    Connection getConnection() throws SQLException {
+    Connection getConnection() {
         return datasource.getConnection();
     }
 
-    void shutdown() throws SQLException {
+    void shutdown() {
         datasource.close();
     }
 
-    void initialize() throws SQLException {
+    void initialize() {
         // do nothing, already initialized during constructor call
     }
 }

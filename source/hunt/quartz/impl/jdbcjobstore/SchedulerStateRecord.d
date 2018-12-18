@@ -24,7 +24,7 @@ module hunt.quartz.impl.jdbcjobstore.SchedulerStateRecord;
  * 
  * @author James House
  */
-class SchedulerStateRecord implements java.io.Serializable {
+class SchedulerStateRecord : java.io.Serializable {
 
 
     /*

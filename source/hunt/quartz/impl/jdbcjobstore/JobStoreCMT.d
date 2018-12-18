@@ -123,7 +123,7 @@ class JobStoreCMT : JobStoreSupport {
 
     override
     void initialize(ClassLoadHelper loadHelper,
-            SchedulerSignaler signaler) throws SchedulerConfigException {
+            SchedulerSignaler signaler) {
 
         if (nonManagedTxDsName is null) {
             throw new SchedulerConfigException(
@@ -142,7 +142,7 @@ class JobStoreCMT : JobStoreSupport {
 
         super.initialize(loadHelper, signaler);
 
-        getLog().info("JobStoreCMT initialized.");
+        info("JobStoreCMT initialized.");
     }
     
     override
@@ -153,13 +153,12 @@ class JobStoreCMT : JobStoreSupport {
         try {
             DBConnectionManager.getInstance().shutdown(getNonManagedTXDataSource());
         } catch (SQLException sqle) {
-            getLog().warn("Database connection shutdown unsuccessful.", sqle);
+            warning("Database connection shutdown unsuccessful.", sqle);
         }
     }
 
     override
-    protected Connection getNonManagedTXConnection()
-        throws JobPersistenceException {
+    protected Connection getNonManagedTXConnection() {
         Connection conn = null;
         try {
             conn = DBConnectionManager.getInstance().getConnection(
@@ -195,7 +194,7 @@ class JobStoreCMT : JobStoreSupport {
                 conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             }
         } catch (SQLException sqle) {
-            getLog().warn("Failed to override connection auto commit/transaction isolation.", sqle);
+            warning("Failed to override connection auto commit/transaction isolation.", sqle);
         } catch (Throwable e) {
             try { conn.close(); } catch(Throwable tt) {}
             
@@ -224,7 +223,7 @@ class JobStoreCMT : JobStoreSupport {
     override
     protected Object executeInLock(
             string lockName, 
-            TransactionCallback txCallback) throws JobPersistenceException {
+            TransactionCallback txCallback) {
         bool transOwner = false;
         Connection conn = null;
         try {

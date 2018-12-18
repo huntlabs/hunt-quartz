@@ -47,7 +47,7 @@ class TriggerUtils {
     /**
      * Private constructor because this is a pure utility class.
      */
-    private TriggerUtils() {
+    private this() {
     }
     
     /*
@@ -114,7 +114,7 @@ class TriggerUtils {
     static Date computeEndTimeToAllowParticularNumberOfFirings(OperableTrigger trigg, hunt.quartz.Calendar cal, 
             int numTimes) {
 
-        OperableTrigger t = (OperableTrigger) trigg.clone();
+        OperableTrigger t = cast(OperableTrigger) trigg.clone();
 
         if (t.getNextFireTime() is null) {
             t.computeFirstFireTime(cal);
@@ -170,7 +170,7 @@ class TriggerUtils {
             hunt.quartz.Calendar cal, Date from, Date to) {
         LinkedList!(Date) lst = new LinkedList!(Date)();
 
-        OperableTrigger t = (OperableTrigger) trigg.clone();
+        OperableTrigger t = cast(OperableTrigger) trigg.clone();
 
         if (t.getNextFireTime() is null) {
             t.setStartTime(from);
@@ -195,7 +195,8 @@ class TriggerUtils {
             }
         }
 
-        return java.container.Collections.unmodifiableList(lst);
+        // return java.container.Collections.unmodifiableList(lst);
+        return lst;
     }
 
 }

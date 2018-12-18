@@ -33,8 +33,7 @@ class CronCalendar : BaseCalendar {
      *  
      * @param expression a string representation of the desired cron expression
      */
-    CronCalendar(string expression) 
-        throws ParseException {
+    CronCalendar(string expression) {
         this(null, expression, null);
     }
 
@@ -48,7 +47,7 @@ class CronCalendar : BaseCalendar {
      * @param expression   a string representation of the desired cron expression
      */
     CronCalendar(Calendar baseCalendar,
-            string expression) throws ParseException {
+            string expression) {
         this(baseCalendar, expression, null);
     }
 
@@ -68,7 +67,7 @@ class CronCalendar : BaseCalendar {
      *          <code>TimeZone.getDefault()</code> will be used.
      */
     CronCalendar(Calendar baseCalendar,
-            string expression, TimeZone timeZone) throws ParseException {
+            string expression, TimeZone timeZone) {
         super(baseCalendar);
         this.cronExpression = new CronExpression(expression);
         this.cronExpression.setTimeZone(timeZone);
@@ -202,7 +201,7 @@ class CronCalendar : BaseCalendar {
      * @throws ParseException
      *         if the string expression cannot be parsed
      */
-    void setCronExpression(string expression) throws ParseException {
+    void setCronExpression(string expression) {
         CronExpression newExp = new CronExpression(expression);
         
         this.cronExpression = newExp;

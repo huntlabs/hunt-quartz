@@ -36,8 +36,8 @@ import hunt.quartz.spi.JobStore;
 import hunt.quartz.spi.SchedulerPlugin;
 import hunt.quartz.spi.ThreadExecutor;
 import hunt.quartz.spi.ThreadPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * <p>
@@ -92,7 +92,7 @@ import org.slf4j.LoggerFactory;
  * @see JobStore
  * @see ThreadPool
  */
-class DirectSchedulerFactory implements SchedulerFactory {
+class DirectSchedulerFactory : SchedulerFactory {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -127,7 +127,6 @@ class DirectSchedulerFactory implements SchedulerFactory {
 
     private static DirectSchedulerFactory instance = new DirectSchedulerFactory();
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,9 +136,6 @@ class DirectSchedulerFactory implements SchedulerFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected Logger getLog() {
-        return log;
-    }
 
     /**
      * Constructor
@@ -168,8 +164,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      * @throws SchedulerException
      *           if initialization failed.
      */
-    void createVolatileScheduler(int maxThreads)
-        throws SchedulerException {
+    void createVolatileScheduler(int maxThreads) {
         SimpleThreadPool threadPool = new SimpleThreadPool(maxThreads,
                 Thread.NORM_PRIORITY);
         threadPool.initialize();
@@ -189,8 +184,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      * @throws SchedulerException
      *           if the remote scheduler could not be reached.
      */
-    void createRemoteScheduler(string rmiHost, int rmiPort)
-        throws SchedulerException {
+    void createRemoteScheduler(string rmiHost, int rmiPort) {
         createRemoteScheduler(DEFAULT_SCHEDULER_NAME, DEFAULT_INSTANCE_ID,
                 rmiHost, rmiPort);
     }
@@ -214,8 +208,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      *           if the remote scheduler could not be reached.
      */
     void createRemoteScheduler(string schedulerName,
-            string schedulerInstanceId, string rmiHost, int rmiPort)
-        throws SchedulerException {
+            string schedulerInstanceId, string rmiHost, int rmiPort) {
         createRemoteScheduler(schedulerName,
                 schedulerInstanceId, null, rmiHost, rmiPort);
     }
@@ -242,8 +235,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      *           if the remote scheduler could not be reached.
      */
     void createRemoteScheduler(string schedulerName,
-            string schedulerInstanceId, string rmiBindName, string rmiHost, int rmiPort)
-        throws SchedulerException {
+            string schedulerInstanceId, string rmiBindName, string rmiHost, int rmiPort) {
 
         string uid = (rmiBindName !is null) ? rmiBindName :
             QuartzSchedulerResources.getUniqueIdentifier(
@@ -268,8 +260,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      * @throws SchedulerException
      *           if initialization failed
      */
-    void createScheduler(ThreadPool threadPool, JobStore jobStore)
-        throws SchedulerException {
+    void createScheduler(ThreadPool threadPool, JobStore jobStore) {
         createScheduler(DEFAULT_SCHEDULER_NAME, DEFAULT_INSTANCE_ID,
                 threadPool, jobStore);
     }
@@ -293,8 +284,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      *           if initialization failed
      */
     void createScheduler(string schedulerName,
-            string schedulerInstanceId, ThreadPool threadPool, JobStore jobStore)
-        throws SchedulerException {
+            string schedulerInstanceId, ThreadPool threadPool, JobStore jobStore) {
         createScheduler(schedulerName, schedulerInstanceId, threadPool,
                 jobStore, null, 0, -1, -1);
     }
@@ -325,8 +315,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
     void createScheduler(string schedulerName,
             string schedulerInstanceId, ThreadPool threadPool,
             JobStore jobStore, string rmiRegistryHost, int rmiRegistryPort,
-            long idleWaitTime, long dbFailureRetryInterval)
-        throws SchedulerException {
+            long idleWaitTime, long dbFailureRetryInterval) {
         createScheduler(schedulerName,
                 schedulerInstanceId, threadPool,
                 jobStore, null, // plugins
@@ -367,8 +356,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
             JobStore jobStore, Map!(string, SchedulerPlugin) schedulerPluginMap,
             string rmiRegistryHost, int rmiRegistryPort,
             long idleWaitTime, long dbFailureRetryInterval,
-            bool jmxExport, string jmxObjectName)
-        throws SchedulerException {
+            bool jmxExport, string jmxObjectName) {
         createScheduler(schedulerName, schedulerInstanceId, threadPool,
                 DEFAULT_THREAD_EXECUTOR, jobStore, schedulerPluginMap,
                 rmiRegistryHost, rmiRegistryPort, idleWaitTime,
@@ -410,8 +398,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
             JobStore jobStore, Map!(string, SchedulerPlugin) schedulerPluginMap,
             string rmiRegistryHost, int rmiRegistryPort,
             long idleWaitTime, long dbFailureRetryInterval,
-            bool jmxExport, string jmxObjectName)
-        throws SchedulerException {
+            bool jmxExport, string jmxObjectName) {
         createScheduler(schedulerName, schedulerInstanceId, threadPool,
                 DEFAULT_THREAD_EXECUTOR, jobStore, schedulerPluginMap,
                 rmiRegistryHost, rmiRegistryPort, idleWaitTime,
@@ -457,8 +444,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
             JobStore jobStore, Map!(string, SchedulerPlugin) schedulerPluginMap,
             string rmiRegistryHost, int rmiRegistryPort,
             long idleWaitTime, long dbFailureRetryInterval,
-            bool jmxExport, string jmxObjectName, int maxBatchSize, long batchTimeWindow)
-        throws SchedulerException {
+            bool jmxExport, string jmxObjectName, int maxBatchSize, long batchTimeWindow) {
         // Currently only one run-shell factory is available...
         JobRunShellFactory jrsf = new StdJobRunShellFactory();
 
@@ -517,9 +503,9 @@ class DirectSchedulerFactory implements SchedulerFactory {
             }
         }
 
-        getLog().info("Quartz scheduler '" ~ scheduler.getSchedulerName());
+        info("Quartz scheduler '" ~ scheduler.getSchedulerName());
 
-        getLog().info("Quartz scheduler version: " ~ qs.getVersion());
+        info("Quartz scheduler version: " ~ qs.getVersion());
 
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
@@ -549,7 +535,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      * calling getScheduler()
      * </p>
      */
-    Scheduler getScheduler() throws SchedulerException {
+    Scheduler getScheduler() {
         if (!initialized) {
             throw new SchedulerException(
                 "you must call createRemoteScheduler or createScheduler methods before calling getScheduler()");
@@ -563,7 +549,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      * Returns a handle to the Scheduler with the given name, if it exists.
      * </p>
      */
-    Scheduler getScheduler(string schedName) throws SchedulerException {
+    Scheduler getScheduler(string schedName) {
         SchedulerRepository schedRep = SchedulerRepository.getInstance();
 
         return schedRep.lookup(schedName);
@@ -575,7 +561,7 @@ class DirectSchedulerFactory implements SchedulerFactory {
      * StdSchedulerFactory instance.).
      * </p>
      */
-    Collection!(Scheduler) getAllSchedulers() throws SchedulerException {
+    Collection!(Scheduler) getAllSchedulers() {
         return SchedulerRepository.getInstance().lookupAll();
     }
 

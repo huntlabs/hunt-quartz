@@ -88,7 +88,7 @@ class JTAJobRunShell : JobRunShell {
      */
 
     override
-    protected void begin() throws SchedulerException {
+    protected void begin() {
         // Don't get a new UserTransaction w/o making sure we cleaned up the old 
         // one.  This is necessary because there are paths through JobRunShell.run()
         // where begin() can be called multiple times w/o complete being called in
@@ -97,13 +97,13 @@ class JTAJobRunShell : JobRunShell {
         
         bool beganSuccessfully = false;
         try {
-            getLog().debug("Looking up UserTransaction.");
+            trace("Looking up UserTransaction.");
             ut = UserTransactionHelper.lookupUserTransaction();
             if (transactionTimeout !is null) {
                 ut.setTransactionTimeout(transactionTimeout);
             }
 
-            getLog().debug("Beginning UserTransaction.");
+            trace("Beginning UserTransaction.");
             ut.begin();
             
             beganSuccessfully = true;
@@ -121,8 +121,7 @@ class JTAJobRunShell : JobRunShell {
     }
 
     override
-    protected void complete(bool successfulExecution)
-        throws SchedulerException {
+    protected void complete(bool successfulExecution) {
         if (ut is null) {
             return;
         }
@@ -130,7 +129,7 @@ class JTAJobRunShell : JobRunShell {
         try {
             try {
                 if (ut.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
-                    getLog().debug("UserTransaction marked for rollback only.");
+                    trace("UserTransaction marked for rollback only.");
                     successfulExecution = false;
                 }
             } catch (SystemException e) {
@@ -140,7 +139,7 @@ class JTAJobRunShell : JobRunShell {
     
             if (successfulExecution) {
                 try {
-                    getLog().debug("Committing UserTransaction.");
+                    trace("Committing UserTransaction.");
                     ut.commit();
                 } catch (Exception nse) {
                     throw new SchedulerException(
@@ -148,7 +147,7 @@ class JTAJobRunShell : JobRunShell {
                 }
             } else {
                 try {
-                    getLog().debug("Rolling-back UserTransaction.");
+                    trace("Rolling-back UserTransaction.");
                     ut.rollback();
                 } catch (Exception nse) {
                     throw new SchedulerException(

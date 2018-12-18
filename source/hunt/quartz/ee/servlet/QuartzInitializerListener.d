@@ -21,8 +21,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.Scheduler;
 import hunt.quartz.SchedulerException;
 import hunt.quartz.impl.StdSchedulerFactory;
@@ -123,7 +123,7 @@ import hunt.quartz.impl.StdSchedulerFactory;
  * @author Chuck Cavaness
  * @author John Petrocik
  */
-class QuartzInitializerListener implements ServletContextListener {
+class QuartzInitializerListener : ServletContextListener {
 
     enum string QUARTZ_FACTORY_KEY = "hunt.quartz.impl.StdSchedulerFactory.KEY";
 
@@ -132,7 +132,6 @@ class QuartzInitializerListener implements ServletContextListener {
 
     private Scheduler scheduler = null;
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -234,8 +233,7 @@ class QuartzInitializerListener implements ServletContextListener {
         }
     }
 
-    protected StdSchedulerFactory getSchedulerFactory(string configFile)
-            throws SchedulerException {
+    protected StdSchedulerFactory getSchedulerFactory(string configFile) {
         StdSchedulerFactory factory;
         // get Properties
         if (configFile !is null) {

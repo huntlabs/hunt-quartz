@@ -24,7 +24,7 @@ import java.io.InputStream;
 
 /**
  * A <code>ClassLoadHelper</code> that uses either the current thread's
- * context class loader (<code>Thread.currentThread().getContextClassLoader().loadClass( .. )</code>).
+ * context class loader (<code>Thread.getThis().getContextClassLoader().loadClass( .. )</code>).
  * 
  * @see hunt.quartz.spi.ClassLoadHelper
  * @see hunt.quartz.simpl.InitThreadContextClassLoadHelper
@@ -35,7 +35,7 @@ import java.io.InputStream;
  * @author jhouse
  * @author pl47ypus
  */
-class ThreadContextClassLoadHelper implements ClassLoadHelper {
+class ThreadContextClassLoadHelper : ClassLoadHelper {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,13 +56,12 @@ class ThreadContextClassLoadHelper implements ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    Class<?> loadClass(string name) throws ClassNotFoundException {
+    Class<?> loadClass(string name) {
         return getClassLoader().loadClass(name);
     }
 
     @SuppressWarnings("unchecked")
-    <T> Class<? extends T> loadClass(string name, Class!(T) clazz)
-            throws ClassNotFoundException {
+    <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
         return (Class<? extends T>) loadClass(name);
     }
     
@@ -92,7 +91,7 @@ class ThreadContextClassLoadHelper implements ClassLoadHelper {
      * @return the class-loader user be the helper.
      */
     ClassLoader getClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
+        return Thread.getThis().getContextClassLoader();
     }
 
 }

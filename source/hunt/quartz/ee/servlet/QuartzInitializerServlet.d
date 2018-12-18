@@ -242,8 +242,7 @@ class QuartzInitializerServlet : HttpServlet {
         }
     }
 
-    protected StdSchedulerFactory getSchedulerFactory(string configFile)
-            throws SchedulerException {
+    protected StdSchedulerFactory getSchedulerFactory(string configFile) {
         StdSchedulerFactory factory;
         // get Properties
         if (configFile !is null) {
@@ -274,14 +273,12 @@ class QuartzInitializerServlet : HttpServlet {
     }
 
     override
-    void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+    void doPost(HttpServletRequest request, HttpServletResponse response) {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 
     override
-    void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+    void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 

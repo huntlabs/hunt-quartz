@@ -20,8 +20,8 @@ module hunt.quartz.impl.jdbcjobstore.SimpleSemaphore;
 import java.sql.Connection;
 import java.util.HashSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * Internal in-memory lock handler for providing thread/resource locking in 
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author jhouse
  */
-class SimpleSemaphore implements Semaphore {
+class SimpleSemaphore : Semaphore {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,7 +44,6 @@ class SimpleSemaphore implements Semaphore {
 
     HashSet!(string) locks = new HashSet!(string)();
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,9 +53,6 @@ class SimpleSemaphore implements Semaphore {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected Logger getLog() {
-        return log;
-    }
 
     private HashSet!(string) getThreadLocks() {
         HashSet!(string) threadLocks = lockOwners.get();
@@ -80,14 +76,14 @@ class SimpleSemaphore implements Semaphore {
         if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" ~ lockName ~ "' is desired by: "
-                        + Thread.currentThread().getName());
+                        + Thread.getThis().name());
         }
 
         if (!isLockOwner(lockName)) {
             if(log.isDebugEnabled()) {
                 log.debug(
                     "Lock '" ~ lockName ~ "' is being obtained: "
-                            + Thread.currentThread().getName());
+                            + Thread.getThis().name());
             }
             while (locks.contains(lockName)) {
                 try {
@@ -96,7 +92,7 @@ class SimpleSemaphore implements Semaphore {
                     if(log.isDebugEnabled()) {
                         log.debug(
                             "Lock '" ~ lockName ~ "' was not obtained by: "
-                                    + Thread.currentThread().getName());
+                                    + Thread.getThis().name());
                     }
                 }
             }
@@ -104,14 +100,14 @@ class SimpleSemaphore implements Semaphore {
             if(log.isDebugEnabled()) {
                 log.debug(
                     "Lock '" ~ lockName ~ "' given to: "
-                            + Thread.currentThread().getName());
+                            + Thread.getThis().name());
             }
             getThreadLocks().add(lockName);
             locks.add(lockName);
         } else if(log.isDebugEnabled()) {
             log.debug(
                 "Lock '" ~ lockName ~ "' already owned by: "
-                        + Thread.currentThread().getName()
+                        + Thread.getThis().name()
                         ~ " -- but not owner!",
                 new Exception("stack-trace of wrongful returner"));
         }
@@ -128,20 +124,22 @@ class SimpleSemaphore implements Semaphore {
         lockName = lockName.intern();
 
         if (isLockOwner(lockName)) {
-            if(getLog().isDebugEnabled()) {
-                getLog().debug(
+            version(HUNT_DEBUG) {
+                trace(
                     "Lock '" ~ lockName ~ "' retuned by: "
-                            + Thread.currentThread().getName());
+                            ~ Thread.getThis().name());
             }
             getThreadLocks().remove(lockName);
             locks.remove(lockName);
             this.notifyAll();
-        } else if (getLog().isDebugEnabled()) {
-            getLog().debug(
+        } else {
+            version(HUNT_DEBUG) {
+                trace(
                 "Lock '" ~ lockName ~ "' attempt to retun by: "
-                        + Thread.currentThread().getName()
+                        ~ Thread.getThis().name()
                         ~ " -- but not owner!",
                 new Exception("stack-trace of wrongful returner"));
+            }
         }
     }
 

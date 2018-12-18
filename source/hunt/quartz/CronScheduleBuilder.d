@@ -126,7 +126,7 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
      * @see CronExpression
      */
     static CronScheduleBuilder cronScheduleNonvalidatedExpression(
-            string cronExpression) throws ParseException {
+            string cronExpression) {
         return cronSchedule(new CronExpression(cronExpression));
     }
 

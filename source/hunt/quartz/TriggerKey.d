@@ -58,11 +58,11 @@ import hunt.quartz.utils.Key;
 final class TriggerKey : Key!(TriggerKey) {
   
 
-    TriggerKey(string name) {
+    this(string name) {
         super(name, null);
     }
 
-    TriggerKey(string name, string group) {
+    this(string name, string group) {
         super(name, group);
     }
 

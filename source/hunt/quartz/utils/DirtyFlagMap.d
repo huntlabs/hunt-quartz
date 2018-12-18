@@ -379,7 +379,7 @@ class DirtyFlagMap!(K,V) implements Map!(K,V), Cloneable, java.io.Serializable {
      * Wrap a Map.Entry so we can mark the Map as dirty if
      * a value is set.
      */
-    private class DirtyFlagMapEntry implements Map.Entry!(K,V) {
+    private class DirtyFlagMapEntry : Map.Entry!(K,V) {
         private Map.Entry!(K,V) entry;
 
         DirtyFlagMapEntry(final Map.Entry!(K,V) entry) {

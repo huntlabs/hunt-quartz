@@ -32,7 +32,7 @@ import hunt.quartz.Calendar;
 import hunt.quartz.JobDetail;
 import hunt.quartz.spi.ClassLoadHelper;
 import hunt.quartz.spi.OperableTrigger;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * <p>
@@ -61,8 +61,7 @@ class PointbaseDelegate : StdJDBCDelegate {
      *           if there were problems serializing the JobDataMap
      */
     override           
-    int insertJobDetail(Connection conn, JobDetail job)
-        throws IOException, SQLException {
+    int insertJobDetail(Connection conn, JobDetail job) {
         //log.debug( "Inserting JobDetail " ~ job );
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         int len = baos.toByteArray().length;
@@ -106,8 +105,7 @@ class PointbaseDelegate : StdJDBCDelegate {
      *           if there were problems serializing the JobDataMap
      */
     override           
-    int updateJobDetail(Connection conn, JobDetail job)
-        throws IOException, SQLException {
+    int updateJobDetail(Connection conn, JobDetail job) {
         //log.debug( "Updating job detail " ~ job );
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         int len = baos.toByteArray().length;
@@ -139,7 +137,7 @@ class PointbaseDelegate : StdJDBCDelegate {
 
     override
     int insertTrigger(Connection conn, OperableTrigger trigger, string state,
-            JobDetail jobDetail) throws SQLException, IOException {
+            JobDetail jobDetail) {
 
         ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
         int len = baos.toByteArray().length;
@@ -200,7 +198,7 @@ class PointbaseDelegate : StdJDBCDelegate {
     
     override           
     int updateTrigger(Connection conn, OperableTrigger trigger, string state,
-            JobDetail jobDetail) throws SQLException, IOException {
+            JobDetail jobDetail) {
 
         ByteArrayOutputStream baos = serializeJobData(trigger.getJobDataMap());
         int len = baos.toByteArray().length;
@@ -278,8 +276,7 @@ class PointbaseDelegate : StdJDBCDelegate {
      * @return the number of rows updated
      */
     override           
-    int updateJobData(Connection conn, JobDetail job)
-        throws IOException, SQLException {
+    int updateJobData(Connection conn, JobDetail job) {
         //log.debug( "Updating Job Data for Job " ~ job );
         ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
         int len = baos.toByteArray().length;
@@ -323,7 +320,7 @@ class PointbaseDelegate : StdJDBCDelegate {
      */
     override           
     int insertCalendar(Connection conn, string calendarName,
-            Calendar calendar) throws IOException, SQLException {
+            Calendar calendar) {
         //log.debug( "Inserting Calendar " ~ calendarName ~ " : " ~ calendar
         // );
         ByteArrayOutputStream baos = serializeObject(calendar);
@@ -360,7 +357,7 @@ class PointbaseDelegate : StdJDBCDelegate {
      */
     override           
     int updateCalendar(Connection conn, string calendarName,
-            Calendar calendar) throws IOException, SQLException {
+            Calendar calendar) {
         //log.debug( "Updating calendar " ~ calendarName ~ " : " ~ calendar );
         ByteArrayOutputStream baos = serializeObject(calendar);
         byte buf[] = baos.toByteArray();
@@ -401,8 +398,7 @@ class PointbaseDelegate : StdJDBCDelegate {
      *           if deserialization causes an error
      */
     override           
-    protected Object getObjectFromBlob(ResultSet rs, string colName)
-        throws ClassNotFoundException, IOException, SQLException {
+    protected Object getObjectFromBlob(ResultSet rs, string colName) {
         //log.debug( "Getting blob from column: " ~ colName );
         Object obj = null;
 
@@ -440,8 +436,7 @@ class PointbaseDelegate : StdJDBCDelegate {
      *           if deserialization causes an error
      */
     override           
-    protected Object getJobDataFromBlob(ResultSet rs, string colName)
-        throws ClassNotFoundException, IOException, SQLException {
+    protected Object getJobDataFromBlob(ResultSet rs, string colName) {
         //log.debug( "Getting Job details from blob in col " ~ colName );
         if (canUseProperties()) {
             byte data[] = rs.getBytes(colName);

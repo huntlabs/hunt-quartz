@@ -33,7 +33,7 @@ import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 
 
-class JobExecutionContextImpl implements java.io.Serializable, JobExecutionContext {
+class JobExecutionContextImpl : java.io.Serializable, JobExecutionContext {
 
     
     /*

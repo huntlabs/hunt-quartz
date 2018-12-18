@@ -32,7 +32,7 @@ import hunt.quartz.JobDetail;
  * 
  * @author James House
  */
-class TriggerFiredBundle implements java.io.Serializable {
+class TriggerFiredBundle : java.io.Serializable {
   
 
     /*

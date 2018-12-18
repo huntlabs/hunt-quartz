@@ -662,7 +662,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger) 
       
         // a. Increment afterTime by a second, so that we are comparing against a time after it!
         if (afterTime is null) {
-          afterTime = new Date(System.currentTimeMillis() + 1000L);
+          afterTime = new Date(DateTimeHelper.currentTimeMillis() + 1000L);
         } else {
           afterTime = new Date(afterTime.getTime() + 1000L);
         }
@@ -830,7 +830,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger) 
      *           set.
      */
     override
-    void validate() throws SchedulerException {
+    void validate() {
         super.validate();
         
         if (repeatIntervalUnit is null || !(repeatIntervalUnit== IntervalUnit.SECOND || 

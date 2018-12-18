@@ -196,7 +196,7 @@ import std.datetime;
  * @author Contributions from Mads Henderson
  * @author Refactoring from CronTrigger to CronExpression by Aaron Craven
  */
-final class CronExpression implements Serializable, Cloneable {
+final class CronExpression : Serializable, Cloneable {
 
     
     protected enum int SECOND = 0;
@@ -265,7 +265,7 @@ final class CronExpression implements Serializable, Cloneable {
      *         if the string expression cannot be parsed into a valid 
      *         <CODE>CronExpression</CODE>
      */
-    CronExpression(string cronExpression) throws ParseException {
+    CronExpression(string cronExpression) {
         if (cronExpression is null) {
             throw new IllegalArgumentException("cronExpression cannot be null");
         }
@@ -421,7 +421,7 @@ final class CronExpression implements Serializable, Cloneable {
         return true;
     }
 
-    static void validateExpression(string cronExpression) throws ParseException {
+    static void validateExpression(string cronExpression) {
         
         new CronExpression(cronExpression);
     }
@@ -433,7 +433,7 @@ final class CronExpression implements Serializable, Cloneable {
     //
     ////////////////////////////////////////////////////////////////////////////
 
-    protected void buildExpression(string expression) throws ParseException {
+    protected void buildExpression(string expression) {
         expressionParsed = true;
 
         try {
@@ -519,8 +519,7 @@ final class CronExpression implements Serializable, Cloneable {
         }
     }
 
-    protected int storeExpressionVals(int pos, string s, int type)
-        throws ParseException {
+    protected int storeExpressionVals(int pos, string s, int type) {
 
         int incr = 0;
         int i = skipWhiteSpace(pos, s);
@@ -699,7 +698,7 @@ final class CronExpression implements Serializable, Cloneable {
         return i;
     }
 
-    private void checkIncrementRange(int incr, int type, int idxPos) throws ParseException {
+    private void checkIncrementRange(int incr, int type, int idxPos) {
         if (incr > 59 && (type == SECOND || type == MINUTE)) {
             throw new ParseException("Increment > 60 : " ~ incr, idxPos);
         } else if (incr > 23 && (type == HOUR)) {
@@ -713,8 +712,7 @@ final class CronExpression implements Serializable, Cloneable {
         }
     }
 
-    protected int checkNext(int pos, string s, int val, int type)
-        throws ParseException {
+    protected int checkNext(int pos, string s, int val, int type) {
         
         int end = -1;
         int i = pos;
@@ -962,8 +960,7 @@ final class CronExpression implements Serializable, Cloneable {
         return i;
     }
 
-    protected void addToSet(int val, int end, int incr, int type)
-        throws ParseException {
+    protected void addToSet(int val, int end, int incr, int type) {
         
         TreeSet!(Integer) set = getSet(type);
 

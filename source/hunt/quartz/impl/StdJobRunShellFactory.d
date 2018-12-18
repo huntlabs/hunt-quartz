@@ -32,7 +32,7 @@ import hunt.quartz.spi.TriggerFiredBundle;
  * 
  * @author James House
  */
-class StdJobRunShellFactory implements JobRunShellFactory {
+class StdJobRunShellFactory : JobRunShellFactory {
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -69,7 +69,7 @@ class StdJobRunShellFactory implements JobRunShellFactory {
      * {@link hunt.quartz.core.JobRunShell}</code>.
      * </p>
      */
-    JobRunShell createJobRunShell(TriggerFiredBundle bndle) throws SchedulerException {
+    JobRunShell createJobRunShell(TriggerFiredBundle bndle) {
         return new JobRunShell(scheduler, bndle);
     }
 }

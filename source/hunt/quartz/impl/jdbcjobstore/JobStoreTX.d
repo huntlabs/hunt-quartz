@@ -52,11 +52,11 @@ class JobStoreTX : JobStoreSupport {
 
     override
     void initialize(ClassLoadHelper classLoadHelper,
-            SchedulerSignaler schedSignaler) throws SchedulerConfigException {
+            SchedulerSignaler schedSignaler) {
 
         super.initialize(classLoadHelper, schedSignaler);
 
-        getLog().info("JobStoreTX initialized.");
+        info("JobStoreTX initialized.");
     }
 
     /**
@@ -66,8 +66,7 @@ class JobStoreTX : JobStoreSupport {
      * @see JobStoreSupport#getConnection()
      */
     override
-    protected Connection getNonManagedTXConnection()
-        throws JobPersistenceException {
+    protected Connection getNonManagedTXConnection() {
         return getConnection();
     }
     
@@ -89,7 +88,7 @@ class JobStoreTX : JobStoreSupport {
     override
     protected Object executeInLock(
             string lockName, 
-            TransactionCallback txCallback) throws JobPersistenceException {
+            TransactionCallback txCallback) {
         return executeInNonManagedTXLock(lockName, txCallback, null);
     }
 }

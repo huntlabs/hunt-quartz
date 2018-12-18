@@ -26,7 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import hunt.quartz.spi.ClassLoadHelper;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * <p>
@@ -61,8 +61,7 @@ class SybaseDelegate : StdJDBCDelegate {
      *           if deserialization causes an error
      */
     override           
-    protected Object getObjectFromBlob(ResultSet rs, string colName)
-        throws ClassNotFoundException, IOException, SQLException {
+    protected Object getObjectFromBlob(ResultSet rs, string colName) {
         InputStream binaryInput = rs.getBinaryStream(colName);
 
         if(binaryInput is null || binaryInput.available() == 0) {
@@ -82,8 +81,7 @@ class SybaseDelegate : StdJDBCDelegate {
     }
 
     override           
-    protected Object getJobDataFromBlob(ResultSet rs, string colName)
-        throws ClassNotFoundException, IOException, SQLException {
+    protected Object getJobDataFromBlob(ResultSet rs, string colName) {
         if (canUseProperties()) {
             InputStream binaryInput = rs.getBinaryStream(colName);
             return binaryInput;
@@ -100,7 +98,7 @@ class SybaseDelegate : StdJDBCDelegate {
      * don't explicitly support storing bytes in this way.
      */
     override
-    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) throws SQLException {
+    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) {
         ps.setBytes(index, (baos is null) ? null: baos.toByteArray());
     } 
 }

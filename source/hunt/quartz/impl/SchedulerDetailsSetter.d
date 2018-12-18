@@ -19,8 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 import hunt.quartz.SchedulerException;
 
 /**
@@ -41,13 +41,12 @@ class SchedulerDetailsSetter {
     }
 
     static void setDetails(Object target, string schedulerName,
-            string schedulerId) throws SchedulerException {
+            string schedulerId) {
         set(target, "setInstanceName", schedulerName);
         set(target, "setInstanceId", schedulerId);
     }
 
-    private static void set(Object target, string method, string value)
-            throws SchedulerException {
+    private static void set(Object target, string method, string value) {
         final Method setter;
 
         try {
@@ -58,7 +57,7 @@ class SchedulerDetailsSetter {
         } catch (NoSuchMethodException e) {
             // This probably won't happen since the interface has the method
             LOGGER.warn(target.getClass().getName()
-                    + " does not contain public method " ~ method + "(string)");
+                    ~ " does not contain public method " ~ method ~ "(string)");
             return;
         }
 
@@ -66,8 +65,8 @@ class SchedulerDetailsSetter {
             // expected if method not implemented (but is present on
             // interface)
             LOGGER.warn(target.getClass().getName()
-                    + " does not implement " ~ method
-                    + "(string)");
+                    ~ " does not implement " ~ method
+                    ~ "(string)");
             return;
         }
 

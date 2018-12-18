@@ -43,7 +43,7 @@ import hunt.quartz.utils.ClassUtils;
  * 
  * @author James House
  */
-class JTAAnnotationAwareJobRunShellFactory implements JobRunShellFactory {
+class JTAAnnotationAwareJobRunShellFactory : JobRunShellFactory {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,8 +83,7 @@ class JTAAnnotationAwareJobRunShellFactory implements JobRunShellFactory {
      * operations with the <code>JobStore</code>.
      * </p>
      */
-    void initialize(Scheduler sched)
-        throws SchedulerConfigException {
+    void initialize(Scheduler sched) {
         this.scheduler = sched;
     }
 
@@ -95,8 +94,7 @@ class JTAAnnotationAwareJobRunShellFactory implements JobRunShellFactory {
      * {@link hunt.quartz.core.JobRunShell}</code>.
      * </p>
      */
-    JobRunShell createJobRunShell(TriggerFiredBundle bundle)
-            throws SchedulerException {
+    JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
         ExecuteInJTATransaction jtaAnnotation = ClassUtils.getAnnotation(bundle.getJobDetail().getJobClass(), ExecuteInJTATransaction.class);
         if(jtaAnnotation is null)
             return new JobRunShell(scheduler, bundle);

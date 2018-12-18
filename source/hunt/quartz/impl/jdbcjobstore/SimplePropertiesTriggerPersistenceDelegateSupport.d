@@ -37,7 +37,7 @@ import hunt.quartz.spi.OperableTrigger;
  * 
  * @author jhouse
  */
-abstract class SimplePropertiesTriggerPersistenceDelegateSupport implements TriggerPersistenceDelegate, StdJDBCConstants {
+abstract class SimplePropertiesTriggerPersistenceDelegateSupport : TriggerPersistenceDelegate, StdJDBCConstants {
 
     protected enum string TABLE_SIMPLE_PROPERTIES_TRIGGERS = "SIMPROP_TRIGGERS";
     
@@ -98,7 +98,7 @@ abstract class SimplePropertiesTriggerPersistenceDelegateSupport implements Trig
     
     protected abstract TriggerPropertyBundle getTriggerPropertyBundle(SimplePropertiesTriggerProperties properties);
     
-    int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) throws SQLException {
+    int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
         PreparedStatement ps = null;
 
         try {
@@ -112,7 +112,7 @@ abstract class SimplePropertiesTriggerPersistenceDelegateSupport implements Trig
         }
     }
 
-    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) throws SQLException, IOException {
+    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
         SimplePropertiesTriggerProperties properties = getTriggerProperties(trigger);
         
@@ -140,7 +140,7 @@ abstract class SimplePropertiesTriggerPersistenceDelegateSupport implements Trig
         }
     }
 
-    TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) throws SQLException {
+    TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
 
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -176,7 +176,7 @@ abstract class SimplePropertiesTriggerPersistenceDelegateSupport implements Trig
         }
     }
 
-    int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) throws SQLException, IOException {
+    int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
         SimplePropertiesTriggerProperties properties = getTriggerProperties(trigger);
         

@@ -79,7 +79,7 @@ class UpdateLockRowSemaphore : DBSemaphore {
      * Execute the SQL select for update that will lock the proper database row.
      */
     override
-    protected void executeSQL(Connection conn, final string lockName, final string expandedSQL, final string expandedInsertSQL) throws LockException {
+    protected void executeSQL(Connection conn, final string lockName, final string expandedSQL, final string expandedInsertSQL) {
         SQLException lastFailure = null;
         for (int i = 0; i < RETRY_COUNT; i++) {
             try {
@@ -90,14 +90,14 @@ class UpdateLockRowSemaphore : DBSemaphore {
             } catch (SQLException e) {
                 lastFailure = e;
                 if ((i + 1) == RETRY_COUNT) {
-                    getLog().debug("Lock '{}' was not obtained by: {}", lockName, Thread.currentThread().getName());
+                    trace("Lock '{}' was not obtained by: {}", lockName, Thread.getThis().name());
                 } else {
-                    getLog().debug("Lock '{}' was not obtained by: {} - will try again.", lockName, Thread.currentThread().getName());
+                    trace("Lock '{}' was not obtained by: {} - will try again.", lockName, Thread.getThis().name());
                 }
                 try {
                     Thread.sleep(1000L);
                 } catch (InterruptedException _) {
-                    Thread.currentThread().interrupt();
+                    Thread.getThis().interrupt();
                 }
             }
         }
@@ -112,19 +112,19 @@ class UpdateLockRowSemaphore : DBSemaphore {
         setSQL(updateLockRowSQL);
     }
 
-    private bool lockViaUpdate(Connection conn, string lockName, string sql) throws SQLException {
+    private bool lockViaUpdate(Connection conn, string lockName, string sql) {
         PreparedStatement ps = conn.prepareStatement(sql);
         try {
             ps.setString(1, lockName);
-            getLog().debug("Lock '" ~ lockName ~ "' is being obtained: " ~ Thread.currentThread().getName());
+            trace("Lock '" ~ lockName ~ "' is being obtained: " ~ Thread.getThis().name());
             return ps.executeUpdate() >= 1;
         } finally {
             ps.close();
         }
     }
 
-    private void lockViaInsert(Connection conn, string lockName, string sql) throws SQLException {
-        getLog().debug("Inserting new lock row for lock: '" ~ lockName ~ "' being obtained by thread: " ~ Thread.currentThread().getName());
+    private void lockViaInsert(Connection conn, string lockName, string sql) {
+        trace("Inserting new lock row for lock: '" ~ lockName ~ "' being obtained by thread: " ~ Thread.getThis().name());
         PreparedStatement ps = conn.prepareStatement(sql);
         try {
             ps.setString(1, lockName);

@@ -98,7 +98,7 @@ class DBConnectionManager {
      *              if an error occurs, or there is no DataSource with the
      *              given name.
      */
-    Connection getConnection(string dsName) throws SQLException {
+    Connection getConnection(string dsName) {
         ConnectionProvider provider = providers.get(dsName);
         if (provider is null) {
             throw new SQLException("There is no DataSource named '"
@@ -127,7 +127,7 @@ class DBConnectionManager {
      *              if an error occurs, or there is no DataSource with the
      *              given name.
      */
-    void shutdown(string dsName) throws SQLException {
+    void shutdown(string dsName) {
 
         ConnectionProvider provider = (ConnectionProvider) providers
         .get(dsName);

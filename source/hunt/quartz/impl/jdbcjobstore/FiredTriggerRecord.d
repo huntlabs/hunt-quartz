@@ -27,7 +27,7 @@ import hunt.quartz.TriggerKey;
  * 
  * @author James House
  */
-class FiredTriggerRecord implements java.io.Serializable {
+class FiredTriggerRecord : java.io.Serializable {
 
 
     /*

@@ -24,7 +24,7 @@ import hunt.quartz.TriggerKey;
  *
  * @author James House (jhouse AT revolition DOT net)
  */
-class BroadcastSchedulerListener implements SchedulerListener {
+class BroadcastSchedulerListener : SchedulerListener {
 
     private List!(SchedulerListener) listeners;
 

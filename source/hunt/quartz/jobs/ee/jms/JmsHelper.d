@@ -71,8 +71,7 @@ final class JmsHelper {
 
     }
 
-    static InitialContext getInitialContext(final JobDataMap dataMap)
-            throws NamingException {
+    static InitialContext getInitialContext(final JobDataMap dataMap) {
         final Hashtable!(string, string) params = new Hashtable!(string, string)(4);
 
         final string initialContextFactory = dataMap
@@ -103,8 +102,7 @@ final class JmsHelper {
 
     }
 
-    static JmsMessageFactory getMessageFactory(final string name)
-            throws JmsJobException {
+    static JmsMessageFactory getMessageFactory(final string name) {
 
         try {
             final Class<?> cls = Class.forName(name);

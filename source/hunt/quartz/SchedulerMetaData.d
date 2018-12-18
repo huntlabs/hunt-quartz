@@ -26,7 +26,7 @@ import std.datetime;
  * 
  * @author James House
  */
-class SchedulerMetaData implements java.io.Serializable {
+class SchedulerMetaData {
   
 
     /*
@@ -75,7 +75,7 @@ class SchedulerMetaData implements java.io.Serializable {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    SchedulerMetaData(string schedName, string schedInst,
+    this(string schedName, string schedInst,
             Class<?> schedClass, bool isRemote, bool started,
             bool isInStandbyMode, bool shutdown, Date startTime, int numJobsExec,
             Class<?> jsClass, bool jsPersistent, bool jsClustered, Class<?> tpClass, int tpSize,
@@ -283,7 +283,7 @@ class SchedulerMetaData implements java.io.Serializable {
      * 
      * </p>
      */
-    string getSummary() throws SchedulerException {
+    string getSummary() {
         StringBuilder str = new StringBuilder("Quartz Scheduler (v");
         str.append(getVersion());
         str.append(") '");

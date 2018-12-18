@@ -20,7 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import hunt.quartz.spi.ClassLoadHelper;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * Quartz JDBC delegate for DB2 v8 databases.
@@ -38,7 +38,7 @@ class DB2v8Delegate : StdJDBCDelegate {
      * This translates the bool to 1/0 for true/false.
      */
     override           
-    protected void setBoolean(PreparedStatement ps, int index, bool val) throws SQLException {
+    protected void setBoolean(PreparedStatement ps, int index, bool val) {
         ps.setInt(index, ((val) ? 1 : 0));
     }
 }

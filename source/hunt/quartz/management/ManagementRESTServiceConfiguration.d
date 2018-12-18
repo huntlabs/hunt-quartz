@@ -36,16 +36,16 @@ class ManagementRESTServiceConfiguration {
      */
     enum int DEFAULT_SECURITY_SVC_TIMEOUT = 5 * 1000;
 
-    private volatile bool enabled = false;
-    private volatile string securityServiceLocation;
-    private volatile int securityServiceTimeout = DEFAULT_SECURITY_SVC_TIMEOUT;
-    private volatile string bind = DEFAULT_BIND;
+    private bool enabled = false;
+    private string securityServiceLocation;
+    private int securityServiceTimeout = DEFAULT_SECURITY_SVC_TIMEOUT;
+    private string bind = DEFAULT_BIND;
 
-    // private volatile int sampleHistorySize =
+    // private int sampleHistorySize =
     // CacheStatisticsSampler.DEFAULT_HISTORY_SIZE;
-    // private volatile int sampleIntervalSeconds =
+    // private int sampleIntervalSeconds =
     // CacheStatisticsSampler.DEFAULT_INTERVAL_SECS;
-    // private volatile int sampleSearchIntervalSeconds =
+    // private int sampleSearchIntervalSeconds =
     // CacheStatisticsSampler.DEFAULT_SEARCH_INTERVAL_SEC;
 
     /**

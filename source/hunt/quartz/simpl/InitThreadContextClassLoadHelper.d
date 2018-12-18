@@ -35,7 +35,7 @@ import java.io.InputStream;
  * @author jhouse
  * @author pl47ypus
  */
-class InitThreadContextClassLoadHelper implements ClassLoadHelper {
+class InitThreadContextClassLoadHelper : ClassLoadHelper {
 
     
     /*
@@ -62,19 +62,18 @@ class InitThreadContextClassLoadHelper implements ClassLoadHelper {
      * thread, which is the thread that is initializing Quartz.
      */
     void initialize() {
-        initClassLoader = Thread.currentThread().getContextClassLoader();
+        initClassLoader = Thread.getThis().getContextClassLoader();
     }
 
     /**
      * Return the class with the given name.
      */
-    Class<?> loadClass(string name) throws ClassNotFoundException {
+    Class<?> loadClass(string name) {
         return initClassLoader.loadClass(name);
     }
 
     @SuppressWarnings("unchecked")
-    <T> Class<? extends T> loadClass(string name, Class!(T) clazz)
-            throws ClassNotFoundException {
+    <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
         return (Class<? extends T>) loadClass(name);
     }
     

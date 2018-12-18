@@ -37,8 +37,8 @@ import hunt.quartz.spi.InstanceIdGenerator;
  * @see InstanceIdGenerator
  * @see SimpleInstanceIdGenerator
  */
-class HostnameInstanceIdGenerator implements InstanceIdGenerator {
-    string generateInstanceId() throws SchedulerException {
+class HostnameInstanceIdGenerator : InstanceIdGenerator {
+    string generateInstanceId() {
         try {
             return InetAddress.getLocalHost().getHostName();
         } catch (Exception e) {

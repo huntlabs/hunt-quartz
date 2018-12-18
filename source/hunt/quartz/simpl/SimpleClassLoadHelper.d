@@ -35,7 +35,7 @@ import java.io.InputStream;
  * @author jhouse
  * @author pl47ypus
  */
-class SimpleClassLoadHelper implements ClassLoadHelper {
+class SimpleClassLoadHelper : ClassLoadHelper {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,13 +56,12 @@ class SimpleClassLoadHelper implements ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    Class<?> loadClass(string name) throws ClassNotFoundException {
+    Class<?> loadClass(string name) {
         return Class.forName(name);
     }
 
     @SuppressWarnings("unchecked")
-    <T> Class<? extends T> loadClass(string name, Class!(T) clazz)
-            throws ClassNotFoundException {
+    <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
         return (Class<? extends T>) loadClass(name);
     }
 

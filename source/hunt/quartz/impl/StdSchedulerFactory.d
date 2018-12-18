@@ -48,8 +48,8 @@ import hunt.quartz.utils.DBConnectionManager;
 import hunt.quartz.utils.JNDIConnectionProvider;
 import hunt.quartz.utils.PoolingConnectionProvider;
 import hunt.quartz.utils.PropertiesParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -118,7 +118,7 @@ import java.util.Properties;
  * @author Anthony Eden
  * @author Mohammad Rezaei
  */
-class StdSchedulerFactory implements SchedulerFactory {
+class StdSchedulerFactory : SchedulerFactory {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -299,7 +299,6 @@ class StdSchedulerFactory implements SchedulerFactory {
 
     private PropertiesParser cfg;
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     //  private Scheduler scheduler;
 
@@ -323,7 +322,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      *
      * @see #initialize(Properties)
      */
-    StdSchedulerFactory(Properties props) throws SchedulerException {
+    StdSchedulerFactory(Properties props) {
         initialize(props);
     }
 
@@ -333,7 +332,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      *
      * @see #initialize(string)
      */
-    StdSchedulerFactory(string fileName) throws SchedulerException {
+    StdSchedulerFactory(string fileName) {
         initialize(fileName);
     }
 
@@ -345,9 +344,6 @@ class StdSchedulerFactory implements SchedulerFactory {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    Logger getLog() {
-        return log;
-    }
 
     /**
      * <p>
@@ -373,7 +369,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      * <code>{@link java.lang.System#getProperties()}</code>.
      * </p>
      */
-    void initialize() throws SchedulerException {
+    void initialize() {
         // short-circuit if already initialized
         if (cfg !is null) {
             return;
@@ -410,7 +406,7 @@ class StdSchedulerFactory implements SchedulerFactory {
                 }
             } else if (requestedFile !is null) {
                 in =
-                    Thread.currentThread().getContextClassLoader().getResourceAsStream(requestedFile);
+                    Thread.getThis().getContextClassLoader().getResourceAsStream(requestedFile);
 
                 if(in is null) {
                     initException = new SchedulerException("Properties file: '"
@@ -481,7 +477,7 @@ class StdSchedulerFactory implements SchedulerFactory {
         try {
             sysProps = System.getProperties();
         } catch (AccessControlException e) {
-            getLog().warn(
+            warning(
                 "Skipping overriding quartz properties with System properties " ~
                 "during initialization because of an AccessControlException.  " ~
                 "This is likely due to not having read/write access for " ~
@@ -505,7 +501,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      * name.
      * </p>
      */
-    void initialize(string filename) throws SchedulerException {
+    void initialize(string filename) {
         // short-circuit if already initialized
         if (cfg !is null) {
             return;
@@ -518,7 +514,7 @@ class StdSchedulerFactory implements SchedulerFactory {
         InputStream is = null;
         Properties props = new Properties();
 
-        is = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
+        is = Thread.getThis().getContextClassLoader().getResourceAsStream(filename);
 
         try {
             if(is !is null) {
@@ -549,8 +545,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      * given <code>InputStream</code>.
      * </p>
      */
-    void initialize(InputStream propertiesStream)
-        throws SchedulerException {
+    void initialize(InputStream propertiesStream) {
         // short-circuit if already initialized
         if (cfg !is null) {
             return;
@@ -586,7 +581,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      * the contents of the given <code>Properties</code> object.
      * </p>
      */
-    void initialize(Properties props) throws SchedulerException {
+    void initialize(Properties props) {
         if (propSrc is null) {
             propSrc = "an externally provided properties instance.";
         }
@@ -594,7 +589,7 @@ class StdSchedulerFactory implements SchedulerFactory {
         this.cfg = new PropertiesParser(props);
     }
 
-    private Scheduler instantiate() throws SchedulerException {
+    private Scheduler instantiate() {
         if (cfg is null) {
             initialize();
         }
@@ -735,7 +730,7 @@ class StdSchedulerFactory implements SchedulerFactory {
         } catch (Exception e) {
             throw new SchedulerConfigException(
                     "Unable to instantiate class load helper class: "
-                            + e.getMessage(), e);
+                            ~ e.msg, e);
         }
         loadHelper.initialize();
 
@@ -790,7 +785,7 @@ class StdSchedulerFactory implements SchedulerFactory {
             } catch (Exception e) {
                 throw new SchedulerConfigException(
                         "Unable to instantiate JobFactory class: "
-                                + e.getMessage(), e);
+                                ~ e.msg, e);
             }
 
             tProps = cfg.getPropertyGroup(PROP_SCHED_JOB_FACTORY_PREFIX, true);
@@ -811,7 +806,7 @@ class StdSchedulerFactory implements SchedulerFactory {
             } catch (Exception e) {
                 throw new SchedulerConfigException(
                         "Unable to instantiate InstanceIdGenerator class: "
-                        + e.getMessage(), e);
+                        ~ e.msg, e);
             }
 
             tProps = cfg.getPropertyGroup(PROP_SCHED_INSTANCE_ID_GENERATOR_PREFIX, true);
@@ -908,7 +903,7 @@ class StdSchedulerFactory implements SchedulerFactory {
                     }
 
                     ((JobStoreSupport)js).setLockHandler(lockHandler);
-                    getLog().info("Using custom data access locking (synchronization): " ~ lockHandlerClass);
+                    info("Using custom data access locking (synchronization): " ~ lockHandlerClass);
                 } catch (Exception e) {
                     initException = new SchedulerException("JobStore LockHandler class '" ~ lockHandlerClass
                             ~ "' could not be instantiated.", e);
@@ -1235,7 +1230,7 @@ class StdSchedulerFactory implements SchedulerFactory {
                       schedInstId = instanceIdGenerator.generateInstanceId();
                   }
                 } catch (Exception e) {
-                    getLog().error("Couldn't generate instance Id!", e);
+                    error("Couldn't generate instance Id!", e);
                     throw new IllegalStateException("Cannot run without an instance id.");
                 }
             }
@@ -1359,11 +1354,11 @@ class StdSchedulerFactory implements SchedulerFactory {
             
             qs.initialize();
     
-            getLog().info(
+            info(
                     "Quartz scheduler '" ~ scheduler.getSchedulerName()
                             ~ "' initialized from " ~ propSrc);
     
-            getLog().info("Quartz scheduler version: " ~ qs.getVersion());
+            info("Quartz scheduler version: " ~ qs.getVersion());
     
             // prevents the repository from being garbage collected
             qs.addNoGCObject(schedRep);
@@ -1389,7 +1384,7 @@ class StdSchedulerFactory implements SchedulerFactory {
         }
     }
 
-    private void populateProviderWithExtraProps(PoolingConnectionProvider cp, Properties props) throws Exception {
+    private void populateProviderWithExtraProps(PoolingConnectionProvider cp, Properties props) {
         Properties copyProps = new Properties();
         copyProps.putAll(props);
 
@@ -1412,7 +1407,7 @@ class StdSchedulerFactory implements SchedulerFactory {
             else if(tpInited)
                 tp.shutdown(false);
         } catch (Exception e) {
-            getLog().error("Got another exception while shutting down after instantiation exception", e);
+            error("Got another exception while shutting down after instantiation exception", e);
         }
     }
 
@@ -1423,8 +1418,7 @@ class StdSchedulerFactory implements SchedulerFactory {
     }
 
 
-    private void setBeanProps(Object obj, Properties props)
-        throws NoSuchMethodException, IllegalAccessException,
+    private void setBeanProps(Object obj, Properties props) IllegalAccessException,
             java.lang.reflect.InvocationTargetException,
             IntrospectionException, SchedulerConfigException {
         props.remove("class");
@@ -1501,7 +1495,7 @@ class StdSchedulerFactory implements SchedulerFactory {
         return null;
     }
 
-    private Class<?> loadClass(string className) throws ClassNotFoundException, SchedulerConfigException {
+    private Class<?> loadClass(string className) {
 
         try {
             ClassLoader cl = findClassloader();
@@ -1517,10 +1511,10 @@ class StdSchedulerFactory implements SchedulerFactory {
 
     private ClassLoader findClassloader() {
         // work-around set context loader for windows-service started jvms (QUARTZ-748)
-        if(Thread.currentThread().getContextClassLoader() is null && getClass().getClassLoader() !is null) {
-            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+        if(Thread.getThis().getContextClassLoader() is null && getClass().getClassLoader() !is null) {
+            Thread.getThis().setContextClassLoader(getClass().getClassLoader());
         }
-        return Thread.currentThread().getContextClassLoader();
+        return Thread.getThis().getContextClassLoader();
     }
 
     private string getSchedulerName() {
@@ -1539,7 +1533,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      * will be called by this method.
      * </p>
      */
-    Scheduler getScheduler() throws SchedulerException {
+    Scheduler getScheduler() {
         if (cfg is null) {
             initialize();
         }
@@ -1569,7 +1563,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      *
      * @see #initialize()
      */
-    static Scheduler getDefaultScheduler() throws SchedulerException {
+    static Scheduler getDefaultScheduler() {
         StdSchedulerFactory fact = new StdSchedulerFactory();
 
         return fact.getScheduler();
@@ -1581,7 +1575,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      * it has already been instantiated).
      * </p>
      */
-    Scheduler getScheduler(string schedName) throws SchedulerException {
+    Scheduler getScheduler(string schedName) {
         return SchedulerRepository.getInstance().lookup(schedName);
     }
 
@@ -1591,7 +1585,7 @@ class StdSchedulerFactory implements SchedulerFactory {
      * StdSchedulerFactory instance.).
      * </p>
      */
-    Collection!(Scheduler) getAllSchedulers() throws SchedulerException {
+    Collection!(Scheduler) getAllSchedulers() {
         return SchedulerRepository.getInstance().lookupAll();
     }
 }

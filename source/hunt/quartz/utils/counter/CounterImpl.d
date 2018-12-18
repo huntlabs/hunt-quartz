@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 1.8
  * 
  */
-class CounterImpl implements Counter, Serializable {
+class CounterImpl : Counter, Serializable {
   
     
     private AtomicLong value;

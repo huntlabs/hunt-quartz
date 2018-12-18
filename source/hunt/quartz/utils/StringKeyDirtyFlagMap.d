@@ -36,15 +36,15 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      */
     private bool allowsTransientData = false;
 
-    StringKeyDirtyFlagMap() {
+    this() {
         super();
     }
 
-    StringKeyDirtyFlagMap(int initialCapacity) {
+    this(int initialCapacity) {
         super(initialCapacity);
     }
 
-    StringKeyDirtyFlagMap(int initialCapacity, float loadFactor) {
+    this(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
@@ -56,7 +56,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
     override
     size_t toHash() @trusted nothrow()
     {
-        return getWrappedMap().hashCode();
+        return getWrappedMap().toHash();
     }
     
     /**

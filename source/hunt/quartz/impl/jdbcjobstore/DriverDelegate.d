@@ -35,7 +35,7 @@ import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.spi.ClassLoadHelper;
 import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.utils.Key;
-import org.slf4j.Logger;
+import hunt.logging;
 
 /**
  * <p>
@@ -606,7 +606,7 @@ interface DriverDelegate {
      * @throws SQLException
      * @throws JobPersistenceException 
      */
-    List!(OperableTrigger) selectTriggersForJob(Connection conn, JobKey jobKey) throws SQLException, ClassNotFoundException,
+    List!(OperableTrigger) selectTriggersForJob(Connection conn, JobKey jobKey) ClassNotFoundException,
         IOException, JobPersistenceException;
 
     /**
@@ -635,7 +635,7 @@ interface DriverDelegate {
      * @return the <code>{@link hunt.quartz.Trigger}</code> object
      * @throws JobPersistenceException 
      */
-    OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) throws SQLException, ClassNotFoundException,
+    OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) ClassNotFoundException,
         IOException, JobPersistenceException;
 
     /**
@@ -653,7 +653,7 @@ interface DriverDelegate {
      * never null, but possibly empty.
      */
     JobDataMap selectTriggerJobDataMap(Connection conn, string triggerName,
-        string groupName) throws SQLException, ClassNotFoundException,
+        string groupName) ClassNotFoundException,
         IOException;
 
     /**

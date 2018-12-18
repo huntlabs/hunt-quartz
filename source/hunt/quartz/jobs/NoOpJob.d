@@ -31,7 +31,7 @@ import hunt.quartz.JobExecutionException;
  * 
  * @author James House
  */
-class NoOpJob implements Job {
+class NoOpJob : Job {
 
 
     /*
@@ -58,8 +58,7 @@ class NoOpJob implements Job {
      * Do nothing.
      * </p>
      */
-    void execute(JobExecutionContext context)
-        throws JobExecutionException {
+    void execute(JobExecutionContext context) {
     }
     
 }

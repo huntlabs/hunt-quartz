@@ -39,7 +39,7 @@ import hunt.quartz.spi.TriggerFiredBundle;
  * 
  * @author James House
  */
-class JTAJobRunShellFactory implements JobRunShellFactory {
+class JTAJobRunShellFactory : JobRunShellFactory {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,8 +79,7 @@ class JTAJobRunShellFactory implements JobRunShellFactory {
      * operations with the <code>JobStore</code>.
      * </p>
      */
-    void initialize(Scheduler sched)
-        throws SchedulerConfigException {
+    void initialize(Scheduler sched) {
         this.scheduler = sched;
     }
 
@@ -91,8 +90,7 @@ class JTAJobRunShellFactory implements JobRunShellFactory {
      * {@link hunt.quartz.core.JobRunShell}</code>.
      * </p>
      */
-    JobRunShell createJobRunShell(TriggerFiredBundle bundle)
-            throws SchedulerException {
+    JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
         return new JTAJobRunShell(scheduler, bundle);
     }
 

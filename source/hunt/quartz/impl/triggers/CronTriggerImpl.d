@@ -153,8 +153,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
      * @deprecated use a TriggerBuilder instead
      */
     deprecated("")
-    CronTriggerImpl(string name, string group, string cronExpression)
-        throws ParseException {
+    CronTriggerImpl(string name, string group, string cronExpression) {
         
         super(name, group);
 
@@ -201,7 +200,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
      */
     deprecated("")
     CronTriggerImpl(string name, string group, string jobName,
-            string jobGroup, string cronExpression) throws ParseException {
+            string jobGroup, string cronExpression) {
         this(name, group, jobName, jobGroup, null, null, cronExpression,
                 TimeZone.getDefault());
     }
@@ -217,8 +216,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
      */
     deprecated("")
     CronTriggerImpl(string name, string group, string jobName,
-            string jobGroup, string cronExpression, TimeZone timeZone)
-        throws ParseException {
+            string jobGroup, string cronExpression, TimeZone timeZone) {
         this(name, group, jobName, jobGroup, null, null, cronExpression,
                 timeZone);
     }
@@ -245,8 +243,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
      */
     deprecated("")
     CronTriggerImpl(string name, string group, string jobName,
-            string jobGroup, Date startTime, Date endTime, string cronExpression)
-        throws ParseException {
+            string jobGroup, Date startTime, Date endTime, string cronExpression) {
         super(name, group, jobName, jobGroup);
 
         setCronExpression(cronExpression);
@@ -305,7 +302,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
     deprecated("")
     CronTriggerImpl(string name, string group, string jobName,
             string jobGroup, Date startTime, Date endTime,
-            string cronExpression, TimeZone timeZone) throws ParseException {
+            string cronExpression, TimeZone timeZone) {
         super(name, group, jobName, jobGroup);
 
         setCronExpression(cronExpression);
@@ -341,7 +338,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger) implements CronTrigger, Co
         return copy;
     }
 
-    void setCronExpression(string cronExpression) throws ParseException {
+    void setCronExpression(string cronExpression) {
         TimeZone origTz = getTimeZone();
         this.cronEx = new CronExpression(cronExpression);
         this.cronEx.setTimeZone(origTz);

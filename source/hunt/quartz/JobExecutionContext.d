@@ -235,7 +235,7 @@ interface JobExecutionContext {
      * Put the specified value into the context's data map with the given key.
      * Possibly useful for sharing data between listeners and jobs.
      *
-     * <p>NOTE: this data is volatile - it is lost after the job execution
+     * <p>NOTE: this data is - it is lost after the job execution
      * completes, and all TriggerListeners and JobListeners have been 
      * notified.</p> 
      *  

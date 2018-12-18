@@ -1,12 +1,6 @@
 module hunt.quartz.core.ListenerManagerImpl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.container.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import hunt.container.Map;
+import hunt.container;
 
 import hunt.quartz.JobKey;
 import hunt.quartz.JobListener;
@@ -17,7 +11,7 @@ import hunt.quartz.TriggerKey;
 import hunt.quartz.TriggerListener;
 import hunt.quartz.impl.matchers.EverythingMatcher;
 
-class ListenerManagerImpl implements ListenerManager {
+class ListenerManagerImpl : ListenerManager {
 
     private Map!(string, JobListener) globalJobListeners = new LinkedHashMap!(string, JobListener)(10);
 
@@ -30,7 +24,7 @@ class ListenerManagerImpl implements ListenerManager {
     private ArrayList!(SchedulerListener) schedulerListeners = new ArrayList!(SchedulerListener)(10);
 
     
-    void addJobListener(JobListener jobListener, Matcher!(JobKey) ... matchers) {
+    void addJobListener(JobListener jobListener, Matcher!(JobKey)[]matchers ... ) {
         addJobListener(jobListener, Arrays.asList(matchers));
     }
 
@@ -142,7 +136,7 @@ class ListenerManagerImpl implements ListenerManager {
         }
     }
 
-    void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey) ... matchers) {
+    void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey)[] matchers... ) {
         addTriggerListener(triggerListener, Arrays.asList(matchers));
     }
     

@@ -18,6 +18,8 @@
 
 module hunt.quartz.ObjectAlreadyExistsException;
 
+import hunt.quartz.exception;
+
 /**
  * An exception that is thrown to indicate that an attempt to store a new
  * object (i.e. <code>{@link hunt.quartz.JobDetail}</code>,<code>{@link Trigger}</code>
@@ -43,7 +45,7 @@ class ObjectAlreadyExistsException : JobPersistenceException {
      * message.
      * </p>
      */
-    ObjectAlreadyExistsException(string msg) {
+    this(string msg) {
         super(msg);
     }
 
@@ -58,7 +60,7 @@ class ObjectAlreadyExistsException : JobPersistenceException {
      * group: '__', because one already exists with this identification."
      * </p>
      */
-    ObjectAlreadyExistsException(JobDetail offendingJob) {
+    this(JobDetail offendingJob) {
         super("Unable to store Job : '" ~ offendingJob.getKey()
                 ~ "', because one already exists with this identification.");
     }
@@ -74,10 +76,10 @@ class ObjectAlreadyExistsException : JobPersistenceException {
      * group: '__', because one already exists with this identification."
      * </p>
      */
-    ObjectAlreadyExistsException(Trigger offendingTrigger) {
+    this(Trigger offendingTrigger) {
         super("Unable to store Trigger with name: '"
-                + offendingTrigger.getKey().getName() ~ "' and group: '"
-                + offendingTrigger.getKey().getGroup()
+                ~ offendingTrigger.getKey().getName() ~ "' and group: '"
+                ~ offendingTrigger.getKey().getGroup()
                 ~ "', because one already exists with this identification.");
     }
 

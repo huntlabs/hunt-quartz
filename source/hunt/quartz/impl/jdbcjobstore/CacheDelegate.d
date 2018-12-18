@@ -54,7 +54,7 @@ class CacheDelegate : StdJDBCDelegate {
      * don't explicitly support storing bytes in this way.
      */
     override
-    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) throws SQLException {
+    protected void setBytes(PreparedStatement ps, int index, ByteArrayOutputStream baos) {
         ps.setObject(index, ((baos is null) ? null : baos.toByteArray()), java.sql.Types.BLOB);
     } 
 
@@ -64,7 +64,7 @@ class CacheDelegate : StdJDBCDelegate {
      * Caché requires {@code java.sql.Blob} instances to be explicitly freed.
      */
     override
-    protected Object getObjectFromBlob(ResultSet rs, string colName) throws ClassNotFoundException, IOException, SQLException {
+    protected Object getObjectFromBlob(ResultSet rs, string colName) {
         Blob blob = rs.getBlob(colName);
         if (blob is null) {
             return null;
@@ -99,7 +99,7 @@ class CacheDelegate : StdJDBCDelegate {
      * Caché requires {@code java.sql.Blob} instances to be explicitly freed.
      */
     override
-    protected Object getJobDataFromBlob(ResultSet rs, string colName) throws ClassNotFoundException, IOException, SQLException {
+    protected Object getJobDataFromBlob(ResultSet rs, string colName) {
         if (canUseProperties()) {
             Blob blob = rs.getBlob(colName);
             if (blob is null) {
@@ -123,32 +123,32 @@ class CacheDelegate : StdJDBCDelegate {
         }
 
         override
-        int read() throws IOException {
+        int read() {
             return delegate.read();
         }
 
         override
-        int read(byte[] b) throws IOException {
+        int read(byte[] b) {
             return delegate.read(b);
         }
 
         override
-        int read(byte[] b, int off, int len) throws IOException {
+        int read(byte[] b, int off, int len) {
             return delegate.read(b, off, len);
         }
 
         override
-        long skip(long n) throws IOException {
+        long skip(long n) {
             return delegate.skip(n);
         }
 
         override
-        int available() throws IOException {
+        int available() {
             return delegate.available();
         }
 
         override
-        void close() throws IOException {
+        void close() {
             try {
                 delegate.close();
             } finally {
@@ -166,7 +166,7 @@ class CacheDelegate : StdJDBCDelegate {
         }
 
         override
-        synchronized void reset() throws IOException {
+        synchronized void reset() {
             delegate.reset();
         }
 

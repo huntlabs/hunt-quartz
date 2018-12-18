@@ -29,7 +29,7 @@ import hunt.quartz.TriggerKey;
 import hunt.quartz.impl.triggers.CronTriggerImpl;
 import hunt.quartz.spi.OperableTrigger;
 
-class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegate, StdJDBCConstants {
+class CronTriggerPersistenceDelegate : TriggerPersistenceDelegate, StdJDBCConstants {
 
     protected string tablePrefix;
     protected string schedNameLiteral;
@@ -47,7 +47,7 @@ class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegate, StdJ
         return ((trigger instanceof CronTriggerImpl) && !((CronTriggerImpl)trigger).hasAdditionalProperties());
     }
 
-    int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) throws SQLException {
+    int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
 
         PreparedStatement ps = null;
 
@@ -62,7 +62,7 @@ class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegate, StdJ
         }
     }
 
-    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) throws SQLException, IOException {
+    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
         CronTrigger cronTrigger = (CronTrigger)trigger;
         
@@ -81,7 +81,7 @@ class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegate, StdJ
         }
     }
 
-    TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) throws SQLException {
+    TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
 
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -111,7 +111,7 @@ class CronTriggerPersistenceDelegate implements TriggerPersistenceDelegate, StdJ
         }
     }
 
-    int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) throws SQLException, IOException {
+    int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
         CronTrigger cronTrigger = (CronTrigger)trigger;
         

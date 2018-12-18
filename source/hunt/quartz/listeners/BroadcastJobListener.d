@@ -39,7 +39,7 @@ import hunt.quartz.JobListener;
  *
  * @author James House (jhouse AT revolition DOT net)
  */
-class BroadcastJobListener implements JobListener {
+class BroadcastJobListener : JobListener {
 
     private string name;
     private List!(JobListener) listeners;

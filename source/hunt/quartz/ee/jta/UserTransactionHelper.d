@@ -27,8 +27,8 @@ import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import hunt.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hunt.logging;
+
 
 /**
  * <p>
@@ -104,7 +104,7 @@ class UserTransactionHelper {
      * Create/Lookup a UserTransaction in the InitialContext via the
      * name set in setUserTxLocation().
      */
-    static UserTransaction lookupUserTransaction() throws SchedulerException {
+    static UserTransaction lookupUserTransaction() {
         return new UserTransactionWithContext();
     }
     
@@ -129,11 +129,11 @@ class UserTransactionHelper {
      * to look it up, so that when the UserTransaction is returned to the 
      * UserTransactionHelper the InitialContext can be closed.
      */
-    private static class UserTransactionWithContext implements UserTransaction {
+    private static class UserTransactionWithContext : UserTransaction {
         InitialContext context;
         UserTransaction userTransaction;
         
-        UserTransactionWithContext() throws SchedulerException {
+        UserTransactionWithContext() {
             try {
                 context = new InitialContext();
             } catch (Throwable t) {
@@ -167,7 +167,7 @@ class UserTransactionHelper {
                     context.close();
                 }
             } catch (Throwable t) {
-                getLog().warn("Failed to close InitialContext used to get a UserTransaction.", t);
+                warning("Failed to close InitialContext used to get a UserTransaction.", t);
             }
             context = null;
         }
@@ -177,10 +177,10 @@ class UserTransactionHelper {
          * returned to the UserTransactionHelper.
          */
         override
-        protected void finalize() throws Throwable {
+        protected void finalize() {
             try {
                 if (context !is null) {
-                    getLog().warn("UserTransaction was never returned to the UserTransactionHelper.");
+                    warning("UserTransaction was never returned to the UserTransactionHelper.");
                     closeContext();
                 }
             } finally {
@@ -188,33 +188,30 @@ class UserTransactionHelper {
             }
         }
 
-        private static Logger getLog() {
-            return LoggerFactory.getLogger(UserTransactionWithContext.class);
-        }
         
         // Wrapper methods that just delegate to the underlying UserTransaction
         
-        void begin() throws NotSupportedException, SystemException {
+        void begin() {
             userTransaction.begin();
         }
 
-        void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
+        void commit() {
             userTransaction.commit();        
         }
 
-        void rollback() throws IllegalStateException, SecurityException, SystemException {
+        void rollback() {
             userTransaction.rollback();
         }
 
-        void setRollbackOnly() throws IllegalStateException, SystemException {
+        void setRollbackOnly() {
             userTransaction.setRollbackOnly();
         }
 
-        int getStatus() throws SystemException {
+        int getStatus() {
             return userTransaction.getStatus();
         }
 
-        void setTransactionTimeout(int seconds) throws SystemException {
+        void setTransactionTimeout(int seconds) {
             userTransaction.setTransactionTimeout(seconds);
         }
     }

@@ -61,7 +61,7 @@ import hunt.quartz.utils.Key;
  * @see DateBuilder 
  * @see Trigger
  */
-class TriggerBuilder!(T extends Trigger) {
+class TriggerBuilder(T) if(is(T : Trigger)) {
 
     private TriggerKey key;
     private string description;
@@ -74,7 +74,7 @@ class TriggerBuilder!(T extends Trigger) {
     
     private ScheduleBuilder<?> scheduleBuilder = null;
     
-    private TriggerBuilder() {
+    private this() {
         
     }
     
@@ -93,7 +93,7 @@ class TriggerBuilder!(T extends Trigger) {
      * 
      * @return a Trigger that meets the specifications of the builder.
      */
-    @SuppressWarnings("unchecked")
+    // @SuppressWarnings("unchecked")
     T build() {
 
         if(scheduleBuilder is null)
@@ -114,7 +114,7 @@ class TriggerBuilder!(T extends Trigger) {
         if(!jobDataMap.isEmpty())
             trig.setJobDataMap(jobDataMap);
         
-        return (T) trig;
+        return cast(T) trig;
     }
 
     /**
@@ -266,10 +266,10 @@ class TriggerBuilder!(T extends Trigger) {
      * @see CronScheduleBuilder
      * @see CalendarIntervalScheduleBuilder
      */
-    @SuppressWarnings("unchecked")
-    <SBT extends T> TriggerBuilder!(SBT) withSchedule(ScheduleBuilder!(SBT) schedBuilder) {
+    // @SuppressWarnings("unchecked")
+    TriggerBuilder!(SBT) withSchedule(SBT)(ScheduleBuilder!(SBT) schedBuilder) if(is(SBT : T)) {
         this.scheduleBuilder = schedBuilder;
-        return (TriggerBuilder!(SBT)) this;
+        return cast(TriggerBuilder!(SBT)) this;
     }
 
     /**
@@ -406,7 +406,7 @@ class TriggerBuilder!(T extends Trigger) {
      */
     TriggerBuilder!(T) usingJobData(JobDataMap newJobDataMap) {
         // add any existing data to this new map
-        for(string dataKey: jobDataMap.keySet()) {
+        foreach(string dataKey; jobDataMap.keySet()) {
             newJobDataMap.put(dataKey, jobDataMap.get(dataKey));
         }
         jobDataMap = newJobDataMap; // set new map as the map to use
