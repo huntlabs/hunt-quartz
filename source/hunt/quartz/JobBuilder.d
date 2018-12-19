@@ -187,7 +187,7 @@ class JobBuilder {
      * @return the updated JobBuilder
      * @see JobDetail#getJobClass()
      */
-    JobBuilder ofType(Class <? extends Job> jobClazz) {
+    JobBuilder ofType(TypeInfo_Class jobClazz) {
         this.jobClass = jobClazz;
         return this;
     }

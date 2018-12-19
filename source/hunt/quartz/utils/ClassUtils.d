@@ -23,8 +23,8 @@ module hunt.quartz.utils.ClassUtils;
 // class ClassUtils {
 
     
-//     static bool isAnnotationPresent(Class<?> clazz, Class<? extends Annotation> a) {
-//         for (Class<?> c = clazz; c !is null; c = c.getSuperclass()) {
+//     static bool isAnnotationPresent(TypeInfo_Class clazz, Class<? extends Annotation> a) {
+//         for (TypeInfo_Class c = clazz; c !is null; c = c.getSuperclass()) {
 //             if (c.isAnnotationPresent(a))
 //                 return true;
 //             if(isAnnotationPresentOnInterfaces(c, a))
@@ -33,8 +33,8 @@ module hunt.quartz.utils.ClassUtils;
 //         return false;
 //     }
 
-//     private static bool isAnnotationPresentOnInterfaces(Class<?> clazz, Class<? extends Annotation> a) {
-//         for(Class<?> i : clazz.getInterfaces()) {
+//     private static bool isAnnotationPresentOnInterfaces(TypeInfo_Class clazz, Class<? extends Annotation> a) {
+//         for(TypeInfo_Class i : clazz.getInterfaces()) {
 //             if( i.isAnnotationPresent(a) )
 //                 return true;
 //             if(isAnnotationPresentOnInterfaces(i, a))
@@ -44,9 +44,9 @@ module hunt.quartz.utils.ClassUtils;
 //         return false;
 //     }
 
-//     static <T extends Annotation> T getAnnotation(Class<?> clazz, Class!(T) aClazz) {
+//     static <T extends Annotation> T getAnnotation(TypeInfo_Class clazz, Class!(T) aClazz) {
 //         //Check class hierarchy
-//         for (Class<?> c = clazz; c !is null; c = c.getSuperclass()) {
+//         for (TypeInfo_Class c = clazz; c !is null; c = c.getSuperclass()) {
 //             T anno = c.getAnnotation(aClazz);
 //             if (anno !is null) {
 //                 return anno;
@@ -54,10 +54,10 @@ module hunt.quartz.utils.ClassUtils;
 //         }
 
 //         //Check interfaces (breadth first)
-//         Queue<Class<?>> q = new LinkedList<Class<?>>();
+//         Queue<TypeInfo_Class> q = new LinkedList<TypeInfo_Class>();
 //         q.add(clazz);
 //         while (!q.isEmpty()) {
-//             Class<?> c = q.remove();
+//             TypeInfo_Class c = q.remove();
 //             if (c !is null) {
 //                 if (c.isInterface()) {
 //                     T anno = c.getAnnotation(aClazz);

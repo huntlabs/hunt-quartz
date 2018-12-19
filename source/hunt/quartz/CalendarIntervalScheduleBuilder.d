@@ -66,7 +66,7 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder!(CalendarIntervalTrigger
     private bool preserveHourOfDayAcrossDaylightSavings;
     private bool skipDayIfHourDoesNotExist;
     
-    protected CalendarIntervalScheduleBuilder() {
+    protected this() {
     }
     
     /**

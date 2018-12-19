@@ -140,7 +140,7 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 
 //     private static void invokeSetter(Object target, string attribute, Object value) {
 //         string setterName = "set" ~ Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
-//         Class<?>[] argTypes = {value.getClass()};
+//         TypeInfo_Class[] argTypes = {value.getClass()};
 //         Method setter = findMethod(target.getClass(), setterName, argTypes);
 //         if(setter !is null) {
 //             setter.invoke(target, value);
@@ -150,25 +150,25 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //         }
 //     }
     
-//     private static Class<?> getWrapperIfPrimitive(Class<?> c) {
-//         Class<?> result = c;
+//     private static TypeInfo_Class getWrapperIfPrimitive(TypeInfo_Class c) {
+//         TypeInfo_Class result = c;
 //         try {
 //             Field f = c.getField("TYPE");
 //             f.setAccessible(true);
-//             result = (Class<?>) f.get(null);
+//             result = (TypeInfo_Class) f.get(null);
 //         } catch (Exception e) {
 //             /**/
 //         }
 //         return result;
 //     }
     
-//     private static Method findMethod(Class<?> targetType, string methodName,
-//             Class<?>[] argTypes) {
+//     private static Method findMethod(TypeInfo_Class targetType, string methodName,
+//             TypeInfo_Class[] argTypes) {
 //         BeanInfo beanInfo = Introspector.getBeanInfo(targetType);
 //         if (beanInfo !is null) {
 //             for(MethodDescriptor methodDesc: beanInfo.getMethodDescriptors()) {
 //                 Method method = methodDesc.getMethod();
-//                 Class<?>[] parameterTypes = method.getParameterTypes();
+//                 TypeInfo_Class[] parameterTypes = method.getParameterTypes();
 //                 if (methodName== method.getName() && argTypes.length == parameterTypes.length) {
 //                     bool matchedArgTypes = true;
 //                     for (int i = 0; i < argTypes.length; i++) { 
@@ -207,21 +207,21 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //             if(triggerClassName is null) {
 //                 throw new IllegalArgumentException("No triggerClass specified");
 //             }
-//             Class<?> triggerClass = Class.forName(triggerClassName);
+//             TypeInfo_Class triggerClass = Class.forName(triggerClassName);
 //             Trigger trigger = (Trigger) triggerClass.newInstance();
             
 //             string jobDetailClassName = (string) abstractJobInfo.remove("jobDetailClass");
 //             if(jobDetailClassName is null) {
 //                 throw new IllegalArgumentException("No jobDetailClass specified");
 //             }
-//             Class<?> jobDetailClass = Class.forName(jobDetailClassName);
+//             TypeInfo_Class jobDetailClass = Class.forName(jobDetailClassName);
 //             JobDetail jobDetail = (JobDetail) jobDetailClass.newInstance();
             
 //             string jobClassName = (string) abstractJobInfo.remove("jobClass");
 //             if(jobClassName is null) {
 //                 throw new IllegalArgumentException("No jobClass specified");
 //             }
-//             Class<?> jobClass = Class.forName(jobClassName);
+//             TypeInfo_Class jobClass = Class.forName(jobClassName);
 //             abstractJobInfo.put("jobClass", jobClass);
             
 //             for(Map.Entry!(string, Object) entry : abstractTriggerInfo.entrySet()) {
@@ -270,7 +270,7 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //             if(triggerClassName is null) {
 //                 throw new IllegalArgumentException("No triggerClass specified");
 //             }
-//             Class<?> triggerClass = Class.forName(triggerClassName);
+//             TypeInfo_Class triggerClass = Class.forName(triggerClassName);
 //             Trigger trigger = (Trigger) triggerClass.newInstance();
             
 //             for(Map.Entry!(string, Object) entry : abstractTriggerInfo.entrySet()) {
@@ -302,14 +302,14 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //             if(jobDetailClassName is null) {
 //                 throw new IllegalArgumentException("No jobDetailClass specified");
 //             }
-//             Class<?> jobDetailClass = Class.forName(jobDetailClassName);
+//             TypeInfo_Class jobDetailClass = Class.forName(jobDetailClassName);
 //             JobDetail jobDetail = (JobDetail) jobDetailClass.newInstance();
             
 //             string jobClassName = (string) abstractJobInfo.remove("jobClass");
 //             if(jobClassName is null) {
 //                 throw new IllegalArgumentException("No jobClass specified");
 //             }
-//             Class<?> jobClass = Class.forName(jobClassName);
+//             TypeInfo_Class jobClass = Class.forName(jobClassName);
 //             abstractJobInfo.put("jobClass", jobClass);
             
 //             for(Map.Entry!(string, Object) entry : abstractJobInfo.entrySet()) {

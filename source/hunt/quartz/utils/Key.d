@@ -24,6 +24,10 @@ import hunt.lang.common;
 import std.format;
 import std.uuid;
 
+interface IKey {
+
+}
+
 /**
  * <p>
  * Object representing a job or trigger key.
@@ -31,7 +35,7 @@ import std.uuid;
  * 
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
  */
-class Key(T) : Comparable!(Key!(T)) {
+class Key(T) : Comparable!(Key!(T)), IKey {
   
 
     /**

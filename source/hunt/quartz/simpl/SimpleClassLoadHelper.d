@@ -56,7 +56,7 @@ import hunt.io.common;
 //     /**
 //      * Return the class with the given name.
 //      */
-//     Class<?> loadClass(string name) {
+//     TypeInfo_Class loadClass(string name) {
 //         return Class.forName(name);
 //     }
 
@@ -99,7 +99,7 @@ import hunt.io.common;
 //             // Create a method instance representing the protected
 //             // getCallerClassLoader method of class ClassLoader
 //             Method mthd = ClassLoader.class.getDeclaredMethod(
-//                     "getCallerClassLoader", new Class<?>[0]);
+//                     "getCallerClassLoader", new TypeInfo_Class[0]);
 //             // Make the method accessible.
 //             AccessibleObject.setAccessible(new AccessibleObject[] {mthd}, true);
 //             // Try to get the caller's class-loader

@@ -27,7 +27,7 @@ import hunt.quartz.utils.Key;
  * @author jhouse
  * @since 2.0
  */
-interface Matcher<T extends Key<?>> extends Serializable {
+interface Matcher(T) {
 
     bool isMatch(T key);
  

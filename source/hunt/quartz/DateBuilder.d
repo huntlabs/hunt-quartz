@@ -95,13 +95,13 @@ class DateBuilder {
 
     enum int DECEMBER = 12;
 
-    enum long MILLISECONDS_IN_MINUTE = 60l * 1000l;
+    enum long MILLISECONDS_IN_MINUTE = 60 * 1000;
 
-    enum long MILLISECONDS_IN_HOUR = 60l * 60l * 1000l;
+    enum long MILLISECONDS_IN_HOUR = 60 * 60 * 1000;
 
-    enum long SECONDS_IN_MOST_DAYS = 24l * 60l * 60L;
+    enum long SECONDS_IN_MOST_DAYS = 24 * 60 * 60;
 
-    enum long MILLISECONDS_IN_DAY = SECONDS_IN_MOST_DAYS * 1000l;
+    enum long MILLISECONDS_IN_DAY = SECONDS_IN_MOST_DAYS * 1000;
     
     private int month;
     private int day;
@@ -144,7 +144,7 @@ class DateBuilder {
     /**
      * Create a DateBuilder, with initial settings for the current date and time in the given locale.
      */
-    private DateBuilder(Locale lc) {
+    private this(Locale lc) {
         Calendar cal = Calendar.getInstance(lc);
         
         this.lc = lc;

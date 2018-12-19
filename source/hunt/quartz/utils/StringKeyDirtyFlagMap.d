@@ -17,6 +17,15 @@ module hunt.quartz.utils.StringKeyDirtyFlagMap;
 
 import hunt.quartz.utils.DirtyFlagMap;
 
+import hunt.lang.exception;
+import hunt.lang.Boolean;
+import hunt.lang.Double;
+import hunt.lang.Float;
+import hunt.lang.Integer;
+import hunt.lang.Long;
+import hunt.lang.Number;
+import hunt.lang.String;
+import hunt.lang.character.Character;
 
 /**
  * <p>
@@ -50,23 +59,22 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         super(initialCapacity, loadFactor);
     }
 
-    override
-    bool equals(Object obj) {
-        return super== obj;
-    }
+    // override
+    // bool equals(Object obj) {
+    //     return super== obj;
+    // }
 
     override
-    size_t toHash() @trusted nothrow
-    {
+    size_t toHash() @trusted nothrow {
         return getWrappedMap().toHash();
     }
     
     /**
      * Get a copy of the Map's string keys in an array of Strings.
      */
-    string[] getKeys() {
-        return keySet().toArray(new string[size()]);
-    }
+    // string[] getKeys() {
+    //     return keySet().toArray(new string[size()]);
+    // }
 
     /**
      * Tell the <code>StringKeyDirtyFlagMap</code> that it should
@@ -77,16 +85,16 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      * include non-Serializable values in the Map, you will now get an 
      * exception when attempting to store it in a database.
      */
-    void setAllowsTransientData(bool allowsTransientData) {
+    // void setAllowsTransientData(bool allowsTransientData) {
     
-        if (containsTransientData() && !allowsTransientData) {
-            throw new IllegalStateException(
-                "Cannot set property 'allowsTransientData' to 'false' "
-                    ~ "when data map contains non-serializable objects.");
-        }
+    //     if (containsTransientData() && !allowsTransientData) {
+    //         throw new IllegalStateException(
+    //             "Cannot set property 'allowsTransientData' to 'false' "
+    //                 ~ "when data map contains non-serializable objects.");
+    //     }
     
-        this.allowsTransientData = allowsTransientData;
-    }
+    //     this.allowsTransientData = allowsTransientData;
+    // }
 
     /**
      * Whether the <code>StringKeyDirtyFlagMap</code> allows 
@@ -109,21 +117,21 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      * include non-Serializable values in the Map, you will now get an 
      * exception when attempting to store it in a database.
      */
-    bool containsTransientData() {
-        if (!getAllowsTransientData()) { // short circuit...
-            return false;
-        }
+    // bool containsTransientData() {
+    //     if (!getAllowsTransientData()) { // short circuit...
+    //         return false;
+    //     }
     
-        string[] keys = getKeys();
-        for (int i = 0; i < keys.length; i++) {
-            Object o = super.get(keys[i]);
-            if (!(o instanceof Serializable)) {
-                return true;
-            }
-        }
+    //     string[] keys = getKeys();
+    //     for (int i = 0; i < keys.length; i++) {
+    //         Object o = super.get(keys[i]);
+    //         if (!(o instanceof Serializable)) {
+    //             return true;
+    //         }
+    //     }
     
-        return false;
-    }
+    //     return false;
+    // }
 
     /**
      * Removes any data values in the map that are non-Serializable.  Does 
@@ -133,19 +141,19 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      * include non-Serializable values in the Map, you will now get an 
      * exception when attempting to store it in a database.
      */
-    void removeTransientData() {
-        if (!getAllowsTransientData()) { // short circuit...
-            return;
-        }
+    // void removeTransientData() {
+    //     if (!getAllowsTransientData()) { // short circuit...
+    //         return;
+    //     }
     
-        string[] keys = getKeys();
-        for (int i = 0; i < keys.length; i++) {
-            Object o = super.get(keys[i]);
-            if (!(o instanceof Serializable)) {
-                remove(keys[i]);
-            }
-        }
-    }
+    //     string[] keys = getKeys();
+    //     for (int i = 0; i < keys.length; i++) {
+    //         Object o = super.get(keys[i]);
+    //         if (!(o instanceof Serializable)) {
+    //             remove(keys[i]);
+    //         }
+    //     }
+    // }
 
     // Due to Generic enforcement, this override method is no longer needed.
 //    /**
@@ -238,7 +246,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      */
     override
     Object put(string key, Object value) {
-        return super.put((string)key, value);
+        return super.put(key, value);
     }
     
     /**
@@ -253,9 +261,10 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         Object obj = get(key);
     
         try {
-            if(obj instanceof Integer)
-                return ((Integer) obj).intValue();
-            return Integer.parseInt((string)obj);
+            Number n = cast(Number) obj;
+            if(n !is null)
+                return n.intValue();
+            return Integer.parseInt(obj.toString());
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not an Integer.");
         }
@@ -273,9 +282,10 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         Object obj = get(key);
     
         try {
-            if(obj instanceof Long)
-                return ((Long) obj).longValue();
-            return Long.parseLong((string)obj);
+            Number n = cast(Number) obj;
+            if(n !is null)
+                return n.longValue();
+            return Long.parseLong(obj.toString());
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Long.");
         }
@@ -293,9 +303,10 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         Object obj = get(key);
     
         try {
-            if(obj instanceof Float)
-                return ((Float) obj).floatValue();
-            return Float.parseFloat((string)obj);
+            Number n = cast(Number) obj;
+            if(n !is null)
+                return n.floatValue();
+            return Float.parseFloat(obj.toString());
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Float.");
         }
@@ -313,9 +324,10 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         Object obj = get(key);
     
         try {
-            if(obj instanceof Double)
-                return ((Double) obj).doubleValue();
-            return Double.parseDouble((string)obj);
+            Number n = cast(Number) obj;
+            if(n !is null)
+                return n.doubleValue();
+            return Double.parseDouble(obj.toString());
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Double.");
         }
@@ -333,9 +345,10 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         Object obj = get(key);
     
         try {
-            if(obj instanceof Boolean)
-                return ((Boolean) obj).booleanValue();
-            return Boolean.parseBoolean((string)obj);
+            Boolean n = cast(Boolean) obj;
+            if(n !is null)
+                return n.booleanValue();
+            return Boolean.parseBoolean(obj.toString());
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Boolean.");
         }
@@ -353,9 +366,10 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         Object obj = get(key);
     
         try {
-            if(obj instanceof Character)
-                return ((Character) obj).charValue();
-            return ((string)obj).charAt(0);
+            Character n = cast(Character) obj;
+            if(n !is null)
+                return n.charValue();
+            return (obj.toString())[0];
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a Character.");
         }
@@ -373,7 +387,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         Object obj = get(key);
     
         try {
-            return (string) obj;
+            return obj.toString();
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a string.");
         }

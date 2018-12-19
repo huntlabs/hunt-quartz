@@ -56,7 +56,7 @@ import hunt.io.common;
 //     /**
 //      * Return the class with the given name.
 //      */
-//     Class<?> loadClass(string name) {
+//     TypeInfo_Class loadClass(string name) {
 //         return getClassLoader().loadClass(name);
 //     }
 

@@ -404,7 +404,7 @@ module hunt.quartz.impl.RemoteScheduler;
 //         }
 //     }
 
-//     void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace) {
+//     void scheduleJobs(Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace) {
 //             try {
 //                 getRemoteScheduler().scheduleJobs(triggersAndJobs, replace);
 //             } catch (RemoteException re) {
@@ -413,7 +413,7 @@ module hunt.quartz.impl.RemoteScheduler;
 //             }
 //     }
     
-//     void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, bool replace) {
+//     void scheduleJob(JobDetail jobDetail, Set!(Trigger) triggersForJob, bool replace) {
 //         try {
 //             getRemoteScheduler().scheduleJob(jobDetail, triggersForJob, replace);
 //         } catch (RemoteException re) {
@@ -674,7 +674,7 @@ module hunt.quartz.impl.RemoteScheduler;
 //      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
 //      * </p>
 //      */
-//     List<? extends Trigger> getTriggersOfJob(JobKey jobKey) {
+//     List!(Trigger) getTriggersOfJob(JobKey jobKey) {
 //         try {
 //             return getRemoteScheduler().getTriggersOfJob(jobKey);
 //         } catch (RemoteException re) {

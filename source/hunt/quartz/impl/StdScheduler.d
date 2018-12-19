@@ -275,11 +275,11 @@ class StdScheduler : Scheduler {
         return sched.deleteJobs(jobKeys);
     }
 
-    void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace) {
+    void scheduleJobs(Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace) {
         sched.scheduleJobs(triggersAndJobs, replace);
     }
 
-    void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, bool replace) {
+    void scheduleJob(JobDetail jobDetail, Set!(Trigger) triggersForJob, bool replace) {
         sched.scheduleJob(jobDetail,  triggersForJob, replace);
     }
     
@@ -444,7 +444,7 @@ class StdScheduler : Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    List<? extends Trigger> getTriggersOfJob(JobKey jobKey) {
+    List!(Trigger) getTriggersOfJob(JobKey jobKey) {
         return sched.getTriggersOfJob(jobKey);
     }
 

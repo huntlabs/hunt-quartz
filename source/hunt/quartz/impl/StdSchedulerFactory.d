@@ -1088,7 +1088,7 @@ import hunt.time.util.Locale;
 //         // Set up any JobListeners
 //         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//         Class<?>[] strArg = new Class[] { string.class };
+//         TypeInfo_Class[] strArg = new Class[] { string.class };
 //         string[] jobListenerNames = cfg.getPropertyGroups(PROP_JOB_LISTENER_PREFIX);
 //         JobListener[] jobListeners = new JobListener[jobListenerNames.length];
 //         for (int i = 0; i < jobListenerNames.length; i++) {
@@ -1442,7 +1442,7 @@ import hunt.time.util.Locale;
 //     //                         "No setter for property '" ~ name ~ "'");
 //     //             }
 
-//     //             Class<?>[] params = setMeth.getParameterTypes();
+//     //             TypeInfo_Class[] params = setMeth.getParameterTypes();
 //     //             if (params.length != 1) {
 //     //                 throw new NoSuchMethodException(
 //     //                     "No 1-argument setter for property '" ~ name ~ "'");
@@ -1495,7 +1495,7 @@ import hunt.time.util.Locale;
 //     //     return null;
 //     // }
 
-//     // private Class<?> loadClass(string className) {
+//     // private TypeInfo_Class loadClass(string className) {
 
 //     //     try {
 //     //         ClassLoader cl = findClassloader();

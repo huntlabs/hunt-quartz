@@ -372,10 +372,10 @@ class QuartzSchedulerThread : Thread {
                         for (int i = 0; i < bndles.size(); i++) {
                             TriggerFiredResult result =  bndles.get(i);
                             TriggerFiredBundle bndle =  result.getTriggerFiredBundle();
-                            Exception exception = result.getException();
+                            RuntimeException exception = cast(RuntimeException)result.getException();
 
-                            if (exception instanceof RuntimeException) {
-                                error("RuntimeException while firing trigger " ~ triggers.get(i), exception);
+                            if (exception !is null) {
+                                error("RuntimeException while firing trigger " ~ triggers.get(i), exception.msg);
                                 qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
                                 continue;
                             }

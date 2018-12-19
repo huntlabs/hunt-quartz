@@ -105,7 +105,7 @@ module hunt.quartz.jobs.ee.jms.JmsHelper;
 //     static JmsMessageFactory getMessageFactory(final string name) {
 
 //         try {
-//             final Class<?> cls = Class.forName(name);
+//             final TypeInfo_Class cls = Class.forName(name);
 
 //             final JmsMessageFactory factory = (JmsMessageFactory) cls
 //                     .newInstance();

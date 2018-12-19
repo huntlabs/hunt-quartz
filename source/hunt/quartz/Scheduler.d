@@ -437,7 +437,7 @@ interface Scheduler {
      * @throws ObjectAlreadyExistsException if the job/trigger keys
      * are not unique and the replace flag is not set to true. 
      */
-    void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace);
+    void scheduleJobs(Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace);
     
     /**
      * Schedule the given job with the related set of triggers.
@@ -449,7 +449,7 @@ interface Scheduler {
      * @throws ObjectAlreadyExistsException if the job/trigger keys
      * are not unique and the replace flag is not set to true. 
      */
-    void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, bool replace);
+    void scheduleJob(JobDetail jobDetail, Set!(Trigger) triggersForJob, bool replace);
     
     /**
      * Remove the indicated <code>{@link Trigger}</code> from the scheduler.
@@ -756,7 +756,7 @@ interface Scheduler {
      * </p>
      * 
      */
-    List<? extends Trigger> getTriggersOfJob(JobKey jobKey);
+    List!(Trigger) getTriggersOfJob(JobKey jobKey);
 
     /**
      * Get the names of all known <code>{@link Trigger}</code> groups.

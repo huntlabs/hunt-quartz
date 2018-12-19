@@ -116,7 +116,7 @@ class UserTransactionHelper {
     static void returnUserTransaction(UserTransaction userTransaction) {
         UserTransactionWithContext userTransactionWithContext = 
             cast(UserTransactionWithContext)userTransaction;
-        if (userTransactionWithContext !is null)) {
+        if (userTransactionWithContext !is null) {
             userTransactionWithContext.closeContext();
         }
     }

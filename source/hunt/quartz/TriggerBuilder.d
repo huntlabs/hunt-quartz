@@ -17,10 +17,12 @@
 
 module hunt.quartz.TriggerBuilder;
 
-import std.datetime;
+import hunt.quartz.ScheduleBuilder;
 
 import hunt.quartz.spi.MutableTrigger;
 import hunt.quartz.utils.Key;
+
+import std.datetime;
 
 /**
  * <code>TriggerBuilder</code> is used to instantiate {@link Trigger}s.
@@ -72,7 +74,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
     private JobKey jobKey;
     private JobDataMap jobDataMap = new JobDataMap();
     
-    private ScheduleBuilder<?> scheduleBuilder = null;
+    private ScheduleBuilder scheduleBuilder = null;
     
     private this() {
         

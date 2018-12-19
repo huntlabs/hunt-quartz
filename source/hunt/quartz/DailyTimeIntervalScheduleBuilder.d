@@ -69,7 +69,7 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
 
     private int interval = 1;
     private IntervalUnit intervalUnit = IntervalUnit.MINUTE;
-    private Set!(Integer) daysOfWeek;
+    private Set!(int) daysOfWeek;
     private TimeOfDay startTimeOfDay;
     private TimeOfDay endTimeOfDay;
     private int repeatCount = DailyTimeIntervalTrigger.REPEAT_INDEFINITELY;
@@ -82,7 +82,7 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
      * The set contains all values between {@link hunt.time.util.Calendar#SUNDAY} and {@link hunt.time.util.Calendar#SATURDAY} 
      * (the integers from 1 through 7). 
      */
-    __gshared Set!(Integer) ALL_DAYS_OF_THE_WEEK;
+    __gshared Set!(int) ALL_DAYS_OF_THE_WEEK;
     
     /** 
      * A set of the business days of the week (for locales similar to the USA).
@@ -90,33 +90,33 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
      * The set contains all values between {@link hunt.time.util.Calendar#MONDAY} and {@link hunt.time.util.Calendar#FRIDAY} 
      * (the integers from 2 through 6). 
      */
-    __gshared Set!(Integer) MONDAY_THROUGH_FRIDAY;
+    __gshared Set!(int) MONDAY_THROUGH_FRIDAY;
     
     /**
      * A set of the weekend days of the week (for locales similar to the USA).
      * 
      * The set contains {@link hunt.time.util.Calendar#SATURDAY} and {@link hunt.time.util.Calendar#SUNDAY} 
      */
-    __gshared Set!(Integer) SATURDAY_AND_SUNDAY;
+    __gshared Set!(int) SATURDAY_AND_SUNDAY;
     
     shared static this() {
-        Set!(Integer) t = new HashSet!(Integer)(7);
+        Set!(int) t = new HashSet!(int)(7);
         for(int i=Calendar.SUNDAY; i <= Calendar.SATURDAY; i++)
             t.add(i);
         ALL_DAYS_OF_THE_WEEK = Collections.unmodifiableSet(t);
         
-        t = new HashSet!(Integer)(5);
+        t = new HashSet!(int)(5);
         for(int i=Calendar.MONDAY; i <= Calendar.FRIDAY; i++)
             t.add(i);
         MONDAY_THROUGH_FRIDAY = Collections.unmodifiableSet(t);
         
-        t = new HashSet!(Integer)(2);
+        t = new HashSet!(int)(2);
         t.add(Calendar.SUNDAY);
         t.add(Calendar.SATURDAY);
         SATURDAY_AND_SUNDAY = Collections.unmodifiableSet(t);
     }
     
-    protected DailyTimeIntervalScheduleBuilder() {
+    protected this() {
     }
     
     /**
@@ -231,10 +231,10 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
      * {@link hunt.time.util.Calendar#SUNDAY} - {@link hunt.time.util.Calendar#SATURDAY}. 
      * @return the updated DailyTimeIntervalScheduleBuilder
      */
-    DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(Set!(Integer) onDaysOfWeek) {
+    DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(Set!(int) onDaysOfWeek) {
         if(onDaysOfWeek is null || onDaysOfWeek.size() == 0)
             throw new IllegalArgumentException("Days of week must be an non-empty set.");
-        foreach(Integer day ; onDaysOfWeek)
+        foreach(int day ; onDaysOfWeek)
             if (!ALL_DAYS_OF_THE_WEEK.contains(day))
                 throw new IllegalArgumentException("Invalid value for day of week: " ~ day);
                 
@@ -249,8 +249,8 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
      * defined by {@link hunt.time.util.Calendar#SUNDAY} - {@link hunt.time.util.Calendar#SATURDAY}. 
      * @return the updated DailyTimeIntervalScheduleBuilder
      */
-    DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(Integer ... onDaysOfWeek) {
-        Set!(Integer) daysAsSet = new HashSet!(Integer)(12);
+    DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(int[] onDaysOfWeek... ) {
+        Set!(int) daysAsSet = new HashSet!(int)(12);
         Collections.addAll(daysAsSet, onDaysOfWeek);
         return onDaysOfTheWeek(daysAsSet);
     }

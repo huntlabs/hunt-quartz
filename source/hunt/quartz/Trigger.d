@@ -254,7 +254,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * 
      * @see #getScheduleBuilder()
      */
-    TriggerBuilder<? extends Trigger> getTriggerBuilder();
+    TriggerBuilder!(Trigger) getTriggerBuilder();
     
     /**
      * Get a {@link ScheduleBuilder} that is configured to produce a 
@@ -262,7 +262,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * 
      * @see #getTriggerBuilder()
      */
-    ScheduleBuilder<? extends Trigger> getScheduleBuilder();
+    ScheduleBuilder!(Trigger) getScheduleBuilder();
 
     /**
      * Trigger equality is based upon the equality of the TriggerKey.

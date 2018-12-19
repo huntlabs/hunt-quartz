@@ -27,6 +27,8 @@ import hunt.quartz.core.JobRunShellFactory;
 import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.utils.ClassUtils;
 
+import hunt.lang.exception;
+
 /**
  * <p>
  * Responsible for creating the instances of a {@link JobRunShell}
@@ -95,7 +97,9 @@ class JTAAnnotationAwareJobRunShellFactory : JobRunShellFactory {
      * </p>
      */
     JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
-        ExecuteInJTATransaction jtaAnnotation = ClassUtils.getAnnotation(bundle.getJobDetail().getJobClass(), ExecuteInJTATransaction.class);
+        ExecuteInJTATransaction jtaAnnotation = null;
+        implementationMissing(false);
+        // ClassUtils.getAnnotation(bundle.getJobDetail().getJobClass(), ExecuteInJTATransaction.class);
         if(jtaAnnotation is null)
             return new JobRunShell(scheduler, bundle);
         else {

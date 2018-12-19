@@ -130,26 +130,26 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
         map.clear();
     }
 
-    bool containsKey(Object key) {
+    bool containsKey(K key) {
         return map.containsKey(key);
     }
 
-    bool containsValue(Object val) {
+    bool containsValue(V val) {
         return map.containsValue(val);
     }
 
-    Set!(Entry!(K,V)) entrySet() {
-        return new DirtyFlagMapEntrySet(map.entrySet());
-    }
+    // Set!(Entry!(K,V)) entrySet() {
+    //     return new DirtyFlagMapEntrySet(map.entrySet());
+    // }
 
-    override
-    bool equals(Object obj) {
-        if (obj is null || !(obj instanceof DirtyFlagMap)) {
-            return false;
-        }
+    // override
+    // bool equals(Object obj) {
+    //     if (obj is null || !(obj instanceof DirtyFlagMap)) {
+    //         return false;
+    //     }
 
-        return map.equals(((DirtyFlagMap<?,?>) obj).getWrappedMap());
-    }
+    //     return map.equals(((DirtyFlagMap<?,?>) obj).getWrappedMap());
+    // }
 
     override
     size_t toHash() @trusted nothrow
@@ -175,7 +175,7 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
         return map.put(key, val);
     }
 
-    void putAll(Map<? extends K, ? extends V> t) {
+    void putAll(Map!(K, V) t) {
         if (!t.isEmpty()) {
             dirty = true;
         }
@@ -183,7 +183,7 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
         map.putAll(t);
     }
 
-    V remove(Object key) {
+    V remove(K key) {
         V obj = map.remove(key);
 
         if (obj !is null) {
@@ -201,30 +201,30 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
         return new DirtyFlagCollection!(V)(map.values());
     }
 
-    override
-     // suppress warnings on generic cast of super.clone() and map.clone() lines.
-    Object clone() {
-        DirtyFlagMap!(K,V) copy;
-        try {
-            copy = (DirtyFlagMap!(K,V)) super.clone();
-            if (map instanceof HashMap) {
-                copy.map = (Map!(K,V))((HashMap!(K,V))map).clone();
-            }
-        } catch (CloneNotSupportedException ex) {
-            throw new IncompatibleClassChangeError("Not Cloneable.");
-        }
+    // override
+    //  // suppress warnings on generic cast of super.clone() and map.clone() lines.
+    // Object clone() {
+    //     DirtyFlagMap!(K,V) copy;
+    //     try {
+    //         copy = (DirtyFlagMap!(K,V)) super.clone();
+    //         if (map instanceof HashMap) {
+    //             copy.map = (Map!(K,V))((HashMap!(K,V))map).clone();
+    //         }
+    //     } catch (CloneNotSupportedException ex) {
+    //         throw new IncompatibleClassChangeError("Not Cloneable.");
+    //     }
 
-        return copy;
-    }
+    //     return copy;
+    // }
 
     /**
      * Wrap a Collection so we can mark the DirtyFlagMap as dirty if
      * the underlying Collection is modified.
      */
-    private class DirtyFlagCollection!(T) implements Collection!(T) {
+    private class DirtyFlagCollection(T) : Collection!(T) {
         private Collection!(T) collection;
 
-        DirtyFlagCollection(Collection!(T) c) {
+        this(Collection!(T) c) {
             collection = c;
         }
 
@@ -244,7 +244,7 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
             return removed;
         }
 
-        bool removeAll(Collection<?> c) {
+        bool removeAll(Collection!T c) {
             bool changed = collection.removeAll(c);
             if (changed) {
                 dirty = true;
@@ -252,7 +252,7 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
             return changed;
         }
 
-        bool retainAll(Collection<?> c) {
+        bool retainAll(Collection!T c) {
             bool changed = collection.retainAll(c);
             if (changed) {
                 dirty = true;
@@ -272,23 +272,23 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
         bool isEmpty() { return collection.isEmpty(); }
         bool contains(Object o) { return collection.contains(o); }
         bool add(T o) { return collection.add(o); } // Not supported
-        bool addAll(Collection<? extends T> c) { return collection.addAll(c); } // Not supported
-        bool containsAll(Collection<?> c) { return collection.containsAll(c); }
-        Object[] toArray() { return collection.toArray(); }
-        <U> U[] toArray(U[] array) { return collection.toArray(array); }
+        bool addAll(Collection!T c) { return collection.addAll(c); } // Not supported
+        bool containsAll(Collection!T c) { return collection.containsAll(c); }
+        T[] toArray() { return collection.toArray(); }
+        // T[] toArray(T[] array) { return collection.toArray(array); }
     }
 
     /**
      * Wrap a Set so we can mark the DirtyFlagMap as dirty if
      * the underlying Collection is modified.
      */
-    private class DirtyFlagSet!(T) extends DirtyFlagCollection!(T) implements Set!(T) {
-        DirtyFlagSet(Set!(T) set) {
+    private class DirtyFlagSet(T) : DirtyFlagCollection!(T), Set!(T) {
+        this(Set!(T) set) {
             super(set);
         }
 
         protected Set!(T) getWrappedSet() {
-            return (Set!(T))getWrappedCollection();
+            return cast(Set!(T))getWrappedCollection();
         }
     }
 
@@ -296,76 +296,76 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
      * Wrap an Iterator so that we can mark the DirtyFlagMap as dirty if an
      * element is removed.
      */
-    private class DirtyFlagIterator!(T) implements Iterator!(T) {
-        private Iterator!(T) iterator;
+    // private class DirtyFlagIterator(T) : Iterator!(T) {
+    //     private Iterator!(T) iterator;
 
-        DirtyFlagIterator(Iterator!(T) iterator) {
-            this.iterator = iterator;
-        }
+    //     this(Iterator!(T) iterator) {
+    //         this.iterator = iterator;
+    //     }
 
-        void remove() {
-            dirty = true;
-            iterator.remove();
-        }
+    //     void remove() {
+    //         dirty = true;
+    //         iterator.remove();
+    //     }
 
-        // Pure wrapper methods
-        bool hasNext() { return iterator.hasNext(); }
-        T next() { return iterator.next(); }
-    }
+    //     // Pure wrapper methods
+    //     bool hasNext() { return iterator.hasNext(); }
+    //     T next() { return iterator.next(); }
+    // }
 
     /**
-     * Wrap a Map.Entry Set so we can mark the Map as dirty if
-     * the Set is modified, and return Map.Entry objects
+     * Wrap a MapEntry Set so we can mark the Map as dirty if
+     * the Set is modified, and return MapEntry objects
      * wrapped in the <code>DirtyFlagMapEntry</code> class.
      */
-    private class DirtyFlagMapEntrySet : DirtyFlagSet<Map.Entry!(K,V)> {
+    private class DirtyFlagMapEntrySet : DirtyFlagSet(MapEntry!(K,V)) {
 
-        DirtyFlagMapEntrySet(Set<Map.Entry!(K,V)> set) {
+        this(Set!MapEntry!(K,V)) set) {
             super(set);
         }
 
-        override
-        Iterator<Map.Entry!(K,V)> iterator() {
-            return new DirtyFlagMapEntryIterator(getWrappedSet().iterator());
-        }
+        // override
+        // Iterator<MapEntry!(K,V)> iterator() {
+        //     return new DirtyFlagMapEntryIterator(getWrappedSet().iterator());
+        // }
 
-        override
-        Object[] toArray() {
-            return toArray(new Object[super.size()]);
-        }
+        // override
+        // V[] toArray() {
+        //     return toArray(new Object[super.size()]);
+        // }
 
-         // suppress warnings on both U[] and U casting.
-        override
-        <U> U[] toArray(U[] array) {
-            if (array.getClass().getComponentType().isAssignableFrom(Map.Entry.class) == false) {
-                throw new IllegalArgumentException("Array must be of type assignable from Map.Entry");
-            }
+        //  // suppress warnings on both U[] and U casting.
+        // override
+        // <U> U[] toArray(U[] array) {
+        //     if (array.getClass().getComponentType().isAssignableFrom(MapEntry.class) == false) {
+        //         throw new IllegalArgumentException("Array must be of type assignable from MapEntry");
+        //     }
 
-            int size = super.size();
+        //     int size = super.size();
 
-            U[] result =
-                array.length < size ?
-                    (U[])Array.newInstance(array.getClass().getComponentType(), size) : array;
+        //     U[] result =
+        //         array.length < size ?
+        //             (U[])Array.newInstance(array.getClass().getComponentType(), size) : array;
 
-            Iterator<Map.Entry!(K,V)> entryIter = iterator(); // Will return DirtyFlagMapEntry objects
-            for (int i = 0; i < size; i++) {
-                result[i] = ( U ) entryIter.next();
-            }
+        //     Iterator<MapEntry!(K,V)> entryIter = iterator(); // Will return DirtyFlagMapEntry objects
+        //     for (int i = 0; i < size; i++) {
+        //         result[i] = ( U ) entryIter.next();
+        //     }
 
-            if (result.length > size) {
-                result[size] = null;
-            }
+        //     if (result.length > size) {
+        //         result[size] = null;
+        //     }
 
-            return result;
-        }
+        //     return result;
+        // }
     }
 
     /**
-     * Wrap an Iterator over Map.Entry objects so that we can
+     * Wrap an Iterator over MapEntry objects so that we can
      * mark the Map as dirty if an element is removed or modified.
      */
-    private class DirtyFlagMapEntryIterator : DirtyFlagIterator<Map.Entry!(K,V)> {
-        DirtyFlagMapEntryIterator(Iterator<Map.Entry!(K,V)> iterator) {
+    private class DirtyFlagMapEntryIterator : DirtyFlagIterator!(MapEntry!(K,V)) {
+        this(Iterator!(MapEntry!(K,V)) iterator) {
             super(iterator);
         }
 
@@ -376,13 +376,13 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
     }
 
     /**
-     * Wrap a Map.Entry so we can mark the Map as dirty if
+     * Wrap a MapEntry so we can mark the Map as dirty if
      * a value is set.
      */
-    private class DirtyFlagMapEntry : Map.Entry!(K,V) {
-        private Map.Entry!(K,V) entry;
+    private class DirtyFlagMapEntry : MapEntry!(K,V) {
+        private MapEntry!(K,V) entry;
 
-        DirtyFlagMapEntry(Map.Entry!(K,V) entry) {
+        this(MapEntry!(K,V) entry) {
             this.entry = entry;
         }
 

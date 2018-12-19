@@ -26,6 +26,8 @@ import hunt.quartz.SchedulerFactory;
 import hunt.quartz.listeners.SchedulerListenerSupport;
 
 import core.thread;
+import core.time;
+
 import std.stdio;
 
 /**
@@ -92,7 +94,7 @@ class QuartzServer : SchedulerListenerSupport {
         sched.start();
 
         try {
-            Thread.sleep(3000l);
+            Thread.sleep(3.seconds);
         } catch (Exception ignore) {
         }
 
@@ -104,12 +106,9 @@ class QuartzServer : SchedulerListenerSupport {
             writeln("   If it was configured to export itself via RMI,");
             writeln("   then other process may now use it.");
 
-            BufferedReader rdr = new BufferedReader(new InputStreamReader(
-                    System.in));
-
             while (true) {
                 writeln("Type 'exit' to shutdown the server: ");
-                if ("exit" == rdr.readLine()) {
+                if ("exit" == readln()) {
                     break;
                 }
             }

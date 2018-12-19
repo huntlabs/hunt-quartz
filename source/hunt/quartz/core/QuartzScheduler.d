@@ -76,8 +76,11 @@ import hunt.quartz.spi.ThreadExecutor;
 import hunt.comtainer;
 import hunt.io.common;
 import hunt.logging;
-import std.datetime;
 
+import std.datetime;
+import std.random;
+
+alias RandomLong = Mt19937_64;
 
 /**
  * <p>
@@ -169,7 +172,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
     private SchedulerSignaler signaler;
 
-    private Random random = new Random();
+    private RandomLong random; // = new Random();
 
     private ArrayList!(Object) holdToPreventGC = new ArrayList!(Object)(5);
 
@@ -261,9 +264,9 @@ class QuartzScheduler : RemotableQuartzScheduler {
         // if
         // (!MGMT_SVR_BY_BIND.containsKey(managementRESTServiceConfiguration.getBind()))
         // {
-        // Class<?> managementServerImplClass =
+        // TypeInfo_Class managementServerImplClass =
         // Class.forName("hunt.quartz.management.ManagementServerImpl");
-        // Class<?> managementRESTServiceConfigurationClass[] = new Class[] {
+        // TypeInfo_Class managementRESTServiceConfigurationClass[] = new Class[] {
         // managementRESTServiceConfiguration.getClass() };
         // Constructor<?> managementRESTServiceConfigurationConstructor =
         // managementServerImplClass
@@ -364,10 +367,10 @@ class QuartzScheduler : RemotableQuartzScheduler {
         RemotableQuartzScheduler exportable = null;
 
         if(resources.getRMIServerPort() > 0) {
-            exportable = (RemotableQuartzScheduler) UnicastRemoteObject
+            exportable = cast(RemotableQuartzScheduler) UnicastRemoteObject
                 .exportObject(this, resources.getRMIServerPort());
         } else {
-            exportable = (RemotableQuartzScheduler) UnicastRemoteObject
+            exportable = cast(RemotableQuartzScheduler) UnicastRemoteObject
                 .exportObject(this);
         }
 
@@ -539,27 +542,23 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         schedThread.togglePause(false);
 
-        info(
-                "Scheduler " ~ resources.getUniqueIdentifier() ~ " started.");
+        info("Scheduler " ~ resources.getUniqueIdentifier() ~ " started.");
         
         notifySchedulerListenersStarted();
     }
 
-    void startDelayed(final int seconds) throws SchedulerException
-    {
+    void startDelayed(final int seconds) {
         if (shuttingDown || closed) {
             throw new SchedulerException(
                     "The Scheduler cannot be restarted after shutdown() has been called.");
         }
 
-        Thread t = new Thread(new Runnable() {
-            void run() {
-                try { Thread.sleep(seconds * 1000L); }
-                catch(InterruptedException ignore) {}
-                try { start(); }
-                catch(SchedulerException se) {
-                    error("Unable to start scheduler after startup delay.", se);
-                }
+        Thread t = new Thread( {
+            try { Thread.sleep(seconds * 1000L); }
+            catch(InterruptedException ignore) {}
+            try { start(); }
+            catch(SchedulerException se) {
+                error("Unable to start scheduler after startup delay.", se);
             }
         });
         t.start();
@@ -601,7 +600,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         return jobMgr.getNumJobsFired();
     }
 
-    Class<?> getJobStoreClass() {
+    TypeInfo_Class getJobStoreClass() {
         return resources.getJobStore().getClass();
     }
 
@@ -613,7 +612,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         return resources.getJobStore().isClustered();
     }
 
-    Class<?> getThreadPoolClass() {
+    TypeInfo_Class getThreadPoolClass() {
         return resources.getThreadPool().getClass();
     }
 
@@ -694,12 +693,14 @@ class QuartzScheduler : RemotableQuartzScheduler {
                 (resources.isInterruptJobsOnShutdownWithWait() && waitForJobsToComplete)) {
             List!(JobExecutionContext) jobs = getCurrentlyExecutingJobs();
             foreach(JobExecutionContext job; jobs) {
-                if(job.getJobInstance() instanceof InterruptableJob)
+                InterruptableJob ij = cast(InterruptableJob)job.getJobInstance();
+                if(ij !is null)
                     try {
-                        ((InterruptableJob)job.getJobInstance()).interrupt();
+                        ij.interrupt();
                     } catch (Throwable e) {
                         // do nothing, this was just a courtesy effort
-                        warn("Encountered error when interrupting job {} during shutdown: {}", job.getJobDetail().getKey(), e.msg);
+                        warningf("Encountered error when interrupting job %s during shutdown: %s", 
+                            job.getJobDetail().getKey(), e.msg);
                     }
             }
         }
@@ -732,8 +733,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         holdToPreventGC.clear();
         
-        info(
-                "Scheduler " ~ resources.getUniqueIdentifier()
+        info("Scheduler " ~ resources.getUniqueIdentifier()
                         ~ " shutdown complete.");
     }
 
@@ -825,7 +825,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
             throw new SchedulerException("Job's class cannot be null");
         }
         
-        OperableTrigger trig = (OperableTrigger)trigger;
+        OperableTrigger trig = cast(OperableTrigger)trigger;
 
         if (trigger.getJobKey() is null) {
             trig.setJobKey(jobDetail.getKey());
@@ -873,7 +873,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
             throw new SchedulerException("Trigger cannot be null");
         }
 
-        OperableTrigger trig = (OperableTrigger)trigger;
+        OperableTrigger trig = cast(OperableTrigger)trigger;
         
         trig.validate();
 
@@ -949,7 +949,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         bool result = false;
         
-        List<? extends Trigger> triggers = getTriggersOfJob(jobKey);
+        List!Trigger triggers = getTriggersOfJob(jobKey);
         foreach(Trigger trigger ; triggers) {
             if (!unscheduleJob(trigger.getKey())) {
                 StringBuilder sb = new StringBuilder().append(
@@ -982,19 +982,19 @@ class QuartzScheduler : RemotableQuartzScheduler {
         return result;
     }
 
-    void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace) {
+    void scheduleJobs(Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace) {
         validateState();
 
         // make sure all triggers refer to their associated job
-        for(Entry<JobDetail, Set<? extends Trigger>> e: triggersAndJobs.entrySet()) {
-            JobDetail job = e.getKey();
+        foreach(JobDetail job, Set!(Trigger) triggers; triggersAndJobs) {
+            // JobDetail job = e.getKey();
             if(job is null) // there can be one of these (for adding a bulk set of triggers for pre-existing jobs)
                 continue;
-            Set<? extends Trigger> triggers = e.getValue();
+            // Set!(Trigger) triggers = e.getValue();
             if(triggers is null) // this is possible because the job may be durable, and not yet be having triggers
                 continue;
             foreach(Trigger trigger; triggers) {
-                OperableTrigger opt = (OperableTrigger)trigger;
+                OperableTrigger opt = cast(OperableTrigger)trigger;
                 opt.setJobKey(job.getKey());
 
                 opt.validate();
@@ -1004,7 +1004,8 @@ class QuartzScheduler : RemotableQuartzScheduler {
                     cal = resources.getJobStore().retrieveCalendar(trigger.getCalendarName());
                     if(cal is null) {
                         throw new SchedulerException(
-                            "Calendar '" ~ trigger.getCalendarName() ~ "' not found for trigger: " ~ trigger.getKey());
+                            "Calendar '" ~ trigger.getCalendarName() ~ 
+                            "' not found for trigger: " ~ trigger.getKey().toString());
                     }
                 }
                 Date ft = opt.computeFirstFireTime(cal);
@@ -1018,13 +1019,13 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         resources.getJobStore().storeJobsAndTriggers(triggersAndJobs, replace);
         notifySchedulerThread(0L);
-        for(JobDetail job: triggersAndJobs.keySet())
+        foreach(JobDetail job; triggersAndJobs.keySet())
             notifySchedulerListenersJobAdded(job);
     }
 
-    void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob,
+    void scheduleJob(JobDetail jobDetail, Set!(Trigger) triggersForJob,
             bool replace) {
-        Map<JobDetail, Set<? extends Trigger>> triggersAndJobs = new HashMap<JobDetail, Set<? extends Trigger>>();
+        Map!(JobDetail, Set!(Trigger)) triggersAndJobs = new HashMap!(JobDetail, Set!(Trigger))();
         triggersAndJobs.put(jobDetail, triggersForJob);
         scheduleJobs(triggersAndJobs, replace);
     }
@@ -1085,7 +1086,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
             throw new IllegalArgumentException("newTrigger cannot be null");
         }
 
-        OperableTrigger trig = (OperableTrigger)newTrigger;
+        OperableTrigger trig = cast(OperableTrigger)newTrigger;
         Trigger oldTrigger = getTrigger(triggerKey);
         if (oldTrigger is null) {
             return null;
@@ -1120,12 +1121,9 @@ class QuartzScheduler : RemotableQuartzScheduler {
     
     
     private string newTriggerId() {
-        long r = random.nextLong();
-        if (r < 0) {
-            r = -r;
-        }
-        return "MT_"
-                + Long.toString(r, 30 + (int) (DateTimeHelper.currentTimeMillis() % 7));
+        ulong r = random.front();
+        random.popFront();
+        return "MT_" ~ to!string(r, 30 + cast(int) (DateTimeHelper.currentTimeMillis() % 7));
     }
 
     /**
@@ -1138,7 +1136,8 @@ class QuartzScheduler : RemotableQuartzScheduler {
     void triggerJob(JobKey jobKey, JobDataMap data) {
         validateState();
 
-        OperableTrigger trig = (OperableTrigger) newTrigger().withIdentity(newTriggerId(), Scheduler.DEFAULT_GROUP).forJob(jobKey).build();
+        OperableTrigger trig = cast(OperableTrigger) newTrigger().withIdentity(newTriggerId(), 
+            Scheduler.DEFAULT_GROUP).forJob(jobKey).build();
         trig.computeFirstFireTime(null);
         if(data !is null) {
             trig.setJobDataMap(data);
@@ -1427,7 +1426,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * identified <code>{@link hunt.quartz.JobDetail}</code>.
      * </p>
      */
-    List<? extends Trigger> getTriggersOfJob(JobKey jobKey) {
+    List!(Trigger) getTriggersOfJob(JobKey jobKey) {
         validateState();
 
         return resources.getJobStore().getTriggersForJob(jobKey);
@@ -1801,7 +1800,7 @@ J     *
         List!(Matcher!(JobKey)) matchers = getListenerManager().getJobListenerMatchers(listener.getName());
         if(matchers is null)
             return true;
-        for(Matcher!(JobKey) matcher: matchers) {
+        foreach(Matcher!(JobKey) matcher; matchers) {
             if(matcher.isMatch(key))
                 return true;
         }
@@ -1812,7 +1811,7 @@ J     *
         List!(Matcher!(TriggerKey)) matchers = getListenerManager().getTriggerListenerMatchers(listener.getName());
         if(matchers is null)
             return true;
-        for(Matcher!(TriggerKey) matcher: matchers) {
+        foreach(Matcher!(TriggerKey) matcher; matchers) {
             if(matcher.isMatch(key))
                 return true;
         }

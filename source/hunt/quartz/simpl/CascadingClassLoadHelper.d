@@ -93,7 +93,7 @@ class CascadingClassLoadHelper : ClassLoadHelper {
     /**
      * Return the class with the given name.
      */
-    Class<?> loadClass(string name) {
+    TypeInfo_Class loadClass(string name) {
 
         if (bestCandidate !is null) {
             try {
@@ -104,7 +104,7 @@ class CascadingClassLoadHelper : ClassLoadHelper {
         }
 
         Throwable throwable = null;
-        Class<?> clazz = null;
+        TypeInfo_Class clazz = null;
         ClassLoadHelper loadHelper = null;
 
         Iterator!(ClassLoadHelper) iter = loadHelpers.iterator();

@@ -154,10 +154,9 @@ class TimeOfDay {
 
     override
     bool equals(Object obj) {
-        if(!(obj instanceof TimeOfDay))
+        TimeOfDay other = cast(TimeOfDay)obj;
+        if(other is null)
             return false;
-        
-        TimeOfDay other = (TimeOfDay)obj;
         
         return (other.hour == hour && other.minute == minute && other.second == second);
     }

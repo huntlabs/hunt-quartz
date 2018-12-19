@@ -100,7 +100,7 @@ module hunt.quartz.simpl.PropertySettingJobFactory;
         
 //             java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);
         
-//             Class<?> paramType = null;
+//             TypeInfo_Class paramType = null;
 //             Object o = null;
             
 //             try {

@@ -18,11 +18,13 @@
 
 module hunt.quartz.TriggerUtils;
 
-import std.datetime;
+import hunt.quartz.spi.OperableTrigger;
+
 import hunt.container.LinkedList;
 import hunt.container.List;
+import hunt.lang.exception;
 
-import hunt.quartz.spi.OperableTrigger;
+import std.datetime;
 
 /**
  * Convenience and utility methods for working with <code>{@link Trigger}s</code>.
@@ -72,11 +74,14 @@ class TriggerUtils {
      *          The number of next fire times to produce
      * @return List of java.util.Date objects
      */
-    static List!(Date) computeFireTimes(OperableTrigger trigg, hunt.quartz.Calendar cal,
-            int numTimes) {
+    static List!(Date) computeFireTimes(OperableTrigger trigg, 
+        hunt.quartz.Calendar cal, int numTimes) {
         LinkedList!(Date) lst = new LinkedList!(Date)();
 
-        OperableTrigger t = (OperableTrigger) trigg.clone();
+        implementationMissing(false);
+        // OperableTrigger t = cast(OperableTrigger) trigg.clone();
+        OperableTrigger t = trigg;
+
 
         if (t.getNextFireTime() is null) {
             t.computeFirstFireTime(cal);

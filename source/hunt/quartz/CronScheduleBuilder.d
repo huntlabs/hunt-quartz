@@ -200,7 +200,7 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
      */
 
     static CronScheduleBuilder atHourAndMinuteOnGivenDaysOfWeek(
-            int hour, int minute, Integer... daysOfWeek) {
+            int hour, int minute, int[] daysOfWeek... ) {
         if (daysOfWeek is null || daysOfWeek.length == 0)
             throw new IllegalArgumentException(
                     "You must specify at least one day of week.");

@@ -3,7 +3,6 @@ module hunt.quartz.exception;
 import hunt.lang.exception;
 
 
-
 class SchedulerException : Exception {
     mixin BasicExceptionCtors;
 

@@ -64,7 +64,7 @@ interface JobDetail { //  : Serializable, Cloneable
      * Get the instance of <code>Job</code> that will be executed.
      * </p>
      */
-    Class<? extends Job> getJobClass();
+    TypeInfo_Class getJobClass();
 
     /**
      * <p>

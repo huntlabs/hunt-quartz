@@ -269,7 +269,7 @@ final class CronExpression : Serializable, Cloneable {
      *         if the string expression cannot be parsed into a valid 
      *         <CODE>CronExpression</CODE>
      */
-    CronExpression(string cronExpression) {
+    this(string cronExpression) {
         if (cronExpression is null) {
             throw new IllegalArgumentException("cronExpression cannot be null");
         }
@@ -286,7 +286,7 @@ final class CronExpression : Serializable, Cloneable {
      * @param expression
      *            The existing cron expression to be copied
      */
-    CronExpression(CronExpression expression) {
+    this(CronExpression expression) {
         /*
          * We don't call the other constructor here since we need to swallow the
          * ParseException. We also elide some of the sanity checking as it is
@@ -299,7 +299,8 @@ final class CronExpression : Serializable, Cloneable {
             throw new AssertionError();
         }
         if (expression.getTimeZone() !is null) {
-            setTimeZone((TimeZone) expression.getTimeZone().clone());
+            // setTimeZone(cast(TimeZone) expression.getTimeZone().clone());
+            setTimeZone(cast(TimeZone) expression.getTimeZone());
         }
     }
 
@@ -950,7 +951,6 @@ final class CronExpression : Serializable, Cloneable {
 
     protected int skipWhiteSpace(int i, string s) {
         for (; i < s.length() && (s.charAt(i) == ' ' || s.charAt(i) == '\t'); i++) {
-            ;
         }
 
         return i;
@@ -958,7 +958,6 @@ final class CronExpression : Serializable, Cloneable {
 
     protected int findNextWhiteSpace(int i, string s) {
         for (; i < s.length() && (s.charAt(i) != ' ' || s.charAt(i) != '\t'); i++) {
-            ;
         }
 
         return i;
@@ -1641,21 +1640,20 @@ final class CronExpression : Serializable, Cloneable {
     }
     
 
-    private void readObject(java.io.ObjectInputStream stream)
-        throws java.io.IOException, ClassNotFoundException {
+    // private void readObject(java.io.ObjectInputStream stream) {
         
-        stream.defaultReadObject();
-        try {
-            buildExpression(cronExpression);
-        } catch (Exception ignore) {
-        } // never happens
-    }    
+    //     stream.defaultReadObject();
+    //     try {
+    //         buildExpression(cronExpression);
+    //     } catch (Exception ignore) {
+    //     } // never happens
+    // }    
     
-    override
-    deprecated("")
-    Object clone() {
-        return new CronExpression(this);
-    }
+    // override
+    // deprecated("")
+    // Object clone() {
+    //     return new CronExpression(this);
+    // }
 }
 
 class ValueSet {

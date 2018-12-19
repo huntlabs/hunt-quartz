@@ -19,6 +19,7 @@
 module hunt.quartz.SchedulerMetaData;
 
 import std.datetime;
+import std.string;
 
 /**
  * Describes the settings and capabilities of a given <code>{@link Scheduler}</code>
@@ -41,7 +42,7 @@ class SchedulerMetaData {
 
     private string schedInst;
 
-    private Class<?> schedClass;
+    private TypeInfo_Class schedClass; 
 
     private bool isRemote;
 
@@ -55,17 +56,17 @@ class SchedulerMetaData {
 
     private int numJobsExec;
 
-    private Class<?> jsClass;
+    private TypeInfo_Class jsClass;
 
     private bool jsPersistent;
 
     private bool jsClustered;
 
-    private Class<?> tpClass;
+    private TypeInfo_Class tpClass;
 
     private int tpSize;
 
-    private string version;
+    private string _version;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,10 +77,10 @@ class SchedulerMetaData {
      */
 
     this(string schedName, string schedInst,
-            Class<?> schedClass, bool isRemote, bool started,
+            TypeInfo_Class schedClass, bool isRemote, bool started,
             bool isInStandbyMode, bool shutdown, Date startTime, int numJobsExec,
-            Class<?> jsClass, bool jsPersistent, bool jsClustered, Class<?> tpClass, int tpSize,
-            string version) {
+            TypeInfo_Class jsClass, bool jsPersistent, bool jsClustered, TypeInfo_Class tpClass, int tpSize,
+            string ver) {
         this.schedName = schedName;
         this.schedInst = schedInst;
         this.schedClass = schedClass;
@@ -94,7 +95,7 @@ class SchedulerMetaData {
         this.jsClustered = jsClustered;
         this.tpClass = tpClass;
         this.tpSize = tpSize;
-        this.version = version;
+        this._version = ver;
     }
 
     /*
@@ -128,7 +129,7 @@ class SchedulerMetaData {
      * Returns the class-name of the <code>Scheduler</code> instance.
      * </p>
      */
-    Class<?> getSchedulerClass() {
+    TypeInfo_Class getSchedulerClass() {
         return schedClass;
     }
 
@@ -199,7 +200,7 @@ class SchedulerMetaData {
      * being used by the <code>Scheduler</code>.
      * </p>
      */
-    Class<?> getJobStoreClass() {
+    TypeInfo_Class getJobStoreClass() {
         return jsClass;
     }
     
@@ -229,7 +230,7 @@ class SchedulerMetaData {
      * being used by the <code>Scheduler</code>.
      * </p>
      */
-    Class<?> getThreadPoolClass() {
+    TypeInfo_Class getThreadPoolClass() {
         return tpClass;
     }
 
@@ -249,7 +250,7 @@ class SchedulerMetaData {
      * </p>
      */
     string getVersion() {
-        return version;
+        return _version;
     }
 
     /**

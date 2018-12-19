@@ -60,7 +60,7 @@ module hunt.quartz.core.jmx.JobDetailSupport;
 //         jobDetail.setName((string) cData.get(ITEM_NAMES[i++]));
 //         jobDetail.setGroup((string) cData.get(ITEM_NAMES[i++]));
 //         jobDetail.setDescription((string) cData.get(ITEM_NAMES[i++]));
-//         Class<?> jobClass = Class.forName((string) cData.get(ITEM_NAMES[i++]));
+//         TypeInfo_Class jobClass = Class.forName((string) cData.get(ITEM_NAMES[i++]));
 //         
 //         Class<? extends Job> jobClassTyped = (Class<? extends Job>)jobClass;
 //         jobDetail.setJobClass(jobClassTyped);
@@ -84,7 +84,7 @@ module hunt.quartz.core.jmx.JobDetailSupport;
 //         jobDetail.setName((string) attrMap.get(ITEM_NAMES[i++]));
 //         jobDetail.setGroup((string) attrMap.get(ITEM_NAMES[i++]));
 //         jobDetail.setDescription((string) attrMap.get(ITEM_NAMES[i++]));
-//         Class<?> jobClass = Class.forName((string) attrMap.get(ITEM_NAMES[i++]));
+//         TypeInfo_Class jobClass = Class.forName((string) attrMap.get(ITEM_NAMES[i++]));
 //         
 //         Class<? extends Job> jobClassTyped = (Class<? extends Job>)jobClass;
 //         jobDetail.setJobClass(jobClassTyped);

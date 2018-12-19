@@ -77,7 +77,7 @@ module hunt.quartz.jobs.ee.ejb.EJB3InvokerJob;
 //                 throw new JobExecutionException(ne);
 //             }
             
-//             Class<?>[] argTypes = (Class[]) dataMap.get(EJB_ARG_TYPES_KEY);
+//             TypeInfo_Class[] argTypes = (Class[]) dataMap.get(EJB_ARG_TYPES_KEY);
 //             if (argTypes is null) {
 //                 argTypes = new Class[arguments.length];
 //                 for (int i = 0; i < arguments.length; i++) {

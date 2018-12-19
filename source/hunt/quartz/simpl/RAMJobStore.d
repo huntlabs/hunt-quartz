@@ -356,12 +356,12 @@ class RAMJobStore : JobStore {
     }
 
     void storeJobsAndTriggers(
-            Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace) {
+            Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace) {
 
         synchronized (lock) {
             // make sure there are no collisions...
             if(!replace) {
-                for(Entry<JobDetail, Set<? extends Trigger>> e: triggersAndJobs.entrySet()) {
+                for(Entry!(JobDetail, Set!(Trigger)) e: triggersAndJobs.entrySet()) {
                     if(checkExists(e.getKey().getKey()))
                         throw new ObjectAlreadyExistsException(e.getKey());
                     for(Trigger trigger: e.getValue()) {
@@ -371,7 +371,7 @@ class RAMJobStore : JobStore {
                 }
             }
             // do bulk add...
-            for(Entry<JobDetail, Set<? extends Trigger>> e: triggersAndJobs.entrySet()) {
+            for(Entry!(JobDetail, Set!(Trigger)) e: triggersAndJobs.entrySet()) {
                 storeJob(e.getKey(), true);
                 for(Trigger trigger: e.getValue()) {
                     storeTrigger((OperableTrigger) trigger, true);

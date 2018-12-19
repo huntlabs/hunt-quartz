@@ -22,6 +22,11 @@ import hunt.container.Map;
 
 import hunt.quartz.utils.StringKeyDirtyFlagMap;
 
+import hunt.lang.Nullable;
+import hunt.lang.String;
+
+import std.conv;
+
 /**
  * Holds state information for <code>Job</code> instances.
  * 
@@ -59,7 +64,7 @@ import hunt.quartz.utils.StringKeyDirtyFlagMap;
  * 
  * @author James House
  */
-class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
+class JobDataMap : StringKeyDirtyFlagMap {
 
     
     /*
@@ -75,7 +80,7 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * Create an empty <code>JobDataMap</code>.
      * </p>
      */
-    JobDataMap() {
+    this() {
         super(15);
     }
 
@@ -84,10 +89,10 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * Create a <code>JobDataMap</code> with the given data.
      * </p>
      */
-    JobDataMap(Map<?, ?> map) {
+    this(Map!(string, Object) mapTyped) {
         this();
          // casting to keep API compatible and avoid compiler errors/warnings.
-        Map!(string, Object) mapTyped = (Map!(string, Object))map;
+        // Map!(string, Object) mapTyped = (Map!(string, Object))map;
         putAll(mapTyped);
 
         // When constructing a new data map from another existing map, we should NOT mark dirty flag as true
@@ -103,17 +108,23 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    void putAsString(T)(string key, T value) {
+        String strValue = new String(to!string(value));
+
+        super.put(key, strValue);
+    }
+
     /**
      * <p>
      * Adds the given <code>bool</code> value as a string version to the
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, bool value) {
-        string strValue = Boolean.valueOf(value).toString();
+    // void putAsString(string key, bool value) {
+    //     String strValue = new String(to!string(value));
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -121,11 +132,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, Boolean value) {
-        string strValue = value.toString();
+    // void putAsString(string key, Boolean value) {
+    //     string strValue = value.toString();
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -133,11 +144,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, char value) {
-        string strValue = Character.valueOf(value).toString();
+    // void putAsString(string key, char value) {
+    //     String strValue = new String(to!string(value));
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -145,11 +156,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, Character value) {
-        string strValue = value.toString();
+    // void putAsString(string key, Character value) {
+    //     string strValue = value.toString();
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -157,11 +168,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, double value) {
-        string strValue = Double.toString(value);
+    // void putAsString(string key, double value) {
+    //     String strValue = new String(to!string(value));
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -169,11 +180,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, Double value) {
-        string strValue = value.toString();
+    // void putAsString(string key, Double value) {
+    //     string strValue = value.toString();
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -181,11 +192,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, float value) {
-        string strValue = Float.toString(value);
+    // void putAsString(string key, float value) {
+    //     String strValue = new String(to!string(value));
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -193,11 +204,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, Float value) {
-        string strValue = value.toString();
+    // void putAsString(string key, Float value) {
+    //     string strValue = value.toString();
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -205,11 +216,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, int value) {
-        string strValue = Integer.valueOf(value).toString();
+    // void putAsString(string key, int value) {
+    //     string strValue = Integer.valueOf(value).toString();
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -217,11 +228,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, Integer value) {
-        string strValue = value.toString();
+    // void putAsString(string key, Integer value) {
+    //     string strValue = value.toString();
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -229,11 +240,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, long value) {
-        string strValue = Long.valueOf(value).toString();
+    // void putAsString(string key, long value) {
+    //     string strValue = Long.valueOf(value).toString();
 
-        super.put(key, strValue);
-    }
+    //     super.put(key, strValue);
+    // }
 
     /**
      * <p>
@@ -241,11 +252,18 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * <code>Job</code>'s data map.
      * </p>
      */
-    void putAsString(string key, Long value) {
-        string strValue = value.toString();
+    // void putAsString(string key, Long value) {
+    //     string strValue = value.toString();
 
-        super.put(key, strValue);
+    //     super.put(key, strValue);
+    // }
+
+    T getFromString(T)(string key) {
+        Object obj = get(key);
+        string v = obj.toString();
+        return to!T(v);
     }
+
 
     /**
      * <p>
@@ -256,9 +274,10 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      *           if the identified object is not a string.
      */
     int getIntFromString(string key) {
-        Object obj = get(key);
-
-        return new Integer((string) obj);
+        // Object obj = get(key);
+        // string v = obj.toString();
+        // return to!int(v);
+        return getFromString!(int)(key);
     }
 
     /**
@@ -271,9 +290,10 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      */
     int getIntValue(string key) {
         Object obj = get(key);
+        String str = cast(String)obj;
 
-        if(obj instanceof string) {
-            return getIntFromString(key);
+        if(str !is null) {
+            return getFromString!(int)(key);
         } else {
             return getInt(key);
         }
@@ -287,11 +307,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * @throws ClassCastException
      *           if the identified object is not a string.
      */
-    Integer getIntegerFromString(string key) {
-        Object obj = get(key);
+    // Integer getIntegerFromString(string key) {
+    //     Object obj = get(key);
 
-        return new Integer((string) obj);
-    }
+    //     return new Integer((string) obj);
+    // }
 
     /**
      * <p>
@@ -302,9 +322,10 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      *           if the identified object is not a string.
      */
     bool getBooleanValueFromString(string key) {
-        Object obj = get(key);
+        // Object obj = get(key);
 
-        return Boolean.valueOf((string) obj);
+        // return Boolean.valueOf((string) obj);
+        return getFromString!(bool)(key);
     }
 
     /**
@@ -318,9 +339,10 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      */
     bool getBooleanValue(string key) {
         Object obj = get(key);
+        String str = cast(String)obj;
 
-        if(obj instanceof string) {
-            return getBooleanValueFromString(key);
+        if(str !is null) {
+            return getFromString!(bool)(key);
         } else {
             return getBoolean(key);
         }
@@ -334,11 +356,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * @throws ClassCastException
      *           if the identified object is not a string.
      */
-    Boolean getBooleanFromString(string key) {
-        Object obj = get(key);
+    // Boolean getBooleanFromString(string key) {
+    //     Object obj = get(key);
 
-        return Boolean.valueOf((string) obj);
-    }
+    //     return Boolean.valueOf((string) obj);
+    // }
 
     /**
      * <p>
@@ -349,9 +371,7 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      *           if the identified object is not a string.
      */
     char getCharFromString(string key) {
-        Object obj = get(key);
-
-        return ((string) obj).charAt(0);
+        return getFromString!(char)(key);
     }
 
     /**
@@ -362,11 +382,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * @throws ClassCastException
      *           if the identified object is not a string.
      */
-    Character getCharacterFromString(string key) {
-        Object obj = get(key);
+    // Character getCharacterFromString(string key) {
+    //     Object obj = get(key);
 
-        return ((string) obj).charAt(0);
-    }
+    //     return ((string) obj).charAt(0);
+    // }
 
     /**
      * <p>
@@ -377,9 +397,7 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      *           if the identified object is not a string.
      */
     double getDoubleValueFromString(string key) {
-        Object obj = get(key);
-
-        return Double.valueOf((string) obj);
+        return getFromString!(double)(key);
     }
 
     /**
@@ -392,9 +410,10 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      */
     double getDoubleValue(string key) {
         Object obj = get(key);
+        String str = cast(String)obj;
 
-        if(obj instanceof string) {
-            return getDoubleValueFromString(key);
+        if(str !is null) {
+            return getFromString!(double)(key);
         } else {
             return getDouble(key);
         }
@@ -408,11 +427,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * @throws ClassCastException
      *           if the identified object is not a string.
      */
-    Double getDoubleFromString(string key) {
-        Object obj = get(key);
+    // Double getDoubleFromString(string key) {
+    //     Object obj = get(key);
 
-        return new Double((string) obj);
-    }
+    //     return new Double((string) obj);
+    // }
 
     /**
      * <p>
@@ -423,9 +442,7 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      *           if the identified object is not a string.
      */
     float getFloatValueFromString(string key) {
-        Object obj = get(key);
-
-        return new Float((string) obj);
+        return getFromString!(float)(key);
     }
 
     /**
@@ -438,9 +455,10 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      */
     float getFloatValue(string key) {
         Object obj = get(key);
+        String str = cast(String)obj;
 
-        if(obj instanceof string) {
-            return getFloatValueFromString(key);
+        if(str !is null) {
+            return getFromString!(float)(key);
         } else {
             return getFloat(key);
         }
@@ -454,11 +472,11 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * @throws ClassCastException
      *           if the identified object is not a string.
      */
-    Float getFloatFromString(string key) {
-        Object obj = get(key);
+    // Float getFloatFromString(string key) {
+    //     Object obj = get(key);
 
-        return new Float((string) obj);
-    }
+    //     return new Float((string) obj);
+    // }
 
     /**
      * <p>
@@ -469,9 +487,7 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      *           if the identified object is not a string.
      */
     long getLongValueFromString(string key) {
-        Object obj = get(key);
-
-        return new Long((string) obj);
+        return getFromString!(long)(key);
     }
 
     /**
@@ -484,9 +500,10 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      */
     long getLongValue(string key) {
         Object obj = get(key);
+        String str = cast(String)obj;
 
-        if(obj instanceof string) {
-            return getLongValueFromString(key);
+        if(str !is null) {
+            return getFromString!(long)(key);
         } else {
             return getLong(key);
         }
@@ -500,9 +517,9 @@ class JobDataMap : StringKeyDirtyFlagMap implements Serializable {
      * @throws ClassCastException
      *           if the identified object is not a string.
      */
-    Long getLongFromString(string key) {
-        Object obj = get(key);
+    // Long getLongFromString(string key) {
+    //     Object obj = get(key);
 
-        return new Long((string) obj);
-    }
+    //     return new Long((string) obj);
+    // }
 }

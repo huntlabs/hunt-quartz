@@ -97,7 +97,7 @@ module hunt.quartz.core.jmx.TriggerSupport;
 //         }
 //     }
 
-//     static TabularData toTabularData(List<? extends Trigger> triggers) {
+//     static TabularData toTabularData(List!(Trigger) triggers) {
 //         TabularData tData = new TabularDataSupport(TABULAR_TYPE);
 //         if (triggers !is null) {
 //             ArrayList!(CompositeData) list = new ArrayList!(CompositeData)();
@@ -109,7 +109,7 @@ module hunt.quartz.core.jmx.TriggerSupport;
 //         return tData;
 //     }
     
-//     static List!(CompositeData) toCompositeList(List<? extends Trigger> triggers) {
+//     static List!(CompositeData) toCompositeList(List!(Trigger) triggers) {
 //         List!(CompositeData) result = new ArrayList!(CompositeData)();
 //         foreach(Trigger trigger ; triggers) {
 //             CompositeData cData = TriggerSupport.toCompositeData(trigger);

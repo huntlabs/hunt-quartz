@@ -171,10 +171,10 @@ module hunt.quartz.jobs.ee.ejb.EJBInvokerJob;
 //             }
     
 //             // get home interface class
-//             Class<?> homeClass = metaData.getHomeInterfaceClass();
+//             TypeInfo_Class homeClass = metaData.getHomeInterfaceClass();
     
 //             // get remote interface class
-//             Class<?> remoteClass = metaData.getRemoteInterfaceClass();
+//             TypeInfo_Class remoteClass = metaData.getRemoteInterfaceClass();
     
 //             // get home interface
 //             ejbHome = (EJBHome) PortableRemoteObject.narrow(ejbHome, homeClass);
@@ -206,7 +206,7 @@ module hunt.quartz.jobs.ee.ejb.EJBInvokerJob;
 //             try {
 //                 // create method signature
     
-//                 Class<?>[] argTypes = (Class[]) dataMap.get(EJB_ARG_TYPES_KEY);
+//                 TypeInfo_Class[] argTypes = (Class[]) dataMap.get(EJB_ARG_TYPES_KEY);
 //                 if (argTypes is null) {
 //                     argTypes = new Class[arguments.length];
 //                     for (int i = 0; i < arguments.length; i++) {

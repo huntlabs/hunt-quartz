@@ -422,11 +422,11 @@ module hunt.quartz.impl.RemoteMBeanScheduler;
 //         throw new SchedulerException("Operation not supported for remote schedulers.");
 //     }
 
-//     void scheduleJobs(Map<JobDetail, Set<? extends Trigger>> triggersAndJobs, bool replace) {
+//     void scheduleJobs(Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace) {
 //         throw new SchedulerException("Operation not supported for remote schedulers.");
 //     }
 
-//     void scheduleJob(JobDetail jobDetail, Set<? extends Trigger> triggersForJob, bool replace) {
+//     void scheduleJob(JobDetail jobDetail, Set!(Trigger) triggersForJob, bool replace) {
 //         throw new SchedulerException("Operation not supported for remote schedulers.");
 //     }
 

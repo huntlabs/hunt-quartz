@@ -70,7 +70,7 @@ interface ListenerManager {
      * @see Matcher
      * @see hunt.quartz.impl.matchers.EverythingMatcher
      */
-    void addJobListener(JobListener jobListener, Matcher!(JobKey) ... matchers);
+    void addJobListener(JobListener jobListener, Matcher!(JobKey)[] matchers... );
 
     /**
      * Add the given <code>{@link JobListener}</code> to the <code>Scheduler</code>,
@@ -178,7 +178,7 @@ interface ListenerManager {
      * @see Matcher
      * @see hunt.quartz.impl.matchers.EverythingMatcher
      */
-    void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey) ... matchers);
+    void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey)[] matchers... );
 
     /**
      * Add the given <code>{@link TriggerListener}</code> to the <code>Scheduler</code>,
