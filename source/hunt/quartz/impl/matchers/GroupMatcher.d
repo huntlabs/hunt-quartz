@@ -16,6 +16,8 @@
  */
 module hunt.quartz.impl.matchers.GroupMatcher;
 
+import hunt.quartz.impl.matchers.StringMatcher;
+
 import hunt.quartz.JobKey;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.utils.Key;
@@ -28,7 +30,7 @@ import hunt.quartz.utils.Key;
 class GroupMatcher(T) : StringMatcher!(T) {
   
 
-    protected GroupMatcher(string compareTo, StringOperatorName compareWith) {
+    protected this(string compareTo, StringOperatorName compareWith) {
         super(compareTo, compareWith);
     }
     

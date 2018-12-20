@@ -21,7 +21,7 @@ import hunt.container.Collection;
 import hunt.container.HashMap;
 
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 
 /**
  * <p>

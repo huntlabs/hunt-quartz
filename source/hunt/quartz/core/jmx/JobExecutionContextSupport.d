@@ -19,7 +19,7 @@ module hunt.quartz.core.jmx.JobExecutionContextSupport;
 // import javax.management.openmbean.TabularType;
 
 // import hunt.quartz.JobExecutionContext;
-// import hunt.quartz.SchedulerException;
+// import hunt.quartz.exception;
 
 // class JobExecutionContextSupport {
 //     private enum string COMPOSITE_TYPE_NAME = "JobExecutionContext";

@@ -19,7 +19,7 @@ module hunt.quartz.CalendarIntervalScheduleBuilder;
 
 import std.datetime : TimeZone;
 
-import hunt.quartz.DateBuilder.IntervalUnit;
+import hunt.quartz.DateBuilder;
 import hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 

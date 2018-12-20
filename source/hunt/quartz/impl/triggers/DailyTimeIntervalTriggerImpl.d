@@ -21,16 +21,16 @@ import hunt.quartz.DailyTimeIntervalScheduleBuilder;
 import hunt.quartz.DailyTimeIntervalTrigger;
 import hunt.quartz.DateBuilder;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.TimeOfDay;
 import hunt.quartz.Trigger;
-import hunt.quartz.DateBuilder.IntervalUnit;
+import hunt.quartz.DateBuilder : IntervalUnit;
 
 import hunt.time.util.Calendar;
-import hunt.comtainer.Set;
+import hunt.container.Set;
 
 import std.datetime;
 
@@ -132,7 +132,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * Create a <code>DailyTimeIntervalTrigger</code> with no settings.
      * </p>
      */
-    DailyTimeIntervalTriggerImpl() {
+    this() {
         super();
     }
 
@@ -150,7 +150,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * {@link IntervalUnit#SECOND}, {@link IntervalUnit#MINUTE}, and {@link IntervalUnit#HOUR}.
      * @throws IllegalArgumentException if an invalid IntervalUnit is given, or the repeat interval is zero or less.
      */
-    DailyTimeIntervalTriggerImpl(string name, TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay, IntervalUnit intervalUnit,  int repeatInterval) {
+    this(string name, TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay, 
+        IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, startTimeOfDay, endTimeOfDay, intervalUnit, repeatInterval);
     }
 
@@ -168,7 +169,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * {@link IntervalUnit#SECOND}, {@link IntervalUnit#MINUTE}, and {@link IntervalUnit#HOUR}.
      * @throws IllegalArgumentException if an invalid IntervalUnit is given, or the repeat interval is zero or less.
      */
-    DailyTimeIntervalTriggerImpl(string name, string group, TimeOfDay startTimeOfDay, 
+    this(string name, string group, TimeOfDay startTimeOfDay, 
             TimeOfDay endTimeOfDay, IntervalUnit intervalUnit, int repeatInterval) {
         this(name, group, new Date(), null, startTimeOfDay, endTimeOfDay, intervalUnit, repeatInterval);
     }
@@ -195,7 +196,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *          The number of milliseconds to pause between the repeat firing.
      * @throws IllegalArgumentException if an invalid IntervalUnit is given, or the repeat interval is zero or less.
      */
-    DailyTimeIntervalTriggerImpl(string name, Date startTime,
+    this(string name, Date startTime,
             Date endTime, TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay, 
             IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, startTime, endTime, startTimeOfDay, endTimeOfDay, intervalUnit, repeatInterval);
@@ -223,7 +224,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *          The number of milliseconds to pause between the repeat firing.
      * @throws IllegalArgumentException if an invalid IntervalUnit is given, or the repeat interval is zero or less.
      */
-    DailyTimeIntervalTriggerImpl(string name, string group, Date startTime,
+    this(string name, string group, Date startTime,
             Date endTime, TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay, 
             IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group);
@@ -259,7 +260,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *          The number of milliseconds to pause between the repeat firing.
      * @throws IllegalArgumentException if an invalid IntervalUnit is given, or the repeat interval is zero or less.
      */
-    DailyTimeIntervalTriggerImpl(string name, string group, string jobName,
+    this(string name, string group, string jobName,
             string jobGroup, Date startTime, Date endTime, 
             TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay,
             IntervalUnit intervalUnit,  int repeatInterval) {
@@ -711,19 +712,19 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
             long jumpCount = secondsAfterStart / repeatLong;
             if(secondsAfterStart % repeatLong != 0)
                 jumpCount++;
-            sTime.add(Calendar.SECOND, getRepeatInterval() * (int)jumpCount);
+            sTime.add(Calendar.SECOND, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         } else if(repeatUnit== IntervalUnit.MINUTE) {
             long jumpCount = secondsAfterStart / (repeatLong * 60L);
             if(secondsAfterStart % (repeatLong * 60L) != 0)
                 jumpCount++;
-            sTime.add(Calendar.MINUTE, getRepeatInterval() * (int)jumpCount);
+            sTime.add(Calendar.MINUTE, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         } else if(repeatUnit== IntervalUnit.HOUR) {
             long jumpCount = secondsAfterStart / (repeatLong * 60L * 60L);
             if(secondsAfterStart % (repeatLong * 60L * 60L) != 0)
                 jumpCount++;
-            sTime.add(Calendar.HOUR_OF_DAY, getRepeatInterval() * (int)jumpCount);
+            sTime.add(Calendar.HOUR_OF_DAY, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         }
         

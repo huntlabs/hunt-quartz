@@ -23,7 +23,7 @@ module hunt.quartz.ee.jta.JTAJobRunShell;
 // import javax.transaction.UserTransaction;
 
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.core.JobRunShell;
 import hunt.quartz.spi.TriggerFiredBundle;
 

@@ -28,7 +28,7 @@ module hunt.quartz.jobs.ee.jms.SendTopicMessageJob;
 // import hunt.quartz.Job;
 // import hunt.quartz.JobDataMap;
 // import hunt.quartz.JobExecutionContext;
-// import hunt.quartz.JobExecutionException;
+// import hunt.quartz.exception;
 
 // /**
 //  * <p>

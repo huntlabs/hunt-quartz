@@ -81,7 +81,7 @@ abstract class StringMatcher(T) : Matcher!(T) {
     protected string compareTo;
     protected StringOperatorName compareWith;
     
-    protected StringMatcher(string compareTo, StringOperatorName compareWith) {
+    protected this(string compareTo, StringOperatorName compareWith) {
         if(compareTo is null)
             throw new IllegalArgumentException("CompareTo value cannot be null!");
         if(compareWith is null)
@@ -110,8 +110,8 @@ abstract class StringMatcher(T) : Matcher!(T) {
     }
 
     override
-    bool equals(Object obj) {
-        if (this this obj)
+    bool opEquals(Object o) {
+        if (this is obj)
             return true;
         if (obj is null)
             return false;

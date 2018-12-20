@@ -26,7 +26,7 @@ module hunt.quartz.ee.servlet.QuartzInitializerServlet;
 // import javax.servlet.http.HttpServletResponse;
 
 // import hunt.quartz.Scheduler;
-// import hunt.quartz.SchedulerException;
+// import hunt.quartz.exception;
 // import hunt.quartz.impl.StdSchedulerFactory;
 
 // /**

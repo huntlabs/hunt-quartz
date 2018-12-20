@@ -18,6 +18,13 @@
 
 module hunt.quartz.Trigger;
 
+import hunt.quartz.JobKey;
+import hunt.quartz.JobDataMap;
+import hunt.quartz.ScheduleBuilder;
+import hunt.quartz.TriggerBuilder;
+import hunt.quartz.TriggerKey;
+
+import hunt.lang.common;
 import hunt.util.Comparator;
 import std.datetime;
 
@@ -53,40 +60,8 @@ import std.datetime;
  * 
  * @author James House
  */
-interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable, 
-
+interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,     
     
-    enum TriggerState { NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED }
-    
-    /**
-     * <p><code>NOOP</code> Instructs the <code>{@link Scheduler}</code> that the 
-     * <code>{@link Trigger}</code> has no further instructions.</p>
-     * 
-     * <p><code>RE_EXECUTE_JOB</code> Instructs the <code>{@link Scheduler}</code> that the 
-     * <code>{@link Trigger}</code> wants the <code>{@link hunt.quartz.JobDetail}</code> to 
-     * re-execute immediately. If not in a 'RECOVERING' or 'FAILED_OVER' situation, the
-     * execution context will be re-used (giving the <code>Job</code> the
-     * ability to 'see' anything placed in the context by its last execution).</p>
-     * 
-     * <p><code>SET_TRIGGER_COMPLETE</code> Instructs the <code>{@link Scheduler}</code> that the 
-     * <code>{@link Trigger}</code> should be put in the <code>COMPLETE</code> state.</p>
-     * 
-     * <p><code>DELETE_TRIGGER</code> Instructs the <code>{@link Scheduler}</code> that the 
-     * <code>{@link Trigger}</code> wants itself deleted.</p>
-     * 
-     * <p><code>SET_ALL_JOB_TRIGGERS_COMPLETE</code> Instructs the <code>{@link Scheduler}</code> 
-     * that all <code>Trigger</code>s referencing the same <code>{@link hunt.quartz.JobDetail}</code> 
-     * as this one should be put in the <code>COMPLETE</code> state.</p>
-     * 
-     * <p><code>SET_TRIGGER_ERROR</code> Instructs the <code>{@link Scheduler}</code> that all 
-     * <code>Trigger</code>s referencing the same <code>{@link hunt.quartz.JobDetail}</code> as
-     * this one should be put in the <code>ERROR</code> state.</p>
-     *
-     * <p><code>SET_ALL_JOB_TRIGGERS_ERROR</code> Instructs the <code>{@link Scheduler}</code> that 
-     * the <code>Trigger</code> should be put in the <code>ERROR</code> state.</p>
-     */
-    enum CompletedExecutionInstruction { NOOP, RE_EXECUTE_JOB, SET_TRIGGER_COMPLETE, DELETE_TRIGGER, 
-        SET_ALL_JOB_TRIGGERS_COMPLETE, SET_TRIGGER_ERROR, SET_ALL_JOB_TRIGGERS_ERROR }
 
     /**
      * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
@@ -280,47 +255,84 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      */
     int compareTo(Trigger other);
 
-    /**
-     * A Comparator that compares trigger's next fire times, or in other words,
-     * sorts them according to earliest next fire time.  If the fire times are
-     * the same, then the triggers are sorted according to priority (highest
-     * value first), if the priorities are the same, then they are sorted
-     * by key.
-     */
-    class TriggerTimeComparator : Comparator!(Trigger), Serializable {
-      
-        
-        // This static method exists for comparator in TC clustered quartz
-        static int compare(Date nextFireTime1, int priority1, TriggerKey key1, Date nextFireTime2, int priority2, TriggerKey key2) {
-            if (nextFireTime1 !is null || nextFireTime2 !is null) {
-                if (nextFireTime1 is null) {
-                    return 1;
-                }
-
-                if (nextFireTime2 is null) {
-                    return -1;
-                }
-
-                if(nextFireTime1.before(nextFireTime2)) {
-                    return -1;
-                }
-
-                if(nextFireTime1.after(nextFireTime2)) {
-                    return 1;
-                }
-            }
-
-            int comp = priority2 - priority1;
-            if (comp != 0) {
-                return comp;
-            }
-
-            return key1.compareTo(key2);
-        }
-
-
-        int compare(Trigger t1, Trigger t2) {
-            return compare(t1.getNextFireTime(), t1.getPriority(), t1.getKey(), t2.getNextFireTime(), t2.getPriority(), t2.getKey());
-        }
-    }
 }
+
+
+enum TriggerState { NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED }
+
+/**
+ * <p><code>NOOP</code> Instructs the <code>{@link Scheduler}</code> that the 
+ * <code>{@link Trigger}</code> has no further instructions.</p>
+ * 
+ * <p><code>RE_EXECUTE_JOB</code> Instructs the <code>{@link Scheduler}</code> that the 
+ * <code>{@link Trigger}</code> wants the <code>{@link hunt.quartz.JobDetail}</code> to 
+ * re-execute immediately. If not in a 'RECOVERING' or 'FAILED_OVER' situation, the
+ * execution context will be re-used (giving the <code>Job</code> the
+ * ability to 'see' anything placed in the context by its last execution).</p>
+ * 
+ * <p><code>SET_TRIGGER_COMPLETE</code> Instructs the <code>{@link Scheduler}</code> that the 
+ * <code>{@link Trigger}</code> should be put in the <code>COMPLETE</code> state.</p>
+ * 
+ * <p><code>DELETE_TRIGGER</code> Instructs the <code>{@link Scheduler}</code> that the 
+ * <code>{@link Trigger}</code> wants itself deleted.</p>
+ * 
+ * <p><code>SET_ALL_JOB_TRIGGERS_COMPLETE</code> Instructs the <code>{@link Scheduler}</code> 
+ * that all <code>Trigger</code>s referencing the same <code>{@link hunt.quartz.JobDetail}</code> 
+ * as this one should be put in the <code>COMPLETE</code> state.</p>
+ * 
+ * <p><code>SET_TRIGGER_ERROR</code> Instructs the <code>{@link Scheduler}</code> that all 
+ * <code>Trigger</code>s referencing the same <code>{@link hunt.quartz.JobDetail}</code> as
+ * this one should be put in the <code>ERROR</code> state.</p>
+ *
+ * <p><code>SET_ALL_JOB_TRIGGERS_ERROR</code> Instructs the <code>{@link Scheduler}</code> that 
+ * the <code>Trigger</code> should be put in the <code>ERROR</code> state.</p>
+ */
+enum CompletedExecutionInstruction { NOOP, RE_EXECUTE_JOB, SET_TRIGGER_COMPLETE, DELETE_TRIGGER, 
+    SET_ALL_JOB_TRIGGERS_COMPLETE, SET_TRIGGER_ERROR, SET_ALL_JOB_TRIGGERS_ERROR }
+
+
+/**
+ * A Comparator that compares trigger's next fire times, or in other words,
+ * sorts them according to earliest next fire time.  If the fire times are
+ * the same, then the triggers are sorted according to priority (highest
+ * value first), if the priorities are the same, then they are sorted
+ * by key.
+ */
+class TriggerTimeComparator : Comparator!(Trigger) {
+  
+    
+    // This static method exists for comparator in TC clustered quartz
+    static int compare(Date nextFireTime1, int priority1, TriggerKey key1, 
+        Date nextFireTime2, int priority2, TriggerKey key2) {
+        if (nextFireTime1 !is null || nextFireTime2 !is null) {
+            if (nextFireTime1 is null) {
+                return 1;
+            }
+
+            if (nextFireTime2 is null) {
+                return -1;
+            }
+
+            if(nextFireTime1.before(nextFireTime2)) {
+                return -1;
+            }
+
+            if(nextFireTime1.after(nextFireTime2)) {
+                return 1;
+            }
+        }
+
+        int comp = priority2 - priority1;
+        if (comp != 0) {
+            return comp;
+        }
+
+        return key1.compareTo(key2);
+    }
+
+
+    int compare(Trigger t1, Trigger t2) {
+        return compare(t1.getNextFireTime(), t1.getPriority(), t1.getKey(), 
+            t2.getNextFireTime(), t2.getPriority(), t2.getKey());
+    }
+}    

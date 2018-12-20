@@ -16,7 +16,7 @@
 
 module hunt.quartz.utils.counter.sampled.SampledCounterImpl;
 
-import java.util.TimerTask;
+// import java.util.TimerTask;
 
 import hunt.quartz.utils.CircularLossyQueue;
 import hunt.quartz.utils.counter.CounterImpl;
@@ -36,14 +36,14 @@ class SampledCounterImpl : CounterImpl, SampledCounter {
     /**
      * The history of this counter
      */
-    protected final CircularLossyQueue!(TimeStampedCounterValue) history;
+    protected CircularLossyQueue!(TimeStampedCounterValue) history;
 
     /**
      * Should the counter reset on each sample?
      */
-    protected final bool resetOnSample;
-    private final TimerTask samplerTask;
-    private final long intervalMillis;
+    protected bool resetOnSample;
+    // private TimerTask samplerTask;
+    private long intervalMillis;
 
     /**
      * Constructor accepting a {@link SampledCounterConfig}
@@ -57,12 +57,14 @@ class SampledCounterImpl : CounterImpl, SampledCounter {
         this.history = new CircularLossyQueue!(TimeStampedCounterValue)(config.getHistorySize());
         this.resetOnSample = config.isResetOnSample();
 
-        this.samplerTask = new TimerTask() {
-            override
-            void run() {
-                recordSample();
-            }
-        };
+// TODO: Tasks pending completion -@zxp at 12/20/2018, 10:23:57 AM
+// 
+        // this.samplerTask = new TimerTask() {
+        //     override
+        //     void run() {
+        //         recordSample();
+        //     }
+        // };
 
         recordSample();
     }
@@ -85,9 +87,9 @@ class SampledCounterImpl : CounterImpl, SampledCounter {
      * {@inheritDoc}
      */
     void shutdown() {
-        if (samplerTask !is null) {
-            samplerTask.cancel();
-        }
+        // if (samplerTask !is null) {
+        //     samplerTask.cancel();
+        // }
     }
 
     /**
@@ -95,9 +97,9 @@ class SampledCounterImpl : CounterImpl, SampledCounter {
      * 
      * @return the timer task for this sampled counter
      */
-    TimerTask getTimerTask() {
-        return this.samplerTask;
-    }
+    // TimerTask getTimerTask() {
+    //     return this.samplerTask;
+    // }
 
     /**
      * Returns the sampling thread interval in millis
@@ -112,14 +114,14 @@ class SampledCounterImpl : CounterImpl, SampledCounter {
      * {@inheritDoc}
      */
     void recordSample() {
-        final long sample;
+        long sample;
         if (resetOnSample) {
             sample = getAndReset();
         } else {
             sample = getValue();
         }
 
-        final long now = DateTimeHelper.currentTimeMillis();
+        long now = DateTimeHelper.currentTimeMillis();
         TimeStampedCounterValue timedSample = new TimeStampedCounterValue(now, sample);
 
         history.push(timedSample);

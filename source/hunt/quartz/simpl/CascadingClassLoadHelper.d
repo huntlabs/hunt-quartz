@@ -21,6 +21,7 @@ import hunt.container.Iterator;
 import hunt.container.LinkedList;
 
 // import java.net.URL;
+import hunt.lang.exception;
 import hunt.io.common;
 
 import hunt.quartz.spi.ClassLoadHelper;
@@ -95,48 +96,51 @@ class CascadingClassLoadHelper : ClassLoadHelper {
      */
     TypeInfo_Class loadClass(string name) {
 
-        if (bestCandidate !is null) {
-            try {
-                return bestCandidate.loadClass(name);
-            } catch (Throwable t) {
-                bestCandidate = null;
-            }
-        }
+        implementationMissing(false);
+        return null;
 
-        Throwable throwable = null;
-        TypeInfo_Class clazz = null;
-        ClassLoadHelper loadHelper = null;
+        // if (bestCandidate !is null) {
+        //     try {
+        //         return bestCandidate.loadClass(name);
+        //     } catch (Throwable t) {
+        //         bestCandidate = null;
+        //     }
+        // }
 
-        Iterator!(ClassLoadHelper) iter = loadHelpers.iterator();
-        while (iter.hasNext()) {
-            loadHelper = iter.next();
+        // Throwable throwable = null;
+        // TypeInfo_Class clazz = null;
+        // ClassLoadHelper loadHelper = null;
 
-            try {
-                clazz = loadHelper.loadClass(name);
-                break;
-            } catch (Throwable t) {
-                throwable = t;
-            }
-        }
+        // Iterator!(ClassLoadHelper) iter = loadHelpers.iterator();
+        // while (iter.hasNext()) {
+        //     loadHelper = iter.next();
 
-        if (clazz is null) {
-            if (throwable instanceof ClassNotFoundException) {
-                throw (ClassNotFoundException)throwable;
-            } 
-            else {
-                throw new ClassNotFoundException( string.format( "Unable to load class %s by any known loaders.", name), throwable);
-            } 
-        }
+        //     try {
+        //         clazz = loadHelper.loadClass(name);
+        //         break;
+        //     } catch (Throwable t) {
+        //         throwable = t;
+        //     }
+        // }
 
-        bestCandidate = loadHelper;
+        // if (clazz is null) {
+        //     if (throwable instanceof ClassNotFoundException) {
+        //         throw (ClassNotFoundException)throwable;
+        //     } 
+        //     else {
+        //         throw new ClassNotFoundException( string.format( "Unable to load class %s by any known loaders.", name), throwable);
+        //     } 
+        // }
 
-        return clazz;
+        // bestCandidate = loadHelper;
+
+        // return clazz;
     }
 
     
-    <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
-        return (Class<? extends T>) loadClass(name);
-    }
+    // <T> Class<? extends T> loadClass(string name, Class!(T) clazz) {
+    //     return (Class<? extends T>) loadClass(name);
+    // }
     
     /**
      * Finds a resource with a given name. This method returns null if no
@@ -144,35 +148,35 @@ class CascadingClassLoadHelper : ClassLoadHelper {
      * @param name name of the desired resource
      * @return a java.net.URL object
      */
-    URL getResource(string name) {
+    // URL getResource(string name) {
 
-        URL result = null;
+    //     URL result = null;
 
-        if (bestCandidate !is null) {
-            result = bestCandidate.getResource(name);
-            if(result is null) {
-              bestCandidate = null;
-            }
-            else {
-                return result;
-            }
-        }
+    //     if (bestCandidate !is null) {
+    //         result = bestCandidate.getResource(name);
+    //         if(result is null) {
+    //           bestCandidate = null;
+    //         }
+    //         else {
+    //             return result;
+    //         }
+    //     }
 
-        ClassLoadHelper loadHelper = null;
+    //     ClassLoadHelper loadHelper = null;
 
-        Iterator!(ClassLoadHelper) iter = loadHelpers.iterator();
-        while (iter.hasNext()) {
-            loadHelper = iter.next();
+    //     Iterator!(ClassLoadHelper) iter = loadHelpers.iterator();
+    //     while (iter.hasNext()) {
+    //         loadHelper = iter.next();
 
-            result = loadHelper.getResource(name);
-            if (result !is null) {
-                break;
-            }
-        }
+    //         result = loadHelper.getResource(name);
+    //         if (result !is null) {
+    //             break;
+    //         }
+    //     }
 
-        bestCandidate = loadHelper;
-        return result;
-    }
+    //     bestCandidate = loadHelper;
+    //     return result;
+    // }
 
     /**
      * Finds a resource with a given name. This method returns null if no
@@ -180,45 +184,45 @@ class CascadingClassLoadHelper : ClassLoadHelper {
      * @param name name of the desired resource
      * @return a java.io.InputStream object
      */
-    InputStream getResourceAsStream(string name) {
+    // InputStream getResourceAsStream(string name) {
 
-        InputStream result = null;
+    //     InputStream result = null;
 
-        if (bestCandidate !is null) {
-            result = bestCandidate.getResourceAsStream(name);
-            if(result is null) {
-                bestCandidate = null;
-            }
-            else {
-                return result;
-            }
-        }
+    //     if (bestCandidate !is null) {
+    //         result = bestCandidate.getResourceAsStream(name);
+    //         if(result is null) {
+    //             bestCandidate = null;
+    //         }
+    //         else {
+    //             return result;
+    //         }
+    //     }
 
-        ClassLoadHelper loadHelper = null;
+    //     ClassLoadHelper loadHelper = null;
 
-        Iterator!(ClassLoadHelper) iter = loadHelpers.iterator();
-        while (iter.hasNext()) {
-            loadHelper = iter.next();
+    //     Iterator!(ClassLoadHelper) iter = loadHelpers.iterator();
+    //     while (iter.hasNext()) {
+    //         loadHelper = iter.next();
 
-            result = loadHelper.getResourceAsStream(name);
-            if (result !is null) {
-                break;
-            }
-        }
+    //         result = loadHelper.getResourceAsStream(name);
+    //         if (result !is null) {
+    //             break;
+    //         }
+    //     }
 
-        bestCandidate = loadHelper;
-        return result;
-    }
+    //     bestCandidate = loadHelper;
+    //     return result;
+    // }
 
     /**
      * Enable sharing of the "best" class-loader with 3rd party.
      *
      * @return the class-loader user be the helper.
      */
-    ClassLoader getClassLoader() {
-        return (this.bestCandidate is null) ?
-                Thread.getThis().getContextClassLoader() :
-                this.bestCandidate.getClassLoader();
-    }
+    // ClassLoader getClassLoader() {
+    //     return (this.bestCandidate is null) ?
+    //             Thread.getThis().getContextClassLoader() :
+    //             this.bestCandidate.getClassLoader();
+    // }
 
 }

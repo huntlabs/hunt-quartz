@@ -18,7 +18,7 @@ module hunt.quartz.utils.counter.CounterManagerImpl;
 
 import hunt.container.ArrayList;
 import hunt.container.List;
-import java.util.Timer;
+import hunt.util.timer;
 
 import hunt.quartz.utils.counter.sampled.SampledCounter;
 import hunt.quartz.utils.counter.sampled.SampledCounterImpl;
@@ -58,8 +58,9 @@ class CounterManagerImpl : CounterManager {
         try {
             // shutdown the counters of this counterManager
             foreach(Counter counter ; counters) {
-                if (counter instanceof SampledCounter) {
-                    ((SampledCounter) counter).shutdown();
+                SampledCounter sc = cast(SampledCounter) counter;
+                if (sc !is null) {
+                    sc.shutdown();
                 }
             }
             if(killTimer)

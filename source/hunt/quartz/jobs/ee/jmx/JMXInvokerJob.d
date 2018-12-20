@@ -30,7 +30,7 @@ module hunt.quartz.jobs.ee.jmx.JMXInvokerJob;
 // import hunt.quartz.Job;
 // import hunt.quartz.JobDataMap;
 // import hunt.quartz.JobExecutionContext;
-// import hunt.quartz.JobExecutionException;
+// import hunt.quartz.exception;
 
 
 // /**
@@ -90,7 +90,7 @@ module hunt.quartz.jobs.ee.jmx.JMXInvokerJob;
 //                     for(int k=0;k<paramdefs.length;k++) {
 //                         string parts[]=  split(paramdefs[k], ":");
 //                         if (parts.length<2) {
-//                             throw new Exception("Invalid parameter definition: required parts missing "+paramdefs[k]);
+//                             throw new Exception("Invalid parameter definition: required parts missing " ~paramdefs[k]);
 //                         }
 //                         switch(parts[0].charAt(0)) {
 //                             case 'i':

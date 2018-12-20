@@ -60,7 +60,7 @@ class NotMatcher(T) : Matcher!(T) {
     }
 
     override
-    bool equals(Object obj) {
+    bool opEquals(Object o) {
         if (this == obj)
             return true;
         if (obj is null)

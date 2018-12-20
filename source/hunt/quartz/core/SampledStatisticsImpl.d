@@ -1,10 +1,10 @@
 module hunt.quartz.core.SampledStatisticsImpl;
 
-import java.util.Timer;
+import hunt.util.timer;
 
 import hunt.quartz.JobDetail;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.JobListener;
 import hunt.quartz.SchedulerListener;
 import hunt.quartz.Trigger;
@@ -41,7 +41,7 @@ class SampledStatisticsImpl : SchedulerListenerSupport, SampledStatistics, JobLi
     this(QuartzScheduler scheduler) {
         this.scheduler = scheduler;
         
-        counterManager = new CounterManagerImpl(new Timer(NAME+"Timer"));
+        counterManager = new CounterManagerImpl(new Timer(NAME ~ "Timer"));
         jobsScheduledCount = createSampledCounter(DEFAULT_SAMPLED_COUNTER_CONFIG);
         jobsExecutingCount = createSampledCounter(DEFAULT_SAMPLED_COUNTER_CONFIG);
         jobsCompletedCount = createSampledCounter(DEFAULT_SAMPLED_COUNTER_CONFIG);

@@ -18,6 +18,8 @@
 
 module hunt.quartz.StatefulJob;
 
+import hunt.quartz.Job;
+
 /**
  * A marker interface for <code>{@link hunt.quartz.JobDetail}</code> s that
  * wish to have their state maintained between executions.

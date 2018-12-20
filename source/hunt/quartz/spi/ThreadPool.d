@@ -17,7 +17,7 @@
 
 module hunt.quartz.spi.ThreadPool;
 
-import hunt.quartz.SchedulerConfigException;
+import hunt.quartz.exception;
 
 /**
  * <p>

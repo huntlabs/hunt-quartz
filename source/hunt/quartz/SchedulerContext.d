@@ -37,7 +37,7 @@ import hunt.quartz.utils.StringKeyDirtyFlagMap;
  * 
  * @author James House
  */
-class SchedulerContext : StringKeyDirtyFlagMap, Serializable {
+class SchedulerContext : StringKeyDirtyFlagMap {
   
   
     /**

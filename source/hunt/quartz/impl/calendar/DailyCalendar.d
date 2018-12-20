@@ -537,7 +537,7 @@ class DailyCalendar : BaseCalendar {
                         getTimeRangeEndingTimeInMillis(nextIncludedTime)) {
                     //(move to start of next day)
                     nextIncludedTime = getEndOfDayJavaCalendar(nextIncludedTime).getTime().getTime();
-                    nextIncludedTime += 1l; 
+                    nextIncludedTime++; 
                 } else if ((getBaseCalendar() !is null) && 
                         (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
                     nextIncludedTime = 
@@ -659,7 +659,7 @@ class DailyCalendar : BaseCalendar {
             result.add(stringTokenizer.nextToken());
         }
         
-        return (string[])result.toArray(new string[result.size()]);
+        return result.toArray();
     }
     
     /**

@@ -35,7 +35,7 @@ module hunt.quartz.jobs.ee.mail.SendMailJob;
 // import hunt.quartz.Job;
 // import hunt.quartz.JobDataMap;
 // import hunt.quartz.JobExecutionContext;
-// import hunt.quartz.JobExecutionException;
+// import hunt.quartz.exception;
 
 // /**
 //  * <p>
@@ -220,7 +220,7 @@ module hunt.quartz.jobs.ee.mail.SendMailJob;
         
 //         // extra mail.smtp. properties from user
 //         Properties smtpProperties = new Properties();
-//         for (string key : data.keySet()) {
+//         foreach(string key ; data.keySet()) {
 //             if (key.startsWith("mail.smtp.")) {
 //                 smtpProperties.put(key, data.getString(key));
 //             }

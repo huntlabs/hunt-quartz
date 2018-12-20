@@ -21,7 +21,7 @@ import hunt.logging;
 import hunt.quartz.Job;
 import hunt.quartz.JobDetail;
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.spi.JobFactory;
 import hunt.quartz.spi.TriggerFiredBundle;
 
@@ -35,13 +35,11 @@ import hunt.quartz.spi.TriggerFiredBundle;
  * @author jhouse
  */
 class SimpleJobFactory : JobFactory {
-
-    
     
     Job newJob(TriggerFiredBundle bundle, Scheduler Scheduler) {
 
         JobDetail jobDetail = bundle.getJobDetail();
-        Class<? extends Job> jobClass = jobDetail.getJobClass();
+        TypeInfo_Class jobClass = jobDetail.getJobClass();
         try {
             if(log.isDebugEnabled()) {
                 trace("Producing instance of Job '" ~ jobDetail.getKey().toString() ~ 

@@ -17,10 +17,21 @@
 
 module hunt.quartz.TriggerBuilder;
 
+import hunt.quartz.JobDetail;
+import hunt.quartz.JobDataMap;
+import hunt.quartz.JobKey;
 import hunt.quartz.ScheduleBuilder;
+import hunt.quartz.Trigger;
+import hunt.quartz.TriggerKey;
 
 import hunt.quartz.spi.MutableTrigger;
 import hunt.quartz.utils.Key;
+
+import hunt.lang.Boolean;
+import hunt.lang.Double;
+import hunt.lang.Float;
+import hunt.lang.Integer;
+import hunt.lang.Long;
 
 import std.datetime;
 
@@ -67,17 +78,17 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
 
     private TriggerKey key;
     private string description;
-    private Date startTime = new Date();
+    private Date startTime; // = new Date();
     private Date endTime;
     private int priority = Trigger.DEFAULT_PRIORITY;
     private string calendarName;
     private JobKey jobKey;
-    private JobDataMap jobDataMap = new JobDataMap();
+    private JobDataMap jobDataMap;
     
     private ScheduleBuilder scheduleBuilder = null;
     
     private this() {
-        
+        jobDataMap = new JobDataMap();
     }
     
     /**

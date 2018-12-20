@@ -29,7 +29,7 @@ class AndMatcher(T) : Matcher!(T) {
     protected Matcher!(T) leftOperand;
     protected Matcher!(T) rightOperand;
     
-    protected AndMatcher(Matcher!(T) leftOperand, Matcher!(T) rightOperand) {
+    protected this(Matcher!(T) leftOperand, Matcher!(T) rightOperand) {
         if(leftOperand is null || rightOperand is null)
             throw new IllegalArgumentException("Two non-null operands required!");
         
@@ -68,7 +68,7 @@ class AndMatcher(T) : Matcher!(T) {
     }
 
     override
-    bool equals(Object obj) {
+    bool opEquals(Object o) {
         if (this == obj)
             return true;
         if (obj is null)

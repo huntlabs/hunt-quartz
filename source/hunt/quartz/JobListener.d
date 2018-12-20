@@ -18,6 +18,9 @@
 
 module hunt.quartz.JobListener;
 
+import hunt.quartz.exception;
+import hunt.quartz.JobExecutionContext;
+
 /**
  * The interface to be implemented by classes that want to be informed when a
  * <code>{@link hunt.quartz.JobDetail}</code> executes. In general,

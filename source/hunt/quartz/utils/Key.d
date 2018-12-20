@@ -126,7 +126,7 @@ class Key(T) : Comparable!(Key!(T)), IKey {
     }
 
     override
-    bool equals(Object obj) {
+    bool opEquals(Object o) {
         if (this is obj)
             return true;
         if (obj is null)

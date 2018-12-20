@@ -153,7 +153,7 @@ class TimeOfDay {
     }
 
     override
-    bool equals(Object obj) {
+    bool opEquals(Object o) {
         TimeOfDay other = cast(TimeOfDay)obj;
         if(other is null)
             return false;

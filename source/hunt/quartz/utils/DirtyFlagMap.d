@@ -17,12 +17,14 @@
 
 module hunt.quartz.utils.DirtyFlagMap;
 
+// import hunt.quartz.utils.DirtyFlagIterator;
+
 // import java.lang.reflect.Array;
 import hunt.container.Collection;
 import hunt.container.HashMap;
 import hunt.container.Iterator;
 import hunt.container.Map;
-import hunt.comtainer.Set;
+import hunt.container.Set;
 
 /**
  * <p>
@@ -143,7 +145,7 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
     // }
 
     // override
-    // bool equals(Object obj) {
+    // bool opEquals(Object o) {
     //     if (obj is null || !(obj instanceof DirtyFlagMap)) {
     //         return false;
     //     }
@@ -296,31 +298,31 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
      * Wrap an Iterator so that we can mark the DirtyFlagMap as dirty if an
      * element is removed.
      */
-    // private class DirtyFlagIterator(T) : Iterator!(T) {
-    //     private Iterator!(T) iterator;
+    private class DirtyFlagIterator(T) : Iterator!(T) {
+        private Iterator!(T) iterator;
 
-    //     this(Iterator!(T) iterator) {
-    //         this.iterator = iterator;
-    //     }
+        this(Iterator!(T) iterator) {
+            this.iterator = iterator;
+        }
 
-    //     void remove() {
-    //         dirty = true;
-    //         iterator.remove();
-    //     }
+        void remove() {
+            dirty = true;
+            iterator.remove();
+        }
 
-    //     // Pure wrapper methods
-    //     bool hasNext() { return iterator.hasNext(); }
-    //     T next() { return iterator.next(); }
-    // }
+        // Pure wrapper methods
+        bool hasNext() { return iterator.hasNext(); }
+        T next() { return iterator.next(); }
+    }
 
     /**
      * Wrap a MapEntry Set so we can mark the Map as dirty if
      * the Set is modified, and return MapEntry objects
      * wrapped in the <code>DirtyFlagMapEntry</code> class.
      */
-    private class DirtyFlagMapEntrySet : DirtyFlagSet(MapEntry!(K,V)) {
+    private class DirtyFlagMapEntrySet : DirtyFlagSet!(MapEntry!(K,V)) {
 
-        this(Set!MapEntry!(K,V)) set) {
+        this(Set!(MapEntry!(K,V)) set) {
             super(set);
         }
 

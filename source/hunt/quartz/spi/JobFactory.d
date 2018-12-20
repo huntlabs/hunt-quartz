@@ -16,9 +16,11 @@
  */
 module hunt.quartz.spi.JobFactory;
 
+import hunt.quartz.spi.TriggerFiredBundle;
+
 import hunt.quartz.Job;
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 
 /**
  * <p>

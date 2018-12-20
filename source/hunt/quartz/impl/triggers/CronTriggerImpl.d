@@ -25,7 +25,7 @@ import hunt.quartz.CronExpression;
 import hunt.quartz.CronScheduleBuilder;
 import hunt.quartz.CronTrigger;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.Scheduler;
 import hunt.quartz.Trigger;
@@ -524,7 +524,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         }
 
         if (getStartTime().after(afterTime)) {
-            afterTime = new Date(getStartTime().getTime() - 1000l);
+            afterTime = new Date(getStartTime().getTime() - 1000);
         }
 
         if (getEndTime() !is null && (afterTime.compareTo(getEndTime()) >= 0)) {
@@ -554,7 +554,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     Date getFinalFireTime() {
         Date resultTime;
         if (getEndTime() !is null) {
-            resultTime = getTimeBefore(new Date(getEndTime().getTime() + 1000l));
+            resultTime = getTimeBefore(new Date(getEndTime().getTime() + 1000));
         } else {
             resultTime = (cronEx is null) ? null : cronEx.getFinalFireTime();
         }
@@ -657,7 +657,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
     bool willFireOn(Calendar test, bool dayOnly) {
 
-        test = (Calendar) test.clone();
+        test = cast(Calendar) test.clone();
         
         test.set(Calendar.MILLISECOND, 0); // don't compare millis.
         
@@ -772,7 +772,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
     override
     Date computeFirstFireTime(hunt.quartz.Calendar calendar) {
-        nextFireTime = getFireTimeAfter(new Date(getStartTime().getTime() - 1000l));
+        nextFireTime = getFireTimeAfter(new Date(getStartTime().getTime() - 1000));
 
         while (nextFireTime !is null && calendar !is null
                 && !calendar.isTimeIncluded(nextFireTime.getTime())) {

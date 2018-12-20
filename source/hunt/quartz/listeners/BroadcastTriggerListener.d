@@ -22,7 +22,7 @@ import hunt.container.List;
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerListener;
-import hunt.quartz.Trigger.CompletedExecutionInstruction;
+import hunt.quartz.Trigger : CompletedExecutionInstruction;
 
 /**
  * Holds a List of references to TriggerListener instances and broadcasts all

@@ -16,9 +16,9 @@
  */
 module hunt.quartz.simpl.SimpleInstanceIdGenerator;
 
-import java.net.InetAddress;
+// import java.net.InetAddress;
 
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.spi.InstanceIdGenerator;
 
 import std.conv;

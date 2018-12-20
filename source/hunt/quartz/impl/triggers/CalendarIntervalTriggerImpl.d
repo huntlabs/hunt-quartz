@@ -18,22 +18,26 @@
 
 module hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 
+import hunt.quartz.impl.triggers.CoreTrigger;
 
+import hunt.quartz.Calendar;
 import hunt.quartz.CalendarIntervalScheduleBuilder;
 import hunt.quartz.CalendarIntervalTrigger;
 import hunt.quartz.CronTrigger;
-import hunt.quartz.DateBuilder.IntervalUnit;
+import hunt.quartz.DateBuilder : IntervalUnit;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.SimpleTrigger;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerUtils;
 
 import hunt.time.util.Calendar;
 import std.datetime;
+
+alias QuartzCalendar = hunt.quartz.Calendar.Calendar;
 
 /**
  * <p>A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>
@@ -466,7 +470,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      */
     override
-    void updateAfterMisfire(hunt.quartz.Calendar cal) {
+    void updateAfterMisfire(QuartzCalendar cal) {
         int instr = getMisfireInstruction();
 
         if(instr == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY)
@@ -504,7 +508,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * @see #executionComplete(JobExecutionContext, JobExecutionException)
      */
     override
-    void triggered(hunt.quartz.Calendar calendar) {
+    void triggered(QuartzCalendar calendar) {
         timesTriggered++;
         previousFireTime = nextFireTime;
         nextFireTime = getFireTimeAfter(nextFireTime);
@@ -529,10 +533,10 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
 
     /**
      *  
-     * @see hunt.quartz.spi.OperableTrigger#updateWithNewCalendar(hunt.quartz.Calendar, long)
+     * @see hunt.quartz.spi.OperableTrigger#updateWithNewCalendar(QuartzCalendar, long)
      */
     override
-    void updateWithNewCalendar(hunt.quartz.Calendar calendar, long misfireThreshold)
+    void updateWithNewCalendar(QuartzCalendar calendar, long misfireThreshold)
     {
         nextFireTime = getFireTimeAfter(previousFireTime);
 
@@ -582,7 +586,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      *         </p>
      */
     override
-    Date computeFirstFireTime(hunt.quartz.Calendar calendar) {
+    Date computeFirstFireTime(QuartzCalendar calendar) {
         nextFireTime = getStartTime();
 
         while (nextFireTime !is null && calendar !is null
@@ -715,21 +719,21 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
             long jumpCount = secondsAfterStart / repeatLong;
             if(secondsAfterStart % repeatLong != 0)
                 jumpCount++;
-            sTime.add(Calendar.SECOND, getRepeatInterval() * (int)jumpCount);
+            sTime.add(Calendar.SECOND, getRepeatInterval() * cast(int)jumpCount);
             time = sTime.getTime();
         }
         else if(getRepeatIntervalUnit()== IntervalUnit.MINUTE) {
             long jumpCount = secondsAfterStart / (repeatLong * 60L);
             if(secondsAfterStart % (repeatLong * 60L) != 0)
                 jumpCount++;
-            sTime.add(Calendar.MINUTE, getRepeatInterval() * (int)jumpCount);
+            sTime.add(Calendar.MINUTE, getRepeatInterval() * cast(int)jumpCount);
             time = sTime.getTime();
         }
         else if(getRepeatIntervalUnit()== IntervalUnit.HOUR) {
             long jumpCount = secondsAfterStart / (repeatLong * 60L * 60L);
             if(secondsAfterStart % (repeatLong * 60L * 60L) != 0)
                 jumpCount++;
-            sTime.add(Calendar.HOUR_OF_DAY, getRepeatInterval() * (int)jumpCount);
+            sTime.add(Calendar.HOUR_OF_DAY, getRepeatInterval() * cast(int)jumpCount);
             time = sTime.getTime();
         }
         else { // intervals a day or greater ...
@@ -753,12 +757,12 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
                 // but not all the way because in some cases we may over-shoot or under-shoot
                 if(jumpCount > 20) {
                     if(jumpCount < 50)
-                        jumpCount = (long) (jumpCount * 0.80);
+                        jumpCount = cast(long) (jumpCount * 0.80);
                     else if(jumpCount < 500)
-                        jumpCount = (long) (jumpCount * 0.90);
+                        jumpCount = cast(long) (jumpCount * 0.90);
                     else
-                        jumpCount = (long) (jumpCount * 0.95);
-                    sTime.add(hunt.time.util.Calendar.DAY_OF_YEAR, (int) (getRepeatInterval() * jumpCount));
+                        jumpCount = cast(long) (jumpCount * 0.95);
+                    sTime.add(hunt.time.util.Calendar.DAY_OF_YEAR, cast(int) (getRepeatInterval() * jumpCount));
                 }
                 
                 // now baby-step the rest of the way there...
@@ -789,12 +793,12 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
                 // but not all the way because in some cases we may over-shoot or under-shoot
                 if(jumpCount > 20) {
                     if(jumpCount < 50)
-                        jumpCount = (long) (jumpCount * 0.80);
+                        jumpCount = cast(long) (jumpCount * 0.80);
                     else if(jumpCount < 500)
-                        jumpCount = (long) (jumpCount * 0.90);
+                        jumpCount = cast(long) (jumpCount * 0.90);
                     else
-                        jumpCount = (long) (jumpCount * 0.95);
-                    sTime.add(hunt.time.util.Calendar.WEEK_OF_YEAR, (int) (getRepeatInterval() * jumpCount));
+                        jumpCount = cast(long) (jumpCount * 0.95);
+                    sTime.add(hunt.time.util.Calendar.WEEK_OF_YEAR, cast(int) (getRepeatInterval() * jumpCount));
                 }
                 
                 while(!sTime.getTime().after(afterTime) &&

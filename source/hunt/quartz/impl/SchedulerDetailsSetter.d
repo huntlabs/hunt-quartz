@@ -21,7 +21,7 @@ module hunt.quartz.impl.SchedulerDetailsSetter;
 
 // import hunt.logging;
 
-// import hunt.quartz.SchedulerException;
+// import hunt.quartz.exception;
 
 // /**
 //  * This utility calls methods reflectively on the given objects even though the

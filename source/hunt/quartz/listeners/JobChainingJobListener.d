@@ -19,9 +19,9 @@ import hunt.container.HashMap;
 import hunt.container.Map;
 
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.JobKey;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 
 /**
  * Keeps a collection of mappings of which Job to trigger after the completion

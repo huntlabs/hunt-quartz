@@ -19,8 +19,8 @@ module hunt.quartz.spi.TimeBroker;
 
 import std.datetime;
 
-import hunt.quartz.SchedulerConfigException;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
+import hunt.quartz.exception;
 
 /**
  * <p>NOTE: TimeBroker is not currently used in the Quartz code base.</p>

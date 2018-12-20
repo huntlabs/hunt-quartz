@@ -18,7 +18,8 @@
 
 module hunt.quartz.TriggerListener;
 
-import hunt.quartz.Trigger.CompletedExecutionInstruction;
+import hunt.quartz.JobExecutionContext;
+import hunt.quartz.Trigger;
 
 /**
  * The interface to be implemented by classes that want to be informed when a

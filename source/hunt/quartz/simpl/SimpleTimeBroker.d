@@ -19,7 +19,7 @@ module hunt.quartz.simpl.SimpleTimeBroker;
 
 import std.datetime;
 
-import hunt.quartz.SchedulerConfigException;
+import hunt.quartz.exception;
 import hunt.quartz.spi.TimeBroker;
 
 /**

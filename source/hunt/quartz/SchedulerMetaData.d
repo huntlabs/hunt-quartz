@@ -48,7 +48,7 @@ class SchedulerMetaData {
 
     private bool started;
 
-    private bool isInStandbyMode;
+    private bool _isInStandbyMode;
 
     private bool shutdown;
 
@@ -86,7 +86,7 @@ class SchedulerMetaData {
         this.schedClass = schedClass;
         this.isRemote = isRemote;
         this.started = started;
-        this.isInStandbyMode = isInStandbyMode;
+        this._isInStandbyMode = isInStandbyMode;
         this.shutdown = shutdown;
         this.startTime = startTime;
         this.numJobsExec = numJobsExec;
@@ -182,7 +182,7 @@ class SchedulerMetaData {
      * Reports whether the <code>Scheduler</code> is in standby mode.
      */
     bool isInStandbyMode() {
-        return isInStandbyMode;
+        return _isInStandbyMode;
     }
 
     /**
@@ -313,7 +313,7 @@ class SchedulerMetaData {
             }
             str.append("\n");
 
-            if (isInStandbyMode()) {
+            if (_isInStandbyMode()) {
                 str.append("  Currently in standby mode.");
             } else {
                 str.append("  Not currently in standby mode.");

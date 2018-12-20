@@ -17,10 +17,11 @@
 
 module hunt.quartz.CalendarIntervalTrigger;
 
+import hunt.quartz.DateBuilder : IntervalUnit;
+import hunt.quartz.Trigger;
+
 import hunt.time.util.Calendar;
 import std.datetime : TimeZone;
-
-import hunt.quartz.DateBuilder.IntervalUnit;
 
 /**
  * A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>

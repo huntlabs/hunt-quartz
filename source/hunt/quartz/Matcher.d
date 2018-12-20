@@ -33,5 +33,5 @@ interface Matcher(T) {
  
     size_t toHash() @trusted nothrow;
 
-    bool equals(Object obj);
+    bool opEquals(Object o);
 }

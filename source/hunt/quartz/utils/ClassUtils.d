@@ -34,7 +34,7 @@ module hunt.quartz.utils.ClassUtils;
 //     }
 
 //     private static bool isAnnotationPresentOnInterfaces(TypeInfo_Class clazz, Class<? extends Annotation> a) {
-//         for(TypeInfo_Class i : clazz.getInterfaces()) {
+//         foreach(TypeInfo_Class i ; clazz.getInterfaces()) {
 //             if( i.isAnnotationPresent(a) )
 //                 return true;
 //             if(isAnnotationPresentOnInterfaces(i, a))

@@ -56,7 +56,7 @@ module hunt.quartz.xml.XMLSchedulingDataProcessor;
 // import javax.xml.xpath.XPathFactory;
 
 // import hunt.quartz.*;
-// import hunt.quartz.DateBuilder.IntervalUnit;
+// import hunt.quartz.DateBuilder : IntervalUnit;
 // import hunt.quartz.impl.matchers.GroupMatcher;
 // import hunt.quartz.spi.ClassLoadHelper;
 // import hunt.quartz.spi.MutableTrigger;
@@ -900,9 +900,9 @@ module hunt.quartz.xml.XMLSchedulingDataProcessor;
 //         foreach(string group; jobGroupsToDelete) {
 //             if(group.equals("*")) {
 //                 info("Deleting all jobs in ALL groups.");
-//                 for (string groupName : scheduler.getJobGroupNames()) {
+//                 foreach(string groupName ; scheduler.getJobGroupNames()) {
 //                     if (!jobGroupsToNeverDelete.contains(groupName)) {
-//                         for (JobKey key : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+//                         foreach(JobKey key ; scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
 //                             scheduler.deleteJob(key);
 //                         }
 //                     }
@@ -911,7 +911,7 @@ module hunt.quartz.xml.XMLSchedulingDataProcessor;
 //             else {
 //                 if(!jobGroupsToNeverDelete.contains(group)) {
 //                     info("Deleting all jobs in group: {}", group);
-//                     for (JobKey key : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(group))) {
+//                     foreach(JobKey key ; scheduler.getJobKeys(GroupMatcher.jobGroupEquals(group))) {
 //                         scheduler.deleteJob(key);
 //                     }
 //                 }
@@ -921,9 +921,9 @@ module hunt.quartz.xml.XMLSchedulingDataProcessor;
 //         foreach(string group; triggerGroupsToDelete) {
 //             if(group.equals("*")) {
 //                 info("Deleting all triggers in ALL groups.");
-//                 for (string groupName : scheduler.getTriggerGroupNames()) {
+//                 foreach(string groupName ; scheduler.getTriggerGroupNames()) {
 //                     if (!triggerGroupsToNeverDelete.contains(groupName)) {
-//                         for (TriggerKey key : scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName))) {
+//                         foreach(TriggerKey key ; scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName))) {
 //                             scheduler.unscheduleJob(key);
 //                         }
 //                     }
@@ -932,7 +932,7 @@ module hunt.quartz.xml.XMLSchedulingDataProcessor;
 //             else {
 //                 if(!triggerGroupsToNeverDelete.contains(group)) {
 //                     info("Deleting all triggers in group: {}", group);
-//                     for (TriggerKey key : scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(group))) {
+//                     foreach(TriggerKey key ; scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(group))) {
 //                         scheduler.unscheduleJob(key);
 //                     }
 //                 }

@@ -19,19 +19,19 @@ module hunt.quartz.impl.StdSchedulerFactory;
 
 import hunt.quartz.JobListener;
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerConfigException;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
+import hunt.quartz.exception;
 import hunt.quartz.SchedulerFactory;
 import hunt.quartz.TriggerListener;
 import hunt.quartz.core.JobRunShellFactory;
 import hunt.quartz.core.QuartzScheduler;
 import hunt.quartz.core.QuartzSchedulerResources;
-import hunt.quartz.ee.jta.JTAAnnotationAwareJobRunShellFactory;
-import hunt.quartz.ee.jta.JTAJobRunShellFactory;
-import hunt.quartz.ee.jta.UserTransactionHelper;
-import hunt.quartz.impl.jdbcjobstore.JobStoreSupport;
-import hunt.quartz.impl.jdbcjobstore.Semaphore;
-import hunt.quartz.impl.jdbcjobstore.TablePrefixAware;
+// import hunt.quartz.ee.jta.JTAAnnotationAwareJobRunShellFactory;
+// import hunt.quartz.ee.jta.JTAJobRunShellFactory;
+// import hunt.quartz.ee.jta.UserTransactionHelper;
+// import hunt.quartz.impl.jdbcjobstore.JobStoreSupport;
+// import hunt.quartz.impl.jdbcjobstore.Semaphore;
+// import hunt.quartz.impl.jdbcjobstore.TablePrefixAware;
 import hunt.quartz.impl.matchers.EverythingMatcher;
 import hunt.quartz.management.ManagementRESTServiceConfiguration;
 import hunt.quartz.simpl.RAMJobStore;
@@ -1339,7 +1339,7 @@ import hunt.time.util.Locale;
 //             }
     
 //             // set scheduler context data...
-//             for(Object key: schedCtxtProps.keySet()) {
+//             foreach(Object key; schedCtxtProps.keySet()) {
 //                 string val = schedCtxtProps.getProperty((string) key);    
 //                 scheduler.getContext().put((string)key, val);
 //             }

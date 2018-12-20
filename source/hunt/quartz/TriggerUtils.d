@@ -18,6 +18,7 @@
 
 module hunt.quartz.TriggerUtils;
 
+import hunt.quartz.Calendar;
 import hunt.quartz.spi.OperableTrigger;
 
 import hunt.container.LinkedList;
@@ -75,7 +76,7 @@ class TriggerUtils {
      * @return List of java.util.Date objects
      */
     static List!(Date) computeFireTimes(OperableTrigger trigg, 
-        hunt.quartz.Calendar cal, int numTimes) {
+        Calendar cal, int numTimes) {
         LinkedList!(Date) lst = new LinkedList!(Date)();
 
         implementationMissing(false);
@@ -116,7 +117,7 @@ class TriggerUtils {
      *          The number of next fire times to produce
      * @return the computed Date, or null if the trigger (as configured) will not fire that many times.
      */
-    static Date computeEndTimeToAllowParticularNumberOfFirings(OperableTrigger trigg, hunt.quartz.Calendar cal, 
+    static Date computeEndTimeToAllowParticularNumberOfFirings(OperableTrigger trigg, Calendar cal, 
             int numTimes) {
 
         OperableTrigger t = cast(OperableTrigger) trigg.clone();
@@ -172,7 +173,7 @@ class TriggerUtils {
      * @return List of java.util.Date objects
      */
     static List!(Date) computeFireTimesBetween(OperableTrigger trigg,
-            hunt.quartz.Calendar cal, Date from, Date to) {
+            Calendar cal, Date from, Date to) {
         LinkedList!(Date) lst = new LinkedList!(Date)();
 
         OperableTrigger t = cast(OperableTrigger) trigg.clone();

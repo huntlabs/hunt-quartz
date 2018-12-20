@@ -24,10 +24,10 @@ import hunt.quartz.DisallowConcurrentExecution;
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.PersistJobDataAfterExecution;
 import hunt.quartz.SchedulerContext;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 
 import hunt.logging;
 
@@ -123,7 +123,7 @@ import hunt.logging;
 //         File[] updatedFiles = getUpdatedOrNewFiles(dirName, lastDate, maxAgeDate);
 
 //         if(updatedFiles is null) {
-//             log.warn("Directory '"+dirName+"' does not exist.");
+//             log.warn("Directory '" ~dirName~ "' does not exist.");
 //             return;
 //         }
         
@@ -135,10 +135,10 @@ import hunt.logging;
         
 //         if(updatedFiles.length > 0) {
 //             // notify call back...
-//             info("Directory '"+dirName+"' contents updated, notifying listener.");
+//             info("Directory '" ~dirName~ "' contents updated, notifying listener.");
 //             listener.filesUpdatedOrAdded(updatedFiles); 
 //         } else version(HUNT_DEBUG) {
-//             trace("Directory '"+dirName+"' contents unchanged.");
+//             trace("Directory '" ~dirName~ "' contents unchanged.");
 //         }
         
 //         // It is the JobDataMap on the JobDetail which is actually stateful

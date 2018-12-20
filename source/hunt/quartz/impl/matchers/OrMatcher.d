@@ -70,23 +70,23 @@ class OrMatcher(T) : Matcher!(T) {
     }
 
     override
-    bool equals(Object obj) {
-        if (this == obj)
+    bool opEquals(Object o) {
+        if (this is obj)
             return true;
         if (obj is null)
             return false;
-        if (getClass() != obj.getClass())
+        if (typeid(this) != typeid(obj))
             return false;
-        OrMatcher<?> other = (OrMatcher<?>) obj;
+        OrMatcher!T other = cast(OrMatcher!T) obj;
         if (leftOperand is null) {
             if (other.leftOperand !is null)
                 return false;
-        } else if (!leftOperand== other.leftOperand)
+        } else if (leftOperand != other.leftOperand)
             return false;
         if (rightOperand is null) {
             if (other.rightOperand !is null)
                 return false;
-        } else if (!rightOperand== other.rightOperand)
+        } else if (rightOperand != other.rightOperand)
             return false;
         return true;
     }

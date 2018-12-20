@@ -21,6 +21,7 @@ import std.datetime;
 
 import hunt.quartz.Calendar;
 import hunt.quartz.JobDetail;
+import hunt.quartz.spi.OperableTrigger;
 
 /**
  * <p>
@@ -32,7 +33,7 @@ import hunt.quartz.JobDetail;
  * 
  * @author James House
  */
-class TriggerFiredBundle : java.io.Serializable {
+class TriggerFiredBundle {
   
 
     /*

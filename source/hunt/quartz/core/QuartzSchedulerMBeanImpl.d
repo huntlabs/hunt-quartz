@@ -15,7 +15,7 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 // import hunt.container.HashMap;
 // import hunt.container.List;
 // import hunt.container.Map;
-// import hunt.comtainer.Set;
+// import hunt.container.Set;
 // import java.util.concurrent.atomic.AtomicLong;
 
 // import javax.management.ListenerNotFoundException;
@@ -33,13 +33,13 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 // import hunt.quartz.JobDataMap;
 // import hunt.quartz.JobDetail;
 // import hunt.quartz.JobExecutionContext;
-// import hunt.quartz.JobExecutionException;
+// import hunt.quartz.exception;
 // import hunt.quartz.JobKey;
 // import hunt.quartz.JobListener;
-// import hunt.quartz.SchedulerException;
+// import hunt.quartz.exception;
 // import hunt.quartz.SchedulerListener;
 // import hunt.quartz.Trigger;
-// import hunt.quartz.Trigger.TriggerState;
+// import hunt.quartz.Trigger : TriggerState;
 // import hunt.quartz.TriggerKey;
 // import hunt.quartz.core.jmx.JobDetailSupport;
 // import hunt.quartz.core.jmx.JobExecutionContextSupport;
@@ -105,8 +105,8 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //     TabularData getAllJobDetails() {
 //         try {
 //             List!(JobDetail) detailList = new ArrayList!(JobDetail)();
-//             for (string jobGroupName : scheduler.getJobGroupNames()) {
-//                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(jobGroupName))) {
+//             foreach(string jobGroupName ; scheduler.getJobGroupNames()) {
+//                 foreach(JobKey jobKey ; scheduler.getJobKeys(GroupMatcher.jobGroupEquals(jobGroupName))) {
 //                     detailList.add(scheduler.getJobDetail(jobKey));
 //                 }
 //             }
@@ -119,8 +119,8 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //     List!(CompositeData) getAllTriggers() {
 //         try {
 //             List!(Trigger) triggerList = new ArrayList!(Trigger)();
-//             for (string triggerGroupName : scheduler.getTriggerGroupNames()) {
-//                 for (TriggerKey triggerKey : scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroupName))) {
+//             foreach(string triggerGroupName ; scheduler.getTriggerGroupNames()) {
+//                 foreach(TriggerKey triggerKey ; scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroupName))) {
 //                     triggerList.add(scheduler.getTrigger(triggerKey));
 //                 }
 //             }
@@ -166,7 +166,7 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //             TypeInfo_Class[] argTypes) {
 //         BeanInfo beanInfo = Introspector.getBeanInfo(targetType);
 //         if (beanInfo !is null) {
-//             for(MethodDescriptor methodDesc: beanInfo.getMethodDescriptors()) {
+//             foreach(MethodDescriptor methodDesc; beanInfo.getMethodDescriptors()) {
 //                 Method method = methodDesc.getMethod();
 //                 TypeInfo_Class[] parameterTypes = method.getParameterTypes();
 //                 if (methodName== method.getName() && argTypes.length == parameterTypes.length) {
@@ -382,7 +382,7 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //     List!(string) getJobNames(string groupName) {
 //         try {
 //             List!(string) jobNames = new ArrayList!(string)();
-//             for(JobKey key: scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+//             foreach(JobKey key; scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
 //                 jobNames.add(key.getName());
 //             }
 //             return jobNames;
@@ -423,7 +423,7 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //     List!(string) getTriggerNames(string groupName) {
 //         try {
 //             List!(string) triggerNames = new ArrayList!(string)();
-//             for(TriggerKey key: scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName))) {
+//             foreach(TriggerKey key; scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName))) {
 //                 triggerNames.add(key.getName());
 //             }
 //             return triggerNames;

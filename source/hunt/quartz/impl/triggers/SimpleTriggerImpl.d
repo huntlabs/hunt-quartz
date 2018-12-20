@@ -23,10 +23,10 @@ import std.datetime;
 import hunt.quartz.Calendar;
 import hunt.quartz.CronTrigger;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.SimpleScheduleBuilder;
 import hunt.quartz.SimpleTrigger;
 import hunt.quartz.Trigger;
@@ -810,7 +810,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         
         long time = end.getTime() - start.getTime();
 
-        return (int) (time / repeatInterval);
+        return cast(int) (time / repeatInterval);
     }
 
     /**

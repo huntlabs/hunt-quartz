@@ -17,6 +17,9 @@
 
 module hunt.quartz.CronTrigger;
 
+import hunt.quartz.Trigger;
+import hunt.quartz.TriggerBuilder;
+
 import hunt.time.util.Calendar;
 import std.datetime : TimeZone;
 

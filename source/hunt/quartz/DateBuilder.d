@@ -54,8 +54,6 @@ import std.datetime;
  * @see JobBuilder 
  */
 class DateBuilder {
-
-    enum IntervalUnit { MILLISECOND, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR }
     
     enum int SUNDAY = 1;
 
@@ -1019,3 +1017,5 @@ class DateBuilder {
     }
 
 }
+
+enum IntervalUnit { MILLISECOND, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR }

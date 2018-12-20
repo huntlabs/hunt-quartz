@@ -16,8 +16,11 @@
 
 module hunt.quartz.utils.CircularLossyQueue;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
+// import java.util.concurrent.atomic.AtomicLong;
+// import java.util.concurrent.atomic.AtomicReference;
+
+import core.atomic;
+import hunt.concurrent.atomic.AtomicHelper;
 
 /**
  * An implementation of a CircularQueue data-structure.
@@ -31,7 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 1.7
  */
 class CircularLossyQueue(T) {
-    private AtomicReference!(T)[] circularArray;
+    private T[] circularArray;
     private int maxSize;
 
     private shared long currentIndex = -1;
@@ -42,10 +45,10 @@ class CircularLossyQueue(T) {
      * @param size
      */
     this(int size) {
-        this.circularArray = new AtomicReference[size];
-        for (int i = 0; i < size; i++) {
-            this.circularArray[i] = new AtomicReference!(T)();
-        }
+        this.circularArray = new T[size];
+        // for (int i = 0; i < size; i++) {
+        //     this.circularArray[i] = new AtomicReference!(T)();
+        // }
         this.maxSize = size;
     }
 
@@ -55,8 +58,8 @@ class CircularLossyQueue(T) {
      * @param newVal
      */
     void push(T newVal) {
-        int index = cast(int) (currentIndex.incrementAndGet() % maxSize);
-        circularArray[index].set(newVal);
+        int index = cast(int) (AtomicHelper.increment(currentIndex) % maxSize);
+        AtomicHelper.store(circularArray[index], newVal);
     }
 
     /**
@@ -69,7 +72,7 @@ class CircularLossyQueue(T) {
      *         element is the head of the queue
      */
     T[] toArray(T[] type) {
-        System.getProperties();
+        // System.getProperties();
 
         if (type.length > maxSize) {
             throw new IllegalArgumentException("Size of array passed in cannot be greater than " ~ maxSize);
@@ -78,7 +81,7 @@ class CircularLossyQueue(T) {
         int curIndex = getCurrentIndex();
         for (int k = 0; k < type.length; k++) {
             int index = getIndex(curIndex - k);
-            type[k] = circularArray[index].get();
+            type[k] = circularArray[index];
         }
         return type;
     }
@@ -96,7 +99,7 @@ class CircularLossyQueue(T) {
         if (depth() == 0) {
             return null;
         }
-        return circularArray[getIndex(getCurrentIndex())].get();
+        return circularArray[getIndex(getCurrentIndex())];
     }
 
     /**
@@ -109,7 +112,7 @@ class CircularLossyQueue(T) {
     }
 
     private int getCurrentIndex() {
-        return cast(int) (currentIndex.get() % maxSize);
+        return cast(int) (currentIndex % maxSize);
     }
 
     /**
@@ -118,7 +121,7 @@ class CircularLossyQueue(T) {
      * @return the number of items in the queue
      */
     int depth() {
-        long currInd = currentIndex.get() + 1;
+        long currInd = currentIndex + 1;
         return currInd >= maxSize ? maxSize : cast(int) currInd;
     }
 }

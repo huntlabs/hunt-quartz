@@ -20,7 +20,7 @@ import hunt.logging;
 import hunt.quartz.TriggerListener;
 import hunt.quartz.Trigger;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.Trigger.CompletedExecutionInstruction;
+import hunt.quartz.Trigger : CompletedExecutionInstruction;
 
 /**
  * A helpful abstract base class for implementors of 

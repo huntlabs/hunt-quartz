@@ -19,7 +19,7 @@ module hunt.quartz.simpl.InitThreadContextClassLoadHelper;
 
 import hunt.quartz.spi.ClassLoadHelper;
 
-import java.net.URL;
+// import java.net.URL;
 import hunt.io.common;
 
 /**

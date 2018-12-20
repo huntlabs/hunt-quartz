@@ -17,9 +17,9 @@
 module hunt.quartz.DailyTimeIntervalTrigger;
 
 import hunt.time.util.Calendar;
-import hunt.comtainer.Set;
+import hunt.container.Set;
 
-import hunt.quartz.DateBuilder.IntervalUnit;
+import hunt.quartz.DateBuilder : IntervalUnit;
 
 /**
  * A <code>{@link Trigger}</code> that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>

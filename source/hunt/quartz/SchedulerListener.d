@@ -18,6 +18,12 @@
 
 module hunt.quartz.SchedulerListener;
 
+import hunt.quartz.exception;
+import hunt.quartz.JobDetail;
+import hunt.quartz.JobKey;
+import hunt.quartz.Trigger;
+import hunt.quartz.TriggerKey;
+
 /**
  * The interface to be implemented by classes that want to be informed of major
  * <code>{@link Scheduler}</code> events.

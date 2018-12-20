@@ -106,7 +106,7 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
 
         Iterator!(hunt.time.util.Calendar) iter = excludeDays.iterator();
         while (iter.hasNext()) {
-            hunt.time.util.Calendar cl = (hunt.time.util.Calendar) iter.next();
+            hunt.time.util.Calendar cl = cast(hunt.time.util.Calendar) iter.next();
 
             // remember, the list is sorted
             if (dmonth < cl.get(hunt.time.util.Calendar.MONTH)) {
@@ -192,7 +192,7 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
         // search for the object based on month and day of month in the list and remove it
         Iterator!(hunt.time.util.Calendar) iter = excludeDays.iterator();
         while (iter.hasNext()) {
-            hunt.time.util.Calendar cl = (hunt.time.util.Calendar) iter.next();
+            hunt.time.util.Calendar cl = cast(hunt.time.util.Calendar) iter.next();
 
             if (dmonth != cl.get(hunt.time.util.Calendar.MONTH)) {
                 continue;
@@ -264,10 +264,13 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
     }
 }
 
-class CalendarComparator : Comparator!(hunt.time.util.Calendar), Serializable {
+
+/**
+*/
+class CalendarComparator : Comparator!(hunt.time.util.Calendar) { // , Serializable
   
     
-    CalendarComparator() {
+    this() {
     }
 
 

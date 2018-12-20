@@ -22,10 +22,9 @@ module hunt.quartz.core.QuartzSchedulerThread;
 // import java.util.Random;
 // 
 
-import hunt.quartz.JobPersistenceException;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.Trigger;
-import hunt.quartz.Trigger.CompletedExecutionInstruction;
+import hunt.quartz.Trigger : CompletedExecutionInstruction;
 import hunt.quartz.spi.JobStore;
 import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;

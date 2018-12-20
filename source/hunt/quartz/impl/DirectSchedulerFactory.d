@@ -20,7 +20,7 @@ module hunt.quartz.impl.DirectSchedulerFactory;
 // import java.util.Map.Entry;
 
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.SchedulerFactory;
 import hunt.quartz.core.JobRunShellFactory;
 import hunt.quartz.core.QuartzScheduler;

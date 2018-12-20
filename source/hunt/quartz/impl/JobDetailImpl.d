@@ -413,7 +413,7 @@ class JobDetailImpl : JobDetail { // Cloneable,
     }
 
     override
-    bool equals(Object obj) {
+    bool opEquals(Object o) {
         JobDetail other = cast(JobDetail) obj;
         if(other is null)
             return false;

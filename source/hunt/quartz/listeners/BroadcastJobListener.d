@@ -20,7 +20,7 @@ import hunt.container.LinkedList;
 import hunt.container.List;
 
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.JobListener;
 
 /**

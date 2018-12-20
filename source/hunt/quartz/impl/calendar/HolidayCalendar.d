@@ -17,11 +17,11 @@
 
 module hunt.quartz.impl.calendar.HolidayCalendar;
 
-import hunt.container.Collections;
 import std.datetime;
-import java.util.SortedSet;
-import std.datetime : TimeZone;
-import java.util.TreeSet;
+
+import hunt.container.Collections;
+import hunt.container.SortedSet;
+import hunt.container.TreeSet;
 
 import hunt.quartz.Calendar;
 
@@ -40,33 +40,36 @@ import hunt.quartz.Calendar;
  * @author Sharada Jambula
  * @author Juergen Donnerstag
  */
-class HolidayCalendar : BaseCalendar implements Calendar,
-        Serializable {
+class HolidayCalendar : BaseCalendar, Calendar {
     
     // A sorted set to store the holidays
-    private TreeSet!(Date) dates = new TreeSet!(Date)();
+    private TreeSet!(Date) dates;
 
-    HolidayCalendar() {
+    this() {
     }
 
-    HolidayCalendar(Calendar baseCalendar) {
+    this(Calendar baseCalendar) {
         super(baseCalendar);
     }
 
-    HolidayCalendar(TimeZone timeZone) {
+    this(TimeZone timeZone) {
         super(timeZone);
     }
 
-    HolidayCalendar(Calendar baseCalendar, TimeZone timeZone) {
+    this(Calendar baseCalendar, TimeZone timeZone) {
         super(baseCalendar, timeZone);
     }
 
-    override
-    Object clone() {
-        HolidayCalendar clone = (HolidayCalendar) super.clone();
-        clone.dates = new TreeSet!(Date)(dates);
-        return clone;
+    private void initialize() {
+        dates = new TreeSet!(Date)();
     }
+
+    // override
+    // Object clone() {
+    //     HolidayCalendar clone = (HolidayCalendar) super.clone();
+    //     clone.dates = new TreeSet!(Date)(dates);
+    //     return clone;
+    // }
     
     /**
      * <p>

@@ -17,8 +17,18 @@
 
 module hunt.quartz.JobBuilder;
 
+import hunt.quartz.JobDetail;
+import hunt.quartz.JobDataMap;
+import hunt.quartz.JobKey;
+
 import hunt.quartz.impl.JobDetailImpl;
 import hunt.quartz.utils.Key;
+
+import hunt.lang.Boolean;
+import hunt.lang.Double;
+import hunt.lang.Float;
+import hunt.lang.Integer;
+import hunt.lang.Long;
 
 /**
  * <code>JobBuilder</code> is used to instantiate {@link JobDetail}s.

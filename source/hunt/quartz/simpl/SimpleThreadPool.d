@@ -19,7 +19,7 @@ module hunt.quartz.simpl.SimpleThreadPool;
 
 import hunt.logging;
 
-import hunt.quartz.SchedulerConfigException;
+import hunt.quartz.exception;
 import hunt.quartz.spi.ThreadPool;
 
 import hunt.container.Iterator;
@@ -356,10 +356,9 @@ class SimpleThreadPool : ThreadPool {
 
                     // Wait until all worker threads are shut down
                     while (busyWorkers.size() > 0) {
-                        WorkerThread wt = (WorkerThread) busyWorkers.getFirst();
+                        WorkerThread wt = cast(WorkerThread) busyWorkers.getFirst();
                         try {
-                            trace(
-                                    "Waiting for thread " ~ wt.getName()
+                            trace("Waiting for thread " ~ wt.getName()
                                             ~ " to shut down");
 
                             // note: with waiting infinite time the
@@ -372,7 +371,7 @@ class SimpleThreadPool : ThreadPool {
 
                     workerThreads = workers.iterator();
                     while(workerThreads.hasNext()) {
-                        WorkerThread wt = (WorkerThread) workerThreads.next();
+                        WorkerThread wt = cast(WorkerThread) workerThreads.next();
                         try {
                             wt.join();
                             workerThreads.remove();
@@ -421,7 +420,7 @@ class SimpleThreadPool : ThreadPool {
             }
 
             if (!isShutdown) {
-                WorkerThread wt = (WorkerThread)availWorkers.removeFirst();
+                WorkerThread wt = cast(WorkerThread)availWorkers.removeFirst();
                 busyWorkers.add(wt);
                 wt.run(runnable);
             } else {

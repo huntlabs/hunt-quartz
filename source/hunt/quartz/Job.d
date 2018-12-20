@@ -18,6 +18,8 @@
 
 module hunt.quartz.Job;
 
+import hunt.quartz.JobExecutionContext;
+
 /**
  * <p>
  * The interface to be implemented by classes which represent a 'job' to be

@@ -62,12 +62,12 @@ class WeeklyCalendar : BaseCalendar, Calendar {
         excludeAll = areAllDaysExcluded();
     }
 
-    override
-    Object clone() {
-        WeeklyCalendar clone = (WeeklyCalendar) super.clone();
-        clone.excludeDays = excludeDays.clone();
-        return clone;
-    }
+    // override
+    // Object clone() {
+    //     WeeklyCalendar clone = (WeeklyCalendar) super.clone();
+    //     clone.excludeDays = excludeDays.clone();
+    //     return clone;
+    // }
 
     /**
      * <p>

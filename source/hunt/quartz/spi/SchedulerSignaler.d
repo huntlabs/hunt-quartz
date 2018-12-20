@@ -18,7 +18,7 @@
 module hunt.quartz.spi.SchedulerSignaler;
 
 import hunt.quartz.JobKey;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.Trigger;
 
 /**

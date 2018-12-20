@@ -60,7 +60,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
     }
 
     // override
-    // bool equals(Object obj) {
+    // bool opEquals(Object o) {
     //     return super== obj;
     // }
 

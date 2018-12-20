@@ -25,10 +25,10 @@ import hunt.quartz.DisallowConcurrentExecution;
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.PersistJobDataAfterExecution;
 import hunt.quartz.SchedulerContext;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 
 import hunt.logging;
 
@@ -124,16 +124,16 @@ import hunt.logging;
 //         long newDate = getLastModifiedDate(fileName);
         
 //         if(newDate < 0) {
-//             log.warn("File '"+fileName+"' does not exist.");
+//             log.warn("File '" ~fileName~ "' does not exist.");
 //             return;
 //         }
         
 //         if(lastDate > 0 && (newDate > lastDate && newDate < maxAgeDate)) {
 //             // notify call back...
-//             info("File '"+fileName+"' updated, notifying listener.");
+//             info("File '" ~fileName~ "' updated, notifying listener.");
 //             listener.fileUpdated(fileName); 
 //         } else version(HUNT_DEBUG) {
-//             trace("File '"+fileName+"' unchanged.");
+//             trace("File '" ~fileName~ "' unchanged.");
 //         }
         
 //         // It is the JobDataMap on the JobDetail which is actually stateful

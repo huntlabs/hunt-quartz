@@ -27,7 +27,7 @@ module hunt.quartz.jobs.NativeJob;
 // import hunt.quartz.Job;
 // import hunt.quartz.JobDataMap;
 // import hunt.quartz.JobExecutionContext;
-// import hunt.quartz.JobExecutionException;
+// import hunt.quartz.exception;
 
 // /**
 //  * <p> Built in job for executing native executables in a separate process.</p> 

@@ -22,11 +22,11 @@ import hunt.quartz.Calendar;
 import hunt.quartz.CronTrigger;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.JobExecutionException;
+import hunt.quartz.exception;
 import hunt.quartz.JobKey;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.Scheduler;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.SimpleTrigger;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerBuilder;
@@ -836,10 +836,9 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      */
     override
     bool equals(Object o) {
-        if(!(o instanceof Trigger))
+        Trigger other = cast(Trigger)o;
+        if(other is null)
             return false;
-        
-        Trigger other = (Trigger)o;
 
         return !(other.getKey() is null || getKey() is null) && getKey()== other.getKey();
 
@@ -854,24 +853,24 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
         return getKey().toHash();
     }
 
-    override
-    Object clone() {
-        AbstractTrigger<?> copy;
-        try {
-            copy = (AbstractTrigger<?>) super.clone();
+    // override
+    // Object clone() {
+    //     AbstractTrigger<?> copy;
+    //     try {
+    //         copy = (AbstractTrigger<?>) super.clone();
 
-            // Shallow copy the jobDataMap.  Note that this means that if a user
-            // modifies a value object in this map from the cloned Trigger
-            // they will also be modifying this Trigger. 
-            if (jobDataMap !is null) {
-                copy.jobDataMap = (JobDataMap)jobDataMap.clone();
-            }
+    //         // Shallow copy the jobDataMap.  Note that this means that if a user
+    //         // modifies a value object in this map from the cloned Trigger
+    //         // they will also be modifying this Trigger. 
+    //         if (jobDataMap !is null) {
+    //             copy.jobDataMap = cast(JobDataMap)jobDataMap.clone();
+    //         }
 
-        } catch (CloneNotSupportedException ex) {
-            throw new IncompatibleClassChangeError("Not Cloneable.");
-        }
-        return copy;
-    }
+    //     } catch (CloneNotSupportedException ex) {
+    //         throw new IncompatibleClassChangeError("Not Cloneable.");
+    //     }
+    //     return copy;
+    // }
     
     TriggerBuilder!(T) getTriggerBuilder() {
         return TriggerBuilder.newTrigger()

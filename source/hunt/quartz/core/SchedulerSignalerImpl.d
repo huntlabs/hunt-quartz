@@ -21,7 +21,7 @@ module hunt.quartz.core.SchedulerSignalerImpl;
 import hunt.logging;
 
 import hunt.quartz.JobKey;
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.Trigger;
 import hunt.quartz.spi.SchedulerSignaler;
 

@@ -1,7 +1,7 @@
 
 module hunt.quartz.simpl.SystemPropertyInstanceIdGenerator;
 
-import hunt.quartz.SchedulerException;
+import hunt.quartz.exception;
 import hunt.quartz.spi.InstanceIdGenerator;
 
 /**

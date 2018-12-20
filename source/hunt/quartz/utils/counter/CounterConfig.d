@@ -32,7 +32,7 @@ class CounterConfig {
      * 
      * @param initialValue
      */
-    CounterConfig(long initialValue) {
+    this(long initialValue) {
         this.initialValue = initialValue;
     }
 
