@@ -1,5 +1,7 @@
 module hunt.quartz.spi.TriggerFiredResult;
 
+import hunt.quartz.spi.TriggerFiredBundle;
+
 import std.exception;
 
 /**

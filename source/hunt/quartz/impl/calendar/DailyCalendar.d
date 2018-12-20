@@ -1,5 +1,8 @@
 module hunt.quartz.impl.calendar.DailyCalendar;
 
+import hunt.quartz.impl.calendar.BaseCalendar;
+import hunt.quartz.Calendar;
+
 // import java.text.NumberFormat;
 import hunt.container.ArrayList;
 import hunt.time.util.Calendar;
@@ -34,7 +37,7 @@ class DailyCalendar : BaseCalendar {
     private enum string invalidMillis = "Invalid millis: ";
     private enum string invalidTimeRange = "Invalid time range: ";
     private enum string separator = " - ";
-    private static final long oneMillis = 1;
+    private enum long oneMillis = 1;
     private enum string colon = ":";
 
     private int rangeStartingHourOfDay;
@@ -119,7 +122,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTime   a string representing the ending time for the
      *                          time range
      */
-    this(hunt.quartz.Calendar baseCalendar,
+    this(QuartzCalendar baseCalendar,
                          string rangeStartingTime,
                          string rangeEndingTime) {
         super(baseCalendar);
@@ -212,7 +215,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingMillis      the millisecond of the start of the time 
      *                               range
      */
-    this(hunt.quartz.Calendar baseCalendar,
+    this(QuartzCalendar baseCalendar,
                          int rangeStartingHourOfDay,
                          int rangeStartingMinute,
                          int rangeStartingSecond,
@@ -259,9 +262,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingCalendar   a hunt.time.util.Calendar representing the ending
      *                              time for the time range
      */
-    this(
-                         Calendar rangeStartingCalendar,
-                         Calendar rangeEndingCalendar) {
+    this(HuntCalendar rangeStartingCalendar, HuntCalendar rangeEndingCalendar) {
         super();
         setTimeRange(rangeStartingCalendar, rangeEndingCalendar);
     }
@@ -296,9 +297,9 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingCalendar   a hunt.time.util.Calendar representing the ending
      *                              time for the time range
      */
-    this(hunt.quartz.Calendar baseCalendar,
-                         Calendar rangeStartingCalendar,
-                         Calendar rangeEndingCalendar) {
+    this(QuartzCalendar baseCalendar,
+                         HuntCalendar rangeStartingCalendar,
+                         HuntCalendar rangeEndingCalendar) {
         super(baseCalendar);
         setTimeRange(rangeStartingCalendar, rangeEndingCalendar);
     }
@@ -321,7 +322,7 @@ class DailyCalendar : BaseCalendar {
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
      * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
      * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>.
-     * You should use <code>{@link #DailyCalendar(hunt.quartz.Calendar, std.datetime : TimeZone, long, long)}</code>
+     * You should use <code>{@link #DailyCalendar(QuartzCalendar, std.datetime : TimeZone, long, long)}</code>
      * if you don't want the given <code>rangeStartingTimeInMillis</code> and
      * <code>rangeEndingTimeInMillis</code> to be evaluated in the default 
      * time zone.
@@ -357,7 +358,7 @@ class DailyCalendar : BaseCalendar {
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
      * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
      * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>.
-     * You should use <code>{@link #DailyCalendar(hunt.quartz.Calendar, std.datetime : TimeZone, long, long)} </code>
+     * You should use <code>{@link #DailyCalendar(QuartzCalendar, std.datetime : TimeZone, long, long)} </code>
      * if you don't want the given <code>rangeStartingTimeInMillis</code> and
      * <code>rangeEndingTimeInMillis</code> to be evaluated in the default 
      * time zone.
@@ -372,7 +373,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    this(hunt.quartz.Calendar baseCalendar,
+    this(QuartzCalendar baseCalendar,
                          long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
         super(baseCalendar);
@@ -438,7 +439,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    this(hunt.quartz.Calendar baseCalendar,
+    this(QuartzCalendar baseCalendar,
                          TimeZone timeZone,
                          long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
@@ -561,11 +562,11 @@ class DailyCalendar : BaseCalendar {
      *         time range for the specified date.
      */
     long getTimeRangeStartingTimeInMillis(long timeInMillis) {
-        Calendar rangeStartingTime = createJavaCalendar(timeInMillis);
-        rangeStartingTime.set(Calendar.HOUR_OF_DAY, rangeStartingHourOfDay);
-        rangeStartingTime.set(Calendar.MINUTE, rangeStartingMinute);
-        rangeStartingTime.set(Calendar.SECOND, rangeStartingSecond);
-        rangeStartingTime.set(Calendar.MILLISECOND, rangeStartingMillis);
+        HuntCalendar rangeStartingTime = createJavaCalendar(timeInMillis);
+        rangeStartingTime.set(HuntCalendar.HOUR_OF_DAY, rangeStartingHourOfDay);
+        rangeStartingTime.set(HuntCalendar.MINUTE, rangeStartingMinute);
+        rangeStartingTime.set(HuntCalendar.SECOND, rangeStartingSecond);
+        rangeStartingTime.set(HuntCalendar.MILLISECOND, rangeStartingMillis);
         return rangeStartingTime.getTime().getTime();
     }
 
@@ -579,11 +580,11 @@ class DailyCalendar : BaseCalendar {
      *         time range for the specified date.
      */
     long getTimeRangeEndingTimeInMillis(long timeInMillis) {
-        Calendar rangeEndingTime = createJavaCalendar(timeInMillis);
-        rangeEndingTime.set(Calendar.HOUR_OF_DAY, rangeEndingHourOfDay);
-        rangeEndingTime.set(Calendar.MINUTE, rangeEndingMinute);
-        rangeEndingTime.set(Calendar.SECOND, rangeEndingSecond);
-        rangeEndingTime.set(Calendar.MILLISECOND, rangeEndingMillis);
+        HuntCalendar rangeEndingTime = createJavaCalendar(timeInMillis);
+        rangeEndingTime.set(HuntCalendar.HOUR_OF_DAY, rangeEndingHourOfDay);
+        rangeEndingTime.set(HuntCalendar.MINUTE, rangeEndingMinute);
+        rangeEndingTime.set(HuntCalendar.SECOND, rangeEndingSecond);
+        rangeEndingTime.set(HuntCalendar.MILLISECOND, rangeEndingMillis);
         return rangeEndingTime.getTime().getTime();
     }
 
@@ -768,17 +769,17 @@ class DailyCalendar : BaseCalendar {
                  rangeEndingSecond,
                  rangeEndingMillis);
         
-        Calendar startCal = createJavaCalendar();
-        startCal.set(Calendar.HOUR_OF_DAY, rangeStartingHourOfDay);
-        startCal.set(Calendar.MINUTE, rangeStartingMinute);
-        startCal.set(Calendar.SECOND, rangeStartingSecond);
-        startCal.set(Calendar.MILLISECOND, rangeStartingMillis);
+        HuntCalendar startCal = createJavaCalendar();
+        startCal.set(HuntCalendar.HOUR_OF_DAY, rangeStartingHourOfDay);
+        startCal.set(HuntCalendar.MINUTE, rangeStartingMinute);
+        startCal.set(HuntCalendar.SECOND, rangeStartingSecond);
+        startCal.set(HuntCalendar.MILLISECOND, rangeStartingMillis);
         
-        Calendar endCal = createJavaCalendar();
-        endCal.set(Calendar.HOUR_OF_DAY, rangeEndingHourOfDay);
-        endCal.set(Calendar.MINUTE, rangeEndingMinute);
-        endCal.set(Calendar.SECOND, rangeEndingSecond);
-        endCal.set(Calendar.MILLISECOND, rangeEndingMillis);
+        HuntCalendar endCal = createJavaCalendar();
+        endCal.set(HuntCalendar.HOUR_OF_DAY, rangeEndingHourOfDay);
+        endCal.set(HuntCalendar.MINUTE, rangeEndingMinute);
+        endCal.set(HuntCalendar.SECOND, rangeEndingSecond);
+        endCal.set(HuntCalendar.MILLISECOND, rangeEndingMillis);
         
         if (!startCal.before(endCal)) {
             throw new IllegalArgumentException(invalidTimeRange +
@@ -811,17 +812,17 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingCalendar   a Calendar containing the end time for
      *                              the <CODE>DailyCalendar</CODE>
      */
-    void setTimeRange(Calendar rangeStartingCalendar,
-                              Calendar rangeEndingCalendar) {
+    void setTimeRange(HuntCalendar rangeStartingCalendar,
+                              HuntCalendar rangeEndingCalendar) {
         setTimeRange(
-                rangeStartingCalendar.get(Calendar.HOUR_OF_DAY),
-                rangeStartingCalendar.get(Calendar.MINUTE),
-                rangeStartingCalendar.get(Calendar.SECOND),
-                rangeStartingCalendar.get(Calendar.MILLISECOND),
-                rangeEndingCalendar.get(Calendar.HOUR_OF_DAY),
-                rangeEndingCalendar.get(Calendar.MINUTE),
-                rangeEndingCalendar.get(Calendar.SECOND),
-                rangeEndingCalendar.get(Calendar.MILLISECOND));
+                rangeStartingCalendar.get(HuntCalendar.HOUR_OF_DAY),
+                rangeStartingCalendar.get(HuntCalendar.MINUTE),
+                rangeStartingCalendar.get(HuntCalendar.SECOND),
+                rangeStartingCalendar.get(HuntCalendar.MILLISECOND),
+                rangeEndingCalendar.get(HuntCalendar.HOUR_OF_DAY),
+                rangeEndingCalendar.get(HuntCalendar.MINUTE),
+                rangeEndingCalendar.get(HuntCalendar.SECOND),
+                rangeEndingCalendar.get(HuntCalendar.MILLISECOND));
     }
     
     /**

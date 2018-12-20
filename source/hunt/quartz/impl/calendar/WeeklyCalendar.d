@@ -17,9 +17,10 @@
 
 module hunt.quartz.impl.calendar.WeeklyCalendar;
 
-import std.datetime : TimeZone;
-
+import hunt.quartz.impl.calendar.BaseCalendar;
 import hunt.quartz.Calendar;
+
+import std.datetime : TimeZone;
 
 /**
  * <p>

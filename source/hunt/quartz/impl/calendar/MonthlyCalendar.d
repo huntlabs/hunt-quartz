@@ -17,6 +17,8 @@
 
 module hunt.quartz.impl.calendar.MonthlyCalendar;
 
+import hunt.quartz.impl.calendar.BaseCalendar;
+
 import std.datetime : TimeZone;
 
 import hunt.quartz.Calendar;

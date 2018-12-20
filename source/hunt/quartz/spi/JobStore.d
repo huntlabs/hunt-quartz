@@ -17,6 +17,11 @@
 
 module hunt.quartz.spi.JobStore;
 
+import hunt.quartz.spi.ClassLoadHelper;
+import hunt.quartz.spi.OperableTrigger;
+import hunt.quartz.spi.SchedulerSignaler;
+import hunt.quartz.spi.TriggerFiredResult;
+
 import hunt.container.Collection;
 import hunt.container.List;
 import hunt.container.Map;

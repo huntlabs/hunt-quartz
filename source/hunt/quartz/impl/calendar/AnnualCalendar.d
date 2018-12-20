@@ -17,6 +17,8 @@
 
 module hunt.quartz.impl.calendar.AnnualCalendar;
 
+import hunt.quartz.impl.calendar.BaseCalendar;
+
 import hunt.container.ArrayList;
 import hunt.container.Collections;
 import hunt.container.Iterator;
@@ -37,10 +39,10 @@ import hunt.quartz.Calendar;
  * 
  * @author Juergen Donnerstag
  */
-class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
+class AnnualCalendar : BaseCalendar, QuartzCalendar {
 
 
-    private ArrayList!(hunt.time.util.Calendar) excludeDays;
+    private ArrayList!(HuntCalendar) excludeDays;
 
     // true, if excludeDays is sorted
     private bool dataSorted = false;
@@ -48,7 +50,7 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
     this() {
     }
 
-    this(Calendar baseCalendar) {
+    this(QuartzCalendar baseCalendar) {
         super(baseCalendar);
     }
 
@@ -56,18 +58,18 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
         super(timeZone);
     }
 
-    this(Calendar baseCalendar, TimeZone timeZone) {
+    this(QuartzCalendar baseCalendar, TimeZone timeZone) {
         super(baseCalendar, timeZone);
     }
 
     private void initialize() {
-        excludeDays = new ArrayList!(hunt.time.util.Calendar)();
+        excludeDays = new ArrayList!(HuntCalendar)();
     }
 
     // override
     // Object clone() {
     //     AnnualCalendar clone = (AnnualCalendar) super.clone();
-    //     clone.excludeDays = new ArrayList!(hunt.time.util.Calendar)(excludeDays);
+    //     clone.excludeDays = new ArrayList!(HuntCalendar)(excludeDays);
     //     return clone;
     // }
 
@@ -76,7 +78,7 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
      * Get the array which defines the exclude-value of each day of month
      * </p>
      */
-    ArrayList!(hunt.time.util.Calendar) getDaysExcluded() {
+    ArrayList!(HuntCalendar) getDaysExcluded() {
         return excludeDays;
     }
 
@@ -85,7 +87,7 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
      * Return true, if day is defined to be exluded.
      * </p>
      */
-    bool isDayExcluded(hunt.time.util.Calendar day) {
+    bool isDayExcluded(HuntCalendar day) {
 
         if (day is null) {
             throw new IllegalArgumentException("Parameter day must not be null");
@@ -96,28 +98,28 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
          return true;
         } 
         
-        int dmonth = day.get(hunt.time.util.Calendar.MONTH);
-        int dday = day.get(hunt.time.util.Calendar.DAY_OF_MONTH);
+        int dmonth = day.get(HuntCalendar.MONTH);
+        int dday = day.get(HuntCalendar.DAY_OF_MONTH);
 
         if (dataSorted == false) {
             Collections.sort(excludeDays, new CalendarComparator());
             dataSorted = true;
         }
 
-        Iterator!(hunt.time.util.Calendar) iter = excludeDays.iterator();
+        Iterator!(HuntCalendar) iter = excludeDays.iterator();
         while (iter.hasNext()) {
-            hunt.time.util.Calendar cl = cast(hunt.time.util.Calendar) iter.next();
+            HuntCalendar cl = cast(HuntCalendar) iter.next();
 
             // remember, the list is sorted
-            if (dmonth < cl.get(hunt.time.util.Calendar.MONTH)) {
+            if (dmonth < cl.get(HuntCalendar.MONTH)) {
                 return false;
             }
 
-            if (dday != cl.get(hunt.time.util.Calendar.DAY_OF_MONTH)) {
+            if (dday != cl.get(HuntCalendar.DAY_OF_MONTH)) {
                 continue;
             }
 
-            if (dmonth != cl.get(hunt.time.util.Calendar.MONTH)) {
+            if (dmonth != cl.get(HuntCalendar.MONTH)) {
                 continue;
             }
 
@@ -130,12 +132,12 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
     /**
      * <p>
      * Redefine the list of days excluded. The ArrayList 
-     * should contain <code>hunt.time.util.Calendar</code> objects. 
+     * should contain <code>HuntCalendar</code> objects. 
      * </p>
      */
-    void setDaysExcluded(ArrayList!(hunt.time.util.Calendar) days) {
+    void setDaysExcluded(ArrayList!(HuntCalendar) days) {
         if (days is null) {
-            excludeDays = new ArrayList!(hunt.time.util.Calendar)();
+            excludeDays = new ArrayList!(HuntCalendar)();
         } else {
             excludeDays = days;
         }
@@ -148,7 +150,7 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
      * Redefine a certain day to be excluded (true) or included (false).
      * </p>
      */
-    void setDayExcluded(hunt.time.util.Calendar day, bool exclude) {
+    void setDayExcluded(HuntCalendar day, bool exclude) {
         if (exclude) {
             if (isDayExcluded(day)) {
                 return;
@@ -170,11 +172,11 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
      *  
      * @param day the day to exclude
      */
-    void removeExcludedDay(hunt.time.util.Calendar day) {
+    void removeExcludedDay(HuntCalendar day) {
         removeExcludedDay(day, false);
     }
     
-    private void removeExcludedDay(hunt.time.util.Calendar day, bool isChecked) {
+    private void removeExcludedDay(HuntCalendar day, bool isChecked) {
         if (! isChecked &&
             ! isDayExcluded(day)) {
             return;
@@ -185,20 +187,20 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
             return;
         }
         
-        int dmonth = day.get(hunt.time.util.Calendar.MONTH);
-        int dday = day.get(hunt.time.util.Calendar.DAY_OF_MONTH);
+        int dmonth = day.get(HuntCalendar.MONTH);
+        int dday = day.get(HuntCalendar.DAY_OF_MONTH);
         
         // Since there is no guarantee that the given day is in the arraylist with the exact same year
         // search for the object based on month and day of month in the list and remove it
-        Iterator!(hunt.time.util.Calendar) iter = excludeDays.iterator();
+        Iterator!(HuntCalendar) iter = excludeDays.iterator();
         while (iter.hasNext()) {
-            hunt.time.util.Calendar cl = cast(hunt.time.util.Calendar) iter.next();
+            HuntCalendar cl = cast(HuntCalendar) iter.next();
 
-            if (dmonth != cl.get(hunt.time.util.Calendar.MONTH)) {
+            if (dmonth != cl.get(HuntCalendar.MONTH)) {
                 continue;
             }
 
-            if (dday != cl.get(hunt.time.util.Calendar.DAY_OF_MONTH)) {
+            if (dday != cl.get(HuntCalendar.DAY_OF_MONTH)) {
                 continue;
             }
 
@@ -226,7 +228,7 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
         // excludes the time/date, continue evaluating this calendar instance.
         if (super.isTimeIncluded(timeStamp) == false) { return false; }
 
-        hunt.time.util.Calendar day = createJavaCalendar(timeStamp);
+        HuntCalendar day = createJavaCalendar(timeStamp);
 
         return !(isDayExcluded(day));
     }
@@ -251,13 +253,13 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
         }
 
         // Get timestamp for 00:00:00
-        hunt.time.util.Calendar day = getStartOfDayJavaCalendar(timeStamp);
+        HuntCalendar day = getStartOfDayJavaCalendar(timeStamp);
         if (isDayExcluded(day) == false) { 
             return timeStamp; // return the original value
         }
 
         while (isDayExcluded(day) == true) {
-            day.add(hunt.time.util.Calendar.DATE, 1);
+            day.add(HuntCalendar.DATE, 1);
         }
 
         return day.getTime().getTime();
@@ -267,20 +269,20 @@ class AnnualCalendar : BaseCalendar, hunt.quartz.Calendar {
 
 /**
 */
-class CalendarComparator : Comparator!(hunt.time.util.Calendar) { // , Serializable
+class CalendarComparator : Comparator!(HuntCalendar) { // , Serializable
   
     
     this() {
     }
 
 
-    int compare(hunt.time.util.Calendar c1, hunt.time.util.Calendar c2) {
+    int compare(HuntCalendar c1, HuntCalendar c2) {
         
-        int month1 = c1.get(hunt.time.util.Calendar.MONTH);
-        int month2 = c2.get(hunt.time.util.Calendar.MONTH);
+        int month1 = c1.get(HuntCalendar.MONTH);
+        int month2 = c2.get(HuntCalendar.MONTH);
         
-        int day1 = c1.get(hunt.time.util.Calendar.DAY_OF_MONTH);
-        int day2 = c2.get(hunt.time.util.Calendar.DAY_OF_MONTH);
+        int day1 = c1.get(HuntCalendar.DAY_OF_MONTH);
+        int day2 = c2.get(HuntCalendar.DAY_OF_MONTH);
         
         if (month1 < month2) {
             return -1;

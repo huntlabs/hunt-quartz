@@ -85,7 +85,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
     private JobKey jobKey;
     private JobDataMap jobDataMap;
     
-    private ScheduleBuilder scheduleBuilder = null;
+    private ScheduleBuilder!(T) scheduleBuilder = null;
     
     private this() {
         jobDataMap = new JobDataMap();

@@ -16,6 +16,10 @@
 
 module hunt.quartz.utils.counter.CounterManagerImpl;
 
+import hunt.quartz.utils.counter.Counter;
+import hunt.quartz.utils.counter.CounterConfig;
+import hunt.quartz.utils.counter.CounterManager;
+
 import hunt.container.ArrayList;
 import hunt.container.List;
 import hunt.util.timer;
@@ -33,7 +37,7 @@ import hunt.quartz.utils.counter.sampled.SampledCounterImpl;
 class CounterManagerImpl : CounterManager {
 
     private Timer timer;
-    private bool shutdown;
+    private bool _isShutdown;
     private List!(Counter) counters;
 
     /**
@@ -52,7 +56,7 @@ class CounterManagerImpl : CounterManager {
      * {@inheritDoc}
      */
     void shutdown(bool killTimer) {
-        if (shutdown) {
+        if (_isShutdown) {
             return;
         }
         try {
@@ -66,7 +70,7 @@ class CounterManagerImpl : CounterManager {
             if(killTimer)
                 timer.cancel();
         } finally {
-            shutdown = true;
+            _isShutdown = true;
         }
     }
 
@@ -74,7 +78,7 @@ class CounterManagerImpl : CounterManager {
      * {@inheritDoc}
      */
     Counter createCounter(CounterConfig config) {
-        if (shutdown) {
+        if (_isShutdown) {
             throw new IllegalStateException("counter manager is shutdown");
         }
         if (config is null) {

@@ -396,7 +396,7 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
         // Pure wrapper methods
         K getKey() { return entry.getKey(); }
         V getValue() { return entry.getValue(); }
-        bool equals(Object o) { return entry== o; }
+        override bool opEquals(Object o) { return entry== o; }
     }
 }
 

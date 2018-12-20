@@ -17,6 +17,7 @@
 
 module hunt.quartz.simpl.ZeroSizeThreadPool;
 
+import hunt.lang.common;
 import hunt.logging;
 
 import hunt.quartz.exception;

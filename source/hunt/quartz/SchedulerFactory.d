@@ -18,6 +18,8 @@
 
 module hunt.quartz.SchedulerFactory;
 
+import hunt.quartz.Scheduler;
+
 import hunt.container.Collection;
 
 /**

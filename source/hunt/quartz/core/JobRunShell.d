@@ -18,6 +18,8 @@
 
 module hunt.quartz.core.JobRunShell;
 
+import hunt.quartz.core.QuartzScheduler;
+
 import hunt.quartz.exception;
 import hunt.quartz.Job;
 import hunt.quartz.JobDetail;
@@ -32,6 +34,7 @@ import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 
 import hunt.datetime;
+import hunt.lang.common;
 import hunt.logging;
 
 

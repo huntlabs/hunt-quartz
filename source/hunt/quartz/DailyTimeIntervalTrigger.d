@@ -16,10 +16,16 @@
  */
 module hunt.quartz.DailyTimeIntervalTrigger;
 
+import hunt.quartz.DateBuilder : IntervalUnit;
+import hunt.quartz.TimeOfDay;
+import hunt.quartz.Trigger;
+import hunt.quartz.TriggerBuilder;
+
 import hunt.time.util.Calendar;
 import hunt.container.Set;
 
-import hunt.quartz.DateBuilder : IntervalUnit;
+import std.datetime;
+
 
 /**
  * A <code>{@link Trigger}</code> that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>
@@ -124,7 +130,7 @@ interface DailyTimeIntervalTrigger : Trigger {
      * @return a Set containing the integers representing the days of the week, per the values 1-7 as defined by 
      * {@link hunt.time.util.Calendar#SUNDAY} - {@link hunt.time.util.Calendar#SATURDAY}. 
      */
-    Set!(Integer) getDaysOfWeek();
+    Set!(int) getDaysOfWeek();
     
     /**
      * <p>

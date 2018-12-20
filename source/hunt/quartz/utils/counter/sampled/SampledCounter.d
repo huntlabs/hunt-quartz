@@ -16,6 +16,8 @@
 
 module hunt.quartz.utils.counter.sampled.SampledCounter;
 
+import hunt.quartz.utils.counter.sampled.TimeStampedCounterValue;
+
 import hunt.quartz.utils.counter.Counter;
 
 /**

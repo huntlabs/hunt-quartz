@@ -17,14 +17,18 @@
 
 module hunt.quartz.simpl.SimpleThreadPool;
 
-import hunt.logging;
-
 import hunt.quartz.exception;
 import hunt.quartz.spi.ThreadPool;
 
+import hunt.concurrent.thread;
 import hunt.container.Iterator;
 import hunt.container.LinkedList;
 import hunt.container.List;
+import hunt.lang.common;
+import hunt.logging;
+
+import core.thread;
+
 
 
 /**
@@ -58,7 +62,7 @@ class SimpleThreadPool : ThreadPool {
 
     private int count = -1;
 
-    private int prio = Thread.NORM_PRIORITY;
+    private int prio; // = Thread.PRIORITY_DEFAULT;
 
     private bool isShutdown = false;
     private bool handoffPending = false;
@@ -69,13 +73,13 @@ class SimpleThreadPool : ThreadPool {
 
     private bool makeThreadsDaemons = false;
 
-    private ThreadGroup threadGroup;
+    private ThreadGroupEx threadGroup;
 
-    private final Object nextRunnableLock = new Object();
+    private Object nextRunnableLock; // = new Object();
 
     private List!(WorkerThread) workers;
-    private LinkedList!(WorkerThread) availWorkers = new LinkedList!(WorkerThread)();
-    private LinkedList!(WorkerThread) busyWorkers = new LinkedList!(WorkerThread)();
+    private LinkedList!(WorkerThread) availWorkers; // = new LinkedList!(WorkerThread)();
+    private LinkedList!(WorkerThread) busyWorkers; // = new LinkedList!(WorkerThread)();
 
     private string threadNamePrefix;
 
@@ -99,6 +103,7 @@ class SimpleThreadPool : ThreadPool {
      * @see #setThreadPriority(int)
      */
     this() {
+        initializeMembers();
     }
 
     /**
@@ -116,8 +121,16 @@ class SimpleThreadPool : ThreadPool {
      * @see java.lang.Thread
      */
     this(int threadCount, int threadPriority) {
+        initializeMembers();
         setThreadCount(threadCount);
         setThreadPriority(threadPriority);
+    }
+
+    private void initializeMembers() {
+        nextRunnableLock = new Object();
+        availWorkers = new LinkedList!(WorkerThread)();
+        busyWorkers = new LinkedList!(WorkerThread)();
+        prio = Thread.PRIORITY_DEFAULT;
     }
 
     /*
@@ -248,12 +261,12 @@ class SimpleThreadPool : ThreadPool {
         } else {
             // follow the threadGroup tree to the root thread group.
             threadGroup = Thread.getThis().getThreadGroup();
-            ThreadGroup parent = threadGroup;
+            ThreadGroupEx parent = threadGroup;
             while ( !parent.getName().equals("main") ) {
                 threadGroup = parent;
                 parent = threadGroup.getParent();
             }
-            threadGroup = new ThreadGroup(parent, schedulerInstanceName ~ "-SimpleThreadPool");
+            threadGroup = new ThreadGroupEx(parent, schedulerInstanceName ~ "-SimpleThreadPool");
             if (isMakeThreadsDaemons()) {
                 threadGroup.setDaemon(true);
             }
@@ -483,12 +496,12 @@ class SimpleThreadPool : ThreadPool {
      * A Worker loops, waiting to execute tasks.
      * </p>
      */
-    class WorkerThread : Thread {
+    class WorkerThread : ThreadEx {
 
-        private final Object lock = new Object();
+        private Object lock;
 
         // A flag that signals the WorkerThread to terminate.
-        private AtomicBoolean run = new AtomicBoolean(true);
+        private shared bool _run;
 
         private SimpleThreadPool tp;
 
@@ -503,7 +516,7 @@ class SimpleThreadPool : ThreadPool {
          * flag is set.
          * </p>
          */
-        this(SimpleThreadPool tp, ThreadGroup threadGroup, string name,
+        this(SimpleThreadPool tp, ThreadGroupEx threadGroup, string name,
                      int prio, bool isDaemon) {
 
             this(tp, threadGroup, name, prio, isDaemon, null);
@@ -515,9 +528,10 @@ class SimpleThreadPool : ThreadPool {
          * the thread (one time execution).
          * </p>
          */
-        this(SimpleThreadPool tp, ThreadGroup threadGroup, string name,
+        this(SimpleThreadPool tp, ThreadGroupEx threadGroup, string name,
                      int prio, bool isDaemon, Runnable runnable) {
-
+            
+            lock = new Object();
             super(threadGroup, name);
             this.tp = tp;
             this.runnable = runnable;
@@ -533,7 +547,7 @@ class SimpleThreadPool : ThreadPool {
          * </p>
          */
         void shutdown() {
-            run.set(false);
+            _run.set(false);
         }
 
         void run(Runnable newRunnable) {
@@ -556,10 +570,10 @@ class SimpleThreadPool : ThreadPool {
         void run() {
             bool ran = false;
             
-            while (run.get()) {
+            while (_run.get()) {
                 try {
                     synchronized(lock) {
-                        while (runnable is null && run.get()) {
+                        while (runnable is null && _run.get()) {
                             lock.wait(500);
                         }
 
@@ -592,7 +606,7 @@ class SimpleThreadPool : ThreadPool {
                     }
 
                     if (runOnce) {
-                           run.set(false);
+                           _run.set(false);
                         clearFromBusyWorkersList(this);
                     } else if(ran) {
                         ran = false;

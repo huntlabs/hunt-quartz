@@ -18,6 +18,9 @@
 
 module hunt.quartz.Calendar;
 
+
+alias QuartzCalendar = Calendar;
+
 /**
  * An interface to be implemented by objects that define spaces of time during 
  * which an associated <code>{@link Trigger}</code> may (not) fire. Calendars 

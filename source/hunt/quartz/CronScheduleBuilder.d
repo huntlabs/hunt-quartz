@@ -17,6 +17,10 @@
 
 module hunt.quartz.CronScheduleBuilder;
 
+import hunt.quartz.CronExpression;
+import hunt.quartz.CronTrigger;
+import hunt.quartz.ScheduleBuilder;
+
 import hunt.lang.exception;
 import std.datetime : TimeZone;
 

@@ -38,8 +38,10 @@ import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.spi.TriggerFiredResult;
 
 import hunt.container;
+import hunt.datetime;
 import hunt.logging;
 import hunt.util.Comparator;
+
 import std.datetime;
 
 
@@ -71,27 +73,27 @@ class RAMJobStore : JobStore {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected HashMap!(JobKey, JobWrapper) jobsByKey = new HashMap!(JobKey, JobWrapper)(1000);
+    protected HashMap!(JobKey, JobWrapper) jobsByKey;
 
-    protected HashMap!(TriggerKey, TriggerWrapper) triggersByKey = new HashMap!(TriggerKey, TriggerWrapper)(1000);
+    protected HashMap!(TriggerKey, TriggerWrapper) triggersByKey;
+    
+    protected HashMap!(string, HashMap!(JobKey, JobWrapper)) jobsByGroup;
 
-    protected HashMap!(string, HashMap!(JobKey, JobWrapper)) jobsByGroup = new HashMap!(string, HashMap!(JobKey, JobWrapper))(25);
+    protected HashMap!(string, HashMap!(TriggerKey, TriggerWrapper)) triggersByGroup;
 
-    protected HashMap!(string, HashMap!(TriggerKey, TriggerWrapper)) triggersByGroup = new HashMap!(string, HashMap!(TriggerKey, TriggerWrapper))(25);
+    protected TreeSet!(TriggerWrapper) timeTriggers;
 
-    protected TreeSet!(TriggerWrapper) timeTriggers = new TreeSet!(TriggerWrapper)(new TriggerWrapperComparator());
+    protected HashMap!(string, Calendar) calendarsByName;
 
-    protected HashMap!(string, Calendar) calendarsByName = new HashMap!(string, Calendar)(25);
+    protected Map!(JobKey, List!(TriggerWrapper)) triggersByJob;
 
-    protected Map!(JobKey, List!(TriggerWrapper)) triggersByJob = new HashMap!(JobKey, List!(TriggerWrapper))(1000);
+    protected Object lock;
 
-    protected final Object lock = new Object();
+    protected HashSet!(string) pausedTriggerGroups;
 
-    protected HashSet!(string) pausedTriggerGroups = new HashSet!(string)();
+    protected HashSet!(string) pausedJobGroups;
 
-    protected HashSet!(string) pausedJobGroups = new HashSet!(string)();
-
-    protected HashSet!(JobKey) blockedJobs = new HashSet!(JobKey)();
+    protected HashSet!(JobKey) blockedJobs;
     
     protected long misfireThreshold = 5000;
 
@@ -112,6 +114,17 @@ class RAMJobStore : JobStore {
      * </p>
      */
     this() {
+        jobsByKey = new HashMap!(JobKey, JobWrapper)(1000);
+        triggersByKey = new HashMap!(TriggerKey, TriggerWrapper)(1000);
+        jobsByGroup = new HashMap!(string, HashMap!(JobKey, JobWrapper))(25);
+        triggersByGroup = new HashMap!(string, HashMap!(TriggerKey, TriggerWrapper))(25);
+        timeTriggers = new TreeSet!(TriggerWrapper)(new TriggerWrapperComparator());
+        calendarsByName = new HashMap!(string, Calendar)(25);
+        triggersByJob = new HashMap!(JobKey, List!(TriggerWrapper))(1000);
+        lock = new Object();
+        pausedTriggerGroups = new HashSet!(string)();
+        pausedJobGroups = new HashSet!(string)();
+        blockedJobs = new HashSet!(JobKey)();
     }
 
     /*
@@ -1404,7 +1417,11 @@ class RAMJobStore : JobStore {
         return true;
     }
 
-    private static final AtomicLong ftrCtr = new AtomicLong(DateTimeHelper.currentTimeMillis());
+    private shared static long ftrCtr; // = new AtomicLong(DateTimeHelper.currentTimeMillis());
+
+    shared static this() {
+        ftrCtr = DateTimeHelper.currentTimeMillis();
+    }
 
     protected string getFiredTriggerRecordId() {
         return string.valueOf(ftrCtr.incrementAndGet());
@@ -1792,11 +1809,11 @@ class JobWrapper {
 
 class TriggerWrapper {
 
-    final TriggerKey key;
+    TriggerKey key;
 
-    final JobKey jobKey;
+    JobKey jobKey;
 
-    final OperableTrigger trigger;
+    OperableTrigger trigger;
 
     int state = STATE_WAITING;
 

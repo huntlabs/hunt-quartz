@@ -17,12 +17,13 @@
 
 module hunt.quartz.CalendarIntervalScheduleBuilder;
 
-import std.datetime : TimeZone;
-
+import hunt.quartz.CalendarIntervalTrigger;
 import hunt.quartz.DateBuilder;
+import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 
+import std.datetime : TimeZone;
 /**
  * <code>CalendarIntervalScheduleBuilder</code> is a {@link ScheduleBuilder} 
  * that defines calendar time (day, week, month, year) interval-based 
@@ -63,8 +64,8 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder!(CalendarIntervalTrigger
 
     private int misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
     private TimeZone timeZone;
-    private bool preserveHourOfDayAcrossDaylightSavings;
-    private bool skipDayIfHourDoesNotExist;
+    private bool _preserveHourOfDayAcrossDaylightSavings;
+    private bool _skipDayIfHourDoesNotExist;
     
     protected this() {
     }
@@ -93,8 +94,8 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder!(CalendarIntervalTrigger
         st.setRepeatIntervalUnit(intervalUnit);
         st.setMisfireInstruction(misfireInstruction);
         st.setTimeZone(timeZone);
-        st.setPreserveHourOfDayAcrossDaylightSavings(preserveHourOfDayAcrossDaylightSavings);
-        st.setSkipDayIfHourDoesNotExist(skipDayIfHourDoesNotExist);
+        st.setPreserveHourOfDayAcrossDaylightSavings(_preserveHourOfDayAcrossDaylightSavings);
+        st.setSkipDayIfHourDoesNotExist(_skipDayIfHourDoesNotExist);
 
         return st;
     }
@@ -303,7 +304,7 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder!(CalendarIntervalTrigger
      * @see TriggerBuilder#startAt(java.util.Date)
      */
     CalendarIntervalScheduleBuilder preserveHourOfDayAcrossDaylightSavings(bool preserveHourOfDay) {
-        this.preserveHourOfDayAcrossDaylightSavings = preserveHourOfDay;
+        this._preserveHourOfDayAcrossDaylightSavings = preserveHourOfDay;
         return this;
     }
 
@@ -328,7 +329,7 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder!(CalendarIntervalTrigger
      * @see #preserveHourOfDayAcrossDaylightSavings(bool)
      */
     CalendarIntervalScheduleBuilder skipDayIfHourDoesNotExist(bool skipDay) {
-        this.skipDayIfHourDoesNotExist = skipDay;
+        this._skipDayIfHourDoesNotExist = skipDay;
         return this;
     }
     

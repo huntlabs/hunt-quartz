@@ -16,6 +16,10 @@
 
 module hunt.quartz.utils.counter.sampled.SampledRateCounterImpl;
 
+import hunt.quartz.utils.counter.sampled.SampledRateCounter;
+import hunt.quartz.utils.counter.sampled.SampledCounterImpl;
+import hunt.quartz.utils.counter.sampled.SampledRateCounterConfig;
+
 /**
  * An implementation of {@link SampledRateCounter}
  * 

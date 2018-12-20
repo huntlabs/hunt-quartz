@@ -121,7 +121,6 @@ class ValidationException : Exception {
      * 
      * @return the detail message string.
      */
-    override
     string getMessage() {
         if (getValidationExceptions().size() == 0) { return super.getMessage(); }
 
@@ -129,8 +128,7 @@ class ValidationException : Exception {
 
         bool first = true;
 
-        for (Iterator!(Exception) iter = getValidationExceptions().iterator(); iter
-                .hasNext(); ) {
+        for (Iterator!(Exception) iter = getValidationExceptions().iterator(); iter.hasNext(); ) {
             Exception e = iter.next();
 
             if (!first) {

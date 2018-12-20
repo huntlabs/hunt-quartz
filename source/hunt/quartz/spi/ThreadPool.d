@@ -19,6 +19,8 @@ module hunt.quartz.spi.ThreadPool;
 
 import hunt.quartz.exception;
 
+import hunt.lang.common;
+
 /**
  * <p>
  * The interface to be implemented by classes that want to provide a thread

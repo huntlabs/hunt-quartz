@@ -16,6 +16,10 @@
 
 module hunt.quartz.utils.counter.sampled.SampledRateCounter;
 
+import hunt.quartz.utils.counter.sampled.SampledCounter;
+import hunt.quartz.utils.counter.sampled.SampledCounterImpl;
+import hunt.quartz.utils.counter.sampled.SampledRateCounterConfig;
+
 /**
  * Interface of a sampled rate counter -- a counter that keeps sampled values of
  * rates

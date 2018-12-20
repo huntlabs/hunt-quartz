@@ -44,7 +44,7 @@ import std.datetime;
 /**
  * @author James House
  */
-interface RemotableQuartzScheduler : Remote {
+interface RemotableQuartzScheduler { // : Remote 
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

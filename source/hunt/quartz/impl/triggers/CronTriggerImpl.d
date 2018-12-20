@@ -17,10 +17,10 @@
 
 module hunt.quartz.impl.triggers.CronTriggerImpl;
 
-import hunt.lang.exception;
-import hunt.time.util.Calendar;
-import std.datetime;
+import hunt.quartz.impl.triggers.AbstractTrigger;
+import hunt.quartz.impl.triggers.CoreTrigger;
 
+import hunt.quartz.Calendar;
 import hunt.quartz.CronExpression;
 import hunt.quartz.CronScheduleBuilder;
 import hunt.quartz.CronTrigger;
@@ -31,6 +31,10 @@ import hunt.quartz.Scheduler;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerUtils;
 
+import hunt.lang.exception;
+import hunt.time.util.Calendar;
+
+import std.datetime;
 
 /**
  * <p>
@@ -72,10 +76,10 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
 
     private CronExpression cronEx = null;
-    private Date startTime = null;
-    private Date endTime = null;
-    private Date nextFireTime = null;
-    private Date previousFireTime = null;
+    private Date startTime;// = null;
+    private Date endTime;// = null;
+    private Date nextFireTime;// = null;
+    private Date previousFireTime;// = null;
     private TimeZone timeZone = null;
 
     /*
@@ -430,7 +434,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * has been added to the scheduler.
      * </p>
      *
-     * @see TriggerUtils#computeFireTimesBetween(hunt.quartz.spi.OperableTrigger, hunt.quartz.Calendar, java.util.Date, java.util.Date)
+     * @see TriggerUtils#computeFireTimesBetween(hunt.quartz.spi.OperableTrigger, QuartzCalendar, java.util.Date, java.util.Date)
      */
     override
     Date getNextFireTime() {
@@ -514,7 +518,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * 
      * <p>
      * Note that the date returned is NOT validated against the related
-     * hunt.quartz.Calendar (if any)
+     * QuartzCalendar (if any)
      * </p>
      */
     override
@@ -598,7 +602,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * </p>
      */
     override
-    void updateAfterMisfire(hunt.quartz.Calendar cal) {
+    void updateAfterMisfire(QuartzCalendar cal) {
         int instr = getMisfireInstruction();
 
         if(instr == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY)
@@ -634,7 +638,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * 
      * @see #willFireOn(Calendar, bool)
      */
-    bool willFireOn(Calendar test) {
+    bool willFireOn(HuntCalendar test) {
         return willFireOn(test, false);
     }
     
@@ -646,7 +650,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * 
      * <p>
      * Note that the value returned is NOT validated against the related
-     * hunt.quartz.Calendar (if any)
+     * QuartzCalendar (if any)
      * </p>
      * 
      * @param test the date to compare
@@ -655,16 +659,16 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * (hours, minutes and seconds will be ignored).
      * @see #willFireOn(Calendar)
      */
-    bool willFireOn(Calendar test, bool dayOnly) {
+    bool willFireOn(HuntCalendar test, bool dayOnly) {
 
-        test = cast(Calendar) test.clone();
+        test = cast(HuntCalendar) test.clone();
         
-        test.set(Calendar.MILLISECOND, 0); // don't compare millis.
+        test.set(HuntCalendar.MILLISECOND, 0); // don't compare millis.
         
         if(dayOnly) {
-            test.set(Calendar.HOUR_OF_DAY, 0); 
-            test.set(Calendar.MINUTE, 0); 
-            test.set(Calendar.SECOND, 0); 
+            test.set(HuntCalendar.HOUR_OF_DAY, 0); 
+            test.set(HuntCalendar.MINUTE, 0); 
+            test.set(HuntCalendar.SECOND, 0); 
         }
         
         Date testTime = test.getTime();
@@ -674,17 +678,17 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         if(fta is null)
             return false;
 
-        Calendar p = Calendar.getInstance(test.getTimeZone());
+        HuntCalendar p = HuntCalendar.getInstance(test.getTimeZone());
         p.setTime(fta);
         
-        int year = p.get(Calendar.YEAR);
-        int month = p.get(Calendar.MONTH);
-        int day = p.get(Calendar.DATE);
+        int year = p.get(HuntCalendar.YEAR);
+        int month = p.get(HuntCalendar.MONTH);
+        int day = p.get(HuntCalendar.DATE);
         
         if(dayOnly) {
-            return (year == test.get(Calendar.YEAR) 
-                    && month == test.get(Calendar.MONTH) 
-                    && day == test.get(Calendar.DATE));
+            return (year == test.get(HuntCalendar.YEAR) 
+                    && month == test.get(HuntCalendar.MONTH) 
+                    && day == test.get(HuntCalendar.DATE));
         }
         
         while(fta.before(testTime)) {
@@ -705,7 +709,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * @see #executionComplete(JobExecutionContext, JobExecutionException)
      */
     override
-    void triggered(hunt.quartz.Calendar calendar) {
+    void triggered(QuartzCalendar calendar) {
         previousFireTime = nextFireTime;
         nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -717,10 +721,10 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
 
     /**
      *  
-     * @see AbstractTrigger#updateWithNewCalendar(hunt.quartz.Calendar, long)
+     * @see AbstractTrigger#updateWithNewCalendar(QuartzCalendar, long)
      */
     override
-    void updateWithNewCalendar(hunt.quartz.Calendar calendar, long misfireThreshold)
+    void updateWithNewCalendar(QuartzCalendar calendar, long misfireThreshold)
     {
         nextFireTime = getFireTimeAfter(previousFireTime);
         
@@ -738,9 +742,9 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
             
             //avoid infinite loop
             // Use gregorian only because the constant is based on Gregorian
-            hunt.time.util.Calendar c = new java.util.GregorianCalendar(); 
+            HuntCalendar c = new java.util.GregorianCalendar(); 
             c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
             
@@ -771,7 +775,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      *         </p>
      */
     override
-    Date computeFirstFireTime(hunt.quartz.Calendar calendar) {
+    Date computeFirstFireTime(QuartzCalendar calendar) {
         nextFireTime = getFireTimeAfter(new Date(getStartTime().getTime() - 1000));
 
         while (nextFireTime !is null && calendar !is null

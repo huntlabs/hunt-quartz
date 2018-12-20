@@ -16,15 +16,19 @@
  */
 module hunt.quartz.DailyTimeIntervalScheduleBuilder;
 
+import hunt.quartz.CalendarIntervalTrigger;
+import hunt.quartz.DailyTimeIntervalTrigger;
+import hunt.quartz.DateBuilder : IntervalUnit;
+import hunt.quartz.ScheduleBuilder;
+import hunt.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
+import hunt.quartz.spi.MutableTrigger;
+
 import hunt.time.util.Calendar;
 import hunt.container.Collections;
-import std.datetime;
 import hunt.container.HashSet;
 import hunt.container.Set;
 
-import hunt.quartz.DateBuilder : IntervalUnit;
-import hunt.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
-import hunt.quartz.spi.MutableTrigger;
+import std.datetime;
 
 /**
  * A {@link ScheduleBuilder} implementation that build schedule for DailyTimeIntervalTrigger.
@@ -117,6 +121,7 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
     }
     
     protected this() {
+
     }
     
     /**

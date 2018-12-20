@@ -18,6 +18,8 @@
 
 module hunt.quartz.core.QuartzSchedulerResources;
 
+import hunt.quartz.core.JobRunShellFactory;
+
 import hunt.container.ArrayList;
 import hunt.container.List;
 

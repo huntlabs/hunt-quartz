@@ -18,6 +18,7 @@
 module hunt.quartz.CronExpression;
 
 import hunt.container;
+import hunt.lang.common;
 import hunt.lang.exception;
 import hunt.time.util.Calendar;
 import hunt.time.util.Locale;
@@ -196,7 +197,7 @@ import std.datetime;
  * @author Contributions from Mads Henderson
  * @author Refactoring from CronTrigger to CronExpression by Aaron Craven
  */
-final class CronExpression : Serializable, Cloneable {
+final class CronExpression : Cloneable { // Serializable,
 
     
     protected enum int SECOND = 0;
@@ -897,7 +898,7 @@ final class CronExpression : Serializable, Cloneable {
         return buf.toString();
     }
 
-    protected string getExpressionSetSummary(java.util.Set!(int) set) {
+    protected string getExpressionSetSummary(Set!(int) set) {
 
         if (set.contains(NO_SPEC)) {
             return "?";
@@ -923,7 +924,7 @@ final class CronExpression : Serializable, Cloneable {
         return buf.toString();
     }
 
-    protected string getExpressionSetSummary(java.util.ArrayList!(int) list) {
+    protected string getExpressionSetSummary(ArrayList!(int) list) {
 
         if (list.contains(NO_SPEC)) {
             return "?";

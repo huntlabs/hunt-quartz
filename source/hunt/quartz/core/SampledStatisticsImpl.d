@@ -1,6 +1,8 @@
 module hunt.quartz.core.SampledStatisticsImpl;
 
-import hunt.util.timer;
+import hunt.quartz.core.QuartzScheduler;
+import hunt.quartz.core.QuartzSchedulerThread;
+import hunt.quartz.core.SampledStatistics;
 
 import hunt.quartz.JobDetail;
 import hunt.quartz.JobExecutionContext;
@@ -15,6 +17,8 @@ import hunt.quartz.utils.counter.CounterManagerImpl;
 import hunt.quartz.utils.counter.sampled.SampledCounter;
 import hunt.quartz.utils.counter.sampled.SampledCounterConfig;
 import hunt.quartz.utils.counter.sampled.SampledRateCounterConfig;
+
+import hunt.util.timer;
 
 class SampledStatisticsImpl : SchedulerListenerSupport, SampledStatistics, JobListener, SchedulerListener {
     private QuartzScheduler scheduler;

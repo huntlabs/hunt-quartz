@@ -19,6 +19,8 @@
 module hunt.quartz.ObjectAlreadyExistsException;
 
 import hunt.quartz.exception;
+import hunt.quartz.JobDetail;
+import hunt.quartz.Trigger;
 
 /**
  * An exception that is thrown to indicate that an attempt to store a new

@@ -18,7 +18,8 @@
 
 module hunt.quartz.impl.triggers.SimpleTriggerImpl;
 
-import std.datetime;
+import hunt.quartz.impl.triggers.AbstractTrigger;
+import hunt.quartz.impl.triggers.CoreTrigger;
 
 import hunt.quartz.Calendar;
 import hunt.quartz.CronTrigger;
@@ -31,6 +32,8 @@ import hunt.quartz.SimpleScheduleBuilder;
 import hunt.quartz.SimpleTrigger;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerUtils;
+
+import std.datetime;
 
 
 /**
@@ -75,13 +78,13 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    private Date startTime = null;
+    private Date startTime; // = null;
 
-    private Date endTime = null;
+    private Date endTime; // = null;
 
-    private Date nextFireTime = null;
+    private Date nextFireTime; // = null;
 
-    private Date previousFireTime = null;
+    private Date previousFireTime; // = null;
 
     private int repeatCount = 0;
 

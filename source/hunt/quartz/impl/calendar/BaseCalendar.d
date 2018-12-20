@@ -19,6 +19,8 @@ module hunt.quartz.impl.calendar.BaseCalendar;
 
 import hunt.quartz.Calendar;
 
+import hunt.io.common;
+import hunt.lang.common;
 import hunt.time.util.Calendar;
 
 import std.datetime;
@@ -43,11 +45,11 @@ import std.datetime;
  * @author Juergen Donnerstag
  * @author James House
  */
-class BaseCalendar : Calendar, Serializable, Cloneable {
+class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
 
 
     // <p>A optional base calendar.</p>
-    private Calendar baseCalendar;
+    private QuartzCalendar baseCalendar;
 
     private string description;
 
@@ -56,7 +58,7 @@ class BaseCalendar : Calendar, Serializable, Cloneable {
     this() {
     }
 
-    this(Calendar baseCalendar) {
+    this(QuartzCalendar baseCalendar) {
         setBaseCalendar(baseCalendar);
     }
 
@@ -72,7 +74,7 @@ class BaseCalendar : Calendar, Serializable, Cloneable {
      * @param timeZone The time zone to use for this Calendar, <code>null</code>
      * if <code>{@link TimeZone#getDefault()}</code> should be used
      */
-    this(Calendar baseCalendar, TimeZone timeZone) {
+    this(QuartzCalendar baseCalendar, TimeZone timeZone) {
         setBaseCalendar(baseCalendar);
         setTimeZone(timeZone);
     }
@@ -97,7 +99,7 @@ class BaseCalendar : Calendar, Serializable, Cloneable {
      * Set a new base calendar or remove the existing one
      * </p>
      */
-    void setBaseCalendar(Calendar baseCalendar) {
+    void setBaseCalendar(QuartzCalendar baseCalendar) {
         this.baseCalendar = baseCalendar;
     }
 
@@ -106,7 +108,7 @@ class BaseCalendar : Calendar, Serializable, Cloneable {
      * Get the base calendar. Will be null, if not set.
      * </p>
      */
-    Calendar getBaseCalendar() {
+    QuartzCalendar getBaseCalendar() {
         return this.baseCalendar;
     }
 
@@ -201,63 +203,63 @@ class BaseCalendar : Calendar, Serializable, Cloneable {
     }
 
     /**
-     * Build a <code>{@link hunt.time.util.Calendar}</code> for the given timeStamp.
+     * Build a <code>{@link HuntCalendar}</code> for the given timeStamp.
      * The new Calendar will use the <code>BaseCalendar</code> time zone if it
      * is not <code>null</code>.
      */
-    protected hunt.time.util.Calendar createJavaCalendar(long timeStamp) {
-        hunt.time.util.Calendar calendar = createJavaCalendar();
+    protected HuntCalendar createJavaCalendar(long timeStamp) {
+        HuntCalendar calendar = createJavaCalendar();
         calendar.setTime(new Date(timeStamp));
         return calendar;
     }
 
     /**
-     * Build a <code>{@link hunt.time.util.Calendar}</code> with the current time.
+     * Build a <code>{@link HuntCalendar}</code> with the current time.
      * The new Calendar will use the <code>BaseCalendar</code> time zone if
      * it is not <code>null</code>.
      */
-    protected hunt.time.util.Calendar createJavaCalendar() {
+    protected HuntCalendar createJavaCalendar() {
         return
             (getTimeZone() is null) ?
-                hunt.time.util.Calendar.getInstance() :
-                hunt.time.util.Calendar.getInstance(getTimeZone());
+                HuntCalendar.getInstance() :
+                HuntCalendar.getInstance(getTimeZone());
     }
 
     /**
-     * Returns the start of the given day as a <code>{@link hunt.time.util.Calendar}</code>.
+     * Returns the start of the given day as a <code>{@link HuntCalendar}</code>.
      * This calculation will take the <code>BaseCalendar</code>
      * time zone into account if it is not <code>null</code>.
      *
      * @param timeInMillis A time containing the desired date for the
      *                     start-of-day time
-     * @return A <code>{@link hunt.time.util.Calendar}</code> set to the start of
+     * @return A <code>{@link HuntCalendar}</code> set to the start of
      *         the given day.
      */
-    protected hunt.time.util.Calendar getStartOfDayJavaCalendar(long timeInMillis) {
-        hunt.time.util.Calendar startOfDay = createJavaCalendar(timeInMillis);
-        startOfDay.set(hunt.time.util.Calendar.HOUR_OF_DAY, 0);
-        startOfDay.set(hunt.time.util.Calendar.MINUTE, 0);
-        startOfDay.set(hunt.time.util.Calendar.SECOND, 0);
-        startOfDay.set(hunt.time.util.Calendar.MILLISECOND, 0);
+    protected HuntCalendar getStartOfDayJavaCalendar(long timeInMillis) {
+        HuntCalendar startOfDay = createJavaCalendar(timeInMillis);
+        startOfDay.set(HuntCalendar.HOUR_OF_DAY, 0);
+        startOfDay.set(HuntCalendar.MINUTE, 0);
+        startOfDay.set(HuntCalendar.SECOND, 0);
+        startOfDay.set(HuntCalendar.MILLISECOND, 0);
         return startOfDay;
     }
 
     /**
-     * Returns the end of the given day <code>{@link hunt.time.util.Calendar}</code>.
+     * Returns the end of the given day <code>{@link HuntCalendar}</code>.
      * This calculation will take the <code>BaseCalendar</code>
      * time zone into account if it is not <code>null</code>.
      *
      * @param timeInMillis a time containing the desired date for the
      *                     end-of-day time.
-     * @return A <code>{@link hunt.time.util.Calendar}</code> set to the end of
+     * @return A <code>{@link HuntCalendar}</code> set to the end of
      *         the given day.
      */
-    protected hunt.time.util.Calendar getEndOfDayJavaCalendar(long timeInMillis) {
-        hunt.time.util.Calendar endOfDay = createJavaCalendar(timeInMillis);
-        endOfDay.set(hunt.time.util.Calendar.HOUR_OF_DAY, 23);
-        endOfDay.set(hunt.time.util.Calendar.MINUTE, 59);
-        endOfDay.set(hunt.time.util.Calendar.SECOND, 59);
-        endOfDay.set(hunt.time.util.Calendar.MILLISECOND, 999);
+    protected HuntCalendar getEndOfDayJavaCalendar(long timeInMillis) {
+        HuntCalendar endOfDay = createJavaCalendar(timeInMillis);
+        endOfDay.set(HuntCalendar.HOUR_OF_DAY, 23);
+        endOfDay.set(HuntCalendar.MINUTE, 59);
+        endOfDay.set(HuntCalendar.SECOND, 59);
+        endOfDay.set(HuntCalendar.MILLISECOND, 999);
         return endOfDay;
     }
 }

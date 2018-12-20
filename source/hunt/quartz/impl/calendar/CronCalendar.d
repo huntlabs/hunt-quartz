@@ -1,5 +1,7 @@
 module hunt.quartz.impl.calendar.CronCalendar;
 
+import hunt.quartz.impl.calendar.BaseCalendar;
+
 import hunt.lang.exception;
 import std.datetime;
 

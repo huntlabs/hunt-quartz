@@ -15,6 +15,8 @@
  */
 module hunt.quartz.listeners.JobChainingJobListener;
 
+import hunt.quartz.listeners.JobListenerSupport;
+
 import hunt.container.HashMap;
 import hunt.container.Map;
 

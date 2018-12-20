@@ -18,12 +18,15 @@
 
 module hunt.quartz.core.SchedulerSignalerImpl;
 
-import hunt.logging;
+import hunt.quartz.core.QuartzScheduler;
+import hunt.quartz.core.QuartzSchedulerThread;
 
 import hunt.quartz.JobKey;
 import hunt.quartz.exception;
 import hunt.quartz.Trigger;
 import hunt.quartz.spi.SchedulerSignaler;
+
+import hunt.logging;
 
 /**
  * An interface to be used by <code>JobStore</code> instances in order to

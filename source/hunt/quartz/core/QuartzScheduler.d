@@ -18,6 +18,10 @@
 
 module hunt.quartz.core.QuartzScheduler;
 
+import hunt.quartz.core.QuartzSchedulerResources;
+import hunt.quartz.core.QuartzSchedulerThread;
+import hunt.quartz.core.RemotableQuartzScheduler;
+
 // import hunt.io.common;
 // import java.lang.management.ManagementFactory;
 // import java.rmi.RemoteException;
@@ -72,6 +76,7 @@ import hunt.quartz.spi.SchedulerPlugin;
 import hunt.quartz.spi.SchedulerSignaler;
 import hunt.quartz.spi.ThreadExecutor;
 
+import hunt.concurrent.thread;
 import hunt.container;
 import hunt.io.common;
 import hunt.logging;
@@ -151,19 +156,19 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
     private QuartzSchedulerThread schedThread;
 
-    private ThreadGroup threadGroup;
+    private ThreadGroupEx threadGroup;
 
-    private SchedulerContext context = new SchedulerContext();
+    private SchedulerContext context;
 
-    private ListenerManager listenerManager = new ListenerManagerImpl();
+    private ListenerManager listenerManager;
     
-    private HashMap!(string, JobListener) internalJobListeners = new HashMap!(string, JobListener)(10);
+    private HashMap!(string, JobListener) internalJobListeners;
 
-    private HashMap!(string, TriggerListener) internalTriggerListeners = new HashMap!(string, TriggerListener)(10);
+    private HashMap!(string, TriggerListener) internalTriggerListeners;
 
-    private ArrayList!(SchedulerListener) internalSchedulerListeners = new ArrayList!(SchedulerListener)(10);
+    private ArrayList!(SchedulerListener) internalSchedulerListeners;
 
-    private JobFactory jobFactory = new PropertySettingJobFactory();
+    private JobFactory jobFactory; // = new PropertySettingJobFactory();
     
     ExecutingJobsManager jobMgr = null;
 
@@ -173,7 +178,6 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
     private RandomLong random; // = new Random();
 
-    private ArrayList!(Object) holdToPreventGC = new ArrayList!(Object)(5);
 
     private bool signalOnSchedulingChange = true;
 
@@ -181,9 +185,9 @@ class QuartzScheduler : RemotableQuartzScheduler {
     private bool shuttingDown = false;
     private bool boundRemotely = false;
 
-    private QuartzSchedulerMBean jmxBean = null;
+    // private QuartzSchedulerMBean jmxBean = null;
     
-    private Date initialStart = null;
+    private Date initialStart; // = null;
 
     
     // private static final Map!(string, ManagementServer) MGMT_SVR_BY_BIND = new
@@ -207,6 +211,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * @see QuartzSchedulerResources
      */
     this(QuartzSchedulerResources resources, long idleWaitTime) {
+        defaultInitialize();
         this.resources = resources;
         JobListener j = cast(JobListener)resources.getJobStore();
         if (j !is null) {
@@ -228,6 +233,15 @@ class QuartzScheduler : RemotableQuartzScheduler {
         signaler = new SchedulerSignalerImpl(this, this.schedThread);
         
         info("Quartz Scheduler v." ~ getVersion() ~ " created.");
+    }
+
+    private void defaultInitialize() {
+        context = new SchedulerContext();
+        listenerManager = new ListenerManagerImpl();
+        internalJobListeners = new HashMap!(string, JobListener)(10);
+        internalTriggerListeners = new HashMap!(string, TriggerListener)(10);
+        internalSchedulerListeners = new ArrayList!(SchedulerListener)(10);
+        holdToPreventGC = new ArrayList!(Object)(5);
     }
 
     void initialize() {
@@ -467,10 +481,10 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * Returns the name of the thread group for Quartz's main threads.
      * </p>
      */
-    ThreadGroup getSchedulerThreadGroup() {
+    ThreadGroupEx getSchedulerThreadGroup() {
         if (threadGroup is null) {
-            threadGroup = new ThreadGroup("QuartzScheduler:"
-                    + getSchedulerName());
+            threadGroup = new ThreadGroupEx("QuartzScheduler:"
+                    ~ getSchedulerName());
             if (resources.getMakeSchedulerThreadDaemon()) {
                 threadGroup.setDaemon(true);
             }

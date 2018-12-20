@@ -16,6 +16,7 @@
 module hunt.quartz.impl.DefaultThreadExecutor;
 
 import hunt.quartz.spi.ThreadExecutor;
+import core.thread;
 
 /**
  * Schedules work on a newly spawned thread. This is the default Quartz

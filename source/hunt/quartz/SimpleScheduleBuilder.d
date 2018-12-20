@@ -17,6 +17,9 @@
 
 module hunt.quartz.SimpleScheduleBuilder;
 
+import hunt.quartz.Scheduler;
+import hunt.quartz.ScheduleBuilder;
+import hunt.quartz.SimpleTrigger;
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 

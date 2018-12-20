@@ -18,9 +18,8 @@
 
 module hunt.quartz.core.QuartzSchedulerThread;
 
-
-// import java.util.Random;
-// 
+import hunt.quartz.core.QuartzScheduler;
+import hunt.quartz.core.QuartzSchedulerResources;
 
 import hunt.quartz.exception;
 import hunt.quartz.Trigger;
@@ -30,6 +29,7 @@ import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.spi.TriggerFiredResult;
 
+import hunt.concurrent.thread;
 import hunt.container.ArrayList;
 import hunt.container.List;
 import hunt.logging;
@@ -47,7 +47,7 @@ import hunt.logging;
  *
  * @author James House
  */
-class QuartzSchedulerThread : Thread {
+class QuartzSchedulerThread : ThreadEx {
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *

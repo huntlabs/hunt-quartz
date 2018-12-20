@@ -16,6 +16,10 @@
 
 module hunt.quartz.utils.counter.CounterImpl;
 
+import hunt.quartz.utils.counter.Counter;
+
+import hunt.io.common;
+
 // import java.util.concurrent.atomic.AtomicLong;
 
 /**

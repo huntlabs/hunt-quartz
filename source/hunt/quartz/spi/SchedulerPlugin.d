@@ -17,6 +17,8 @@
 
 module hunt.quartz.spi.SchedulerPlugin;
 
+import hunt.quartz.spi.ClassLoadHelper;
+
 import hunt.quartz.Scheduler;
 import hunt.quartz.exception;
 

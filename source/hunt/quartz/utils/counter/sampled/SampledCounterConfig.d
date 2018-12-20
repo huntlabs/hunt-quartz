@@ -27,9 +27,9 @@ import hunt.quartz.utils.counter.CounterConfig;
  * 
  */
 class SampledCounterConfig : CounterConfig {
-    private final int intervalSecs;
-    private final int historySize;
-    private final bool isReset;
+    private int intervalSecs;
+    private int historySize;
+    private bool isReset;
 
     /**
      * Make a new timed counter config (duh)

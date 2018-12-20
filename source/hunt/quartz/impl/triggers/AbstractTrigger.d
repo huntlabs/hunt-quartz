@@ -835,7 +835,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * @return true if the key of this Trigger equals that of the given Trigger.
      */
     override
-    bool equals(Object o) {
+    bool opEquals(Object o) {
         Trigger other = cast(Trigger)o;
         if(other is null)
             return false;
@@ -885,5 +885,5 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
             .withSchedule(getScheduleBuilder());
     }
 
-    abstract ScheduleBuilder!(T) getScheduleBuilder();
+    abstract ScheduleBuilder!(T) getScheduleBuilder(); // 
 }

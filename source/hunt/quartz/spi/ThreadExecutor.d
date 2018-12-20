@@ -1,5 +1,7 @@
 module hunt.quartz.spi.ThreadExecutor;
 
+import core.thread;
+
 /**
  * Allows different strategies for scheduling threads. The {@link #initialize()}
  * method is required to be called before the first call to

@@ -237,14 +237,14 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * 
      * @see #getTriggerBuilder()
      */
-    ScheduleBuilder!(Trigger) getScheduleBuilder();
+    ScheduleBuilder!(Trigger) getScheduleBuilder(); // 
 
     /**
      * Trigger equality is based upon the equality of the TriggerKey.
      * 
      * @return true if the key of this Trigger equals that of the given Trigger.
      */
-    bool equals(Object other);
+    bool opEquals(Object other);
     
     /**
      * <p>

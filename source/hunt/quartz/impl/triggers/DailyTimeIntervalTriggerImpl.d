@@ -16,7 +16,10 @@
  */
 module hunt.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 
+import hunt.quartz.impl.triggers.AbstractTrigger;
+import hunt.quartz.impl.triggers.CoreTrigger;
 
+import hunt.quartz.Calendar;
 import hunt.quartz.DailyTimeIntervalScheduleBuilder;
 import hunt.quartz.DailyTimeIntervalTrigger;
 import hunt.quartz.DateBuilder;
@@ -84,7 +87,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    // private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = hunt.time.util.Calendar.getInstance().get(hunt.time.util.Calendar.YEAR) + 100;
+    // private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = HuntCalendar.getInstance().get(HuntCalendar.YEAR) + 100;
     private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = 2018 + 100;
 
     /*
@@ -95,13 +98,13 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    private Date startTime = null;
+    private Date startTime;// = null;
 
-    private Date endTime = null;
+    private Date endTime;// = null;
 
-    private Date nextFireTime = null;
+    private Date nextFireTime;// = null;
 
-    private Date previousFireTime = null;
+    private Date previousFireTime;// = null;
     
     private int repeatCount = REPEAT_INDEFINITELY;
 
@@ -109,7 +112,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
     
     private IntervalUnit repeatIntervalUnit = IntervalUnit.MINUTE;
 
-    private Set!(Integer) daysOfWeek;
+    private Set!(int) daysOfWeek;
     
     private TimeOfDay startTimeOfDay;
 
@@ -440,7 +443,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * </p>
      */
     override
-    void updateAfterMisfire(hunt.quartz.Calendar cal) {
+    void updateAfterMisfire(QuartzCalendar cal) {
         int instr = getMisfireInstruction();
 
         if(instr == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY)
@@ -478,7 +481,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * @see #executionComplete(JobExecutionContext, JobExecutionException)
      */
     override
-    void triggered(hunt.quartz.Calendar calendar) {
+    void triggered(QuartzCalendar calendar) {
         timesTriggered++;
         previousFireTime = nextFireTime;
         nextFireTime = getFireTimeAfter(nextFireTime);
@@ -492,9 +495,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
                 break;
             
             //avoid infinite loop
-            hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
+            HuntCalendar c = HuntCalendar.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
         }
@@ -506,10 +509,10 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
 
 
     /**
-     * @see hunt.quartz.impl.triggers.AbstractTrigger#updateWithNewCalendar(hunt.quartz.Calendar, long)
+     * @see hunt.quartz.impl.triggers.AbstractTrigger#updateWithNewCalendar(QuartzCalendar, long)
      */
     override
-    void updateWithNewCalendar(hunt.quartz.Calendar calendar, long misfireThreshold)
+    void updateWithNewCalendar(QuartzCalendar calendar, long misfireThreshold)
     {
         nextFireTime = getFireTimeAfter(previousFireTime);
 
@@ -526,9 +529,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
                 break;
             
             //avoid infinite loop
-            hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
+            HuntCalendar c = HuntCalendar.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
 
@@ -559,7 +562,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *         </p>
      */
     override
-    Date computeFirstFireTime(hunt.quartz.Calendar calendar) {
+    Date computeFirstFireTime(QuartzCalendar calendar) {
         
       nextFireTime = getFireTimeAfter(new Date(getStartTime().getTime() - 1000L));
       
@@ -573,9 +576,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
               break;
       
           //avoid infinite loop
-          hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
+          HuntCalendar c = HuntCalendar.getInstance();
           c.setTime(nextFireTime);
-          if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+          if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
               return null;
           }
       }
@@ -583,8 +586,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
       return nextFireTime;
     }
     
-    private Calendar createCalendarTime(Date dateTime) {
-        Calendar cal = Calendar.getInstance();
+    private HuntCalendar createCalendarTime(Date dateTime) {
+        HuntCalendar cal = HuntCalendar.getInstance();
         cal.setTime(dateTime);
         return cal;
     }
@@ -706,25 +709,25 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         long startMillis = fireTimeStartDate.getTime();
         long secondsAfterStart = (fireMillis - startMillis) / 1000L;
         long repeatLong = getRepeatInterval();
-        Calendar sTime = createCalendarTime(fireTimeStartDate);
+        HuntCalendar sTime = createCalendarTime(fireTimeStartDate);
         IntervalUnit repeatUnit = getRepeatIntervalUnit();
         if(repeatUnit== IntervalUnit.SECOND) {
             long jumpCount = secondsAfterStart / repeatLong;
             if(secondsAfterStart % repeatLong != 0)
                 jumpCount++;
-            sTime.add(Calendar.SECOND, getRepeatInterval() * cast(int)jumpCount);
+            sTime.add(HuntCalendar.SECOND, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         } else if(repeatUnit== IntervalUnit.MINUTE) {
             long jumpCount = secondsAfterStart / (repeatLong * 60L);
             if(secondsAfterStart % (repeatLong * 60L) != 0)
                 jumpCount++;
-            sTime.add(Calendar.MINUTE, getRepeatInterval() * cast(int)jumpCount);
+            sTime.add(HuntCalendar.MINUTE, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         } else if(repeatUnit== IntervalUnit.HOUR) {
             long jumpCount = secondsAfterStart / (repeatLong * 60L * 60L);
             if(secondsAfterStart % (repeatLong * 60L * 60L) != 0)
                 jumpCount++;
-            sTime.add(Calendar.HOUR_OF_DAY, getRepeatInterval() * cast(int)jumpCount);
+            sTime.add(HuntCalendar.HOUR_OF_DAY, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         }
         
@@ -741,10 +744,10 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
 
     private bool isSameDay(Date d1, Date d2) {
     
-      Calendar c1 = createCalendarTime(d1);
-      Calendar c2 = createCalendarTime(d2);
+      HuntCalendar c1 = createCalendarTime(d1);
+      HuntCalendar c2 = createCalendarTime(d2);
       
-      return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR);
+      return c1.get(HuntCalendar.YEAR) == c2.get(HuntCalendar.YEAR) && c1.get(HuntCalendar.DAY_OF_YEAR) == c2.get(HuntCalendar.DAY_OF_YEAR);
     }
     
     /**
@@ -760,16 +763,16 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         // a. Advance or adjust to next dayOfWeek if need to first, starting next day with startTimeOfDay.
         TimeOfDay sTimeOfDay = getStartTimeOfDay();
         Date fireTimeStartDate = sTimeOfDay.getTimeOfDayForDate(fireTime);      
-        Calendar fireTimeStartDateCal = createCalendarTime(fireTimeStartDate);          
-        int dayOfWeekOfFireTime = fireTimeStartDateCal.get(Calendar.DAY_OF_WEEK);
+        HuntCalendar fireTimeStartDateCal = createCalendarTime(fireTimeStartDate);          
+        int dayOfWeekOfFireTime = fireTimeStartDateCal.get(HuntCalendar.DAY_OF_WEEK);
         
         // b2. We need to advance to another day if isAfterTimePassEndTimeOfDay is true, or dayOfWeek is not set.
-        Set!(Integer) daysOfWeekToFire = getDaysOfWeek();
+        Set!(int) daysOfWeekToFire = getDaysOfWeek();
         if (forceToAdvanceNextDay || !daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
           // Advance one day at a time until next available date.
           for(int i=1; i <= 7; i++) {
-            fireTimeStartDateCal.add(Calendar.DATE, 1);
-            dayOfWeekOfFireTime = fireTimeStartDateCal.get(Calendar.DAY_OF_WEEK);
+            fireTimeStartDateCal.add(HuntCalendar.DATE, 1);
+            dayOfWeekOfFireTime = fireTimeStartDateCal.get(HuntCalendar.DAY_OF_WEEK);
             if (daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
               fireTime = fireTimeStartDateCal.getTime();
               break;
@@ -865,14 +868,14 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
     /**
      * {@inheritDoc}
      */
-    Set!(Integer) getDaysOfWeek() {
+    Set!(int) getDaysOfWeek() {
         if (daysOfWeek is null) {
             daysOfWeek = DailyTimeIntervalScheduleBuilder.ALL_DAYS_OF_THE_WEEK;
         }
         return daysOfWeek;
     }
 
-    void setDaysOfWeek(Set!(Integer) daysOfWeek) {
+    void setDaysOfWeek(Set!(int) daysOfWeek) {
         if(daysOfWeek is null || daysOfWeek.size() == 0)
             throw new IllegalArgumentException("DaysOfWeek set must be a set that contains at least one day.");
         else if(daysOfWeek.size() == 0) 

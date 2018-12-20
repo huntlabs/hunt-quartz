@@ -27,6 +27,8 @@ import hunt.quartz.exception;
 import hunt.quartz.core.JobRunShell;
 import hunt.quartz.spi.TriggerFiredBundle;
 
+import hunt.lang.exception;
+
 /**
  * <p>
  * An extension of <code>{@link hunt.quartz.core.JobRunShell}</code> that
@@ -49,7 +51,7 @@ class JTAJobRunShell : JobRunShell {
      */
     private int transactionTimeout;
 
-    private UserTransaction ut;
+    // private UserTransaction ut;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,13 +100,15 @@ class JTAJobRunShell : JobRunShell {
         bool beganSuccessfully = false;
         try {
             trace("Looking up UserTransaction.");
-            ut = UserTransactionHelper.lookupUserTransaction();
-            if (transactionTimeout !is null) {
-                ut.setTransactionTimeout(transactionTimeout);
-            }
+            implementationMissing(false);
+            
+            // ut = UserTransactionHelper.lookupUserTransaction();
+            // if (transactionTimeout !is null) {
+            //     ut.setTransactionTimeout(transactionTimeout);
+            // }
 
-            trace("Beginning UserTransaction.");
-            ut.begin();
+            // trace("Beginning UserTransaction.");
+            // ut.begin();
             
             beganSuccessfully = true;
         } catch (SchedulerException se) {

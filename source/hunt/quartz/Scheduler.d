@@ -130,7 +130,7 @@ interface Scheduler {
      * A (possibly) useful constant that can be used for specifying the group
      * that <code>Job</code> and <code>Trigger</code> instances belong to.
      */
-    string DEFAULT_GROUP = Key.DEFAULT_GROUP;
+    enum string DEFAULT_GROUP = "DEFAULT"; // Key.DEFAULT_GROUP;
 
     /**
      * A constant <code>Trigger</code> group name used internally by the
@@ -139,7 +139,7 @@ interface Scheduler {
      *
      * @see hunt.quartz.JobDetail#requestsRecovery()
      */
-    string DEFAULT_RECOVERY_GROUP = "RECOVERING_JOBS";
+    enum string DEFAULT_RECOVERY_GROUP = "RECOVERING_JOBS";
 
     /**
      * A constant <code>Trigger</code> group name used internally by the
@@ -148,7 +148,7 @@ interface Scheduler {
      *
      * @see hunt.quartz.JobDetail#requestsRecovery()
      */
-    string DEFAULT_FAIL_OVER_GROUP = "FAILED_OVER_JOBS";
+    enum string DEFAULT_FAIL_OVER_GROUP = "FAILED_OVER_JOBS";
 
 
     /**
@@ -159,7 +159,7 @@ interface Scheduler {
      *
      * @see hunt.quartz.JobDetail#requestsRecovery()
      */
-    string FAILED_JOB_ORIGINAL_TRIGGER_NAME =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME";
+    enum string FAILED_JOB_ORIGINAL_TRIGGER_NAME =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_NAME";
 
     /**
      * A constant <code>JobDataMap</code> key that can be used to retrieve the
@@ -169,7 +169,7 @@ interface Scheduler {
      *
      * @see hunt.quartz.JobDetail#requestsRecovery()
      */
-    string FAILED_JOB_ORIGINAL_TRIGGER_GROUP =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP";
+    enum string FAILED_JOB_ORIGINAL_TRIGGER_GROUP =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_GROUP";
 
     /**
      * A constant <code>JobDataMap</code> key that can be used to retrieve the
@@ -183,7 +183,7 @@ interface Scheduler {
      *
      * @see hunt.quartz.JobDetail#requestsRecovery()
      */
-    string FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS_AS_STRING";
+    enum string FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_FIRETIME_IN_MILLISECONDS_AS_STRING";
 
     /**
      * A constant <code>JobDataMap</code> key that can be used to retrieve the
@@ -197,7 +197,7 @@ interface Scheduler {
      *
      * @see hunt.quartz.JobDetail#requestsRecovery()
      */
-    string FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS_AS_STRING";
+    enum string FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS =  "QRTZ_FAILED_JOB_ORIG_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS_AS_STRING";
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

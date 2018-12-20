@@ -17,13 +17,14 @@
 
 module hunt.quartz.impl.calendar.HolidayCalendar;
 
-import std.datetime;
+import hunt.quartz.impl.calendar.BaseCalendar;
+import hunt.quartz.Calendar;
 
 import hunt.container.Collections;
 import hunt.container.SortedSet;
 import hunt.container.TreeSet;
 
-import hunt.quartz.Calendar;
+import std.datetime;
 
 /**
  * <p>

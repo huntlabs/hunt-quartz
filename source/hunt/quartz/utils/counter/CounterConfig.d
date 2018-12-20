@@ -16,6 +16,8 @@
 
 module hunt.quartz.utils.counter.CounterConfig;
 
+import hunt.quartz.utils.counter.Counter;
+
 /**
  * Config for a simple Counter
  * 

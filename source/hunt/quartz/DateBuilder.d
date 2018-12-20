@@ -20,6 +20,8 @@ module hunt.quartz.DateBuilder;
 import hunt.time.util.Calendar;
 // import std.datetime;
 import hunt.time.util.Locale;
+
+import std.conv;
 import std.datetime;
 
 /**
@@ -1008,11 +1010,12 @@ class DateBuilder {
         }
     }
 
-    private enum int MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR) + 100;
+    // private enum int MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR) + 100;
+    private enum int MAX_YEAR = 2018 + 100;
     static void validateYear(int year) {
         if (year < 0 || year > MAX_YEAR) {
             throw new IllegalArgumentException(
-                    "Invalid year (must be >= 0 and <= " ~ MAX_YEAR);
+                    "Invalid year (must be >= 0 and <= " ~ MAX_YEAR.to!string());
         }
     }
 

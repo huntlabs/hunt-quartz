@@ -18,6 +18,10 @@
 
 module hunt.quartz.InterruptableJob;
 
+import hunt.quartz.Job;
+import hunt.quartz.JobDetail;
+import hunt.quartz.Trigger;
+
 /**
  * The interface to be implemented by <code>{@link Job}s</code> that provide a 
  * mechanism for having their execution interrupted.  It is NOT a requirement

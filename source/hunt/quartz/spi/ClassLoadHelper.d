@@ -61,7 +61,7 @@ interface ClassLoadHelper {
      * @param name name of the desired resource
      * @return a java.net.URL object
      */
-    URL getResource(string name);
+    // URL getResource(string name);
 
     /**
      * Finds a resource with a given name. This method returns null if no
@@ -77,5 +77,5 @@ interface ClassLoadHelper {
      *
      * @return the class-loader user be the helper.
      */
-    ClassLoader getClassLoader();
+    // ClassLoader getClassLoader();
 }

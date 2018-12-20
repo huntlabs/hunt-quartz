@@ -18,6 +18,7 @@
 
 module hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 
+import hunt.quartz.impl.triggers.AbstractTrigger;
 import hunt.quartz.impl.triggers.CoreTrigger;
 
 import hunt.quartz.Calendar;
@@ -37,7 +38,6 @@ import hunt.quartz.TriggerUtils;
 import hunt.time.util.Calendar;
 import std.datetime;
 
-alias QuartzCalendar = hunt.quartz.Calendar.Calendar;
 
 /**
  * <p>A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>
@@ -78,7 +78,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      */
     
     private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = 2018 + 100; 
-    // hunt.time.util.Calendar.getInstance().get(hunt.time.util.Calendar.YEAR) +
+    // HuntCalendar.getInstance().get(HuntCalendar.YEAR) +
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,13 +88,13 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    private Date startTime = null;
+    private Date startTime;
 
-    private Date endTime = null;
+    private Date endTime;
 
-    private Date nextFireTime = null;
+    private Date nextFireTime;
 
-    private Date previousFireTime = null;
+    private Date previousFireTime;
 
     private  int repeatInterval = 0;
     
@@ -124,6 +124,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      */
     this() {
+        // Date.zero
         super();
     }
 
@@ -522,9 +523,9 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
                 break;
             
             //avoid infinite loop
-            hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
+            HuntCalendar c = HuntCalendar.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
         }
@@ -553,9 +554,9 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
                 break;
             
             //avoid infinite loop
-            hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
+            HuntCalendar c = HuntCalendar.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
 
@@ -598,9 +599,9 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
                 break;
 
             //avoid infinite loop
-            hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
+            HuntCalendar c = HuntCalendar.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 return null;
             }
         }
@@ -762,17 +763,17 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
                         jumpCount = cast(long) (jumpCount * 0.90);
                     else
                         jumpCount = cast(long) (jumpCount * 0.95);
-                    sTime.add(hunt.time.util.Calendar.DAY_OF_YEAR, cast(int) (getRepeatInterval() * jumpCount));
+                    sTime.add(HuntCalendar.DAY_OF_YEAR, cast(int) (getRepeatInterval() * jumpCount));
                 }
                 
                 // now baby-step the rest of the way there...
                 while(!sTime.getTime().after(afterTime) &&
-                        (sTime.get(hunt.time.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
-                    sTime.add(hunt.time.util.Calendar.DAY_OF_YEAR, getRepeatInterval());
+                        (sTime.get(HuntCalendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
+                    sTime.add(HuntCalendar.DAY_OF_YEAR, getRepeatInterval());
                 }
                 while(daylightSavingHourShiftOccurredAndAdvanceNeeded(sTime, initialHourOfDay, afterTime) &&
-                        (sTime.get(hunt.time.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
-                    sTime.add(hunt.time.util.Calendar.DAY_OF_YEAR, getRepeatInterval());
+                        (sTime.get(HuntCalendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
+                    sTime.add(HuntCalendar.DAY_OF_YEAR, getRepeatInterval());
                 }
                 time = sTime.getTime();
             }
@@ -798,16 +799,16 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
                         jumpCount = cast(long) (jumpCount * 0.90);
                     else
                         jumpCount = cast(long) (jumpCount * 0.95);
-                    sTime.add(hunt.time.util.Calendar.WEEK_OF_YEAR, cast(int) (getRepeatInterval() * jumpCount));
+                    sTime.add(HuntCalendar.WEEK_OF_YEAR, cast(int) (getRepeatInterval() * jumpCount));
                 }
                 
                 while(!sTime.getTime().after(afterTime) &&
-                        (sTime.get(hunt.time.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
-                    sTime.add(hunt.time.util.Calendar.WEEK_OF_YEAR, getRepeatInterval());
+                        (sTime.get(HuntCalendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
+                    sTime.add(HuntCalendar.WEEK_OF_YEAR, getRepeatInterval());
                 }
                 while(daylightSavingHourShiftOccurredAndAdvanceNeeded(sTime, initialHourOfDay, afterTime) &&
-                        (sTime.get(hunt.time.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
-                    sTime.add(hunt.time.util.Calendar.WEEK_OF_YEAR, getRepeatInterval());
+                        (sTime.get(HuntCalendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
+                    sTime.add(HuntCalendar.WEEK_OF_YEAR, getRepeatInterval());
                 }
                 time = sTime.getTime();
             }
@@ -819,24 +820,24 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
                 // just advance via brute-force iteration.
                 
                 while(!sTime.getTime().after(afterTime) &&
-                        (sTime.get(hunt.time.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
-                    sTime.add(hunt.time.util.Calendar.MONTH, getRepeatInterval());
+                        (sTime.get(HuntCalendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
+                    sTime.add(HuntCalendar.MONTH, getRepeatInterval());
                 }
                 while(daylightSavingHourShiftOccurredAndAdvanceNeeded(sTime, initialHourOfDay, afterTime) &&
-                        (sTime.get(hunt.time.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
-                    sTime.add(hunt.time.util.Calendar.MONTH, getRepeatInterval());
+                        (sTime.get(HuntCalendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
+                    sTime.add(HuntCalendar.MONTH, getRepeatInterval());
                 }
                 time = sTime.getTime();
             }
             else if(getRepeatIntervalUnit()== IntervalUnit.YEAR) {
     
                 while(!sTime.getTime().after(afterTime) &&
-                        (sTime.get(hunt.time.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
-                    sTime.add(hunt.time.util.Calendar.YEAR, getRepeatInterval());
+                        (sTime.get(HuntCalendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {            
+                    sTime.add(HuntCalendar.YEAR, getRepeatInterval());
                 }
                 while(daylightSavingHourShiftOccurredAndAdvanceNeeded(sTime, initialHourOfDay, afterTime) &&
-                        (sTime.get(hunt.time.util.Calendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
-                    sTime.add(hunt.time.util.Calendar.YEAR, getRepeatInterval());
+                        (sTime.get(HuntCalendar.YEAR) < YEAR_TO_GIVEUP_SCHEDULING_AT)) {
+                    sTime.add(HuntCalendar.YEAR, getRepeatInterval());
                 }
                 time = sTime.getTime();
             }
@@ -849,10 +850,10 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         return time;
     }
 
-    private bool daylightSavingHourShiftOccurredAndAdvanceNeeded(Calendar newTime, int initialHourOfDay, Date afterTime) {
-        if(isPreserveHourOfDayAcrossDaylightSavings() && newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay) {
-            newTime.set(Calendar.HOUR_OF_DAY, initialHourOfDay);
-            if (newTime.get(Calendar.HOUR_OF_DAY) != initialHourOfDay) {
+    private bool daylightSavingHourShiftOccurredAndAdvanceNeeded(HuntCalendar newTime, int initialHourOfDay, Date afterTime) {
+        if(isPreserveHourOfDayAcrossDaylightSavings() && newTime.get(HuntCalendar.HOUR_OF_DAY) != initialHourOfDay) {
+            newTime.set(HuntCalendar.HOUR_OF_DAY, initialHourOfDay);
+            if (newTime.get(HuntCalendar.HOUR_OF_DAY) != initialHourOfDay) {
                 return isSkipDayIfHourDoesNotExist();
             } else {
                 return !newTime.getTime().after(afterTime);
@@ -895,25 +896,25 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         lTime.setLenient(true);
         
         if(getRepeatIntervalUnit()== IntervalUnit.SECOND) {
-            lTime.add(hunt.time.util.Calendar.SECOND, -1 * getRepeatInterval());
+            lTime.add(HuntCalendar.SECOND, -1 * getRepeatInterval());
         }
         else if(getRepeatIntervalUnit()== IntervalUnit.MINUTE) {
-            lTime.add(hunt.time.util.Calendar.MINUTE, -1 * getRepeatInterval());
+            lTime.add(HuntCalendar.MINUTE, -1 * getRepeatInterval());
         }
         else if(getRepeatIntervalUnit()== IntervalUnit.HOUR) {
-            lTime.add(hunt.time.util.Calendar.HOUR_OF_DAY, -1 * getRepeatInterval());
+            lTime.add(HuntCalendar.HOUR_OF_DAY, -1 * getRepeatInterval());
         }
         else if(getRepeatIntervalUnit()== IntervalUnit.DAY) {
-            lTime.add(hunt.time.util.Calendar.DAY_OF_YEAR, -1 * getRepeatInterval());
+            lTime.add(HuntCalendar.DAY_OF_YEAR, -1 * getRepeatInterval());
         }
         else if(getRepeatIntervalUnit()== IntervalUnit.WEEK) {
-            lTime.add(hunt.time.util.Calendar.WEEK_OF_YEAR, -1 * getRepeatInterval());
+            lTime.add(HuntCalendar.WEEK_OF_YEAR, -1 * getRepeatInterval());
         }
         else if(getRepeatIntervalUnit()== IntervalUnit.MONTH) {
-            lTime.add(hunt.time.util.Calendar.MONTH, -1 * getRepeatInterval());
+            lTime.add(HuntCalendar.MONTH, -1 * getRepeatInterval());
         }
         else if(getRepeatIntervalUnit()== IntervalUnit.YEAR) {
-            lTime.add(hunt.time.util.Calendar.YEAR, -1 * getRepeatInterval());
+            lTime.add(HuntCalendar.YEAR, -1 * getRepeatInterval());
         }
 
         return lTime.getTime();
