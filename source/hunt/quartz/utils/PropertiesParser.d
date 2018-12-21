@@ -156,7 +156,7 @@ import hunt.string.StringTokenizer;
 
 //     char getCharProperty(string name, char def) {
 //         string param = getStringProperty(name);
-//         return  (param is null) ? def : param.charAt(0);
+//         return  (param is null) ? def : param[0];
 //     }
 
 //     double getDoubleProperty(string name) {

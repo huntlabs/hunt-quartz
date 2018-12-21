@@ -139,7 +139,7 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //     }
 
 //     private static void invokeSetter(Object target, string attribute, Object value) {
-//         string setterName = "set" ~ Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
+//         string setterName = "set" ~ Character.toUpperCase(attribute[0]) + attribute.substring(1);
 //         TypeInfo_Class[] argTypes = {value.getClass()};
 //         Method setter = findMethod(target.getClass(), setterName, argTypes);
 //         if(setter !is null) {

@@ -92,7 +92,7 @@ module hunt.quartz.jobs.ee.jmx.JMXInvokerJob;
 //                         if (parts.length<2) {
 //                             throw new Exception("Invalid parameter definition: required parts missing " ~paramdefs[k]);
 //                         }
-//                         switch(parts[0].charAt(0)) {
+//                         switch(parts[0][0]) {
 //                             case 'i':
 //                                 params[k]=Integer.valueOf(jobDataMap.getString(parts[1]));
 //                                 types[k]=Integer.TYPE.getName();

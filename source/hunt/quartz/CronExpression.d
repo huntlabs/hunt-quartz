@@ -499,7 +499,7 @@ final class CronExpression : Cloneable { // Serializable,
 
             if (exprOn <= DAY_OF_WEEK) {
                 throw new ParseException("Unexpected end of expression.",
-                            expression.length());
+                            expression.length);
             }
 
             if (exprOn <= YEAR) {
@@ -531,10 +531,10 @@ final class CronExpression : Cloneable { // Serializable,
 
         int incr = 0;
         int i = skipWhiteSpace(pos, s);
-        if (i >= s.length()) {
+        if (i >= s.length) {
             return i;
         }
-        char c = s.charAt(i);
+        char c = s[i];
         if ((c >= 'A') && (c <= 'Z') && (!s.equals("L")) && (!s.equals("LW")) && (!s.matches("^L-[0-9]*[W]?"))) {
             string sub = s.substring(i, i + 3);
             int sval = -1;
@@ -544,8 +544,8 @@ final class CronExpression : Cloneable { // Serializable,
                 if (sval <= 0) {
                     throw new ParseException("Invalid Month value: '" ~ sub ~ "'", i);
                 }
-                if (s.length() > i + 3) {
-                    c = s.charAt(i + 3);
+                if (s.length > i + 3) {
+                    c = s[i + 3];
                     if (c == '-') {
                         i += 4;
                         sub = s.substring(i, i + 3);
@@ -559,10 +559,10 @@ final class CronExpression : Cloneable { // Serializable,
                 sval = getDayOfWeekNumber(sub);
                 if (sval < 0) {
                     throw new ParseException("Invalid Day-of-Week value: '"
-                                + sub ~ "'", i);
+                                ~ sub ~ "'", i);
                 }
-                if (s.length() > i + 3) {
-                    c = s.charAt(i + 3);
+                if (s.length > i + 3) {
+                    c = s[i + 3];
                     if (c == '-') {
                         i += 4;
                         sub = s.substring(i, i + 3);
@@ -604,10 +604,10 @@ final class CronExpression : Cloneable { // Serializable,
 
         if (c == '?') {
             i++;
-            if ((i + 1) < s.length() 
-                    && (s.charAt(i) != ' ' && s.charAt(i + 1) != '\t')) {
+            if ((i + 1) < s.length 
+                    && (s[i] != ' ' && s[i + 1] != '\t')) {
                 throw new ParseException("Illegal character after '?': "
-                            + s.charAt(i), i);
+                            + s[i], i);
             }
             if (type != DAY_OF_WEEK && type != DAY_OF_MONTH) {
                 throw new ParseException(
@@ -628,20 +628,19 @@ final class CronExpression : Cloneable { // Serializable,
         }
 
         if (c == '*' || c == '/') {
-            if (c == '*' && (i + 1) >= s.length()) {
+            if (c == '*' && (i + 1) >= s.length) {
                 addToSet(ALL_SPEC_INT, -1, incr, type);
                 return i + 1;
             } else if (c == '/'
-                    && ((i + 1) >= s.length() || s.charAt(i + 1) == ' ' || s
-                            .charAt(i + 1) == '\t')) { 
+                    && ((i + 1) >= s.length || s[i + 1] == ' ' || s[i + 1] == '\t')) { 
                 throw new ParseException("'/' must be followed by an integer.", i);
             } else if (c == '*') {
                 i++;
             }
-            c = s.charAt(i);
+            c = s[i];
             if (c == '/') { // is an increment specified?
                 i++;
-                if (i >= s.length()) {
+                if (i >= s.length) {
                     throw new ParseException("Unexpected end of string.", i);
                 }
 
@@ -666,8 +665,8 @@ final class CronExpression : Cloneable { // Serializable,
             if (type == DAY_OF_WEEK) {
                 addToSet(7, 7, 0, type);
             }
-            if(type == DAY_OF_MONTH && s.length() > i) {
-                c = s.charAt(i);
+            if(type == DAY_OF_MONTH && s.length > i) {
+                c = s[i];
                 if(c == '-') {
                     ValueSet vs = getValue(0, s, i+1);
                     lastdayOffset = vs.value;
@@ -675,8 +674,8 @@ final class CronExpression : Cloneable { // Serializable,
                         throw new ParseException("Offset from last day must be <= 30", i+1);
                     i = vs.pos;
                 }                        
-                if(s.length() > i) {
-                    c = s.charAt(i);
+                if(s.length > i) {
+                    c = s[i];
                     if(c == 'W') {
                         nearestWeekday = true;
                         i++;
@@ -687,10 +686,10 @@ final class CronExpression : Cloneable { // Serializable,
         } else if (c >= '0' && c <= '9') {
             int val = int.parseInt(string.valueOf(c));
             i++;
-            if (i >= s.length()) {
+            if (i >= s.length) {
                 addToSet(val, -1, -1, type);
             } else {
-                c = s.charAt(i);
+                c = s[i];
                 if (c >= '0' && c <= '9') {
                     ValueSet vs = getValue(val, s, i);
                     val = vs.value;
@@ -725,12 +724,12 @@ final class CronExpression : Cloneable { // Serializable,
         int end = -1;
         int i = pos;
 
-        if (i >= s.length()) {
+        if (i >= s.length) {
             addToSet(val, end, -1, type);
             return i;
         }
 
-        char c = s.charAt(pos);
+        char c = s[pos];
 
         if (c == 'L') {
             if (type == DAY_OF_WEEK) {
@@ -784,30 +783,30 @@ final class CronExpression : Cloneable { // Serializable,
 
         if (c == '-') {
             i++;
-            c = s.charAt(i);
+            c = s[i];
             int v = int.parseInt(string.valueOf(c));
             end = v;
             i++;
-            if (i >= s.length()) {
+            if (i >= s.length) {
                 addToSet(val, end, 1, type);
                 return i;
             }
-            c = s.charAt(i);
+            c = s[i];
             if (c >= '0' && c <= '9') {
                 ValueSet vs = getValue(v, s, i);
                 end = vs.value;
                 i = vs.pos;
             }
-            if (i < s.length() && ((c = s.charAt(i)) == '/')) {
+            if (i < s.length && ((c = s[i]) == '/')) {
                 i++;
-                c = s.charAt(i);
+                c = s[i];
                 int v2 = int.parseInt(string.valueOf(c));
                 i++;
-                if (i >= s.length()) {
+                if (i >= s.length) {
                     addToSet(val, end, v2, type);
                     return i;
                 }
-                c = s.charAt(i);
+                c = s[i];
                 if (c >= '0' && c <= '9') {
                     ValueSet vs = getValue(v2, s, i);
                     int v3 = vs.value;
@@ -825,20 +824,20 @@ final class CronExpression : Cloneable { // Serializable,
         }
 
         if (c == '/') {
-            if ((i + 1) >= s.length() || s.charAt(i + 1) == ' ' || s.charAt(i + 1) == '\t') {
+            if ((i + 1) >= s.length || s[i + 1] == ' ' || s[i + 1] == '\t') {
                 throw new ParseException("'/' must be followed by an integer.", i);
             }
 
             i++;
-            c = s.charAt(i);
+            c = s[i];
             int v2 = int.parseInt(string.valueOf(c));
             i++;
-            if (i >= s.length()) {
+            if (i >= s.length) {
                 checkIncrementRange(v2, type, i);
                 addToSet(val, end, v2, type);
                 return i;
             }
-            c = s.charAt(i);
+            c = s[i];
             if (c >= '0' && c <= '9') {
                 ValueSet vs = getValue(v2, s, i);
                 int v3 = vs.value;
@@ -953,14 +952,14 @@ final class CronExpression : Cloneable { // Serializable,
     }
 
     protected int skipWhiteSpace(int i, string s) {
-        for (; i < s.length() && (s.charAt(i) == ' ' || s.charAt(i) == '\t'); i++) {
+        for (; i < s.length && (s[i] == ' ' || s[i] == '\t'); i++) {
         }
 
         return i;
     }
 
     protected int findNextWhiteSpace(int i, string s) {
-        for (; i < s.length() && (s.charAt(i) != ' ' || s.charAt(i) != '\t'); i++) {
+        for (; i < s.length && (s[i] != ' ' || s[i] != '\t'); i++) {
         }
 
         return i;
@@ -1120,19 +1119,19 @@ final class CronExpression : Cloneable { // Serializable,
     }
 
     protected ValueSet getValue(int v, string s, int i) {
-        char c = s.charAt(i);
+        char c = s[i];
         StringBuilder s1 = new StringBuilder(string.valueOf(v));
         while (c >= '0' && c <= '9') {
             s1.append(c);
             i++;
-            if (i >= s.length()) {
+            if (i >= s.length) {
                 break;
             }
-            c = s.charAt(i);
+            c = s[i];
         }
         ValueSet val = new ValueSet();
         
-        val.pos = (i < s.length()) ? i : i + 1;
+        val.pos = (i < s.length) ? i : i + 1;
         val.value = int.parseInt(s1.toString());
         return val;
     }

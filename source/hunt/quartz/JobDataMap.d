@@ -385,7 +385,7 @@ class JobDataMap : StringKeyDirtyFlagMap {
     // Character getCharacterFromString(string key) {
     //     Object obj = get(key);
 
-    //     return ((string) obj).charAt(0);
+    //     return ((string) obj)[0];
     // }
 
     /**

@@ -170,7 +170,7 @@ module hunt.quartz.simpl.PropertySettingJobFactory;
 //                         if (o instanceof string) {
 //                             string str = (string)o;
 //                             if (str.length() == 1) {
-//                                 parm = Character.valueOf(str.charAt(0));
+//                                 parm = Character.valueOf(str[0]);
 //                             }
 //                         } else if (o instanceof Character) {
 //                             parm = o;
