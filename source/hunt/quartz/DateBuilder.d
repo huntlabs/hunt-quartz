@@ -26,7 +26,7 @@ import std.datetime;
 
 /**
  * <code>DateBuilder</code> is used to conveniently create 
- * <code>java.util.Date</code> instances that meet particular criteria.
+ * <code>java.util.LocalDateTime</code> instances that meet particular criteria.
  *  
  * <p>Quartz provides a builder-style API for constructing scheduling-related
  * entities via a Domain-Specific Language (DSL).  The DSL can best be
@@ -201,9 +201,9 @@ class DateBuilder {
     }
 
     /**
-     * Build the Date defined by this builder instance. 
+     * Build the LocalDateTime defined by this builder instance. 
      */
-    Date build() {
+    LocalDateTime build() {
         Calendar cal;
 
         if(tz !is null && lc !is null)
@@ -227,7 +227,7 @@ class DateBuilder {
     }
     
     /**
-     * Set the hour (0-23) for the Date that will be built by this builder.
+     * Set the hour (0-23) for the LocalDateTime that will be built by this builder.
      */
     DateBuilder atHourOfDay(int atHour) {
         validateHour(atHour);
@@ -237,7 +237,7 @@ class DateBuilder {
     }
 
     /**
-     * Set the minute (0-59) for the Date that will be built by this builder.
+     * Set the minute (0-59) for the LocalDateTime that will be built by this builder.
      */
     DateBuilder atMinute(int atMinute) {
         validateMinute(atMinute);
@@ -247,7 +247,7 @@ class DateBuilder {
     }
 
     /**
-     * Set the second (0-59) for the Date that will be built by this builder, and truncate the milliseconds to 000.
+     * Set the second (0-59) for the LocalDateTime that will be built by this builder, and truncate the milliseconds to 000.
      */
     DateBuilder atSecond(int atSecond) {
         validateSecond(atSecond);
@@ -268,7 +268,7 @@ class DateBuilder {
     }
     
     /**
-     * Set the day of month (1-31) for the Date that will be built by this builder.
+     * Set the day of month (1-31) for the LocalDateTime that will be built by this builder.
      */
     DateBuilder onDay(int onDay) {
         validateDayOfMonth(onDay);
@@ -278,7 +278,7 @@ class DateBuilder {
     }
 
     /**
-     * Set the month (1-12) for the Date that will be built by this builder.
+     * Set the month (1-12) for the LocalDateTime that will be built by this builder.
      */
     DateBuilder inMonth(int inMonth) {
         validateMonth(inMonth);
@@ -297,7 +297,7 @@ class DateBuilder {
     }
 
     /**
-     * Set the year for the Date that will be built by this builder.
+     * Set the year for the LocalDateTime that will be built by this builder.
      */
     DateBuilder inYear(int inYear) {
         validateYear(inYear);
@@ -307,7 +307,7 @@ class DateBuilder {
     }
 
     /**
-     * Set the TimeZone for the Date that will be built by this builder (if "null", system default will be used)
+     * Set the TimeZone for the LocalDateTime that will be built by this builder (if "null", system default will be used)
      */
     DateBuilder inTimeZone(TimeZone timezone) {
         this.tz = timezone;
@@ -315,17 +315,17 @@ class DateBuilder {
     }
 
     /**
-     * Set the Locale for the Date that will be built by this builder (if "null", system default will be used)
+     * Set the Locale for the LocalDateTime that will be built by this builder (if "null", system default will be used)
      */
     DateBuilder inLocale(Locale locale) {
         this.lc = locale;
         return this;
     }
 
-    static Date futureDate(int interval, IntervalUnit unit) {
+    static LocalDateTime futureDate(int interval, IntervalUnit unit) {
         
         Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
+        c.setTime(new LocalDateTime());
         c.setLenient(true);
         
         c.add(translate(unit), interval);
@@ -350,7 +350,7 @@ class DateBuilder {
 
     /**
      * <p>
-     * Get a <code>Date</code> object that represents the given time, on
+     * Get a <code>LocalDateTime</code> object that represents the given time, on
      * tomorrow's date.
      * </p>
      * 
@@ -362,12 +362,12 @@ class DateBuilder {
      *          The value (0-23) to give the hours field of the date
      * @return the new date
      */
-    static Date tomorrowAt(int hour, int minute, int second) {
+    static LocalDateTime tomorrowAt(int hour, int minute, int second) {
         validateSecond(second);
         validateMinute(minute);
         validateHour(hour);
 
-        Date date = new Date();
+        LocalDateTime date = new LocalDateTime();
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -386,7 +386,7 @@ class DateBuilder {
 
     /**
      * <p>
-     * Get a <code>Date</code> object that represents the given time, on
+     * Get a <code>LocalDateTime</code> object that represents the given time, on
      * today's date (equivalent to {@link #dateOf(int, int, int)}).
      * </p>
      * 
@@ -398,13 +398,13 @@ class DateBuilder {
      *          The value (0-23) to give the hours field of the date
      * @return the new date
      */
-    static Date todayAt(int hour, int minute, int second) {
+    static LocalDateTime todayAt(int hour, int minute, int second) {
         return dateOf(hour, minute, second);
     }
     
     /**
      * <p>
-     * Get a <code>Date</code> object that represents the given time, on
+     * Get a <code>LocalDateTime</code> object that represents the given time, on
      * today's date  (equivalent to {@link #todayAt(int, int, int)}).
      * </p>
      * 
@@ -416,12 +416,12 @@ class DateBuilder {
      *          The value (0-23) to give the hours field of the date
      * @return the new date
      */
-    static Date dateOf(int hour, int minute, int second) {
+    static LocalDateTime dateOf(int hour, int minute, int second) {
         validateSecond(second);
         validateMinute(minute);
         validateHour(hour);
 
-        Date date = new Date();
+        LocalDateTime date = new LocalDateTime();
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -437,7 +437,7 @@ class DateBuilder {
 
     /**
      * <p>
-     * Get a <code>Date</code> object that represents the given time, on the
+     * Get a <code>LocalDateTime</code> object that represents the given time, on the
      * given date.
      * </p>
      * 
@@ -453,7 +453,7 @@ class DateBuilder {
      *          The value (1-12) to give the month field of the date
      * @return the new date
      */
-    static Date dateOf(int hour, int minute, int second,
+    static LocalDateTime dateOf(int hour, int minute, int second,
             int dayOfMonth, int month) {
         validateSecond(second);
         validateMinute(minute);
@@ -461,7 +461,7 @@ class DateBuilder {
         validateDayOfMonth(dayOfMonth);
         validateMonth(month);
 
-        Date date = new Date();
+        LocalDateTime date = new LocalDateTime();
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -478,7 +478,7 @@ class DateBuilder {
 
     /**
      * <p>
-     * Get a <code>Date</code> object that represents the given time, on the
+     * Get a <code>LocalDateTime</code> object that represents the given time, on the
      * given date.
      * </p>
      * 
@@ -496,7 +496,7 @@ class DateBuilder {
      *          The value (1970-2099) to give the year field of the date
      * @return the new date
      */
-    static Date dateOf(int hour, int minute, int second,
+    static LocalDateTime dateOf(int hour, int minute, int second,
             int dayOfMonth, int month, int year) {
         validateSecond(second);
         validateMinute(minute);
@@ -505,7 +505,7 @@ class DateBuilder {
         validateMonth(month);
         validateYear(year);
 
-        Date date = new Date();
+        LocalDateTime date = new LocalDateTime();
 
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -535,7 +535,7 @@ class DateBuilder {
      * 
      * @return the new rounded date
      */
-    static Date evenHourDateAfterNow() {
+    static LocalDateTime evenHourDateAfterNow() {
         return evenHourDate(null);
     }
     /**
@@ -551,13 +551,13 @@ class DateBuilder {
      * </p>
      * 
      * @param date
-     *          the Date to round, if <code>null</code> the current time will
+     *          the LocalDateTime to round, if <code>null</code> the current time will
      *          be used
      * @return the new rounded date
      */
-    static Date evenHourDate(Date date) {
+    static LocalDateTime evenHourDate(LocalDateTime date) {
         if (date is null) {
-            date = new Date();
+            date = new LocalDateTime();
         }
 
         Calendar c = Calendar.getInstance();
@@ -584,13 +584,13 @@ class DateBuilder {
      * </p>
      * 
      * @param date
-     *          the Date to round, if <code>null</code> the current time will
+     *          the LocalDateTime to round, if <code>null</code> the current time will
      *          be used
      * @return the new rounded date
      */
-    static Date evenHourDateBefore(Date date) {
+    static LocalDateTime evenHourDateBefore(LocalDateTime date) {
         if (date is null) {
-            date = new Date();
+            date = new LocalDateTime();
         }
 
         Calendar c = Calendar.getInstance();
@@ -616,7 +616,7 @@ class DateBuilder {
      * 
      * @return the new rounded date
      */
-    static Date evenMinuteDateAfterNow() {
+    static LocalDateTime evenMinuteDateAfterNow() {
         return evenMinuteDate(null);
     }
     
@@ -633,13 +633,13 @@ class DateBuilder {
      * </p>
      * 
      * @param date
-     *          the Date to round, if <code>null</code> the current time will
+     *          the LocalDateTime to round, if <code>null</code> the current time will
      *          be used
      * @return the new rounded date
      */
-    static Date evenMinuteDate(Date date) {
+    static LocalDateTime evenMinuteDate(LocalDateTime date) {
         if (date is null) {
-            date = new Date();
+            date = new LocalDateTime();
         }
 
         Calendar c = Calendar.getInstance();
@@ -665,13 +665,13 @@ class DateBuilder {
      * </p>
      * 
      * @param date
-     *          the Date to round, if <code>null</code> the current time will
+     *          the LocalDateTime to round, if <code>null</code> the current time will
      *          be used
      * @return the new rounded date
      */
-    static Date evenMinuteDateBefore(Date date) {
+    static LocalDateTime evenMinuteDateBefore(LocalDateTime date) {
         if (date is null) {
-            date = new Date();
+            date = new LocalDateTime();
         }
 
         Calendar c = Calendar.getInstance();
@@ -690,7 +690,7 @@ class DateBuilder {
      * 
      * @return the new rounded date
      */
-    static Date evenSecondDateAfterNow() {
+    static LocalDateTime evenSecondDateAfterNow() {
         return evenSecondDate(null);
     }
     /**
@@ -700,13 +700,13 @@ class DateBuilder {
      * </p>
      * 
      * @param date
-     *          the Date to round, if <code>null</code> the current time will
+     *          the LocalDateTime to round, if <code>null</code> the current time will
      *          be used
      * @return the new rounded date
      */
-    static Date evenSecondDate(Date date) {
+    static LocalDateTime evenSecondDate(LocalDateTime date) {
         if (date is null) {
-            date = new Date();
+            date = new LocalDateTime();
         }
 
         Calendar c = Calendar.getInstance();
@@ -731,13 +731,13 @@ class DateBuilder {
      * </p>
      * 
      * @param date
-     *          the Date to round, if <code>null</code> the current time will
+     *          the LocalDateTime to round, if <code>null</code> the current time will
      *          be used
      * @return the new rounded date
      */
-    static Date evenSecondDateBefore(Date date) {
+    static LocalDateTime evenSecondDateBefore(LocalDateTime date) {
         if (date is null) {
-            date = new Date();
+            date = new LocalDateTime();
         }
 
         Calendar c = Calendar.getInstance();
@@ -833,22 +833,22 @@ class DateBuilder {
      * </p>
      * 
      * @param date
-     *          the Date to round, if <code>null</code> the current time will
+     *          the LocalDateTime to round, if <code>null</code> the current time will
      *          be used
      * @param minuteBase
      *          the base-minute to set the time on
      * @return the new rounded date
      * 
-     * @see #nextGivenSecondDate(Date, int)
+     * @see #nextGivenSecondDate(LocalDateTime, int)
      */
-    static Date nextGivenMinuteDate(Date date, int minuteBase) {
+    static LocalDateTime nextGivenMinuteDate(LocalDateTime date, int minuteBase) {
         if (minuteBase < 0 || minuteBase > 59) {
             throw new IllegalArgumentException(
                     "minuteBase must be >=0 and <= 59");
         }
 
         if (date is null) {
-            date = new Date();
+            date = new LocalDateTime();
         }
 
         Calendar c = Calendar.getInstance();
@@ -898,21 +898,21 @@ class DateBuilder {
      * <code>getNextGivenMinuteDate(..)<code>.
      * </p>
      *
-     * @param date the Date to round, if <code>null</code> the current time will
+     * @param date the LocalDateTime to round, if <code>null</code> the current time will
      * be used
      * @param secondBase the base-second to set the time on
      * @return the new rounded date
      * 
-     * @see #nextGivenMinuteDate(Date, int)
+     * @see #nextGivenMinuteDate(LocalDateTime, int)
      */
-    static Date nextGivenSecondDate(Date date, int secondBase) {
+    static LocalDateTime nextGivenSecondDate(LocalDateTime date, int secondBase) {
         if (secondBase < 0 || secondBase > 59) {
             throw new IllegalArgumentException(
                     "secondBase must be >=0 and <= 59");
         }
 
         if (date is null) {
-            date = new Date();
+            date = new LocalDateTime();
         }
 
         Calendar c = Calendar.getInstance();
@@ -957,9 +957,9 @@ class DateBuilder {
      * @param dest the destination time-zone
      * @return the translated date
      */
-    static Date translateTime(Date date, TimeZone src, TimeZone dest) {
+    static LocalDateTime translateTime(LocalDateTime date, TimeZone src, TimeZone dest) {
 
-        Date newDate = new Date();
+        LocalDateTime newDate = new LocalDateTime();
 
         int offset = (dest.getOffset(date.getTime()) - src.getOffset(date.getTime()));
 

@@ -63,13 +63,13 @@ class JobExecutionContextImpl : JobExecutionContext {
 
     private int numRefires = 0;
 
-    private Date fireTime;
+    private LocalDateTime fireTime;
 
-    private Date scheduledFireTime;
+    private LocalDateTime scheduledFireTime;
 
-    private Date prevFireTime;
+    private LocalDateTime prevFireTime;
 
-    private Date nextFireTime;
+    private LocalDateTime nextFireTime;
     
     private long jobRunTime = -1;
     
@@ -189,28 +189,28 @@ class JobExecutionContextImpl : JobExecutionContext {
     /**
      * {@inheritDoc}
      */
-    Date getFireTime() {
+    LocalDateTime getFireTime() {
         return fireTime;
     }
 
     /**
      * {@inheritDoc}
      */
-    Date getScheduledFireTime() {
+    LocalDateTime getScheduledFireTime() {
         return scheduledFireTime;
     }
 
     /**
      * {@inheritDoc}
      */
-    Date getPreviousFireTime() {
+    LocalDateTime getPreviousFireTime() {
         return prevFireTime;
     }
 
     /**
      * {@inheritDoc}
      */
-    Date getNextFireTime() {
+    LocalDateTime getNextFireTime() {
         return nextFireTime;
     }
 

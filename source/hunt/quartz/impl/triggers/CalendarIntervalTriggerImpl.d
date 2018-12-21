@@ -88,13 +88,13 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    private Date startTime;
+    private LocalDateTime startTime;
 
-    private Date endTime;
+    private LocalDateTime endTime;
 
-    private Date nextFireTime;
+    private LocalDateTime nextFireTime;
 
-    private Date previousFireTime;
+    private LocalDateTime previousFireTime;
 
     private  int repeatInterval = 0;
     
@@ -124,7 +124,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      */
     this() {
-        // Date.zero
+        // LocalDateTime.zero
         super();
     }
 
@@ -146,7 +146,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      */
     this(string name, string group, IntervalUnit intervalUnit,
             int repeatInterval) {
-        this(name, group, new Date(), null, intervalUnit, repeatInterval);
+        this(name, group, new LocalDateTime(), null, intervalUnit, repeatInterval);
     }
     
     /**
@@ -156,18 +156,18 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      * 
      * @param startTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to fire.
      * @param endTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to quit repeat firing.
      * @param intervalUnit
      *          The repeat interval unit (minutes, days, months, etc).
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    this(string name, Date startTime,
-            Date endTime, IntervalUnit intervalUnit,  int repeatInterval) {
+    this(string name, LocalDateTime startTime,
+            LocalDateTime endTime, IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, startTime, endTime, intervalUnit, repeatInterval);
     }
     
@@ -178,18 +178,18 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      * 
      * @param startTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to fire.
      * @param endTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to quit repeat firing.
      * @param intervalUnit
      *          The repeat interval unit (minutes, days, months, etc).
      * @param repeatInterval
      *          The number of milliseconds to pause between the repeat firing.
      */
-    this(string name, string group, Date startTime,
-            Date endTime, IntervalUnit intervalUnit,  int repeatInterval) {
+    this(string name, string group, LocalDateTime startTime,
+            LocalDateTime endTime, IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group);
 
         setStartTime(startTime);
@@ -206,10 +206,10 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      * 
      * @param startTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to fire.
      * @param endTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to quit repeat firing.
      * @param intervalUnit
      *          The repeat interval unit (minutes, days, months, etc).
@@ -217,7 +217,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      *          The number of milliseconds to pause between the repeat firing.
      */
     this(string name, string group, string jobName,
-            string jobGroup, Date startTime, Date endTime,  
+            string jobGroup, LocalDateTime startTime, LocalDateTime endTime,  
             IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group, jobName, jobGroup);
 
@@ -241,9 +241,9 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      */
     override
-    Date getStartTime() {
+    LocalDateTime getStartTime() {
         if(startTime is null)
-            startTime = new Date();
+            startTime = new LocalDateTime();
         return startTime;
     }
 
@@ -256,12 +256,12 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      *              if startTime is <code>null</code>.
      */
     override
-    void setStartTime(Date startTime) {
+    void setStartTime(LocalDateTime startTime) {
         if (startTime is null) {
             throw new IllegalArgumentException("Start time cannot be null");
         }
 
-        Date eTime = getEndTime();
+        LocalDateTime eTime = getEndTime();
         if (eTime !is null && eTime.before(startTime)) {
             throw new IllegalArgumentException(
                 "End time cannot be before start time");    
@@ -279,7 +279,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * @see #getFinalFireTime()
      */
     override
-    Date getEndTime() {
+    LocalDateTime getEndTime() {
         return endTime;
     }
 
@@ -293,8 +293,8 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      *              if endTime is before start time.
      */
     override
-    void setEndTime(Date endTime) {
-        Date sTime = getStartTime();
+    void setEndTime(LocalDateTime endTime) {
+        LocalDateTime sTime = getStartTime();
         if (sTime !is null && endTime !is null && sTime.after(endTime)) {
             throw new IllegalArgumentException(
                     "End time cannot be before start time");
@@ -482,7 +482,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         }
 
         if (instr == MISFIRE_INSTRUCTION_DO_NOTHING) {
-            Date newFireTime = getFireTimeAfter(new Date());
+            LocalDateTime newFireTime = getFireTimeAfter(new LocalDateTime());
             while (newFireTime !is null && cal !is null
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
@@ -490,7 +490,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
             setNextFireTime(newFireTime);
         } else if (instr == MISFIRE_INSTRUCTION_FIRE_ONCE_NOW) { 
             // fire once now...
-            setNextFireTime(new Date());
+            setNextFireTime(new LocalDateTime());
             // the new fire time afterward will magically preserve the original  
             // time of day for firing for day/week/month interval triggers, 
             // because of the way getFireTimeAfter() works - in its always restarting
@@ -545,7 +545,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
             return;
         }
         
-        Date now = new Date();
+        LocalDateTime now = new LocalDateTime();
         while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
@@ -587,7 +587,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      *         </p>
      */
     override
-    Date computeFirstFireTime(QuartzCalendar calendar) {
+    LocalDateTime computeFirstFireTime(QuartzCalendar calendar) {
         nextFireTime = getStartTime();
 
         while (nextFireTime !is null && calendar !is null
@@ -624,7 +624,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      */
     override
-    Date getNextFireTime() {
+    LocalDateTime getNextFireTime() {
         return nextFireTime;
     }
 
@@ -635,7 +635,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * returned.
      */
     override
-    Date getPreviousFireTime() {
+    LocalDateTime getPreviousFireTime() {
         return previousFireTime;
     }
 
@@ -648,7 +648,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * <b>This method should not be invoked by client code.</b>
      * </p>
      */
-    void setNextFireTime(Date nextFireTime) {
+    void setNextFireTime(LocalDateTime nextFireTime) {
         this.nextFireTime = nextFireTime;
     }
 
@@ -661,7 +661,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * <b>This method should not be invoked by client code.</b>
      * </p>
      */
-    void setPreviousFireTime(Date previousFireTime) {
+    void setPreviousFireTime(LocalDateTime previousFireTime) {
         this.previousFireTime = previousFireTime;
     }
 
@@ -673,11 +673,11 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      */
     override
-    Date getFireTimeAfter(Date afterTime) {
+    LocalDateTime getFireTimeAfter(LocalDateTime afterTime) {
         return getFireTimeAfter(afterTime, false);
     }
     
-    protected Date getFireTimeAfter(Date afterTime, bool ignoreEndTime) {
+    protected LocalDateTime getFireTimeAfter(LocalDateTime afterTime, bool ignoreEndTime) {
         if (complete) {
             return null;
         }
@@ -685,7 +685,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         // increment afterTme by a second, so that we are 
         // comparing against a time after it!
         if (afterTime is null) {
-            afterTime = new Date();
+            afterTime = new LocalDateTime();
         }
 
         long startMillis = getStartTime().getTime();
@@ -698,13 +698,13 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         }
 
         if (afterMillis < startMillis) {
-            return new Date(startMillis);
+            return new LocalDateTime(startMillis);
         }
 
         
         long secondsAfterStart = 1 + (afterMillis - startMillis) / 1000L;
 
-        Date time = null;
+        LocalDateTime time = null;
         long repeatLong = getRepeatInterval();
         
         Calendar aTime = Calendar.getInstance();
@@ -850,7 +850,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         return time;
     }
 
-    private bool daylightSavingHourShiftOccurredAndAdvanceNeeded(HuntCalendar newTime, int initialHourOfDay, Date afterTime) {
+    private bool daylightSavingHourShiftOccurredAndAdvanceNeeded(HuntCalendar newTime, int initialHourOfDay, LocalDateTime afterTime) {
         if(isPreserveHourOfDayAcrossDaylightSavings() && newTime.get(HuntCalendar.HOUR_OF_DAY) != initialHourOfDay) {
             newTime.set(HuntCalendar.HOUR_OF_DAY, initialHourOfDay);
             if (newTime.get(HuntCalendar.HOUR_OF_DAY) != initialHourOfDay) {
@@ -873,13 +873,13 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
      * </p>
      */
     override
-    Date getFinalFireTime() {
+    LocalDateTime getFinalFireTime() {
         if (complete || getEndTime() is null) {
             return null;
         }
 
         // back up a second from end time
-        Date fTime = new Date(getEndTime().getTime() - 1000L);
+        LocalDateTime fTime = new LocalDateTime(getEndTime().getTime() - 1000L);
         // find the next fire time after that
         fTime = getFireTimeAfter(fTime, true);
         

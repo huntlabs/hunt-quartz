@@ -52,7 +52,7 @@ class SchedulerMetaData {
 
     private bool shutdown;
 
-    private Date startTime;
+    private LocalDateTime startTime;
 
     private int numJobsExec;
 
@@ -78,7 +78,7 @@ class SchedulerMetaData {
 
     this(string schedName, string schedInst,
             TypeInfo_Class schedClass, bool isRemote, bool started,
-            bool isInStandbyMode, bool shutdown, Date startTime, int numJobsExec,
+            bool isInStandbyMode, bool shutdown, LocalDateTime startTime, int numJobsExec,
             TypeInfo_Class jsClass, bool jsPersistent, bool jsClustered, TypeInfo_Class tpClass, int tpSize,
             string ver) {
         this.schedName = schedName;
@@ -135,12 +135,12 @@ class SchedulerMetaData {
 
     /**
      * <p>
-     * Returns the <code>Date</code> at which the Scheduler started running.
+     * Returns the <code>LocalDateTime</code> at which the Scheduler started running.
      * </p>
      * 
      * @return null if the scheduler has not been started.
      */
-    Date getRunningSince() {
+    LocalDateTime getRunningSince() {
         return startTime;
     }
     

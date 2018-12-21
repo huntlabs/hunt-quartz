@@ -245,9 +245,9 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //             AbstractTrigger<?> at = (AbstractTrigger<?>)trigger;
 //             at.setKey(new TriggerKey(at.getName(), at.getGroup()));
             
-//             Date startDate = at.getStartTime();
-//             if(startDate is null || startDate.before(new Date())) {
-//                 at.setStartTime(new Date());
+//             LocalDateTime startDate = at.getStartTime();
+//             if(startDate is null || startDate.before(new LocalDateTime())) {
+//                 at.setStartTime(new LocalDateTime());
 //             }
             
 //             scheduler.deleteJob(jobDetail.getKey());
@@ -285,9 +285,9 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //             AbstractTrigger<?> at = (AbstractTrigger<?>)trigger;
 //             at.setKey(new TriggerKey(at.getName(), at.getGroup()));
             
-//             Date startDate = at.getStartTime();
-//             if(startDate is null || startDate.before(new Date())) {
-//                 at.setStartTime(new Date());
+//             LocalDateTime startDate = at.getStartTime();
+//             if(startDate is null || startDate.before(new LocalDateTime())) {
+//                 at.setStartTime(new LocalDateTime());
 //             }
             
 //             scheduler.scheduleJob(trigger);
@@ -467,7 +467,7 @@ module hunt.quartz.core.QuartzSchedulerMBeanImpl;
 //         }
 //     }
 
-//     Date scheduleJob(string jobName, string jobGroup,
+//     LocalDateTime scheduleJob(string jobName, string jobGroup,
 //             string triggerName, string triggerGroup) {
 //         try {
 //             JobKey jobKey = jobKey(jobName, jobGroup);

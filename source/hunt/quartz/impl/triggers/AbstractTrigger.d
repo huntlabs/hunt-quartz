@@ -506,7 +506,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      *         will return (until after the first firing of the <code>Trigger</code>).
      *         </p>
      */
-    abstract Date computeFirstFireTime(Calendar calendar);
+    abstract LocalDateTime computeFirstFireTime(Calendar calendar);
 
     /**
      * <p>
@@ -570,7 +570,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * Get the time at which the <code>Trigger</code> should occur.
      * </p>
      */
-    abstract Date getStartTime();
+    abstract LocalDateTime getStartTime();
 
     /**
      * <p>
@@ -585,7 +585,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * of the trigger.
      * </p>
      */
-    abstract void setStartTime(Date startTime);
+    abstract void setStartTime(LocalDateTime startTime);
 
     /**
      * <p>
@@ -596,7 +596,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * 
      * @see TriggerUtils#computeEndTimeToAllowParticularNumberOfFirings(hunt.quartz.spi.OperableTrigger, hunt.quartz.Calendar, int)
      */ 
-    abstract void setEndTime(Date endTime);
+    abstract void setEndTime(LocalDateTime endTime);
 
     /**
      * <p>
@@ -607,7 +607,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * 
      * @see #getFinalFireTime()
      */
-    abstract Date getEndTime();
+    abstract LocalDateTime getEndTime();
 
     /**
      * <p>
@@ -623,16 +623,16 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * has been added to the scheduler.
      * </p>
      *
-     * @see TriggerUtils#computeFireTimesBetween(hunt.quartz.spi.OperableTrigger, hunt.quartz.Calendar, java.util.Date, java.util.Date)
+     * @see TriggerUtils#computeFireTimesBetween(hunt.quartz.spi.OperableTrigger, hunt.quartz.Calendar, java.util.LocalDateTime, java.util.LocalDateTime)
      */
-    abstract Date getNextFireTime();
+    abstract LocalDateTime getNextFireTime();
 
     /**
      * <p>
      * Returns the previous time at which the <code>Trigger</code> fired.
      * If the trigger has not yet fired, <code>null</code> will be returned.
      */
-    abstract Date getPreviousFireTime();
+    abstract LocalDateTime getPreviousFireTime();
 
     /**
      * <p>
@@ -641,7 +641,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * <code>null</code> will be returned.
      * </p>
      */
-    abstract Date getFireTimeAfter(Date afterTime);
+    abstract LocalDateTime getFireTimeAfter(LocalDateTime afterTime);
 
     /**
      * <p>
@@ -653,7 +653,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * Note that the return time *may* be in the past.
      * </p>
      */
-    abstract Date getFinalFireTime();
+    abstract LocalDateTime getFinalFireTime();
 
     /**
      * <p>

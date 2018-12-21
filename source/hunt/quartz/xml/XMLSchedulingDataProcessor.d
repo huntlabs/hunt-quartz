@@ -657,12 +657,12 @@ module hunt.quartz.xml.XMLSchedulingDataProcessor;
 //             string endTimeString = getTrimmedToNullString(xpath, "q:end-time", triggerNode);
 
 //             //QTZ-273 : use of DatatypeConverter.parseDateTime() instead of SimpleDateFormat
-//             Date triggerStartTime;
+//             LocalDateTime triggerStartTime;
 //             if(startTimeFutureSecsString !is null)
-//                 triggerStartTime = new Date(DateTimeHelper.currentTimeMillis() + (Long.valueOf(startTimeFutureSecsString) * 1000L));
+//                 triggerStartTime = new LocalDateTime(DateTimeHelper.currentTimeMillis() + (Long.valueOf(startTimeFutureSecsString) * 1000L));
 //             else 
-//                 triggerStartTime = (startTimeString is null || startTimeString.length() == 0 ? new Date() : DatatypeConverter.parseDateTime(startTimeString).getTime());
-//             Date triggerEndTime = endTimeString is null || endTimeString.length() == 0 ? null : DatatypeConverter.parseDateTime(endTimeString).getTime();
+//                 triggerStartTime = (startTimeString is null || startTimeString.length() == 0 ? new LocalDateTime() : DatatypeConverter.parseDateTime(startTimeString).getTime());
+//             LocalDateTime triggerEndTime = endTimeString is null || endTimeString.length() == 0 ? null : DatatypeConverter.parseDateTime(endTimeString).getTime();
 
 //             TriggerKey triggerKey = triggerKey(triggerName, triggerGroup);
             
@@ -1043,7 +1043,7 @@ module hunt.quartz.xml.XMLSchedulingDataProcessor;
 //                     triggers.remove(trigger);  // remove triggers as we handle them...
 
 //                     if (trigger.getStartTime() is null) {
-//                         trigger.setStartTime(new Date());
+//                         trigger.setStartTime(new LocalDateTime());
 //                     }
 
 //                     Trigger dupeT = sched.getTrigger(trigger.getKey());
@@ -1099,7 +1099,7 @@ module hunt.quartz.xml.XMLSchedulingDataProcessor;
 //         foreach(MutableTrigger trigger; triggers) {
             
 //             if(trigger.getStartTime() is null) {
-//                 trigger.setStartTime(new Date());
+//                 trigger.setStartTime(new LocalDateTime());
 //             }
             
 //             Trigger dupeT = sched.getTrigger(trigger.getKey());

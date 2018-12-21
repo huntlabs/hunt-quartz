@@ -89,7 +89,7 @@ interface MutableTrigger : Trigger {
      * of the trigger.
      * </p>
      */
-    void setStartTime(Date startTime);
+    void setStartTime(LocalDateTime startTime);
 
     /**
      * <p>
@@ -100,7 +100,7 @@ interface MutableTrigger : Trigger {
      * 
      * @see TriggerUtils#computeEndTimeToAllowParticularNumberOfFirings(Trigger, Calendar, int)
      */
-    void setEndTime(Date endTime);
+    void setEndTime(LocalDateTime endTime);
 
     /**
      * <p>

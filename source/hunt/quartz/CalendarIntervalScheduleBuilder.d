@@ -304,7 +304,7 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder!(CalendarIntervalTrigger
      * 
      * @see #skipDayIfHourDoesNotExist(bool)
      * @see #inTimeZone(TimeZone)
-     * @see TriggerBuilder#startAt(java.util.Date)
+     * @see TriggerBuilder#startAt(java.util.LocalDateTime)
      */
     CalendarIntervalScheduleBuilder preserveHourOfDayAcrossDaylightSavings(bool preserveHourOfDay) {
         this._preserveHourOfDayAcrossDaylightSavings = preserveHourOfDay;

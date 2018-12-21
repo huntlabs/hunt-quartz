@@ -111,7 +111,7 @@ module hunt.quartz.core.jmx.QuartzSchedulerMBean;
 //      * @return date of nextFireTime
 //      * @throws Exception
 //      */
-//     Date scheduleJob(string jobName, string jobGroup,
+//     LocalDateTime scheduleJob(string jobName, string jobGroup,
 //             string triggerName, string triggerGroup);
 
 //     /**
@@ -134,7 +134,7 @@ module hunt.quartz.core.jmx.QuartzSchedulerMBean;
 //      *
 //      * If the Trigger and JobDetail can be successfully instantiated, the remaining attributes will be
 //      * reflectively applied to those instances. The remaining attributes are limited to the types:
-//      *   Integer, Double, Float, string, Boolean, Date, Character, Map!(string, Object).
+//      *   Integer, Double, Float, string, Boolean, LocalDateTime, Character, Map!(string, Object).
 //      * Maps are further limited to containing values from the same set of types, less Map itself.
 //      * 
 //      * @throws Exception 
@@ -147,7 +147,7 @@ module hunt.quartz.core.jmx.QuartzSchedulerMBean;
 //      * fully-qualified trigger class name under the key "triggerClass."  That trigger type must contain a
 //      * no-arg constructor and have public access. Other attributes are applied reflectively and are limited
 //      * to the types:
-//      *   Integer, Double, Float, string, Boolean, Date, Character, Map!(string, Object).
+//      *   Integer, Double, Float, string, Boolean, LocalDateTime, Character, Map!(string, Object).
 //      * Maps are limited to containing values from the same set of types, less Map itself.
 //      * 
 //      * @param jobName
@@ -176,7 +176,7 @@ module hunt.quartz.core.jmx.QuartzSchedulerMBean;
 //      * class name under the key "jobDetailClass."  That JobDetail type must contain a no-arg constructor
 //      * and have public access. Other attributes are applied reflectively and are limited
 //      * to the types:
-//      *   Integer, Double, Float, string, Boolean, Date, Character, Map!(string, Object).
+//      *   Integer, Double, Float, string, Boolean, LocalDateTime, Character, Map!(string, Object).
 //      * Maps are limited to containing values from the same set of types, less Map itself.
 //      * 
 //      * @param abstractJobInfo map of attributes defining job

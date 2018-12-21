@@ -209,7 +209,7 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
      */
     protected HuntCalendar createJavaCalendar(long timeStamp) {
         HuntCalendar calendar = createJavaCalendar();
-        calendar.setTime(new Date(timeStamp));
+        calendar.setTime(new LocalDateTime(timeStamp));
         return calendar;
     }
 

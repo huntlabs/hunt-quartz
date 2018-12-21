@@ -166,7 +166,7 @@ import std.datetime : TimeZone;
 //     }
     
 //     /** Return a date with time of day reset to this object values. The millisecond value will be zero. */
-//     Date getTimeOfDayForDate(Date dateTime) {
+//     LocalDateTime getTimeOfDayForDate(LocalDateTime dateTime) {
 //         if (dateTime is null)
 //             return null;
 //         Calendar cal = Calendar.getInstance();
@@ -181,20 +181,20 @@ import std.datetime : TimeZone;
 //     /**
 //      * Create a TimeOfDay from the given date, in the system default TimeZone.
 //      * 
-//      * @param dateTime The java.util.Date from which to extract Hour, Minute and Second.
+//      * @param dateTime The java.util.LocalDateTime from which to extract Hour, Minute and Second.
 //      */
-//     static TimeOfDay hourAndMinuteAndSecondFromDate(Date dateTime) {
+//     static TimeOfDay hourAndMinuteAndSecondFromDate(LocalDateTime dateTime) {
 //         return hourAndMinuteAndSecondFromDate(dateTime, null);
 //     }
     
 //     /**
 //      * Create a TimeOfDay from the given date, in the given TimeZone.
 //      * 
-//      * @param dateTime The java.util.Date from which to extract Hour, Minute and Second.
+//      * @param dateTime The java.util.LocalDateTime from which to extract Hour, Minute and Second.
 //      * @param tz The TimeZone from which relate Hour, Minute and Second for the given date.  If null, system default
 //      * TimeZone will be used.
 //      */
-//     static TimeOfDay hourAndMinuteAndSecondFromDate(Date dateTime, TimeZone tz) {
+//     static TimeOfDay hourAndMinuteAndSecondFromDate(LocalDateTime dateTime, TimeZone tz) {
 //         if (dateTime is null)
 //             return null;
 //         Calendar cal = Calendar.getInstance();
@@ -208,20 +208,20 @@ import std.datetime : TimeZone;
 //     /**
 //      * Create a TimeOfDay from the given date (at the zero-second), in the system default TimeZone.
 //      * 
-//      * @param dateTime The java.util.Date from which to extract Hour and Minute.
+//      * @param dateTime The java.util.LocalDateTime from which to extract Hour and Minute.
 //      */
-//     static TimeOfDay hourAndMinuteFromDate(Date dateTime) {
+//     static TimeOfDay hourAndMinuteFromDate(LocalDateTime dateTime) {
 //         return hourAndMinuteFromDate(dateTime, null);
 //     }
     
 //     /**
 //      * Create a TimeOfDay from the given date (at the zero-second), in the system default TimeZone.
 //      * 
-//      * @param dateTime The java.util.Date from which to extract Hour and Minute.
+//      * @param dateTime The java.util.LocalDateTime from which to extract Hour and Minute.
 //      * @param tz The TimeZone from which relate Hour and Minute for the given date.  If null, system default
 //      * TimeZone will be used.
 //      */
-//     static TimeOfDay hourAndMinuteFromDate(Date dateTime, TimeZone tz) {
+//     static TimeOfDay hourAndMinuteFromDate(LocalDateTime dateTime, TimeZone tz) {
 //         if (dateTime is null)
 //             return null;
 //         Calendar cal = Calendar.getInstance();

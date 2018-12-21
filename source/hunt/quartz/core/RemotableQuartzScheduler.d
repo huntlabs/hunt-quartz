@@ -74,7 +74,7 @@ interface RemotableQuartzScheduler { // : Remote
 
     bool isShutdown();
 
-    Date runningSince();
+    LocalDateTime runningSince();
 
     string getVersion();
 
@@ -94,9 +94,9 @@ interface RemotableQuartzScheduler { // : Remote
     
     List!(JobExecutionContext) getCurrentlyExecutingJobs();
 
-    Date scheduleJob(JobDetail jobDetail, Trigger trigger);
+    LocalDateTime scheduleJob(JobDetail jobDetail, Trigger trigger);
 
-    Date scheduleJob(Trigger trigger);
+    LocalDateTime scheduleJob(Trigger trigger);
 
     void addJob(JobDetail jobDetail, bool replace);
 
@@ -106,7 +106,7 @@ interface RemotableQuartzScheduler { // : Remote
 
     bool unscheduleJob(TriggerKey triggerKey);
 
-    Date rescheduleJob(TriggerKey triggerKey, Trigger newTrigger);
+    LocalDateTime rescheduleJob(TriggerKey triggerKey, Trigger newTrigger);
         
     void triggerJob(JobKey jobKey, JobDataMap data);
 

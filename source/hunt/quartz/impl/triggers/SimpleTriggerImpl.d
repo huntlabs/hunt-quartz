@@ -78,13 +78,13 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    private Date startTime; // = null;
+    private LocalDateTime startTime; // = null;
 
-    private Date endTime; // = null;
+    private LocalDateTime endTime; // = null;
 
-    private Date nextFireTime; // = null;
+    private LocalDateTime nextFireTime; // = null;
 
-    private Date previousFireTime; // = null;
+    private LocalDateTime previousFireTime; // = null;
 
     private int repeatCount = 0;
 
@@ -134,7 +134,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  */
     // deprecated("")
     // this(string name, string group) {
-    //     this(name, group, new Date(), null, 0, 0);
+    //     this(name, group, new LocalDateTime(), null, 0, 0);
     // }
 
     // /**
@@ -161,7 +161,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     // deprecated("")
     // this(string name, string group, int repeatCount,
     //         long repeatInterval) {
-    //     this(name, group, new Date(), null, repeatCount, repeatInterval);
+    //     this(name, group, new LocalDateTime(), null, repeatCount, repeatInterval);
     // }
 
     // /**
@@ -173,7 +173,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  * @deprecated use a TriggerBuilder instead
     //  */
     // deprecated("")
-    // this(string name, Date startTime) {
+    // this(string name, LocalDateTime startTime) {
     //     this(name, null, startTime);
     // }
 
@@ -186,7 +186,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  * @deprecated use a TriggerBuilder instead
     //  */
     // deprecated("")
-    // this(string name, string group, Date startTime) {
+    // this(string name, string group, LocalDateTime startTime) {
     //     this(name, group, startTime, null, 0, 0);
     // }
     
@@ -198,10 +198,10 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  * </p>
     //  * 
     //  * @param startTime
-    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
     //  *          to fire.
     //  * @param endTime
-    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
     //  *          to quit repeat firing.
     //  * @param repeatCount
     //  *          The number of times for the <code>Trigger</code> to repeat
@@ -212,8 +212,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  * @deprecated use a TriggerBuilder instead
     //  */
     // deprecated("")
-    // this(string name, Date startTime,
-    //         Date endTime, int repeatCount, long repeatInterval) {
+    // this(string name, LocalDateTime startTime,
+    //         LocalDateTime endTime, int repeatCount, long repeatInterval) {
     //     this(name, null, startTime, endTime, repeatCount, repeatInterval);
     // }
     
@@ -225,10 +225,10 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  * </p>
     //  * 
     //  * @param startTime
-    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
     //  *          to fire.
     //  * @param endTime
-    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
     //  *          to quit repeat firing.
     //  * @param repeatCount
     //  *          The number of times for the <code>Trigger</code> to repeat
@@ -239,8 +239,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  * @deprecated use a TriggerBuilder instead
     //  */
     // deprecated("")
-    // this(string name, string group, Date startTime,
-    //         Date endTime, int repeatCount, long repeatInterval) {
+    // this(string name, string group, LocalDateTime startTime,
+    //         LocalDateTime endTime, int repeatCount, long repeatInterval) {
     //     super(name, group);
 
     //     setStartTime(startTime);
@@ -257,10 +257,10 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  * </p>
     //  * 
     //  * @param startTime
-    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
     //  *          to fire.
     //  * @param endTime
-    //  *          A <code>Date</code> set to the time for the <code>Trigger</code>
+    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
     //  *          to quit repeat firing.
     //  * @param repeatCount
     //  *          The number of times for the <code>Trigger</code> to repeat
@@ -272,7 +272,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //  */
     // deprecated("")
     // this(string name, string group, string jobName,
-    //         string jobGroup, Date startTime, Date endTime, int repeatCount,
+    //         string jobGroup, LocalDateTime startTime, LocalDateTime endTime, int repeatCount,
     //         long repeatInterval) {
     //     super(name, group, jobName, jobGroup);
 
@@ -296,7 +296,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * </p>
      */
     override
-    Date getStartTime() {
+    LocalDateTime getStartTime() {
         return startTime;
     }
 
@@ -309,12 +309,12 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      *              if startTime is <code>null</code>.
      */
     override
-    void setStartTime(Date startTime) {
+    void setStartTime(LocalDateTime startTime) {
         if (startTime is null) {
             throw new IllegalArgumentException("Start time cannot be null");
         }
 
-        Date eTime = getEndTime();
+        LocalDateTime eTime = getEndTime();
         if (eTime !is null && startTime !is null && eTime.before(startTime)) {
             throw new IllegalArgumentException(
                 "End time cannot be before start time");    
@@ -332,7 +332,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * @see #getFinalFireTime()
      */
     override
-    Date getEndTime() {
+    LocalDateTime getEndTime() {
         return endTime;
     }
 
@@ -346,8 +346,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      *              if endTime is before start time.
      */
     override
-    void setEndTime(Date endTime) {
-        Date sTime = getStartTime();
+    void setEndTime(LocalDateTime endTime) {
+        LocalDateTime sTime = getStartTime();
         if (sTime !is null && endTime !is null && sTime.after(endTime)) {
             throw new IllegalArgumentException(
                     "End time cannot be before start time");
@@ -487,9 +487,9 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         }
 
         if (instr == MISFIRE_INSTRUCTION_FIRE_NOW) {
-            setNextFireTime(new Date());
+            setNextFireTime(new LocalDateTime());
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT) {
-            Date newFireTime = getFireTimeAfter(new Date());
+            LocalDateTime newFireTime = getFireTimeAfter(new LocalDateTime());
             while (newFireTime !is null && cal !is null
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
@@ -506,7 +506,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             }
             setNextFireTime(newFireTime);
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT) {
-            Date newFireTime = getFireTimeAfter(new Date());
+            LocalDateTime newFireTime = getFireTimeAfter(new LocalDateTime());
             while (newFireTime !is null && cal !is null
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
@@ -529,7 +529,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
 
             setNextFireTime(newFireTime);
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT) {
-            Date newFireTime = new Date();
+            LocalDateTime newFireTime = new LocalDateTime();
             if (repeatCount != 0 && repeatCount != REPEAT_INDEFINITELY) {
                 setRepeatCount(getRepeatCount() - getTimesTriggered());
                 setTimesTriggered(0);
@@ -542,7 +542,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
                 setNextFireTime(newFireTime);
             } 
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT) {
-            Date newFireTime = new Date();
+            LocalDateTime newFireTime = new LocalDateTime();
 
             int timesMissed = computeNumTimesFiredBetween(nextFireTime,
                     newFireTime);
@@ -612,7 +612,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return;
         }
         
-        Date now = new Date();
+        LocalDateTime now = new LocalDateTime();
         while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
@@ -654,7 +654,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      *         </p>
      */
     override
-    Date computeFirstFireTime(Calendar calendar) {
+    LocalDateTime computeFirstFireTime(Calendar calendar) {
         nextFireTime = getStartTime();
 
         while (nextFireTime !is null && calendar !is null
@@ -689,10 +689,10 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * has been added to the scheduler.
      * </p>
      *
-     * @see TriggerUtils#computeFireTimesBetween(hunt.quartz.spi.OperableTrigger, hunt.quartz.Calendar, java.util.Date, java.util.Date)
+     * @see TriggerUtils#computeFireTimesBetween(hunt.quartz.spi.OperableTrigger, hunt.quartz.Calendar, java.util.LocalDateTime, java.util.LocalDateTime)
      */
     override
-    Date getNextFireTime() {
+    LocalDateTime getNextFireTime() {
         return nextFireTime;
     }
 
@@ -703,7 +703,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * returned.
      */
     override
-    Date getPreviousFireTime() {
+    LocalDateTime getPreviousFireTime() {
         return previousFireTime;
     }
 
@@ -716,7 +716,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * <b>This method should not be invoked by client code.</b>
      * </p>
      */
-    void setNextFireTime(Date nextFireTime) {
+    void setNextFireTime(LocalDateTime nextFireTime) {
         this.nextFireTime = nextFireTime;
     }
 
@@ -729,7 +729,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * <b>This method should not be invoked by client code.</b>
      * </p>
      */
-    void setPreviousFireTime(Date previousFireTime) {
+    void setPreviousFireTime(LocalDateTime previousFireTime) {
         this.previousFireTime = previousFireTime;
     }
 
@@ -741,7 +741,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * </p>
      */
     override
-    Date getFireTimeAfter(Date afterTime) {
+    LocalDateTime getFireTimeAfter(LocalDateTime afterTime) {
         if (complete) {
             return null;
         }
@@ -752,7 +752,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         }
 
         if (afterTime is null) {
-            afterTime = new Date();
+            afterTime = new LocalDateTime();
         }
 
         if (repeatCount == 0 && afterTime.compareTo(getStartTime()) >= 0) {
@@ -769,7 +769,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         }
 
         if (afterMillis < startMillis) {
-            return new Date(startMillis);
+            return new LocalDateTime(startMillis);
         }
 
         long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
@@ -779,7 +779,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return null;
         }
 
-        Date time = new Date(startMillis + (numberOfTimesExecuted * repeatInterval));
+        LocalDateTime time = new LocalDateTime(startMillis + (numberOfTimesExecuted * repeatInterval));
 
         if (endMillis <= time.getTime()) {
             return null;
@@ -795,17 +795,17 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * given time, <code>null</code> will be returned.
      * </p>
      */
-    Date getFireTimeBefore(Date end) {
+    LocalDateTime getFireTimeBefore(LocalDateTime end) {
         if (end.getTime() < getStartTime().getTime()) {
             return null;
         }
 
         int numFires = computeNumTimesFiredBetween(getStartTime(), end);
 
-        return new Date(getStartTime().getTime() + (numFires * repeatInterval));
+        return new LocalDateTime(getStartTime().getTime() + (numFires * repeatInterval));
     }
 
-    int computeNumTimesFiredBetween(Date start, Date end) {
+    int computeNumTimesFiredBetween(LocalDateTime start, LocalDateTime end) {
 
         if(repeatInterval < 1) {
             return 0;
@@ -827,7 +827,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * </p>
      */
     override
-    Date getFinalFireTime() {
+    LocalDateTime getFinalFireTime() {
         if (repeatCount == 0) {
             return startTime;
         }
@@ -839,7 +839,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         long lastTrigger = startTime.getTime() + (repeatCount * repeatInterval);
 
         if ((getEndTime() is null) || (lastTrigger < getEndTime().getTime())) { 
-            return new Date(lastTrigger);
+            return new LocalDateTime(lastTrigger);
         } else {
             return getFireTimeBefore(getEndTime());
         }

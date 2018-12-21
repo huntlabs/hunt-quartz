@@ -129,14 +129,14 @@ module hunt.quartz.core.jmx.TriggerSupport;
 //         if(cData.containsKey("jobDataMap")) {
 //             trigger.setJobDataMap(JobDataMapSupport.newJobDataMap((TabularData)cData.get("jobDataMap")));
 //         }
-//         Date startTime;
+//         LocalDateTime startTime;
 //         if(cData.containsKey("startTime")) {
-//             startTime = (Date) cData.get("startTime");
+//             startTime = (LocalDateTime) cData.get("startTime");
 //         } else {
-//             startTime = new Date();
+//             startTime = new LocalDateTime();
 //         }
 //         trigger.setStartTime(startTime);
-//         trigger.setEndTime((Date) cData.get("endTime"));
+//         trigger.setEndTime((LocalDateTime) cData.get("endTime"));
 //         if(cData.containsKey("misfireInstruction")) {
 //             trigger.setMisfireInstruction(((Integer)cData.get("misfireInstruction")).intValue());
 //         }
@@ -155,15 +155,15 @@ module hunt.quartz.core.jmx.TriggerSupport;
 //             Map!(string, Object) mapTyped = (Map!(string, Object))attrMap.get("jobDataMap");
 //             trigger.setJobDataMap(JobDataMapSupport.newJobDataMap(mapTyped));
 //         }
-//         Date startTime;
+//         LocalDateTime startTime;
 //         if(attrMap.containsKey("startTime")) {
-//             startTime = (Date) attrMap.get("startTime");
+//             startTime = (LocalDateTime) attrMap.get("startTime");
 //         } else {
-//             startTime = new Date();
+//             startTime = new LocalDateTime();
 //         }
 //         trigger.setStartTime(startTime);
 //         if(attrMap.containsKey("endTime")) {
-//             trigger.setEndTime((Date) attrMap.get("endTime"));
+//             trigger.setEndTime((LocalDateTime) attrMap.get("endTime"));
 //         }
 //         if(attrMap.containsKey("misfireInstruction")) {
 //             trigger.setMisfireInstruction(((Integer)attrMap.get("misfireInstruction")).intValue());

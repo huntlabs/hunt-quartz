@@ -187,7 +187,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
     // private QuartzSchedulerMBean jmxBean = null;
     
-    private Date initialStart; // = null;
+    private LocalDateTime initialStart; // = null;
 
     
     // private static final Map!(string, ManagementServer) MGMT_SVR_BY_BIND = new
@@ -546,7 +546,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         notifySchedulerListenersStarting();
 
         if (initialStart is null) {
-            initialStart = new Date();
+            initialStart = new LocalDateTime();
             this.resources.getJobStore().schedulerStarted();            
             startPlugins();
         } else {
@@ -603,10 +603,10 @@ class QuartzScheduler : RemotableQuartzScheduler {
         return schedThread.isPaused();
     }
 
-    Date runningSince() {
+    LocalDateTime runningSince() {
         if(initialStart is null)
             return null;
-        return new Date(initialStart.getTime());
+        return new LocalDateTime(initialStart.getTime());
     }
 
     int numJobsExecuted() {
@@ -818,7 +818,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      *           if the Job or Trigger cannot be added to the Scheduler, or
      *           there is an internal Scheduler error.
      */
-    Date scheduleJob(JobDetail jobDetail,
+    LocalDateTime scheduleJob(JobDetail jobDetail,
             Trigger trigger) {
         validateState();
 
@@ -853,7 +853,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         if (trigger.getCalendarName() !is null) {
             cal = resources.getJobStore().retrieveCalendar(trigger.getCalendarName());
         }
-        Date ft = trig.computeFirstFireTime(cal);
+        LocalDateTime ft = trig.computeFirstFireTime(cal);
 
         if (ft is null) {
             throw new SchedulerException(
@@ -879,7 +879,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      *           added to the Scheduler, or there is an internal Scheduler
      *           error.
      */
-    Date scheduleJob(Trigger trigger) {
+    LocalDateTime scheduleJob(Trigger trigger) {
         validateState();
 
         if (trigger is null) {
@@ -898,7 +898,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
                     "Calendar not found: " ~ trigger.getCalendarName());
             }
         }
-        Date ft = trig.computeFirstFireTime(cal);
+        LocalDateTime ft = trig.computeFirstFireTime(cal);
 
         if (ft is null) {
             throw new SchedulerException(
@@ -1021,7 +1021,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
                             "' not found for trigger: " ~ trigger.getKey().toString());
                     }
                 }
-                Date ft = opt.computeFirstFireTime(cal);
+                LocalDateTime ft = opt.computeFirstFireTime(cal);
 
                 if (ft is null) {
                     throw new SchedulerException(
@@ -1088,7 +1088,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      *         name & group was not found and removed from the store, otherwise
      *         the first fire time of the newly scheduled trigger.
      */
-    Date rescheduleJob(TriggerKey triggerKey,
+    LocalDateTime rescheduleJob(TriggerKey triggerKey,
             Trigger newTrigger) {
         validateState();
 
@@ -1113,7 +1113,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
             cal = resources.getJobStore().retrieveCalendar(
                     newTrigger.getCalendarName());
         }
-        Date ft = trig.computeFirstFireTime(cal);
+        LocalDateTime ft = trig.computeFirstFireTime(cal);
 
         if (ft is null) {
             throw new SchedulerException(

@@ -56,11 +56,11 @@ import hunt.quartz.spi.TimeBroker;
 
 //     /**
 //      * <p>
-//      * Get the current time, simply using <code>new Date()</code>.
+//      * Get the current time, simply using <code>new LocalDateTime()</code>.
 //      * </p>
 //      */
-//     Date getCurrentTime() {
-//         return new Date();
+//     LocalDateTime getCurrentTime() {
+//         return new LocalDateTime();
 //     }
 
 //     void initialize() {

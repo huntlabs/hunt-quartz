@@ -98,13 +98,13 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    private Date startTime;// = null;
+    private LocalDateTime startTime;// = null;
 
-    private Date endTime;// = null;
+    private LocalDateTime endTime;// = null;
 
-    private Date nextFireTime;// = null;
+    private LocalDateTime nextFireTime;// = null;
 
-    private Date previousFireTime;// = null;
+    private LocalDateTime previousFireTime;// = null;
     
     private int repeatCount = REPEAT_INDEFINITELY;
 
@@ -174,7 +174,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      */
     this(string name, string group, TimeOfDay startTimeOfDay, 
             TimeOfDay endTimeOfDay, IntervalUnit intervalUnit, int repeatInterval) {
-        this(name, group, new Date(), null, startTimeOfDay, endTimeOfDay, intervalUnit, repeatInterval);
+        this(name, group, new LocalDateTime(), null, startTimeOfDay, endTimeOfDay, intervalUnit, repeatInterval);
     }
     
     /**
@@ -184,10 +184,10 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * </p>
      * 
      * @param startTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to fire.
      * @param endTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to quit repeat firing.
      * @param startTimeOfDay 
      *          The <code>TimeOfDay</code> that the repeating should begin occurring.          
@@ -199,8 +199,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *          The number of milliseconds to pause between the repeat firing.
      * @throws IllegalArgumentException if an invalid IntervalUnit is given, or the repeat interval is zero or less.
      */
-    this(string name, Date startTime,
-            Date endTime, TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay, 
+    this(string name, LocalDateTime startTime,
+            LocalDateTime endTime, TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay, 
             IntervalUnit intervalUnit,  int repeatInterval) {
         this(name, null, startTime, endTime, startTimeOfDay, endTimeOfDay, intervalUnit, repeatInterval);
     }
@@ -212,10 +212,10 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * </p>
      * 
      * @param startTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to fire.
      * @param endTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to quit repeat firing.
      * @param startTimeOfDay 
      *          The <code>TimeOfDay</code> that the repeating should begin occurring.          
@@ -227,8 +227,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *          The number of milliseconds to pause between the repeat firing.
      * @throws IllegalArgumentException if an invalid IntervalUnit is given, or the repeat interval is zero or less.
      */
-    this(string name, string group, Date startTime,
-            Date endTime, TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay, 
+    this(string name, string group, LocalDateTime startTime,
+            LocalDateTime endTime, TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay, 
             IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group);
 
@@ -248,10 +248,10 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * </p>
      * 
      * @param startTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to fire.
      * @param endTime
-     *          A <code>Date</code> set to the time for the <code>Trigger</code>
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
      *          to quit repeat firing.
      * @param startTimeOfDay 
      *          The <code>TimeOfDay</code> that the repeating should begin occurring.          
@@ -264,7 +264,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * @throws IllegalArgumentException if an invalid IntervalUnit is given, or the repeat interval is zero or less.
      */
     this(string name, string group, string jobName,
-            string jobGroup, Date startTime, Date endTime, 
+            string jobGroup, LocalDateTime startTime, LocalDateTime endTime, 
             TimeOfDay startTimeOfDay, TimeOfDay endTimeOfDay,
             IntervalUnit intervalUnit,  int repeatInterval) {
         super(name, group, jobName, jobGroup);
@@ -292,9 +292,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * </p>
      */
     override
-    Date getStartTime() {
+    LocalDateTime getStartTime() {
         if(startTime is null) {
-            startTime = new Date();
+            startTime = new LocalDateTime();
         }
         return startTime;
     }
@@ -308,12 +308,12 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *              if startTime is <code>null</code>.
      */
     override
-    void setStartTime(Date startTime) {
+    void setStartTime(LocalDateTime startTime) {
         if (startTime is null) {
             throw new IllegalArgumentException("Start time cannot be null");
         }
 
-        Date eTime = getEndTime();
+        LocalDateTime eTime = getEndTime();
         if (eTime !is null && eTime.before(startTime)) {
             throw new IllegalArgumentException(
                 "End time cannot be before start time");    
@@ -331,7 +331,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * @see #getFinalFireTime()
      */
     override
-    Date getEndTime() {
+    LocalDateTime getEndTime() {
         return endTime;
     }
 
@@ -345,8 +345,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *              if endTime is before start time.
      */
     override
-    void setEndTime(Date endTime) {
-        Date sTime = getStartTime();
+    void setEndTime(LocalDateTime endTime) {
+        LocalDateTime sTime = getStartTime();
         if (sTime !is null && endTime !is null && sTime.after(endTime)) {
             throw new IllegalArgumentException(
                     "End time cannot be before start time");
@@ -454,7 +454,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         }
 
         if (instr == MISFIRE_INSTRUCTION_DO_NOTHING) {
-            Date newFireTime = getFireTimeAfter(new Date());
+            LocalDateTime newFireTime = getFireTimeAfter(new LocalDateTime());
             while (newFireTime !is null && cal !is null
                     && !cal.isTimeIncluded(newFireTime.getTime())) {
                 newFireTime = getFireTimeAfter(newFireTime);
@@ -462,7 +462,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
             setNextFireTime(newFireTime);
         } else if (instr == MISFIRE_INSTRUCTION_FIRE_ONCE_NOW) { 
             // fire once now...
-            setNextFireTime(new Date());
+            setNextFireTime(new LocalDateTime());
             // the new fire time afterward will magically preserve the original  
             // time of day for firing for day/week/month interval triggers, 
             // because of the way getFireTimeAfter() works - in its always restarting
@@ -520,7 +520,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
             return;
         }
         
-        Date now = new Date();
+        LocalDateTime now = new LocalDateTime();
         while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
@@ -562,9 +562,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      *         </p>
      */
     override
-    Date computeFirstFireTime(QuartzCalendar calendar) {
+    LocalDateTime computeFirstFireTime(QuartzCalendar calendar) {
         
-      nextFireTime = getFireTimeAfter(new Date(getStartTime().getTime() - 1000L));
+      nextFireTime = getFireTimeAfter(new LocalDateTime(getStartTime().getTime() - 1000L));
       
       // Check calendar for date-time exclusion
       while (nextFireTime !is null && calendar !is null
@@ -586,7 +586,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
       return nextFireTime;
     }
     
-    private HuntCalendar createCalendarTime(Date dateTime) {
+    private HuntCalendar createCalendarTime(LocalDateTime dateTime) {
         HuntCalendar cal = HuntCalendar.getInstance();
         cal.setTime(dateTime);
         return cal;
@@ -607,7 +607,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * </p>
      */
     override
-    Date getNextFireTime() {
+    LocalDateTime getNextFireTime() {
         return nextFireTime;
     }
 
@@ -618,7 +618,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * returned.
      */
     override
-    Date getPreviousFireTime() {
+    LocalDateTime getPreviousFireTime() {
         return previousFireTime;
     }
 
@@ -631,7 +631,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * <b>This method should not be invoked by client code.</b>
      * </p>
      */
-    void setNextFireTime(Date nextFireTime) {
+    void setNextFireTime(LocalDateTime nextFireTime) {
         this.nextFireTime = nextFireTime;
     }
 
@@ -644,7 +644,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * <b>This method should not be invoked by client code.</b>
      * </p>
      */
-    void setPreviousFireTime(Date previousFireTime) {
+    void setPreviousFireTime(LocalDateTime previousFireTime) {
         this.previousFireTime = previousFireTime;
     }
 
@@ -656,7 +656,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * </p>
      */
     override
-    Date getFireTimeAfter(Date afterTime) {
+    LocalDateTime getFireTimeAfter(LocalDateTime afterTime) {
         // Check if trigger has completed or not.
         if (complete) {
             return null;
@@ -669,9 +669,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
       
         // a. Increment afterTime by a second, so that we are comparing against a time after it!
         if (afterTime is null) {
-          afterTime = new Date(DateTimeHelper.currentTimeMillis() + 1000L);
+          afterTime = new LocalDateTime(DateTimeHelper.currentTimeMillis() + 1000L);
         } else {
-          afterTime = new Date(afterTime.getTime() + 1000L);
+          afterTime = new LocalDateTime(afterTime.getTime() + 1000L);
         }
          
         // make sure afterTime is at least startTime
@@ -685,19 +685,19 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         }
         // c. now we need to move move to the next valid day of week if either: 
         // the given time is past the end time of day, or given time is not on a valid day of week
-        Date fireTime = advanceToNextDayOfWeekIfNecessary(afterTime, afterTimePastEndTimeOfDay);
+        LocalDateTime fireTime = advanceToNextDayOfWeekIfNecessary(afterTime, afterTimePastEndTimeOfDay);
         if (fireTime is null)
           return null;
                 
         // d. Calculate and save fireTimeEndDate variable for later use
-        Date fireTimeEndDate = null;
+        LocalDateTime fireTimeEndDate = null;
         if (endTimeOfDay is null)
           fireTimeEndDate = new TimeOfDay(23, 59, 59).getTimeOfDayForDate(fireTime);
         else
           fireTimeEndDate = endTimeOfDay.getTimeOfDayForDate(fireTime);
         
         // e. Check fireTime against startTime or startTimeOfDay to see which go first.
-        Date fireTimeStartDate = startTimeOfDay.getTimeOfDayForDate(fireTime);
+        LocalDateTime fireTimeStartDate = startTimeOfDay.getTimeOfDayForDate(fireTime);
         if (fireTime.before(fireTimeStartDate)) {
           return fireTimeStartDate;
         } 
@@ -742,7 +742,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         return fireTime;
     }
 
-    private bool isSameDay(Date d1, Date d2) {
+    private bool isSameDay(LocalDateTime d1, LocalDateTime d2) {
     
       HuntCalendar c1 = createCalendarTime(d1);
       HuntCalendar c2 = createCalendarTime(d2);
@@ -759,10 +759,10 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * can happen when a caller determine fireTime has passed the endTimeOfDay that fireTime should move to next day anyway.
      * @return a next day fireTime.
      */
-    private Date advanceToNextDayOfWeekIfNecessary(Date fireTime, bool forceToAdvanceNextDay) {
+    private LocalDateTime advanceToNextDayOfWeekIfNecessary(LocalDateTime fireTime, bool forceToAdvanceNextDay) {
         // a. Advance or adjust to next dayOfWeek if need to first, starting next day with startTimeOfDay.
         TimeOfDay sTimeOfDay = getStartTimeOfDay();
-        Date fireTimeStartDate = sTimeOfDay.getTimeOfDayForDate(fireTime);      
+        LocalDateTime fireTimeStartDate = sTimeOfDay.getTimeOfDayForDate(fireTime);      
         HuntCalendar fireTimeStartDateCal = createCalendarTime(fireTimeStartDate);          
         int dayOfWeekOfFireTime = fireTimeStartDateCal.get(HuntCalendar.DAY_OF_WEEK);
         
@@ -781,7 +781,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         }
         
         // Check fireTime not pass the endTime
-         Date eTime = getEndTime();
+         LocalDateTime eTime = getEndTime();
          if (eTime !is null && fireTime.getTime() > eTime.getTime()) {
              return null;
          }
@@ -800,15 +800,15 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * </p>
      */
     override
-    Date getFinalFireTime() {
+    LocalDateTime getFinalFireTime() {
         if (complete || getEndTime() is null) {
             return null;
         }
         
         // We have an endTime, we still need to check to see if there is a endTimeOfDay if that's applicable.
-        Date eTime = getEndTime();
+        LocalDateTime eTime = getEndTime();
         if (endTimeOfDay !is null) {
-            Date endTimeOfDayDate = endTimeOfDay.getTimeOfDayForDate(eTime);
+            LocalDateTime endTimeOfDayDate = endTimeOfDay.getTimeOfDayForDate(eTime);
             if (eTime.getTime() < endTimeOfDayDate.getTime()) {
                 eTime = endTimeOfDayDate;
             }

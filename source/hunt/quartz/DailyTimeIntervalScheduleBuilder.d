@@ -326,9 +326,9 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
         if(startTimeOfDay is null)
             throw new IllegalArgumentException("You must set the startDailyAt() before calling this endingDailyAfterCount()!");
         
-        Date today = new Date();
-        Date startTimeOfDayDate = startTimeOfDay.getTimeOfDayForDate(today);
-        Date maxEndTimeOfDayDate = TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59).getTimeOfDayForDate(today);
+        LocalDateTime today = new LocalDateTime();
+        LocalDateTime startTimeOfDayDate = startTimeOfDay.getTimeOfDayForDate(today);
+        LocalDateTime maxEndTimeOfDayDate = TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59).getTimeOfDayForDate(today);
         long remainingMillisInDay = maxEndTimeOfDayDate.getTime() - startTimeOfDayDate.getTime();
         long intervalInMillis;
         if (intervalUnit == IntervalUnit.SECOND)
@@ -348,7 +348,7 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
             throw new IllegalArgumentException("The given count " ~ count ~ " is too large! The max you can set is " ~ maxNumOfCount);
         
         long incrementInMillis = (count - 1) * intervalInMillis;
-        Date endTimeOfDayDate = new Date(startTimeOfDayDate.getTime() + incrementInMillis);
+        LocalDateTime endTimeOfDayDate = new LocalDateTime(startTimeOfDayDate.getTime() + incrementInMillis);
         
         if (endTimeOfDayDate.getTime() > maxEndTimeOfDayDate.getTime())
             throw new IllegalArgumentException("The given count " ~ count ~ " is too large! The max you can set is " ~ maxNumOfCount);

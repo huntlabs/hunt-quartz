@@ -348,7 +348,7 @@ module hunt.quartz.impl.RemoteScheduler;
 //      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
 //      * </p>
 //      */
-//     Date scheduleJob(JobDetail jobDetail, Trigger trigger) {
+//     LocalDateTime scheduleJob(JobDetail jobDetail, Trigger trigger) {
 //         try {
 //             return getRemoteScheduler().scheduleJob(jobDetail,
 //                     trigger);
@@ -363,7 +363,7 @@ module hunt.quartz.impl.RemoteScheduler;
 //      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
 //      * </p>
 //      */
-//     Date scheduleJob(Trigger trigger) {
+//     LocalDateTime scheduleJob(Trigger trigger) {
 //         try {
 //             return getRemoteScheduler().scheduleJob(trigger);
 //         } catch (RemoteException re) {
@@ -465,7 +465,7 @@ module hunt.quartz.impl.RemoteScheduler;
 //      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
 //      * </p>
 //      */
-//     Date rescheduleJob(TriggerKey triggerKey,
+//     LocalDateTime rescheduleJob(TriggerKey triggerKey,
 //             Trigger newTrigger) {
 //         try {
 //             return getRemoteScheduler().rescheduleJob(triggerKey,

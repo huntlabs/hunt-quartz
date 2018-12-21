@@ -316,15 +316,15 @@ final class CronExpression : Cloneable { // Serializable,
      * @return a bool indicating whether the given date satisfies the cron
      *         expression
      */
-    bool isSatisfiedBy(Date date) {
+    bool isSatisfiedBy(LocalDateTime date) {
         Calendar testDateCal = Calendar.getInstance(getTimeZone());
         testDateCal.setTime(date);
         testDateCal.set(Calendar.MILLISECOND, 0);
-        Date originalDate = testDateCal.getTime();
+        LocalDateTime originalDate = testDateCal.getTime();
         
         testDateCal.add(Calendar.SECOND, -1);
         
-        Date timeAfter = getTimeAfter(testDateCal.getTime());
+        LocalDateTime timeAfter = getTimeAfter(testDateCal.getTime());
 
         return ((timeAfter !is null) && (timeAfter== originalDate));
     }
@@ -337,7 +337,7 @@ final class CronExpression : Cloneable { // Serializable,
      *             date/time
      * @return the next valid date/time
      */
-    Date getNextValidTimeAfter(Date date) {
+    LocalDateTime getNextValidTimeAfter(LocalDateTime date) {
         return getTimeAfter(date);
     }
     
@@ -349,16 +349,16 @@ final class CronExpression : Cloneable { // Serializable,
      *             invalid date/time
      * @return the next valid date/time
      */
-    Date getNextInvalidTimeAfter(Date date) {
+    LocalDateTime getNextInvalidTimeAfter(LocalDateTime date) {
         long difference = 1000;
         
         //move back to the nearest second so differences will be accurate
         Calendar adjustCal = Calendar.getInstance(getTimeZone());
         adjustCal.setTime(date);
         adjustCal.set(Calendar.MILLISECOND, 0);
-        Date lastDate = adjustCal.getTime();
+        LocalDateTime lastDate = adjustCal.getTime();
         
-        Date newDate;
+        LocalDateTime newDate;
         
         //FUTURE_TODO: (QUARTZ-481) IMPROVE THIS! The following is a BAD solution to this problem. Performance will be very bad here, depending on the cron expression. It is, however A solution.
         
@@ -377,7 +377,7 @@ final class CronExpression : Cloneable { // Serializable,
             }
         }
         
-        return new Date(lastDate.getTime() + 1000);
+        return new LocalDateTime(lastDate.getTime() + 1000);
     }
     
     /**
@@ -1168,14 +1168,14 @@ final class CronExpression : Cloneable { // Serializable,
     //
     ////////////////////////////////////////////////////////////////////////////
 
-    Date getTimeAfter(Date afterTime) {
+    LocalDateTime getTimeAfter(LocalDateTime afterTime) {
 
         // Computation is based on Gregorian year only.
         Calendar cl = new java.util.GregorianCalendar(getTimeZone()); 
 
         // move ahead one second, since we're computing the time *after* the
         // given time
-        afterTime = new Date(afterTime.getTime() + 1000);
+        afterTime = new LocalDateTime(afterTime.getTime() + 1000);
         // CronTrigger does not deal with milliseconds
         cl.setTime(afterTime);
         cl.set(Calendar.MILLISECOND, 0);
@@ -1306,7 +1306,7 @@ final class CronExpression : Cloneable { // Serializable,
                         tcal.set(Calendar.HOUR_OF_DAY, hr);
                         tcal.set(Calendar.DAY_OF_MONTH, day);
                         tcal.set(Calendar.MONTH, mon - 1);
-                        Date nTime = tcal.getTime();
+                        LocalDateTime nTime = tcal.getTime();
                         if(nTime.before(afterTime)) {
                             day = 1;
                             mon++;
@@ -1343,7 +1343,7 @@ final class CronExpression : Cloneable { // Serializable,
                     tcal.set(Calendar.HOUR_OF_DAY, hr);
                     tcal.set(Calendar.DAY_OF_MONTH, day);
                     tcal.set(Calendar.MONTH, mon - 1);
-                    Date nTime = tcal.getTime();
+                    LocalDateTime nTime = tcal.getTime();
                     if(nTime.before(afterTime)) {
                         day = daysOfMonth.first();
                         mon++;
@@ -1590,7 +1590,7 @@ final class CronExpression : Cloneable { // Serializable,
      * NOT YET IMPLEMENTED: Returns the time before the given time
      * that the <code>CronExpression</code> matches.
      */ 
-    Date getTimeBefore(Date endTime) { 
+    LocalDateTime getTimeBefore(LocalDateTime endTime) { 
         // FUTURE_TODO: implement QUARTZ-423
         return null;
     }
@@ -1599,7 +1599,7 @@ final class CronExpression : Cloneable { // Serializable,
      * NOT YET IMPLEMENTED: Returns the final time that the 
      * <code>CronExpression</code> will match.
      */
-    Date getFinalFireTime() {
+    LocalDateTime getFinalFireTime() {
         // FUTURE_TODO: implement QUARTZ-423
         return null;
     }

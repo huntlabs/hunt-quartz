@@ -23,7 +23,7 @@ import core.thread;
  * behavior.
  *
  * @author matt.accola
- * @version $Revision$ $Date$
+ * @version $Revision$ $LocalDateTime$
  */
 class DefaultThreadExecutor : ThreadExecutor {
 

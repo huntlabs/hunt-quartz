@@ -124,7 +124,7 @@ class CronCalendar : BaseCalendar {
             return false;
         }
         
-        return (!(cronExpression.isSatisfiedBy(new Date(timeInMillis))));
+        return (!(cronExpression.isSatisfiedBy(new LocalDateTime(timeInMillis))));
     }
 
     /**
@@ -148,9 +148,9 @@ class CronCalendar : BaseCalendar {
             // baseCalendar, ask it the next time it includes and begin testing
             // from there. Failing this, add one millisecond and continue
             // testing.
-            if (cronExpression.isSatisfiedBy(new Date(nextIncludedTime))) {
+            if (cronExpression.isSatisfiedBy(new LocalDateTime(nextIncludedTime))) {
                 nextIncludedTime = cronExpression.getNextInvalidTimeAfter(
-                        new Date(nextIncludedTime)).getTime();
+                        new LocalDateTime(nextIncludedTime)).getTime();
             } else if ((getBaseCalendar() !is null) && 
                     (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
                 nextIncludedTime = 

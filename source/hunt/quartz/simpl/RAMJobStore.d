@@ -1389,7 +1389,7 @@ class RAMJobStore : JobStore {
             misfireTime -= getMisfireThreshold();
         }
 
-        Date tnft = tw.trigger.getNextFireTime();
+        LocalDateTime tnft = tw.trigger.getNextFireTime();
         if (tnft is null || tnft.getTime() > misfireTime 
                 || tw.trigger.getMisfireInstruction() == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) { 
             return false; 
@@ -1551,7 +1551,7 @@ class RAMJobStore : JobStore {
                     if(cal is null)
                         continue;
                 }
-                Date prevFireTime = trigger.getPreviousFireTime();
+                LocalDateTime prevFireTime = trigger.getPreviousFireTime();
                 // in case trigger was replaced between acquiring and firing
                 timeTriggers.remove(tw);
                 // call triggered on our copy, and the scheduler's copy
@@ -1562,7 +1562,7 @@ class RAMJobStore : JobStore {
 
                 TriggerFiredBundle bndle = new TriggerFiredBundle(retrieveJob(
                         tw.jobKey), trigger, cal,
-                        false, new Date(), trigger.getPreviousFireTime(), prevFireTime,
+                        false, new LocalDateTime(), trigger.getPreviousFireTime(), prevFireTime,
                         trigger.getNextFireTime());
 
                 JobDetail job = bndle.getJobDetail();

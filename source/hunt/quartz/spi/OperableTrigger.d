@@ -49,7 +49,7 @@ interface OperableTrigger : MutableTrigger {
      *         will return (until after the first firing of the <code>Trigger</code>).
      *         </p>
      */
-    Date computeFirstFireTime(Calendar calendar);
+    LocalDateTime computeFirstFireTime(Calendar calendar);
 
     /**
      * <p>
@@ -148,7 +148,7 @@ interface OperableTrigger : MutableTrigger {
     string getFireInstanceId();
 
     
-    void setNextFireTime(Date nextFireTime);
+    void setNextFireTime(LocalDateTime nextFireTime);
     
-    void setPreviousFireTime(Date previousFireTime);
+    void setPreviousFireTime(LocalDateTime previousFireTime);
 }

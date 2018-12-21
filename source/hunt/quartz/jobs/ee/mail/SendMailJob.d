@@ -161,7 +161,7 @@ module hunt.quartz.jobs.ee.mail.SendMailJob;
         
 //         mimeMessage.setSubject(mailInfo.getSubject());
         
-//         mimeMessage.setSentDate(new Date());
+//         mimeMessage.setSentDate(new LocalDateTime());
 
 //         setMimeMessageContent(mimeMessage, mailInfo);
 

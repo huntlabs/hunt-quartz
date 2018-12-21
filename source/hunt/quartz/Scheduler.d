@@ -423,7 +423,7 @@ interface Scheduler {
      *           if the Job or Trigger cannot be added to the Scheduler, or
      *           there is an internal Scheduler error.
      */
-    Date scheduleJob(JobDetail jobDetail, Trigger trigger);
+    LocalDateTime scheduleJob(JobDetail jobDetail, Trigger trigger);
 
     /**
      * Schedule the given <code>{@link hunt.quartz.Trigger}</code> with the
@@ -434,7 +434,7 @@ interface Scheduler {
      *           added to the Scheduler, or there is an internal Scheduler
      *           error.
      */
-    Date scheduleJob(Trigger trigger);
+    LocalDateTime scheduleJob(Trigger trigger);
 
     /**
      * Schedule all of the given jobs with the related set of triggers.
@@ -497,7 +497,7 @@ interface Scheduler {
      *         new trigger is therefore not stored), otherwise
      *         the first fire time of the newly scheduled trigger is returned.
      */
-    Date rescheduleJob(TriggerKey triggerKey, Trigger newTrigger);
+    LocalDateTime rescheduleJob(TriggerKey triggerKey, Trigger newTrigger);
     
     /**
      * Add the given <code>Job</code> to the Scheduler - with no associated

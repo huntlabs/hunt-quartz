@@ -64,7 +64,7 @@ interface TimeBroker {
      *           with the error code set to
      *           SchedulerException.ERR_TIME_BROKER_FAILURE
      */
-    Date getCurrentTime();
+    LocalDateTime getCurrentTime();
 
     /**
      * <p>

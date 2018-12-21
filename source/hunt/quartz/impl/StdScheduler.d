@@ -244,7 +244,7 @@ class StdScheduler : Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Date scheduleJob(JobDetail jobDetail, Trigger trigger) {
+    LocalDateTime scheduleJob(JobDetail jobDetail, Trigger trigger) {
         return sched.scheduleJob(jobDetail, trigger);
     }
 
@@ -253,7 +253,7 @@ class StdScheduler : Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Date scheduleJob(Trigger trigger) {
+    LocalDateTime scheduleJob(Trigger trigger) {
         return sched.scheduleJob(trigger);
     }
 
@@ -310,7 +310,7 @@ class StdScheduler : Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    Date rescheduleJob(TriggerKey triggerKey,
+    LocalDateTime rescheduleJob(TriggerKey triggerKey,
             Trigger newTrigger) {
         return sched.rescheduleJob(triggerKey, newTrigger);
     }

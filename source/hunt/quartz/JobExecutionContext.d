@@ -175,7 +175,7 @@ interface JobExecutionContext {
      * @return Returns the fireTime.
      * @see #getScheduledFireTime()
      */
-    Date getFireTime();
+    LocalDateTime getFireTime();
 
     /**
      * The scheduled time the trigger fired for. For instance the scheduled
@@ -185,11 +185,11 @@ interface JobExecutionContext {
      * @return Returns the scheduledFireTime.
      * @see #getFireTime()
      */
-    Date getScheduledFireTime();
+    LocalDateTime getScheduledFireTime();
 
-    Date getPreviousFireTime();
+    LocalDateTime getPreviousFireTime();
 
-    Date getNextFireTime();
+    LocalDateTime getNextFireTime();
 
     /**
      * Get the unique Id that identifies this particular firing instance of the

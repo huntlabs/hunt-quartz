@@ -156,7 +156,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
     /**
      * Get the time at which the <code>Trigger</code> should occur.
      */
-    Date getStartTime();
+    LocalDateTime getStartTime();
 
     /**
      * Get the time at which the <code>Trigger</code> should quit repeating -
@@ -165,7 +165,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * 
      * @see #getFinalFireTime()
      */
-    Date getEndTime();
+    LocalDateTime getEndTime();
 
     /**
      * Returns the next time at which the <code>Trigger</code> is scheduled to fire. If
@@ -179,22 +179,22 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * has been added to the scheduler.
      * </p>
      *
-     * @see TriggerUtils#computeFireTimesBetween(hunt.quartz.spi.OperableTrigger, Calendar, java.util.Date, java.util.Date)
+     * @see TriggerUtils#computeFireTimesBetween(hunt.quartz.spi.OperableTrigger, Calendar, java.util.LocalDateTime, java.util.LocalDateTime)
      */
-    Date getNextFireTime();
+    LocalDateTime getNextFireTime();
 
     /**
      * Returns the previous time at which the <code>Trigger</code> fired.
      * If the trigger has not yet fired, <code>null</code> will be returned.
      */
-    Date getPreviousFireTime();
+    LocalDateTime getPreviousFireTime();
 
     /**
      * Returns the next time at which the <code>Trigger</code> will fire,
      * after the given time. If the trigger will not fire after the given time,
      * <code>null</code> will be returned.
      */
-    Date getFireTimeAfter(Date afterTime);
+    LocalDateTime getFireTimeAfter(LocalDateTime afterTime);
 
     /**
      * Returns the last time at which the <code>Trigger</code> will fire, if
@@ -204,7 +204,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * Note that the return time *may* be in the past.
      * </p>
      */
-    Date getFinalFireTime();
+    LocalDateTime getFinalFireTime();
 
     /**
      * Get the instruction the <code>Scheduler</code> should be given for
@@ -302,8 +302,8 @@ class TriggerTimeComparator : Comparator!(Trigger) {
   
     
     // This static method exists for comparator in TC clustered quartz
-    static int compare(Date nextFireTime1, int priority1, TriggerKey key1, 
-        Date nextFireTime2, int priority2, TriggerKey key2) {
+    static int compare(LocalDateTime nextFireTime1, int priority1, TriggerKey key1, 
+        LocalDateTime nextFireTime2, int priority2, TriggerKey key2) {
         if (nextFireTime1 !is null || nextFireTime2 !is null) {
             if (nextFireTime1 is null) {
                 return 1;

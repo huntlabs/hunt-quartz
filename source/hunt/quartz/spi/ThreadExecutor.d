@@ -9,7 +9,7 @@ import core.thread;
  * passed to execute and the work is scheduled by the underlying implementation.
  *
  * @author matt.accola
- * @version $Revision$ $Date$
+ * @version $Revision$ $LocalDateTime$
  */
 interface ThreadExecutor {
 

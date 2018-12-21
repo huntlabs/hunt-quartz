@@ -73,11 +73,11 @@ class TriggerUtils {
      *          The calendar to apply to the trigger's schedule
      * @param numTimes
      *          The number of next fire times to produce
-     * @return List of java.util.Date objects
+     * @return List of java.util.LocalDateTime objects
      */
-    static List!(Date) computeFireTimes(OperableTrigger trigg, 
+    static List!(LocalDateTime) computeFireTimes(OperableTrigger trigg, 
         Calendar cal, int numTimes) {
-        LinkedList!(Date) lst = new LinkedList!(Date)();
+        LinkedList!(LocalDateTime) lst = new LinkedList!(LocalDateTime)();
 
         implementationMissing(false);
         // OperableTrigger t = cast(OperableTrigger) trigg.clone();
@@ -89,7 +89,7 @@ class TriggerUtils {
         }
 
         for (int i = 0; i < numTimes; i++) {
-            Date d = t.getNextFireTime();
+            LocalDateTime d = t.getNextFireTime();
             if (d !is null) {
                 lst.add(d);
                 t.triggered(cal);
@@ -102,7 +102,7 @@ class TriggerUtils {
     }
     
     /**
-     * Compute the <code>Date</code> that is 1 second after the Nth firing of 
+     * Compute the <code>LocalDateTime</code> that is 1 second after the Nth firing of 
      * the given <code>Trigger</code>, taking the triger's associated 
      * <code>Calendar</code> into consideration.
      *  
@@ -115,9 +115,9 @@ class TriggerUtils {
      *          The calendar to apply to the trigger's schedule
      * @param numTimes
      *          The number of next fire times to produce
-     * @return the computed Date, or null if the trigger (as configured) will not fire that many times.
+     * @return the computed LocalDateTime, or null if the trigger (as configured) will not fire that many times.
      */
-    static Date computeEndTimeToAllowParticularNumberOfFirings(OperableTrigger trigg, Calendar cal, 
+    static LocalDateTime computeEndTimeToAllowParticularNumberOfFirings(OperableTrigger trigg, Calendar cal, 
             int numTimes) {
 
         OperableTrigger t = cast(OperableTrigger) trigg.clone();
@@ -127,10 +127,10 @@ class TriggerUtils {
         }
         
         int c = 0;
-        Date endTime = null;
+        LocalDateTime endTime = null;
         
         for (int i = 0; i < numTimes; i++) {
-            Date d = t.getNextFireTime();
+            LocalDateTime d = t.getNextFireTime();
             if (d !is null) {
                 c++;
                 t.triggered(cal);
@@ -144,7 +144,7 @@ class TriggerUtils {
         if(endTime is null)
             return null;
         
-        endTime = new Date(endTime.getTime() + 1000L);
+        endTime = new LocalDateTime(endTime.getTime() + 1000L);
         
         return endTime;
     }
@@ -170,11 +170,11 @@ class TriggerUtils {
      *          The starting date at which to find fire times
      * @param to
      *          The ending date at which to stop finding fire times
-     * @return List of java.util.Date objects
+     * @return List of java.util.LocalDateTime objects
      */
-    static List!(Date) computeFireTimesBetween(OperableTrigger trigg,
-            Calendar cal, Date from, Date to) {
-        LinkedList!(Date) lst = new LinkedList!(Date)();
+    static List!(LocalDateTime) computeFireTimesBetween(OperableTrigger trigg,
+            Calendar cal, LocalDateTime from, LocalDateTime to) {
+        LinkedList!(LocalDateTime) lst = new LinkedList!(LocalDateTime)();
 
         OperableTrigger t = cast(OperableTrigger) trigg.clone();
 
@@ -185,7 +185,7 @@ class TriggerUtils {
         }
 
         while (true) {
-            Date d = t.getNextFireTime();
+            LocalDateTime d = t.getNextFireTime();
             if (d !is null) {
                 if (d.before(from)) {
                     t.triggered(cal);

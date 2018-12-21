@@ -44,7 +44,7 @@ import std.datetime;
 class HolidayCalendar : BaseCalendar, Calendar {
     
     // A sorted set to store the holidays
-    private TreeSet!(Date) dates;
+    private TreeSet!(LocalDateTime) dates;
 
     this() {
     }
@@ -62,13 +62,13 @@ class HolidayCalendar : BaseCalendar, Calendar {
     }
 
     private void initialize() {
-        dates = new TreeSet!(Date)();
+        dates = new TreeSet!(LocalDateTime)();
     }
 
     // override
     // Object clone() {
     //     HolidayCalendar clone = (HolidayCalendar) super.clone();
-    //     clone.dates = new TreeSet!(Date)(dates);
+    //     clone.dates = new TreeSet!(LocalDateTime)(dates);
     //     return clone;
     // }
     
@@ -88,7 +88,7 @@ class HolidayCalendar : BaseCalendar, Calendar {
             return false;
         }
 
-        Date lookFor = getStartOfDayJavaCalendar(timeStamp).getTime();
+        LocalDateTime lookFor = getStartOfDayJavaCalendar(timeStamp).getTime();
 
         return !(dates.contains(lookFor));
     }
@@ -123,12 +123,12 @@ class HolidayCalendar : BaseCalendar, Calendar {
 
     /**
      * <p>
-     * Add the given Date to the list of excluded days. Only the month, day and
+     * Add the given LocalDateTime to the list of excluded days. Only the month, day and
      * year of the returned dates are significant.
      * </p>
      */
-    void addExcludedDate(Date excludedDate) {
-        Date date = getStartOfDayJavaCalendar(excludedDate.getTime()).getTime();
+    void addExcludedDate(LocalDateTime excludedDate) {
+        LocalDateTime date = getStartOfDayJavaCalendar(excludedDate.getTime()).getTime();
         /*
          * System.err.println( "HolidayCalendar.add(): date=" ~
          * excludedDate.toLocaleString());
@@ -136,8 +136,8 @@ class HolidayCalendar : BaseCalendar, Calendar {
         this.dates.add(date);
     }
 
-    void removeExcludedDate(Date dateToRemove) {
-        Date date = getStartOfDayJavaCalendar(dateToRemove.getTime()).getTime();
+    void removeExcludedDate(LocalDateTime dateToRemove) {
+        LocalDateTime date = getStartOfDayJavaCalendar(dateToRemove.getTime()).getTime();
         dates.remove(date);
     }
 
@@ -148,7 +148,7 @@ class HolidayCalendar : BaseCalendar, Calendar {
      * significant.
      * </p>
      */
-    SortedSet!(Date) getExcludedDates() {
+    SortedSet!(LocalDateTime) getExcludedDates() {
         return Collections.unmodifiableSortedSet(dates);
     }
 }

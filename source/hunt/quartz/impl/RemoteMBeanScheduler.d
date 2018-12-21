@@ -346,7 +346,7 @@ module hunt.quartz.impl.RemoteMBeanScheduler;
 //      * instance.
 //      * </p>
 //      */
-//     Date scheduleJob(JobDetail jobDetail, Trigger trigger) {
+//     LocalDateTime scheduleJob(JobDetail jobDetail, Trigger trigger) {
 //         throw new SchedulerException("Operation not supported for remote schedulers.");
 //     }
 
@@ -357,7 +357,7 @@ module hunt.quartz.impl.RemoteMBeanScheduler;
 //      * instance.
 //      * </p>
 //      */
-//     Date scheduleJob(Trigger trigger) {
+//     LocalDateTime scheduleJob(Trigger trigger) {
 //         throw new SchedulerException("Operation not supported for remote schedulers.");
 //     }
 
@@ -441,7 +441,7 @@ module hunt.quartz.impl.RemoteMBeanScheduler;
 //      * instance.
 //      * </p>
 //      */
-//     Date rescheduleJob(TriggerKey triggerKey,
+//     LocalDateTime rescheduleJob(TriggerKey triggerKey,
 //             Trigger newTrigger) {
 //         throw new SchedulerException("Operation not supported for remote schedulers.");
 //     }

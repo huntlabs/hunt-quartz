@@ -52,13 +52,13 @@ class TriggerFiredBundle {
 
     private bool jobIsRecovering;
 
-    private Date fireTime;
+    private LocalDateTime fireTime;
 
-    private Date scheduledFireTime;
+    private LocalDateTime scheduledFireTime;
 
-    private Date prevFireTime;
+    private LocalDateTime prevFireTime;
 
-    private Date nextFireTime;
+    private LocalDateTime nextFireTime;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,8 +69,8 @@ class TriggerFiredBundle {
      */
 
     this(JobDetail job, OperableTrigger trigger, Calendar cal,
-            bool jobIsRecovering, Date fireTime, Date scheduledFireTime,
-            Date prevFireTime, Date nextFireTime) {
+            bool jobIsRecovering, LocalDateTime fireTime, LocalDateTime scheduledFireTime,
+            LocalDateTime prevFireTime, LocalDateTime nextFireTime) {
         this.job = job;
         this.trigger = trigger;
         this.cal = cal;
@@ -108,28 +108,28 @@ class TriggerFiredBundle {
     /**
      * @return Returns the fireTime.
      */
-    Date getFireTime() {
+    LocalDateTime getFireTime() {
         return fireTime;
     }
 
     /**
      * @return Returns the nextFireTime.
      */
-    Date getNextFireTime() {
+    LocalDateTime getNextFireTime() {
         return nextFireTime;
     }
 
     /**
      * @return Returns the prevFireTime.
      */
-    Date getPrevFireTime() {
+    LocalDateTime getPrevFireTime() {
         return prevFireTime;
     }
 
     /**
      * @return Returns the scheduledFireTime.
      */
-    Date getScheduledFireTime() {
+    LocalDateTime getScheduledFireTime() {
         return scheduledFireTime;
     }
 

@@ -78,8 +78,8 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
 
     private TriggerKey key;
     private string description;
-    private Date startTime; // = new Date();
-    private Date endTime;
+    private LocalDateTime startTime; // = new LocalDateTime();
+    private LocalDateTime endTime;
     private int priority = Trigger.DEFAULT_PRIORITY;
     private string calendarName;
     private JobKey jobKey;
@@ -233,7 +233,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
      * @see Trigger#getStartTime()
      * @see DateBuilder
      */
-    TriggerBuilder!(T) startAt(Date triggerStartTime) {
+    TriggerBuilder!(T) startAt(LocalDateTime triggerStartTime) {
         this.startTime = triggerStartTime;
         return this;
     }
@@ -247,7 +247,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
      * @see Trigger#getStartTime()
      */
     TriggerBuilder!(T) startNow() {
-        this.startTime = new Date();
+        this.startTime = new LocalDateTime();
         return this;
     }
 
@@ -260,7 +260,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
      * @see Trigger#getEndTime()
      * @see DateBuilder
      */
-    TriggerBuilder!(T) endAt(Date triggerEndTime) {
+    TriggerBuilder!(T) endAt(LocalDateTime triggerEndTime) {
         this.endTime = triggerEndTime;
         return this;
     }
