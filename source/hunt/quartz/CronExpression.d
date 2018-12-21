@@ -20,6 +20,7 @@ module hunt.quartz.CronExpression;
 import hunt.container;
 import hunt.lang.common;
 import hunt.lang.exception;
+import hunt.string;
 import hunt.time.util.Calendar;
 import hunt.time.util.Locale;
 // import std.datetime;
@@ -30,6 +31,7 @@ import hunt.time.util.Locale;
 // import hunt.string.StringTokenizer;
 // import java.util.TreeSet;
 import std.datetime;
+import std.string;
 
 /**
  * Provides a parser and evaluator for unix-like cron expressions. Cron 
@@ -275,7 +277,7 @@ final class CronExpression : Cloneable { // Serializable,
             throw new IllegalArgumentException("cronExpression cannot be null");
         }
         
-        this.cronExpression = cronExpression.toUpperCase(Locale.US);
+        this.cronExpression = cronExpression.toUpper();
         
         buildExpression(this.cronExpression);
     }
@@ -297,7 +299,7 @@ final class CronExpression : Cloneable { // Serializable,
         try {
             buildExpression(cronExpression);
         } catch (ParseException ex) {
-            throw new AssertionError();
+            throw new Error("Building error: " ~ ex.msg);
         }
         if (expression.getTimeZone() !is null) {
             // setTimeZone(cast(TimeZone) expression.getTimeZone().clone());
@@ -472,18 +474,18 @@ final class CronExpression : Cloneable { // Serializable,
                     false);
 
             while (exprsTok.hasMoreTokens() && exprOn <= YEAR) {
-                string expr = exprsTok.nextToken().trim();
+                string expr = exprsTok.nextToken().strip();
 
                 // throw an exception if L is used with other days of the month
-                if(exprOn == DAY_OF_MONTH && expr.indexOf('L') != -1 && expr.length() > 1 && expr.contains(",")) {
-                    throw new ParseException("Support for specifying 'L' and 'LW' with other days of the month is not implemented", -1);
+                if(exprOn == DAY_OF_MONTH && expr.indexOf('L') != -1 && expr.length > 1 && expr.contains(",")) {
+                    throw new ParseException("Support for specifying 'L' and 'LW' with other days of the month is not implemented");
                 }
                 // throw an exception if L is used with other days of the week
-                if(exprOn == DAY_OF_WEEK && expr.indexOf('L') != -1 && expr.length() > 1  && expr.contains(",")) {
-                    throw new ParseException("Support for specifying 'L' with other days of the week is not implemented", -1);
+                if(exprOn == DAY_OF_WEEK && expr.indexOf('L') != -1 && expr.length > 1  && expr.contains(",")) {
+                    throw new ParseException("Support for specifying 'L' with other days of the week is not implemented");
                 }
                 if(exprOn == DAY_OF_WEEK && expr.indexOf('#') != -1 && expr.indexOf('#', expr.indexOf('#') +1) != -1) {
-                    throw new ParseException("Support for specifying multiple \"nth\" days is not implemented.", -1);
+                    throw new ParseException("Support for specifying multiple \"nth\" days is not implemented.");
                 }
                 
                 StringTokenizer vTok = new StringTokenizer(expr, ",");

@@ -13,18 +13,31 @@ import hunt.quartz.impl.matchers.EverythingMatcher;
 
 class ListenerManagerImpl : ListenerManager {
 
-    private Map!(string, JobListener) globalJobListeners = new LinkedHashMap!(string, JobListener)(10);
+    private Map!(string, JobListener) globalJobListeners;
 
-    private Map!(string, TriggerListener) globalTriggerListeners = new LinkedHashMap!(string, TriggerListener)(10);
+    private Map!(string, TriggerListener) globalTriggerListeners;
 
-    private Map!(string, List!(Matcher!(JobKey))) globalJobListenersMatchers = new LinkedHashMap!(string, List!(Matcher!(JobKey)))(10);
+    private Map!(string, List!(Matcher!(JobKey))) globalJobListenersMatchers;
 
-    private Map!(string, List!(Matcher!(TriggerKey))) globalTriggerListenersMatchers = new LinkedHashMap!(string, List!(Matcher!(TriggerKey)))(10);
+    private Map!(string, List!(Matcher!(TriggerKey))) globalTriggerListenersMatchers;
 
-    private ArrayList!(SchedulerListener) schedulerListeners = new ArrayList!(SchedulerListener)(10);
+    private ArrayList!(SchedulerListener) schedulerListeners;
+
+    this() {
+
+        globalJobListeners = new LinkedHashMap!(string, JobListener)(10);
+
+        globalTriggerListeners = new LinkedHashMap!(string, TriggerListener)(10);
+
+        globalJobListenersMatchers = new LinkedHashMap!(string, List!(Matcher!(JobKey)))(10);
+
+        globalTriggerListenersMatchers = new LinkedHashMap!(string, List!(Matcher!(TriggerKey)))(10);
+
+        schedulerListeners = new ArrayList!(SchedulerListener)(10);
+    }
 
     
-    void addJobListener(JobListener jobListener, Matcher!(JobKey)[]matchers ... ) {
+    void addJobListener(JobListener jobListener, Matcher!(JobKey)[] matchers ... ) {
         addJobListener(jobListener, Arrays.asList(matchers));
     }
 

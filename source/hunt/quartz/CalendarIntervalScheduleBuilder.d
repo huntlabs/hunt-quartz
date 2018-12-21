@@ -20,8 +20,11 @@ module hunt.quartz.CalendarIntervalScheduleBuilder;
 import hunt.quartz.CalendarIntervalTrigger;
 import hunt.quartz.DateBuilder;
 import hunt.quartz.ScheduleBuilder;
+import hunt.quartz.Trigger;
 import hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
+
+import hunt.lang.exception;
 
 import std.datetime : TimeZone;
 /**
@@ -110,8 +113,8 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder!(CalendarIntervalTrigger
      * @see CalendarIntervalTrigger#getRepeatIntervalUnit()
      */
     CalendarIntervalScheduleBuilder withInterval(int timeInterval, IntervalUnit unit) {
-        if(unit is null)
-            throw new IllegalArgumentException("TimeUnit must be specified.");
+        // if(unit is null)
+        //     throw new IllegalArgumentException("TimeUnit must be specified.");
         validateInterval(timeInterval);
         this.interval = timeInterval;
         this.intervalUnit = unit;
