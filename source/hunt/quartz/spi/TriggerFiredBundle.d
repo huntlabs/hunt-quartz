@@ -17,11 +17,13 @@
 
 module hunt.quartz.spi.TriggerFiredBundle;
 
-import std.datetime;
-
 import hunt.quartz.Calendar;
 import hunt.quartz.JobDetail;
 import hunt.quartz.spi.OperableTrigger;
+
+import hunt.time.LocalDateTime;
+import std.datetime;
+
 
 /**
  * <p>

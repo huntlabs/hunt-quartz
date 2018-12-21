@@ -33,6 +33,7 @@ import hunt.quartz.Trigger;
 import hunt.quartz.DateBuilder : IntervalUnit;
 
 import hunt.time.util.Calendar;
+import hunt.time.LocalDateTime;
 import hunt.container.Set;
 
 import std.datetime;

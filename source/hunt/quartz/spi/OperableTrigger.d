@@ -8,6 +8,7 @@ import hunt.quartz.Trigger;
 import hunt.quartz.exception;
 import hunt.quartz.Scheduler;
 
+import hunt.time.LocalDateTime;
 import std.datetime;
 
 interface OperableTrigger : MutableTrigger {

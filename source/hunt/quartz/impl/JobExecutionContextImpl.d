@@ -30,8 +30,9 @@ import hunt.quartz.TriggerKey;
 import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 
-import hunt.lang.exception;
 import hunt.container.HashMap;
+import hunt.lang.exception;
+import hunt.time.LocalDateTime;
 
 import std.datetime;
 
@@ -222,7 +223,7 @@ class JobExecutionContextImpl : JobExecutionContext {
                 ~ " scheduledFireTime: " ~ getScheduledFireTime()
                 ~ " previousFireTime: '" ~ getPreviousFireTime()
                 ~ " nextFireTime: " ~ getNextFireTime() ~ " isRecovering: "
-                + isRecovering() ~ " refireCount: " ~ getRefireCount();
+                ~ isRecovering().to!string() ~ " refireCount: " ~ getRefireCount().to!string();
     }
 
     /**

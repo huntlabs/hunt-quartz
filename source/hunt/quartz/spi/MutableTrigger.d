@@ -28,6 +28,8 @@ import hunt.quartz.Trigger;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.TriggerUtils;
 
+import hunt.time.LocalDateTime;
+
 interface MutableTrigger : Trigger {
 
     void setKey(TriggerKey key);

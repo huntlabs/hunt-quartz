@@ -35,6 +35,7 @@ import hunt.quartz.TriggerUtils;
 import hunt.quartz.spi.OperableTrigger;
 
 import hunt.lang.exception;
+import hunt.time.LocalDateTime;
 import std.datetime;
 
 

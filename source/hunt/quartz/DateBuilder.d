@@ -20,6 +20,7 @@ module hunt.quartz.DateBuilder;
 import hunt.time.util.Calendar;
 // import std.datetime;
 import hunt.time.util.Locale;
+import hunt.time.LocalDateTime;
 
 import std.conv;
 import std.datetime;

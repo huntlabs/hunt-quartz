@@ -25,6 +25,7 @@ import hunt.quartz.Scheduler;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerKey;
 
+import hunt.time.LocalDateTime;
 
 import std.datetime;
 

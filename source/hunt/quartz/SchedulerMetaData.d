@@ -18,6 +18,8 @@
 
 module hunt.quartz.SchedulerMetaData;
 
+import hunt.time.LocalDateTime;
+
 import std.datetime;
 import std.string;
 

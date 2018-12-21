@@ -23,6 +23,7 @@ import hunt.lang.exception;
 import hunt.string;
 import hunt.time.util.Calendar;
 import hunt.time.util.Locale;
+import hunt.time.LocalDateTime;
 // import std.datetime;
 // import hunt.container.HashMap;
 // import hunt.container.Iterator;
@@ -30,8 +31,11 @@ import hunt.time.util.Locale;
 // import java.util.SortedSet;
 // import hunt.string.StringTokenizer;
 // import java.util.TreeSet;
+
+import std.conv;
 import std.datetime;
 import std.string;
+
 
 /**
  * Provides a parser and evaluator for unix-like cron expressions. Cron 
@@ -499,7 +503,7 @@ final class CronExpression : Cloneable { // Serializable,
 
             if (exprOn <= DAY_OF_WEEK) {
                 throw new ParseException("Unexpected end of expression.",
-                            expression.length);
+                            cast(int)expression.length);
             }
 
             if (exprOn <= YEAR) {
@@ -523,7 +527,7 @@ final class CronExpression : Cloneable { // Serializable,
             throw pe;
         } catch (Exception e) {
             throw new ParseException("Illegal cron expression format ("
-                    + e.toString() ~ ")", 0);
+                    ~ e.msg ~ ")", 0);
         }
     }
 
@@ -607,7 +611,7 @@ final class CronExpression : Cloneable { // Serializable,
             if ((i + 1) < s.length 
                     && (s[i] != ' ' && s[i + 1] != '\t')) {
                 throw new ParseException("Illegal character after '?': "
-                            + s[i], i);
+                            ~ s[i].to!string(), i);
             }
             if (type != DAY_OF_WEEK && type != DAY_OF_MONTH) {
                 throw new ParseException(
