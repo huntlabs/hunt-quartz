@@ -19,13 +19,19 @@ module hunt.quartz.CronScheduleBuilder;
 
 import hunt.quartz.CronExpression;
 import hunt.quartz.CronTrigger;
+import hunt.quartz.DateBuilder;
 import hunt.quartz.ScheduleBuilder;
-
-import hunt.lang.exception;
-import std.datetime : TimeZone;
+import hunt.quartz.Trigger;
 
 import hunt.quartz.impl.triggers.CronTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
+
+import hunt.lang.exception;
+import hunt.time.ZoneId;
+
+import std.conv;
+// import std.datetime : TimeZone;
+import std.format;
 
 /**
  * <code>CronScheduleBuilder</code> is a {@link ScheduleBuilder} that defines
@@ -143,7 +149,7 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
             // this point...
             throw new RuntimeException(
                     "CronExpression '"
-                            + presumedValidCronExpression
+                            ~ presumedValidCronExpression
                             ~ "' is invalid, which should not be possible, please report bug to Quartz developers.",
                     e);
         }
@@ -176,7 +182,7 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);
 
-        string cronExpression = string.format("0 %d %d ? * *", minute, hour);
+        string cronExpression = format("0 %d %d ? * *", minute, hour);
 
         return cronScheduleNoParseException(cronExpression);
     }
@@ -213,11 +219,11 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);
 
-        string cronExpression = string.format("0 %d %d ? * %d", minute, hour,
+        string cronExpression = format("0 %d %d ? * %d", minute, hour,
                 daysOfWeek[0]);
 
-        for (int i = 1; i < daysOfWeek.length; i++)
-            cronExpression = cronExpression ~ "," ~ daysOfWeek[i];
+        for (size_t i = 1; i < daysOfWeek.length; i++)
+            cronExpression = cronExpression ~ "," ~ daysOfWeek[i].to!string();
 
         return cronScheduleNoParseException(cronExpression);
     }
@@ -249,7 +255,7 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);
 
-        string cronExpression = string.format("0 %d %d ? * %d", minute, hour,
+        string cronExpression = format("0 %d %d ? * %d", minute, hour,
                 dayOfWeek);
 
         return cronScheduleNoParseException(cronExpression);
@@ -275,7 +281,7 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
         DateBuilder.validateHour(hour);
         DateBuilder.validateMinute(minute);
 
-        string cronExpression = string.format("0 %d %d %d * ?", minute, hour,
+        string cronExpression = format("0 %d %d %d * ?", minute, hour,
                 dayOfMonth);
 
         return cronScheduleNoParseException(cronExpression);
@@ -289,7 +295,7 @@ class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
      * @return the updated CronScheduleBuilder
      * @see CronExpression#getTimeZone()
      */
-    CronScheduleBuilder inTimeZone(TimeZone timezone) {
+    CronScheduleBuilder inTimeZone(ZoneId timezone) {
         cronExpression.setTimeZone(timezone);
         return this;
     }

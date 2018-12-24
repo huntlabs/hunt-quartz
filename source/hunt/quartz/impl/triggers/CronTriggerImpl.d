@@ -32,10 +32,11 @@ import hunt.quartz.Trigger;
 import hunt.quartz.TriggerUtils;
 
 import hunt.lang.exception;
-import hunt.time.util.Calendar;
+// import hunt.time.util.Calendar;
 import hunt.time.LocalDateTime;
+import hunt.time.ZoneId;
 
-import std.datetime;
+// import std.datetime;
 
 /**
  * <p>
@@ -81,7 +82,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     private LocalDateTime endTime;// = null;
     private LocalDateTime nextFireTime;// = null;
     private LocalDateTime previousFireTime;// = null;
-    private TimeZone timeZone = null;
+    private ZoneId timeZone = null;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -479,14 +480,14 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     /* (non-Javadoc)
      * @see hunt.quartz.CronTriggerI#getTimeZone()
      */
-    TimeZone getTimeZone() {
+    ZoneId getTimeZone() {
         
         if(cronEx !is null) {
             return cronEx.getTimeZone();
         }
         
         if (timeZone is null) {
-            timeZone = TimeZone.getDefault();
+            timeZone = ZoneId.systemDefault(); // TimeZone.getDefault();
         }
         return timeZone;
     }
@@ -503,7 +504,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * time zone applied by this method will remain in effect, since the 
      * string cron expression does not carry a time zone!
      */
-    void setTimeZone(TimeZone timeZone) {
+    void setTimeZone(ZoneId timeZone) {
         if(cronEx !is null) {
             cronEx.setTimeZone(timeZone);
         }
@@ -639,7 +640,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * 
      * @see #willFireOn(Calendar, bool)
      */
-    bool willFireOn(HuntCalendar test) {
+    bool willFireOn(LocalDateTime test) {
         return willFireOn(test, false);
     }
     
@@ -660,43 +661,41 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * (hours, minutes and seconds will be ignored).
      * @see #willFireOn(Calendar)
      */
-    bool willFireOn(HuntCalendar test, bool dayOnly) {
+    bool willFireOn(LocalDateTime test, bool dayOnly) {
 
-        test = cast(HuntCalendar) test.clone();
+        // test = cast(HuntCalendar) test.clone();
         
-        test.set(HuntCalendar.MILLISECOND, 0); // don't compare millis.
+        // test.set(HuntCalendar.MILLISECOND, 0); // don't compare millis.
         
         if(dayOnly) {
-            test.set(HuntCalendar.HOUR_OF_DAY, 0); 
-            test.set(HuntCalendar.MINUTE, 0); 
-            test.set(HuntCalendar.SECOND, 0); 
+            test = LocalDateTime.of(test.getYear(), test.getMonthValue(), test.getDayOfMonth(), 0, 0, 0);
         }
         
-        LocalDateTime testTime = test.getTime();
+        LocalDateTime testTime = test;
         
-        LocalDateTime fta = getFireTimeAfter(new LocalDateTime(test.getTime().getTime() - 1000));
+        LocalDateTime fta = getFireTimeAfter(test.minusSeconds(1));
         
         if(fta is null)
             return false;
 
-        HuntCalendar p = HuntCalendar.getInstance(test.getTimeZone());
-        p.setTime(fta);
+        // HuntCalendar p = HuntCalendar.getInstance(test.getTimeZone());
+        // p.setTime(fta);
         
-        int year = p.get(HuntCalendar.YEAR);
-        int month = p.get(HuntCalendar.MONTH);
-        int day = p.get(HuntCalendar.DATE);
+        int year = fta.getYear();
+        int month = fta.getMonthValue();
+        int day = fta.getDayOfMonth();
         
         if(dayOnly) {
-            return (year == test.get(HuntCalendar.YEAR) 
-                    && month == test.get(HuntCalendar.MONTH) 
-                    && day == test.get(HuntCalendar.DATE));
+            return (year == test.getYear() 
+                    && month == test.getMonthValue() 
+                    && day == test.getDayOfMonth());
         }
         
         while(fta.before(testTime)) {
             fta = getFireTimeAfter(fta);
         }
 
-        return fta== testTime;
+        return fta == testTime;
     }
 
     /**

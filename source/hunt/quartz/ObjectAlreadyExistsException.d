@@ -63,7 +63,7 @@ class ObjectAlreadyExistsException : JobPersistenceException {
      * </p>
      */
     this(JobDetail offendingJob) {
-        super("Unable to store Job : '" ~ offendingJob.getKey()
+        super("Unable to store Job : '" ~ offendingJob.getKey().toString()
                 ~ "', because one already exists with this identification.");
     }
 

@@ -23,6 +23,8 @@ import hunt.quartz.SimpleTrigger;
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 
+import hunt.lang.exception;
+
 /**
  * <code>SimpleScheduleBuilder</code> is a {@link ScheduleBuilder} 
  * that defines strict/literal interval-based schedules for 

@@ -70,7 +70,7 @@ class JobBuilder {
 
     private JobKey key;
     private string description;
-    // private Class<? extends Job> jobClass;
+    private TypeInfo_Class jobClass;
     private bool durability;
     private bool shouldRecover;
     
@@ -114,7 +114,7 @@ class JobBuilder {
         job.setJobClass(jobClass);
         job.setDescription(description);
         if(key is null)
-            key = new JobKey(Key.createUniqueName(null), null);
+            key = new JobKey(IKey.createUniqueName(null), null);
         job.setKey(key); 
         job.setDurability(durability);
         job.setRequestsRecovery(shouldRecover);

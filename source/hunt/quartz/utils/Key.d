@@ -20,12 +20,22 @@ module hunt.quartz.utils.Key;
 // import java.util.UUID;
 
 import hunt.lang.common;
+import hunt.lang.exception;
 
 import std.format;
 import std.uuid;
 
 interface IKey {
 
+    static string createUniqueName(string group) {
+        if(group is null)
+            group = DEFAULT_GROUP;
+        
+        string n1 = UUID.randomUUID().toString();
+        string n2 = UUID.nameUUIDFromBytes(group.getBytes()).toString();
+        
+        return format("%s-%s", n2[24 .. $], n1);
+    }
 }
 
 /**
@@ -160,15 +170,5 @@ class Key(T) : Comparable!(Key!(T)), IKey {
             return r;
         
         return name == o.getName();
-    }
-    
-    static string createUniqueName(string group) {
-        if(group is null)
-            group = DEFAULT_GROUP;
-        
-        string n1 = UUID.randomUUID().toString();
-        string n2 = UUID.nameUUIDFromBytes(group.getBytes()).toString();
-        
-        return format("%s-%s", n2[24 .. $], n1);
     }
 }

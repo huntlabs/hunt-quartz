@@ -20,15 +20,22 @@ import hunt.quartz.CalendarIntervalTrigger;
 import hunt.quartz.DailyTimeIntervalTrigger;
 import hunt.quartz.DateBuilder : IntervalUnit;
 import hunt.quartz.ScheduleBuilder;
+import hunt.quartz.TimeOfDay;
+import hunt.quartz.Trigger;
 import hunt.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 
-import hunt.time.util.Calendar;
 import hunt.container.Collections;
 import hunt.container.HashSet;
 import hunt.container.Set;
+import hunt.lang.exception;
+// import hunt.time.util.Calendar;
+import hunt.time.LocalDateTime;
+import hunt.time.DayOfWeek;
+import hunt.time.ZoneOffset;
 
-import std.datetime;
+import std.conv;
+// import std.datetime;
 
 /**
  * A {@link ScheduleBuilder} implementation that build schedule for DailyTimeIntervalTrigger.
@@ -105,19 +112,19 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
     
     shared static this() {
         Set!(int) t = new HashSet!(int)(7);
-        for(int i=Calendar.SUNDAY; i <= Calendar.SATURDAY; i++)
-            t.add(i);
-        ALL_DAYS_OF_THE_WEEK = Collections.unmodifiableSet(t);
+        foreach(DayOfWeek we;  DayOfWeek.ENUMS())
+            t.add(we.getValue());
+        ALL_DAYS_OF_THE_WEEK = t; // Collections.unmodifiableSet(t);
         
         t = new HashSet!(int)(5);
-        for(int i=Calendar.MONDAY; i <= Calendar.FRIDAY; i++)
+        for(int i=DayOfWeek.MONDAY.getValue(); i <= DayOfWeek.FRIDAY.getValue(); i++)
             t.add(i);
-        MONDAY_THROUGH_FRIDAY = Collections.unmodifiableSet(t);
+        MONDAY_THROUGH_FRIDAY =t; //  Collections.unmodifiableSet(t);
         
         t = new HashSet!(int)(2);
-        t.add(Calendar.SUNDAY);
-        t.add(Calendar.SATURDAY);
-        SATURDAY_AND_SUNDAY = Collections.unmodifiableSet(t);
+        t.add(DayOfWeek.SUNDAY.getValue());
+        t.add(DayOfWeek.SATURDAY.getValue());
+        SATURDAY_AND_SUNDAY =t; //  Collections.unmodifiableSet(t);
     }
     
     protected this() {
@@ -178,8 +185,8 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
      * @see DailyTimeIntervalTrigger#getRepeatIntervalUnit()
      */
     DailyTimeIntervalScheduleBuilder withInterval(int timeInterval, IntervalUnit unit) {
-        if (unit is null || !(unit== IntervalUnit.SECOND || 
-                unit== IntervalUnit.MINUTE ||unit== IntervalUnit.HOUR))
+        if ((unit != IntervalUnit.SECOND || 
+                unit == IntervalUnit.MINUTE || unit== IntervalUnit.HOUR))
             throw new IllegalArgumentException("Invalid repeat IntervalUnit (must be SECOND, MINUTE or HOUR).");
         validateInterval(timeInterval);
         this.interval = timeInterval;
@@ -241,7 +248,7 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
             throw new IllegalArgumentException("Days of week must be an non-empty set.");
         foreach(int day ; onDaysOfWeek)
             if (!ALL_DAYS_OF_THE_WEEK.contains(day))
-                throw new IllegalArgumentException("Invalid value for day of week: " ~ day);
+                throw new IllegalArgumentException("Invalid value for day of week: " ~ day.to!string());
                 
         this.daysOfWeek = onDaysOfWeek;
         return this;
@@ -256,7 +263,8 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
      */
     DailyTimeIntervalScheduleBuilder onDaysOfTheWeek(int[] onDaysOfWeek... ) {
         Set!(int) daysAsSet = new HashSet!(int)(12);
-        Collections.addAll(daysAsSet, onDaysOfWeek);
+        daysAsSet.addAll(onDaysOfWeek);
+        // Collections.addAll(daysAsSet, onDaysOfWeek);
         return onDaysOfTheWeek(daysAsSet);
     }
     
@@ -324,12 +332,14 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
             throw new IllegalArgumentException("Ending daily after count must be a positive number!");
         
         if(startTimeOfDay is null)
-            throw new IllegalArgumentException("You must set the startDailyAt() before calling this endingDailyAfterCount()!");
+            throw new IllegalArgumentException("You must set the startDailyAt()" ~ 
+                " before calling this endingDailyAfterCount()!");
         
-        LocalDateTime today = new LocalDateTime();
+        LocalDateTime today = LocalDateTime.now();
         LocalDateTime startTimeOfDayDate = startTimeOfDay.getTimeOfDayForDate(today);
         LocalDateTime maxEndTimeOfDayDate = TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59).getTimeOfDayForDate(today);
-        long remainingMillisInDay = maxEndTimeOfDayDate.getTime() - startTimeOfDayDate.getTime();
+        long remainingMillisInDay = maxEndTimeOfDayDate.toInstant(ZoneOffset.UTC).toEpochMilli() - 
+            startTimeOfDayDate.toInstant(ZoneOffset.UTC).toEpochMilli();
         long intervalInMillis;
         if (intervalUnit == IntervalUnit.SECOND)
             intervalInMillis = interval * 1000L;
@@ -338,26 +348,30 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigg
         else if (intervalUnit == IntervalUnit.HOUR)
             intervalInMillis = interval * 1000L * 60 * 24;
         else
-            throw new IllegalArgumentException("The IntervalUnit: " ~ intervalUnit ~ " is invalid for this trigger."); 
+            throw new IllegalArgumentException("The IntervalUnit: " ~ intervalUnit.to!string() ~ 
+                " is invalid for this trigger."); 
         
         if (remainingMillisInDay - intervalInMillis <= 0)
             throw new IllegalArgumentException("The startTimeOfDay is too late with given Interval and IntervalUnit values.");
         
         long maxNumOfCount = (remainingMillisInDay / intervalInMillis);
         if (count > maxNumOfCount)
-            throw new IllegalArgumentException("The given count " ~ count ~ " is too large! The max you can set is " ~ maxNumOfCount);
+            throw new IllegalArgumentException("The given count " ~ count.to!string() ~ 
+                " is too large! The max you can set is " ~ maxNumOfCount.to!string());
         
         long incrementInMillis = (count - 1) * intervalInMillis;
-        LocalDateTime endTimeOfDayDate = new LocalDateTime(startTimeOfDayDate.getTime() + incrementInMillis);
+        LocalDateTime endTimeOfDayDate = startTimeOfDayDate.plusNanos(incrementInMillis * 1000_000);
         
-        if (endTimeOfDayDate.getTime() > maxEndTimeOfDayDate.getTime())
-            throw new IllegalArgumentException("The given count " ~ count ~ " is too large! The max you can set is " ~ maxNumOfCount);
+        long diffInMillis = endTimeOfDayDate.toInstant(ZoneOffset.UTC).toEpochMilli() - 
+            maxEndTimeOfDayDate.toInstant(ZoneOffset.UTC).toEpochMilli();
+
+        if (diffInMillis > 0)
+            throw new IllegalArgumentException("The given count " ~ count.to!string() ~ 
+                " is too large! The max you can set is " ~ maxNumOfCount.to!string());
         
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(endTimeOfDayDate);
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        int minute = cal.get(Calendar.MINUTE);
-        int second = cal.get(Calendar.SECOND);
+        int hour = endTimeOfDayDate.getHour();
+        int minute = endTimeOfDayDate.getMinute();
+        int second = endTimeOfDayDate.getSecond();
         
         endTimeOfDay = TimeOfDay.hourMinuteAndSecondOfDay(hour, minute, second);
         return this;

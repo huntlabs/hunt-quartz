@@ -159,7 +159,7 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
         return map.toHash();
     }
 
-    V get(Object key) {
+    V get(K key) {
         return map.get(key);
     }
 
