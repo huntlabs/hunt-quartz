@@ -17,13 +17,17 @@
 
 module hunt.quartz.SimpleScheduleBuilder;
 
+import hunt.quartz.DateBuilder;
 import hunt.quartz.Scheduler;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.SimpleTrigger;
+import hunt.quartz.Trigger;
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 
 import hunt.lang.exception;
+
+import std.conv;
 
 /**
  * <code>SimpleScheduleBuilder</code> is a {@link ScheduleBuilder} 
@@ -60,7 +64,7 @@ import hunt.lang.exception;
  * @see ScheduleBuilder
  * @see TriggerBuilder
  */
-class SimpleScheduleBuilder : ScheduleBuilder!(SimpleTrigger) {
+class SimpleScheduleBuilder : ScheduleBuilder { // !(SimpleTrigger)
 
     private long interval = 0;
     private int repeatCount = 0;
@@ -163,7 +167,7 @@ class SimpleScheduleBuilder : ScheduleBuilder!(SimpleTrigger) {
      */
     static SimpleScheduleBuilder repeatMinutelyForTotalCount(int count) {
         if(count < 1)
-            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count);
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count.to!string());
 
         return simpleSchedule()
             .withIntervalInMinutes(1)
@@ -180,7 +184,7 @@ class SimpleScheduleBuilder : ScheduleBuilder!(SimpleTrigger) {
      */
     static SimpleScheduleBuilder repeatMinutelyForTotalCount(int count, int minutes) {
         if(count < 1)
-            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count);
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count.to!string());
 
         return simpleSchedule()
             .withIntervalInMinutes(minutes)
@@ -197,7 +201,7 @@ class SimpleScheduleBuilder : ScheduleBuilder!(SimpleTrigger) {
      */
     static SimpleScheduleBuilder repeatSecondlyForTotalCount(int count) {
         if(count < 1)
-            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count);
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count.to!string());
 
         return simpleSchedule()
             .withIntervalInSeconds(1)
@@ -214,7 +218,7 @@ class SimpleScheduleBuilder : ScheduleBuilder!(SimpleTrigger) {
      */
     static SimpleScheduleBuilder repeatSecondlyForTotalCount(int count, int seconds) {
         if(count < 1)
-            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count);
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count.to!string());
 
         return simpleSchedule()
             .withIntervalInSeconds(seconds)
@@ -231,7 +235,7 @@ class SimpleScheduleBuilder : ScheduleBuilder!(SimpleTrigger) {
      */
     static SimpleScheduleBuilder repeatHourlyForTotalCount(int count) {
         if(count < 1)
-            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count);
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count.to!string());
 
         return simpleSchedule()
             .withIntervalInHours(1)
@@ -248,7 +252,7 @@ class SimpleScheduleBuilder : ScheduleBuilder!(SimpleTrigger) {
      */
     static SimpleScheduleBuilder repeatHourlyForTotalCount(int count, int hours) {
         if(count < 1)
-            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count);
+            throw new IllegalArgumentException("Total count of firings must be at least one! Given count: " ~ count.to!string());
 
         return simpleSchedule()
             .withIntervalInHours(hours)

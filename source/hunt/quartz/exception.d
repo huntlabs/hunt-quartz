@@ -28,7 +28,7 @@ class SchedulerException : Exception {
      *         one.
      */
     Throwable getUnderlyingException() {
-        return super.getCause();
+        return next();
     }
 
     override string toString() {

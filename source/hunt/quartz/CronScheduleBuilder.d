@@ -69,7 +69,7 @@ import std.format;
  * @see CalendarIntervalScheduleBuilder
  * @see TriggerBuilder
  */
-class CronScheduleBuilder : ScheduleBuilder!(CronTrigger) {
+class CronScheduleBuilder : ScheduleBuilder { // !(CronTrigger)
 
     private CronExpression cronExpression;
     private int misfireInstruction = CronTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;

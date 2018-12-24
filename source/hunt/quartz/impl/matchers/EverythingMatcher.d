@@ -21,17 +21,8 @@ import hunt.quartz.Matcher;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.utils.Key;
 
-/**
- * Matches on the complete key being equal (both name and group). 
- *  
- * @author jhouse
- */
-class EverythingMatcher(T) : Matcher!(T) {
-  
-    
-    protected this() {
-    }
-    
+class EverythingMatcherHelper {
+
     /**
      * Create an EverythingMatcher that matches all jobs.
      */
@@ -44,6 +35,19 @@ class EverythingMatcher(T) : Matcher!(T) {
      */
     static EverythingMatcher!(TriggerKey) allTriggers() {
         return new EverythingMatcher!(TriggerKey)();
+    }
+    
+}
+
+/**
+ * Matches on the complete key being equal (both name and group). 
+ *  
+ * @author jhouse
+ */
+class EverythingMatcher(T) : Matcher!(T) {
+  
+    
+    protected this() {
     }
     
     bool isMatch(T key) {

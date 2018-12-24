@@ -892,7 +892,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * @see #getTriggerBuilder()
      */
     override
-    ScheduleBuilder!(SimpleTrigger) getScheduleBuilder() {
+    ScheduleBuilder getScheduleBuilder() { // !(SimpleTrigger)
         
         SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()
         .withIntervalInMilliseconds(getRepeatInterval())

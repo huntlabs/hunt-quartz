@@ -19,6 +19,8 @@ module hunt.quartz.impl.matchers.StringMatcher;
 import hunt.quartz.Matcher;
 import hunt.quartz.utils.Key;
 
+import hunt.lang.exception;
+
 import std.string;
 
 abstract class StringOperatorName {

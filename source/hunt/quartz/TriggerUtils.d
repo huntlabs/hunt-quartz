@@ -99,7 +99,8 @@ class TriggerUtils {
             }
         }
 
-        return java.container.Collections.unmodifiableList(lst);
+        // return java.container.Collections.unmodifiableList(lst);
+        return lst;
     }
     
     /**
@@ -121,7 +122,7 @@ class TriggerUtils {
     static LocalDateTime computeEndTimeToAllowParticularNumberOfFirings(OperableTrigger trigg, Calendar cal, 
             int numTimes) {
 
-        OperableTrigger t = cast(OperableTrigger) trigg.clone();
+        OperableTrigger t = cast(OperableTrigger) trigg; //.clone();
 
         if (t.getNextFireTime() is null) {
             t.computeFirstFireTime(cal);
@@ -145,7 +146,7 @@ class TriggerUtils {
         if(endTime is null)
             return null;
         
-        endTime = new LocalDateTime(endTime.getTime() + 1000L);
+        endTime = endTime.plusSeconds(1);
         
         return endTime;
     }
@@ -177,7 +178,7 @@ class TriggerUtils {
             Calendar cal, LocalDateTime from, LocalDateTime to) {
         LinkedList!(LocalDateTime) lst = new LinkedList!(LocalDateTime)();
 
-        OperableTrigger t = cast(OperableTrigger) trigg.clone();
+        OperableTrigger t = cast(OperableTrigger) trigg; //.clone();
 
         if (t.getNextFireTime() is null) {
             t.setStartTime(from);
@@ -188,11 +189,11 @@ class TriggerUtils {
         while (true) {
             LocalDateTime d = t.getNextFireTime();
             if (d !is null) {
-                if (d.before(from)) {
+                if (d.isBefore(from)) {
                     t.triggered(cal);
                     continue;
                 }
-                if (d.after(to)) {
+                if (d.isAfter(to)) {
                     break;
                 }
                 lst.add(d);

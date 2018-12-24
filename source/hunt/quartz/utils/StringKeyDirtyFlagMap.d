@@ -25,7 +25,7 @@ import hunt.lang.Integer;
 import hunt.lang.Long;
 import hunt.lang.Number;
 import hunt.lang.String;
-import hunt.lang.character.Character;
+import hunt.lang.Character;
 
 /**
  * <p>

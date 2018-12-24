@@ -262,7 +262,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingCalendar   a hunt.time.util.Calendar representing the ending
      *                              time for the time range
      */
-    this(HuntCalendar rangeStartingCalendar, HuntCalendar rangeEndingCalendar) {
+    this(LocalDateTime rangeStartingCalendar, LocalDateTime rangeEndingCalendar) {
         super();
         setTimeRange(rangeStartingCalendar, rangeEndingCalendar);
     }
@@ -298,8 +298,8 @@ class DailyCalendar : BaseCalendar {
      *                              time for the time range
      */
     this(QuartzCalendar baseCalendar,
-                         HuntCalendar rangeStartingCalendar,
-                         HuntCalendar rangeEndingCalendar) {
+                         LocalDateTime rangeStartingCalendar,
+                         LocalDateTime rangeEndingCalendar) {
         super(baseCalendar);
         setTimeRange(rangeStartingCalendar, rangeEndingCalendar);
     }
@@ -562,11 +562,11 @@ class DailyCalendar : BaseCalendar {
      *         time range for the specified date.
      */
     long getTimeRangeStartingTimeInMillis(long timeInMillis) {
-        HuntCalendar rangeStartingTime = createJavaCalendar(timeInMillis);
-        rangeStartingTime.set(HuntCalendar.HOUR_OF_DAY, rangeStartingHourOfDay);
-        rangeStartingTime.set(HuntCalendar.MINUTE, rangeStartingMinute);
-        rangeStartingTime.set(HuntCalendar.SECOND, rangeStartingSecond);
-        rangeStartingTime.set(HuntCalendar.MILLISECOND, rangeStartingMillis);
+        LocalDateTime rangeStartingTime = createJavaCalendar(timeInMillis);
+        rangeStartingTime.set(LocalDateTime.HOUR_OF_DAY, rangeStartingHourOfDay);
+        rangeStartingTime.set(LocalDateTime.MINUTE, rangeStartingMinute);
+        rangeStartingTime.set(LocalDateTime.SECOND, rangeStartingSecond);
+        rangeStartingTime.set(LocalDateTime.MILLISECOND, rangeStartingMillis);
         return rangeStartingTime.getTime().getTime();
     }
 
@@ -580,11 +580,11 @@ class DailyCalendar : BaseCalendar {
      *         time range for the specified date.
      */
     long getTimeRangeEndingTimeInMillis(long timeInMillis) {
-        HuntCalendar rangeEndingTime = createJavaCalendar(timeInMillis);
-        rangeEndingTime.set(HuntCalendar.HOUR_OF_DAY, rangeEndingHourOfDay);
-        rangeEndingTime.set(HuntCalendar.MINUTE, rangeEndingMinute);
-        rangeEndingTime.set(HuntCalendar.SECOND, rangeEndingSecond);
-        rangeEndingTime.set(HuntCalendar.MILLISECOND, rangeEndingMillis);
+        LocalDateTime rangeEndingTime = createJavaCalendar(timeInMillis);
+        rangeEndingTime.set(LocalDateTime.HOUR_OF_DAY, rangeEndingHourOfDay);
+        rangeEndingTime.set(LocalDateTime.MINUTE, rangeEndingMinute);
+        rangeEndingTime.set(LocalDateTime.SECOND, rangeEndingSecond);
+        rangeEndingTime.set(LocalDateTime.MILLISECOND, rangeEndingMillis);
         return rangeEndingTime.getTime().getTime();
     }
 
@@ -769,17 +769,17 @@ class DailyCalendar : BaseCalendar {
                  rangeEndingSecond,
                  rangeEndingMillis);
         
-        HuntCalendar startCal = createJavaCalendar();
-        startCal.set(HuntCalendar.HOUR_OF_DAY, rangeStartingHourOfDay);
-        startCal.set(HuntCalendar.MINUTE, rangeStartingMinute);
-        startCal.set(HuntCalendar.SECOND, rangeStartingSecond);
-        startCal.set(HuntCalendar.MILLISECOND, rangeStartingMillis);
+        LocalDateTime startCal = createJavaCalendar();
+        startCal.set(LocalDateTime.HOUR_OF_DAY, rangeStartingHourOfDay);
+        startCal.set(LocalDateTime.MINUTE, rangeStartingMinute);
+        startCal.set(LocalDateTime.SECOND, rangeStartingSecond);
+        startCal.set(LocalDateTime.MILLISECOND, rangeStartingMillis);
         
-        HuntCalendar endCal = createJavaCalendar();
-        endCal.set(HuntCalendar.HOUR_OF_DAY, rangeEndingHourOfDay);
-        endCal.set(HuntCalendar.MINUTE, rangeEndingMinute);
-        endCal.set(HuntCalendar.SECOND, rangeEndingSecond);
-        endCal.set(HuntCalendar.MILLISECOND, rangeEndingMillis);
+        LocalDateTime endCal = createJavaCalendar();
+        endCal.set(LocalDateTime.HOUR_OF_DAY, rangeEndingHourOfDay);
+        endCal.set(LocalDateTime.MINUTE, rangeEndingMinute);
+        endCal.set(LocalDateTime.SECOND, rangeEndingSecond);
+        endCal.set(LocalDateTime.MILLISECOND, rangeEndingMillis);
         
         if (!startCal.before(endCal)) {
             throw new IllegalArgumentException(invalidTimeRange +
@@ -812,17 +812,17 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingCalendar   a Calendar containing the end time for
      *                              the <CODE>DailyCalendar</CODE>
      */
-    void setTimeRange(HuntCalendar rangeStartingCalendar,
-                              HuntCalendar rangeEndingCalendar) {
+    void setTimeRange(LocalDateTime rangeStartingCalendar,
+                              LocalDateTime rangeEndingCalendar) {
         setTimeRange(
-                rangeStartingCalendar.get(HuntCalendar.HOUR_OF_DAY),
-                rangeStartingCalendar.get(HuntCalendar.MINUTE),
-                rangeStartingCalendar.get(HuntCalendar.SECOND),
-                rangeStartingCalendar.get(HuntCalendar.MILLISECOND),
-                rangeEndingCalendar.get(HuntCalendar.HOUR_OF_DAY),
-                rangeEndingCalendar.get(HuntCalendar.MINUTE),
-                rangeEndingCalendar.get(HuntCalendar.SECOND),
-                rangeEndingCalendar.get(HuntCalendar.MILLISECOND));
+                rangeStartingCalendar.get(LocalDateTime.HOUR_OF_DAY),
+                rangeStartingCalendar.get(LocalDateTime.MINUTE),
+                rangeStartingCalendar.get(LocalDateTime.SECOND),
+                rangeStartingCalendar.get(LocalDateTime.MILLISECOND),
+                rangeEndingCalendar.get(LocalDateTime.HOUR_OF_DAY),
+                rangeEndingCalendar.get(LocalDateTime.MINUTE),
+                rangeEndingCalendar.get(LocalDateTime.SECOND),
+                rangeEndingCalendar.get(LocalDateTime.MILLISECOND));
     }
     
     /**

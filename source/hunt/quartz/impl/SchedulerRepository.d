@@ -66,7 +66,7 @@ class SchedulerRepository {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    static synchronized SchedulerRepository getInstance() {
+    static SchedulerRepository getInstance() {
         if (inst is null) {
             inst = new SchedulerRepository();
         }
@@ -74,7 +74,7 @@ class SchedulerRepository {
         return inst;
     }
 
-    synchronized void bind(Scheduler sched) {
+    void bind(Scheduler sched) {
 
         if (cast(Scheduler) schedulers.get(sched.getSchedulerName()) !is null) {
             throw new SchedulerException("Scheduler with name '"
@@ -84,17 +84,16 @@ class SchedulerRepository {
         schedulers.put(sched.getSchedulerName(), sched);
     }
 
-    synchronized bool remove(string schedName) {
+    bool remove(string schedName) {
         return (schedulers.remove(schedName) !is null);
     }
 
-    synchronized Scheduler lookup(string schedName) {
+    Scheduler lookup(string schedName) {
         return schedulers.get(schedName);
     }
 
-    synchronized Collection!(Scheduler) lookupAll() {
-        return java.container.Collections
-                .unmodifiableCollection(schedulers.values());
+    Collection!(Scheduler) lookupAll() {
+        return (schedulers.values());
     }
 
 }

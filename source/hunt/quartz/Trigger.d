@@ -230,7 +230,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * 
      * @see #getScheduleBuilder()
      */
-    TriggerBuilder!(Trigger) getTriggerBuilder();
+    // TriggerBuilder!(Trigger) getTriggerBuilder();
     
     /**
      * Get a {@link ScheduleBuilder} that is configured to produce a 
@@ -238,7 +238,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * 
      * @see #getTriggerBuilder()
      */
-    ScheduleBuilder!(Trigger) getScheduleBuilder(); // 
+    // ScheduleBuilder!(Trigger) getScheduleBuilder(); // 
 
     /**
      * Trigger equality is based upon the equality of the TriggerKey.
@@ -314,11 +314,11 @@ class TriggerTimeComparator : Comparator!(Trigger) {
                 return -1;
             }
 
-            if(nextFireTime1.before(nextFireTime2)) {
+            if(nextFireTime1.isBefore(nextFireTime2)) {
                 return -1;
             }
 
-            if(nextFireTime1.after(nextFireTime2)) {
+            if(nextFireTime1.isAfter(nextFireTime2)) {
                 return 1;
             }
         }
@@ -328,7 +328,7 @@ class TriggerTimeComparator : Comparator!(Trigger) {
             return comp;
         }
 
-        return key1.compareTo(key2);
+        return key1.opCmp(key2);
     }
 
 

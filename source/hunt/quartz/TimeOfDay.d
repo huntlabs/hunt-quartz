@@ -20,6 +20,7 @@ import hunt.time.LocalDateTime;
 import hunt.time.ZonedDateTime;
 import hunt.time.ZoneId;
 
+import hunt.lang.exception;
 import std.format;
 // import hunt.time.util.Calendar;
 // import std.datetime;
@@ -157,7 +158,7 @@ class TimeOfDay {
     }
 
     override
-    bool opEquals(Object o) {
+    bool opEquals(Object obj) {
         TimeOfDay other = cast(TimeOfDay)obj;
         if(other is null)
             return false;

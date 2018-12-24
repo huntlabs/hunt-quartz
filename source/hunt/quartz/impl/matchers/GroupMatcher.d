@@ -22,17 +22,7 @@ import hunt.quartz.JobKey;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.utils.Key;
 
-/**
- * Matches on group (ignores name) property of Keys.
- *  
- * @author jhouse
- */
-class GroupMatcher(T) : StringMatcher!(T) {
-  
-
-    protected this(string compareTo, StringOperatorName compareWith) {
-        super(compareTo, compareWith);
-    }
+class GroupMatcherHelper {
     
     /**
      * Create a GroupMatcher that matches groups equaling the given string.
@@ -138,6 +128,21 @@ class GroupMatcher(T) : StringMatcher!(T) {
     static GroupMatcher!(TriggerKey) anyTriggerGroup() {
         return GroupMatcher.anyGroup();
     }
+}
+
+/**
+ * Matches on group (ignores name) property of Keys.
+ *  
+ * @author jhouse
+ */
+class GroupMatcher(T) : StringMatcher!(T) {
+  
+
+    protected this(string compareTo, StringOperatorName compareWith) {
+        super(compareTo, compareWith);
+    }
+    
+
 
     override
     protected string getValue(T key) {

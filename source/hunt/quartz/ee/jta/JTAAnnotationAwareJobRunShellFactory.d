@@ -45,72 +45,72 @@ import hunt.lang.exception;
  * 
  * @author James House
  */
-class JTAAnnotationAwareJobRunShellFactory : JobRunShellFactory {
+// class JTAAnnotationAwareJobRunShellFactory : JobRunShellFactory {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Data members.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    private Scheduler scheduler;
+//     private Scheduler scheduler;
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constructors.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Constructors.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    this() {
-    }
+//     this() {
+//     }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Interface.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    /**
-     * <p>
-     * Initialize the factory, providing a handle to the <code>Scheduler</code>
-     * that should be made available within the <code>JobRunShell</code> and
-     * the <code>JobExecutionContext</code> s within it, and a handle to the
-     * <code>SchedulingContext</code> that the shell will use in its own
-     * operations with the <code>JobStore</code>.
-     * </p>
-     */
-    void initialize(Scheduler sched) {
-        this.scheduler = sched;
-    }
+//     /**
+//      * <p>
+//      * Initialize the factory, providing a handle to the <code>Scheduler</code>
+//      * that should be made available within the <code>JobRunShell</code> and
+//      * the <code>JobExecutionContext</code> s within it, and a handle to the
+//      * <code>SchedulingContext</code> that the shell will use in its own
+//      * operations with the <code>JobStore</code>.
+//      * </p>
+//      */
+//     void initialize(Scheduler sched) {
+//         this.scheduler = sched;
+//     }
 
-    /**
-     * <p>
-     * Called by the <class>{@link hunt.quartz.core.QuartzSchedulerThread}
-     * </code> to obtain instances of <code>
-     * {@link hunt.quartz.core.JobRunShell}</code>.
-     * </p>
-     */
-    JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
-        ExecuteInJTATransaction jtaAnnotation = null;
-        implementationMissing(false);
-        // ClassUtils.getAnnotation(bundle.getJobDetail().getJobClass(), ExecuteInJTATransaction.class);
-        if(jtaAnnotation is null)
-            return new JobRunShell(scheduler, bundle);
-        else {
-            int timeout = jtaAnnotation.timeout();
-            if (timeout >= 0) {
-                return new JTAJobRunShell(scheduler, bundle, timeout);
-            } else {
-                return new JTAJobRunShell(scheduler, bundle);
-            }
-        }
-    }
+//     /**
+//      * <p>
+//      * Called by the <class>{@link hunt.quartz.core.QuartzSchedulerThread}
+//      * </code> to obtain instances of <code>
+//      * {@link hunt.quartz.core.JobRunShell}</code>.
+//      * </p>
+//      */
+//     JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
+//         ExecuteInJTATransaction jtaAnnotation = null;
+//         implementationMissing(false);
+//         // ClassUtils.getAnnotation(bundle.getJobDetail().getJobClass(), ExecuteInJTATransaction.class);
+//         if(jtaAnnotation is null)
+//             return new JobRunShell(scheduler, bundle);
+//         else {
+//             int timeout = jtaAnnotation.timeout();
+//             if (timeout >= 0) {
+//                 return new JTAJobRunShell(scheduler, bundle, timeout);
+//             } else {
+//                 return new JTAJobRunShell(scheduler, bundle);
+//             }
+//         }
+//     }
 
 
-}
+// }

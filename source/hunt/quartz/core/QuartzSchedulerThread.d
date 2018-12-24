@@ -18,8 +18,10 @@
 
 module hunt.quartz.core.QuartzSchedulerThread;
 
+import hunt.quartz.core.JobRunShell;
 import hunt.quartz.core.QuartzScheduler;
 import hunt.quartz.core.QuartzSchedulerResources;
+
 
 import hunt.quartz.exception;
 import hunt.quartz.Trigger;
@@ -29,11 +31,22 @@ import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.spi.TriggerFiredResult;
 
+import hunt.concurrent.atomic.AtomicHelper;
 import hunt.concurrent.thread;
 import hunt.container.ArrayList;
 import hunt.container.List;
+import hunt.datetime;
+import hunt.lang.exception;
 import hunt.logging;
+import hunt.time.LocalDateTime;
+import hunt.time.Instant;
+import hunt.time.ZoneOffset;
 
+import core.thread;
+import std.algorithm;
+import std.random;
+import core.sync.condition;
+import core.sync.mutex;
 
 /**
  * <p>
@@ -59,7 +72,8 @@ class QuartzSchedulerThread : ThreadEx {
 
     private QuartzSchedulerResources qsRsrcs;
 
-    private Object sigLock;
+    private Mutex sigLock;
+    private Condition sigCondition;
 
     private bool signaled;
     private long signaledNextFireTime;
@@ -95,7 +109,7 @@ class QuartzSchedulerThread : ThreadEx {
      * </p>
      */
     this(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs) {
-        this(qs, qsRsrcs, qsRsrcs.getMakeSchedulerThreadDaemon(), Thread.NORM_PRIORITY);
+        this(qs, qsRsrcs, qsRsrcs.getMakeSchedulerThreadDaemon(), Thread.PRIORITY_DEFAULT);
     }
 
     /**
@@ -107,16 +121,17 @@ class QuartzSchedulerThread : ThreadEx {
      */
     this(QuartzScheduler qs, QuartzSchedulerResources qsRsrcs, bool setDaemon, int threadPrio) {
         super(qs.getSchedulerThreadGroup(), qsRsrcs.getThreadName());
-        sigLock = new Object();
+        sigLock = new Mutex();
+        sigCondition = new Condition(sigLock);
         this.qs = qs;
         this.qsRsrcs = qsRsrcs;
-        this.setDaemon(setDaemon);
+        this.isDaemon(setDaemon);
         if(qsRsrcs.isThreadsInheritInitializersClassLoadContext()) {
             info("QuartzSchedulerThread Inheriting ContextClassLoader of thread: " ~ Thread.getThis().name());
-            this.setContextClassLoader(Thread.getThis().getContextClassLoader());
+            // this.setContextClassLoader(Thread.getThis().getContextClassLoader());
         }
 
-        this.setPriority(threadPrio);
+        this.priority(threadPrio);
 
         // start the underlying thread, but put this object into the 'paused'
         // state
@@ -139,7 +154,7 @@ class QuartzSchedulerThread : ThreadEx {
     }
 
     private long getRandomizedIdleWaitTime() {
-        return idleWaitTime - random.nextInt(idleWaitVariablness);
+        return idleWaitTime - uniform(0, idleWaitVariablness); // random.nextInt(idleWaitVariablness);
     }
 
     /**
@@ -148,13 +163,15 @@ class QuartzSchedulerThread : ThreadEx {
      * </p>
      */
     void togglePause(bool pause) {
-        synchronized (sigLock) {
+        sigLock.lock();
+        scope(exit) sigLock.unlock();
+         {
             paused = pause;
 
             if (paused) {
                 signalSchedulingChange(0);
             } else {
-                sigLock.notifyAll();
+                sigCondition.notifyAll();
             }
         }
     }
@@ -165,11 +182,13 @@ class QuartzSchedulerThread : ThreadEx {
      * </p>
      */
     void halt(bool wait) {
-        synchronized (sigLock) {
-            halted.set(true);
+        sigLock.lock();
+        scope(exit) sigLock.unlock();
+        {
+            halted = true;
 
             if (paused) {
-                sigLock.notifyAll();
+                sigCondition.notifyAll();
             } else {
                 signalSchedulingChange(0);
             }
@@ -188,7 +207,8 @@ class QuartzSchedulerThread : ThreadEx {
                 }
             } finally {
                 if (interrupted) {
-                    Thread.getThis().interrupt();
+                    ThreadEx t = cast(ThreadEx)Thread.getThis();
+                    if(t !is null) t.interrupt();
                 }
             }
         }
@@ -209,29 +229,37 @@ class QuartzSchedulerThread : ThreadEx {
      * will fire.  If this method is being called do to some other even (rather
      * than scheduling a trigger), the caller should pass zero (0).
      */
-    void signalSchedulingChange(long candidateNewNextFireTime) {
-        synchronized(sigLock) {
+    void signalSchedulingChange(long candidateNewNextFireTime) {        
+        sigLock.lock();
+        scope(exit) sigLock.unlock();
+        {
             signaled = true;
             signaledNextFireTime = candidateNewNextFireTime;
-            sigLock.notifyAll();
+            sigCondition.notifyAll();
         }
     }
 
     void clearSignaledSchedulingChange() {
-        synchronized(sigLock) {
+        sigLock.lock();
+        scope(exit) sigLock.unlock();
+        {
             signaled = false;
             signaledNextFireTime = 0;
         }
     }
 
-    bool isScheduleChanged() {
-        synchronized(sigLock) {
+    bool isScheduleChanged() {        
+        sigLock.lock();
+        scope(exit) sigLock.unlock();
+        {
             return signaled;
         }
     }
 
     long getSignaledNextFireTime() {
-        synchronized(sigLock) {
+        sigLock.lock();
+        scope(exit) sigLock.unlock();
+        {
             return signaledNextFireTime;
         }
     }
@@ -245,25 +273,25 @@ class QuartzSchedulerThread : ThreadEx {
     void run() {
         int acquiresFailed = 0;
 
-        while (!halted.get()) {
+        while (!halted) {
             try {
                 // check if we're supposed to pause...
-                synchronized (sigLock) {
-                    while (paused && !halted.get()) {
-                        try {
-                            // wait until togglePause(false) is called...
-                            sigLock.wait(1000L);
-                        } catch (InterruptedException ignore) {
-                        }
-
-                        // reset failure counter when paused, so that we don't
-                        // wait again after unpausing
-                        acquiresFailed = 0;
+                sigLock.lock(); 
+                while (paused && !halted) {
+                    try {
+                        // wait until togglePause(false) is called...
+                        sigCondition.wait(seconds(1));
+                    } catch (InterruptedException ignore) {
                     }
 
-                    if (halted.get()) {
-                        break;
-                    }
+                    // reset failure counter when paused, so that we don't
+                    // wait again after unpausing
+                    acquiresFailed = 0;
+                }
+
+                sigLock.unlock();
+                if (halted) {
+                    break;
                 }
 
                 // wait a bit, if reading from job store is consistently
@@ -271,7 +299,7 @@ class QuartzSchedulerThread : ThreadEx {
                 if (acquiresFailed > 1) {
                     try {
                         long delay = computeDelayForRepeatedErrors(qsRsrcs.getJobStore(), acquiresFailed);
-                        Thread.sleep(delay);
+                        Thread.sleep(delay.msecs);
                     } catch (Exception ignore) {
                     }
                 }
@@ -286,7 +314,7 @@ class QuartzSchedulerThread : ThreadEx {
                     clearSignaledSchedulingChange();
                     try {
                         triggers = qsRsrcs.getJobStore().acquireNextTriggers(
-                                now + idleWaitTime, Math.min(availThreadCount, qsRsrcs.getMaxBatchSize()), qsRsrcs.getBatchTimeWindow());
+                                now + idleWaitTime, min(availThreadCount, qsRsrcs.getMaxBatchSize()), qsRsrcs.getBatchTimeWindow());
                         acquiresFailed = 0;
                         version(HUNT_DEBUG)
                             trace("batch acquisition of " ~ (triggers is null ? 0 : triggers.size()) ~ " triggers");
@@ -296,7 +324,7 @@ class QuartzSchedulerThread : ThreadEx {
                                 "An error occurred while scanning for the next triggers to fire.",
                                 jpe);
                         }
-                        if (acquiresFailed < Integer.MAX_VALUE)
+                        if (acquiresFailed < int.max)
                             acquiresFailed++;
                         continue;
                     } catch (RuntimeException e) {
@@ -304,7 +332,7 @@ class QuartzSchedulerThread : ThreadEx {
                             error("quartzSchedulerThreadLoop: RuntimeException "
                                     ~ e.msg, e);
                         }
-                        if (acquiresFailed < Integer.MAX_VALUE)
+                        if (acquiresFailed < int.max)
                             acquiresFailed++;
                         continue;
                     }
@@ -312,11 +340,13 @@ class QuartzSchedulerThread : ThreadEx {
                     if (triggers !is null && !triggers.isEmpty()) {
 
                         now = DateTimeHelper.currentTimeMillis();
-                        long triggerTime = triggers.get(0).getNextFireTime().getTime();
+                        long triggerTime = triggers.get(0).getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli();
                         long timeUntilTrigger = triggerTime - now;
                         while(timeUntilTrigger > 2) {
-                            synchronized (sigLock) {
-                                if (halted.get()) {
+                            sigLock.lock();
+                            {
+                                if (halted) {
+                                    sigLock.unlock();
                                     break;
                                 }
                                 if (!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) {
@@ -326,11 +356,13 @@ class QuartzSchedulerThread : ThreadEx {
                                         now = DateTimeHelper.currentTimeMillis();
                                         timeUntilTrigger = triggerTime - now;
                                         if(timeUntilTrigger >= 1)
-                                            sigLock.wait(timeUntilTrigger);
+                                            sigCondition.wait(msecs(timeUntilTrigger));
                                     } catch (InterruptedException ignore) {
                                     }
                                 }
                             }
+                            sigLock.unlock();
+
                             if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
                                 break;
                             }
@@ -346,9 +378,9 @@ class QuartzSchedulerThread : ThreadEx {
                         List!(TriggerFiredResult) bndles = new ArrayList!(TriggerFiredResult)();
 
                         bool goAhead = true;
-                        synchronized(sigLock) {
-                            goAhead = !halted.get();
-                        }
+                            goAhead = !AtomicHelper.load(halted);
+
+
                         if(goAhead) {
                             try {
                                 List!(TriggerFiredResult) res = qsRsrcs.getJobStore().triggersFired(triggers);
@@ -357,7 +389,7 @@ class QuartzSchedulerThread : ThreadEx {
                             } catch (SchedulerException se) {
                                 qs.notifySchedulerListenersError(
                                         "An error occurred while firing triggers '"
-                                                + triggers ~ "'", se);
+                                                ~ triggers.toString() ~ "'", se);
                                 //QTZ-179 : a problem occurred interacting with the triggers from the db
                                 //we release them and loop again
                                 for (int i = 0; i < triggers.size(); i++) {
@@ -374,7 +406,7 @@ class QuartzSchedulerThread : ThreadEx {
                             RuntimeException exception = cast(RuntimeException)result.getException();
 
                             if (exception !is null) {
-                                error("RuntimeException while firing trigger " ~ triggers.get(i), exception.msg);
+                                error("RuntimeException while firing trigger " ~ (cast(Object)triggers.get(i)).toString(), exception.msg);
                                 qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
                                 continue;
                             }
@@ -417,20 +449,21 @@ class QuartzSchedulerThread : ThreadEx {
                 long now = DateTimeHelper.currentTimeMillis();
                 long waitTime = now + getRandomizedIdleWaitTime();
                 long timeUntilContinue = waitTime - now;
-                synchronized(sigLock) {
+                sigLock.lock(); {
                     try {
-                      if(!halted.get()) {
+                      if(!halted) {
                         // QTZ-336 A job might have been completed in the mean time and we might have
                         // missed the scheduled changed signal by not waiting for the notify() yet
                         // Check that before waiting for too long in case this very job needs to be
                         // scheduled very soon
                         if (!isScheduleChanged()) {
-                          sigLock.wait(timeUntilContinue);
+                          sigCondition.wait(msecs(timeUntilContinue));
                         }
                       }
                     } catch (InterruptedException ignore) {
                     }
                 }
+                sigLock.unlock();
 
             } catch(RuntimeException re) {
                 error("Runtime error occurred in main trigger firing loop.", re);

@@ -11,6 +11,9 @@ import hunt.quartz.TriggerKey;
 import hunt.quartz.TriggerListener;
 import hunt.quartz.impl.matchers.EverythingMatcher;
 
+import hunt.lang.exception;
+import std.array;
+
 class ListenerManagerImpl : ListenerManager {
 
     private Map!(string, JobListener) globalJobListeners;
@@ -37,14 +40,13 @@ class ListenerManagerImpl : ListenerManager {
     }
 
     
-    void addJobListener(JobListener jobListener, Matcher!(JobKey)[] matchers ... ) {
-        addJobListener(jobListener, Arrays.asList(matchers));
-    }
+    // void addJobListener(JobListener jobListener, Matcher!(JobKey)[] matchers ... ) {
+    //     addJobListener(jobListener, Arrays.asList(matchers));
+    // }
 
     void addJobListener(JobListener jobListener, List!(Matcher!(JobKey)) matchers) {
-        if (jobListener.getName() is null || jobListener.getName().length() == 0) {
-            throw new IllegalArgumentException(
-                    "JobListener name cannot be empty.");
+        if (jobListener.getName().empty) {
+            throw new IllegalArgumentException("JobListener name cannot be empty.");
         }
         
         synchronized (globalJobListeners) {
@@ -53,7 +55,7 @@ class ListenerManagerImpl : ListenerManager {
             if(matchers !is null && matchers.size() > 0)
                 matchersL.addAll(matchers);
             else
-                matchersL.add(EverythingMatcher.allJobs());
+                matchersL.add(EverythingMatcherHelper.allJobs());
             
             globalJobListenersMatchers.put(jobListener.getName(), matchersL);
         }
@@ -61,11 +63,11 @@ class ListenerManagerImpl : ListenerManager {
 
 
     void addJobListener(JobListener jobListener) {
-        addJobListener(jobListener, EverythingMatcher.allJobs());
+        addJobListener(jobListener, EverythingMatcherHelper.allJobs());
     }
     
     void addJobListener(JobListener jobListener, Matcher!(JobKey) matcher) {
-        if (jobListener.getName() is null || jobListener.getName().length() == 0) {
+        if (jobListener.getName().empty()) {
             throw new IllegalArgumentException(
                     "JobListener name cannot be empty.");
         }
@@ -76,7 +78,7 @@ class ListenerManagerImpl : ListenerManager {
             if(matcher !is null)
                 matchersL.add(matcher);
             else
-                matchersL.add(EverythingMatcher.allJobs());
+                matchersL.add(EverythingMatcherHelper.allJobs());
             
             globalJobListenersMatchers.put(jobListener.getName(), matchersL);
         }
@@ -113,7 +115,7 @@ class ListenerManagerImpl : ListenerManager {
             List!(Matcher!(JobKey)) matchers = globalJobListenersMatchers.get(listenerName);
             if(matchers is null)
                 return null;
-            return Collections.unmodifiableList(matchers);
+            return matchers; //Collections.unmodifiableList
         }
     }
 
@@ -139,7 +141,7 @@ class ListenerManagerImpl : ListenerManager {
     
     List!(JobListener) getJobListeners() {
         synchronized (globalJobListeners) {
-            return java.container.Collections.unmodifiableList(new LinkedList!(JobListener)(globalJobListeners.values()));
+            return new LinkedList!(JobListener)(globalJobListeners.values());
         }
     }
 
@@ -149,13 +151,13 @@ class ListenerManagerImpl : ListenerManager {
         }
     }
 
-    void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey)[] matchers... ) {
-        addTriggerListener(triggerListener, Arrays.asList(matchers));
-    }
+    // void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey)[] matchers... ) {
+    //     addTriggerListener(triggerListener, Arrays.asList(matchers));
+    // }
     
     void addTriggerListener(TriggerListener triggerListener, List!(Matcher!(TriggerKey)) matchers) {
         if (triggerListener.getName() is null
-                || triggerListener.getName().length() == 0) {
+                || triggerListener.getName().length == 0) {
             throw new IllegalArgumentException(
                     "TriggerListener name cannot be empty.");
         }
@@ -167,14 +169,14 @@ class ListenerManagerImpl : ListenerManager {
             if(matchers !is null && matchers.size() > 0)
                 matchersL.addAll(matchers);
             else
-                matchersL.add(EverythingMatcher.allTriggers());
+                matchersL.add(EverythingMatcherHelper.allTriggers());
 
             globalTriggerListenersMatchers.put(triggerListener.getName(), matchersL);
         }
     }
     
     void addTriggerListener(TriggerListener triggerListener) {
-        addTriggerListener(triggerListener, EverythingMatcher.allTriggers());
+        addTriggerListener(triggerListener, EverythingMatcherHelper.allTriggers());
     }
 
     void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey) matcher) {
@@ -182,7 +184,7 @@ class ListenerManagerImpl : ListenerManager {
             throw new IllegalArgumentException("Null value not acceptable for matcher.");
         
         if (triggerListener.getName() is null
-                || triggerListener.getName().length() == 0) {
+                || triggerListener.getName().length == 0) {
             throw new IllegalArgumentException(
                     "TriggerListener name cannot be empty.");
         }
@@ -225,7 +227,7 @@ class ListenerManagerImpl : ListenerManager {
             List!(Matcher!(TriggerKey)) matchers = globalTriggerListenersMatchers.get(listenerName);
             if(matchers is null)
                 return null;
-            return Collections.unmodifiableList(matchers);
+            return (matchers); // Collections.unmodifiableList
         }
     }
 
@@ -251,7 +253,7 @@ class ListenerManagerImpl : ListenerManager {
 
     List!(TriggerListener) getTriggerListeners() {
         synchronized (globalTriggerListeners) {
-            return java.container.Collections.unmodifiableList(new LinkedList!(TriggerListener)(globalTriggerListeners.values()));
+            return (new LinkedList!(TriggerListener)(globalTriggerListeners.values())); // java.container.Collections.unmodifiableList
         }
     }
 
@@ -276,7 +278,7 @@ class ListenerManagerImpl : ListenerManager {
 
     List!(SchedulerListener) getSchedulerListeners() {
         synchronized (schedulerListeners) {
-            return java.container.Collections.unmodifiableList(new ArrayList!(SchedulerListener)(schedulerListeners));
+            return (new ArrayList!(SchedulerListener)(schedulerListeners)); // java.container.Collections.unmodifiableList
         }
     }
 }

@@ -18,6 +18,9 @@
 
 module hunt.quartz.SchedulerMetaData;
 
+import hunt.quartz.exception;
+
+import hunt.string;
 import hunt.time.LocalDateTime;
 
 import std.datetime;
@@ -297,7 +300,7 @@ class SchedulerMetaData {
         str.append("'\n");
 
         str.append("  Scheduler class: '");
-        str.append(getSchedulerClass().getName());
+        str.append(getSchedulerClass().name);
         str.append("'");
         if (isSchedulerRemote()) {
             str.append(" - access via RMI.");
@@ -315,7 +318,7 @@ class SchedulerMetaData {
             }
             str.append("\n");
 
-            if (_isInStandbyMode()) {
+            if (_isInStandbyMode) {
                 str.append("  Currently in standby mode.");
             } else {
                 str.append("  Not currently in standby mode.");
@@ -330,14 +333,14 @@ class SchedulerMetaData {
         str.append("\n");
 
         str.append("  Using thread pool '");
-        str.append(getThreadPoolClass().getName());
+        str.append(getThreadPoolClass().name);
         str.append("' - with ");
         str.append(getThreadPoolSize());
         str.append(" threads.");
         str.append("\n");
 
         str.append("  Using job-store '");
-        str.append(getJobStoreClass().getName());
+        str.append(getJobStoreClass().name);
         str.append("' - which ");
         if (isJobStoreSupportsPersistence()) {
             str.append("supports persistence.");

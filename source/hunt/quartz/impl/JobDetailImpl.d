@@ -32,6 +32,8 @@ import hunt.quartz.Trigger;
 import hunt.quartz.utils.ClassUtils;
 
 import hunt.lang.exception;
+
+import std.array;
 import std.conv;
 
 /**
@@ -197,7 +199,7 @@ class JobDetailImpl : JobDetail { // Cloneable,
      *              if name is null or empty.
      */
     void setName(string name) {
-        if (name is null || name.trim().length() == 0) {
+        if (name.empty()) {
             throw new IllegalArgumentException("Job name cannot be empty.");
         }
 
@@ -225,7 +227,7 @@ class JobDetailImpl : JobDetail { // Cloneable,
      *              if the group is an empty string.
      */
     void setGroup(string group) {
-        if (group !is null && group.trim().length() == 0) {
+        if (group.empty()) {
             throw new IllegalArgumentException(
                     "Group name cannot be empty.");
         }
@@ -406,14 +408,14 @@ class JobDetailImpl : JobDetail { // Cloneable,
     override
     string toString() {
         return "JobDetail '" ~ getFullName() ~ "':  jobClass: '"
-                ~ ((getJobClass() is null) ? "null" : getJobClass().name())
+                ~ ((getJobClass() is null) ? "null" : getJobClass().name)
                 ~ " concurrentExectionDisallowed: " ~ isConcurrentExectionDisallowed().to!string() 
                 ~ " persistJobDataAfterExecution: " ~ isPersistJobDataAfterExecution().to!string() 
                 ~ " isDurable: " ~ isDurable().to!string() ~ " requestsRecovers: " ~ requestsRecovery().to!string();
     }
 
     override
-    bool opEquals(Object o) {
+    bool opEquals(Object obj) {
         JobDetail other = cast(JobDetail) obj;
         if(other is null)
             return false;

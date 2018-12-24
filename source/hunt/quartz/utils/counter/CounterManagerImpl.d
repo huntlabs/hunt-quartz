@@ -34,73 +34,73 @@ import hunt.quartz.utils.counter.sampled.SampledCounterImpl;
  * @since 1.8
  * 
  */
-class CounterManagerImpl : CounterManager {
+// class CounterManagerImpl : CounterManager {
 
-    private Timer timer;
-    private bool _isShutdown;
-    private List!(Counter) counters;
+//     private Timer timer;
+//     private bool _isShutdown;
+//     private List!(Counter) counters;
 
-    /**
-     * Constructor that accepts a timer that will be used for scheduling sampled
-     * counter if any is created
-     */
-    this(Timer timer) {
-        if (timer is null) {
-            throw new IllegalArgumentException("Timer cannot be null");
-        }
-        this.timer = timer;
-        counters = new ArrayList!(Counter)();
-    }
+//     /**
+//      * Constructor that accepts a timer that will be used for scheduling sampled
+//      * counter if any is created
+//      */
+//     this(Timer timer) {
+//         if (timer is null) {
+//             throw new IllegalArgumentException("Timer cannot be null");
+//         }
+//         this.timer = timer;
+//         counters = new ArrayList!(Counter)();
+//     }
 
-    /**
-     * {@inheritDoc}
-     */
-    void shutdown(bool killTimer) {
-        if (_isShutdown) {
-            return;
-        }
-        try {
-            // shutdown the counters of this counterManager
-            foreach(Counter counter ; counters) {
-                SampledCounter sc = cast(SampledCounter) counter;
-                if (sc !is null) {
-                    sc.shutdown();
-                }
-            }
-            if(killTimer)
-                timer.cancel();
-        } finally {
-            _isShutdown = true;
-        }
-    }
+//     /**
+//      * {@inheritDoc}
+//      */
+//     void shutdown(bool killTimer) {
+//         if (_isShutdown) {
+//             return;
+//         }
+//         try {
+//             // shutdown the counters of this counterManager
+//             foreach(Counter counter ; counters) {
+//                 SampledCounter sc = cast(SampledCounter) counter;
+//                 if (sc !is null) {
+//                     sc.shutdown();
+//                 }
+//             }
+//             if(killTimer)
+//                 timer.cancel();
+//         } finally {
+//             _isShutdown = true;
+//         }
+//     }
 
-    /**
-     * {@inheritDoc}
-     */
-    Counter createCounter(CounterConfig config) {
-        if (_isShutdown) {
-            throw new IllegalStateException("counter manager is shutdown");
-        }
-        if (config is null) {
-            throw new NullPointerException("config cannot be null");
-        }
-        Counter counter = config.createCounter();
-        SampledCounterImpl sampledCounter = cast(SampledCounterImpl) counter;
-        if (sampledCounter !is null) {
-            timer.schedule(sampledCounter.getTimerTask(), sampledCounter.getIntervalMillis(), sampledCounter.getIntervalMillis());
-        }
-        counters.add(counter);
-        return counter;
-    }
+//     /**
+//      * {@inheritDoc}
+//      */
+//     Counter createCounter(CounterConfig config) {
+//         if (_isShutdown) {
+//             throw new IllegalStateException("counter manager is shutdown");
+//         }
+//         if (config is null) {
+//             throw new NullPointerException("config cannot be null");
+//         }
+//         Counter counter = config.createCounter();
+//         SampledCounterImpl sampledCounter = cast(SampledCounterImpl) counter;
+//         if (sampledCounter !is null) {
+//             timer.schedule(sampledCounter.getTimerTask(), sampledCounter.getIntervalMillis(), sampledCounter.getIntervalMillis());
+//         }
+//         counters.add(counter);
+//         return counter;
+//     }
 
-    /**
-     * {@inheritDoc}
-     */
-    void shutdownCounter(Counter counter) {
-        SampledCounter sc = cast(SampledCounter) counter;
-        if (sc !is null) {
-            sc.shutdown();
-        }
-    }
+//     /**
+//      * {@inheritDoc}
+//      */
+//     void shutdownCounter(Counter counter) {
+//         SampledCounter sc = cast(SampledCounter) counter;
+//         if (sc !is null) {
+//             sc.shutdown();
+//         }
+//     }
 
-}
+// }

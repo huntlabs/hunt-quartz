@@ -21,6 +21,8 @@ import hunt.quartz.JobBuilder;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobKey;
 
+import hunt.lang.common;
+
 /**
  * Conveys the detail properties of a given <code>Job</code> instance. JobDetails are
  * to be created/defined with {@link JobBuilder}.
@@ -48,7 +50,7 @@ import hunt.quartz.JobKey;
  * 
  * @author James House
  */
-interface JobDetail { //  : Serializable, Cloneable
+interface JobDetail : Comparable!(JobDetail) { //  : Serializable, Cloneable
 
     JobKey getKey();
 
@@ -125,5 +127,7 @@ interface JobDetail { //  : Serializable, Cloneable
      * <code>JobDetail</code> identical to this one.
      */
     JobBuilder getJobBuilder();
+
+    
 
 }

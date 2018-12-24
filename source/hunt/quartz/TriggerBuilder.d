@@ -21,6 +21,7 @@ import hunt.quartz.JobDetail;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobKey;
 import hunt.quartz.ScheduleBuilder;
+import hunt.quartz.SimpleScheduleBuilder;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerKey;
 
@@ -32,8 +33,23 @@ import hunt.lang.Double;
 import hunt.lang.Float;
 import hunt.lang.Integer;
 import hunt.lang.Long;
+import hunt.lang.exception;
 import hunt.time.LocalDateTime;
+
 import std.datetime;
+
+class TriggerBuilderHelper {
+
+    /**
+     * Create a new TriggerBuilder with which to define a 
+     * specification for a Trigger.
+     * 
+     * @return the new TriggerBuilder
+     */
+    static TriggerBuilder!(T) newTrigger(T)() if(is(T : Trigger)) {
+        return new TriggerBuilder!(T)();
+    }
+}
 
 /**
  * <code>TriggerBuilder</code> is used to instantiate {@link Trigger}s.
@@ -85,20 +101,10 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
     private JobKey jobKey;
     private JobDataMap jobDataMap;
     
-    private ScheduleBuilder!(T) scheduleBuilder = null;
+    private ScheduleBuilder scheduleBuilder = null; // !(Trigger)
     
     private this() {
         jobDataMap = new JobDataMap();
-    }
-    
-    /**
-     * Create a new TriggerBuilder with which to define a 
-     * specification for a Trigger.
-     * 
-     * @return the new TriggerBuilder
-     */
-    static TriggerBuilder!(Trigger) newTrigger() {
-        return new TriggerBuilder!(Trigger)();
     }
     
     /**
@@ -118,7 +124,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
         trig.setStartTime(startTime);
         trig.setEndTime(endTime);
         if(key is null)
-            key = new TriggerKey(Key.createUniqueName(null), null);
+            key = new TriggerKey(IKey.createUniqueName(null), null);
         trig.setKey(key); 
         if(jobKey !is null)
             trig.setJobKey(jobKey);
@@ -247,7 +253,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
      * @see Trigger#getStartTime()
      */
     TriggerBuilder!(T) startNow() {
-        this.startTime = new LocalDateTime();
+        this.startTime = LocalDateTime.now();
         return this;
     }
 

@@ -45,5 +45,5 @@ interface SchedulerSignaler {
 
     void signalSchedulingChange(long candidateNewNextFireTime);
 
-    void notifySchedulerListenersError(string string, SchedulerException jpe);
+    void notifySchedulerListenersError(string str, SchedulerException jpe);
 }

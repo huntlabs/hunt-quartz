@@ -127,15 +127,15 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
         } catch (SchedulerException se) {
             sched.notifySchedulerListenersError(
                     "An error occured instantiating job to be executed. job= '"
-                            ~ jobDetail.getKey() ~ "'", se);
+                            ~ jobDetail.getKey().toString() ~ "'", se);
             throw se;
         } catch (Throwable ncdfe) { // such as NoClassDefFoundError
             SchedulerException se = new SchedulerException(
                     "Problem instantiating class '"
-                            ~ jobDetail.getJobClass().getName() ~ "' - ", ncdfe);
+                            ~ jobDetail.getJobClass().name ~ "' - ", ncdfe);
             sched.notifySchedulerListenersError(
                     "An error occured instantiating job to be executed. job= '"
-                            ~ jobDetail.getKey() ~ "'", se);
+                            ~ jobDetail.getKey().toString() ~ "'", se);
             throw se;
         }
 
@@ -162,7 +162,7 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                     begin();
                 } catch (SchedulerException se) {
                     qs.notifySchedulerListenersError("Error executing Job ("
-                            ~ jec.getJobDetail().getKey()
+                            ~ jec.getJobDetail().getKey().toString()
                             ~ ": couldn't begin execution.", se);
                     break;
                 }
@@ -186,7 +186,7 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                         complete(true);
                     } catch (SchedulerException se) {
                         qs.notifySchedulerListenersError("Error during veto of Job ("
-                                ~ jec.getJobDetail().getKey()
+                                ~ jec.getJobDetail().getKey().toString()
                                 ~ ": couldn't finalize execution.", se);
                     }
                     break;
@@ -197,22 +197,22 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
 
                 // execute the job
                 try {
-                    trace("Calling execute on job " ~ jobDetail.getKey());
+                    trace("Calling execute on job " ~ jobDetail.getKey().toString());
                     job.execute(jec);
                     endTime = DateTimeHelper.currentTimeMillis();
                 } catch (JobExecutionException jee) {
                     endTime = DateTimeHelper.currentTimeMillis();
                     jobExEx = jee;
-                    info("Job " ~ jobDetail.getKey() ~
+                    info("Job " ~ jobDetail.getKey().toString() ~
                             " threw a JobExecutionException: ", jobExEx);
                 } catch (Throwable e) {
                     endTime = DateTimeHelper.currentTimeMillis();
-                    error("Job " ~ jobDetail.getKey() ~
+                    error("Job " ~ jobDetail.getKey().toString() ~
                             " threw an unhandled Exception: ", e);
                     SchedulerException se = new SchedulerException(
                             "Job threw an unhandled exception.", e);
                     qs.notifySchedulerListenersError("Job ("
-                            ~ jec.getJobDetail().getKey()
+                            ~ jec.getJobDetail().getKey().toString()
                             ~ " threw an exception.", se);
                     jobExEx = new JobExecutionException(se, false);
                 }
@@ -250,7 +250,7 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                         complete(false);
                     } catch (SchedulerException se) {
                         qs.notifySchedulerListenersError("Error executing Job ("
-                                ~ jec.getJobDetail().getKey()
+                                ~ jec.getJobDetail().getKey().toString()
                                 ~ ": couldn't finalize execution.", se);
                     }
                     continue;
@@ -260,7 +260,7 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                     complete(true);
                 } catch (SchedulerException se) {
                     qs.notifySchedulerListenersError("Error executing Job ("
-                            ~ jec.getJobDetail().getKey()
+                            ~ jec.getJobDetail().getKey().toString()
                             ~ ": couldn't finalize execution.", se);
                     continue;
                 }
@@ -296,8 +296,8 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
             qs.notifySchedulerListenersError(
                     "Unable to notify TriggerListener(s) while firing trigger "
                             ~ "(Trigger and Job will NOT be fired!). trigger= "
-                            ~ jobExCtxt.getTrigger().getKey() ~ " job= "
-                            ~ jobExCtxt.getJobDetail().getKey(), se);
+                            ~ jobExCtxt.getTrigger().getKey().toString() ~ " job= "
+                            ~ jobExCtxt.getJobDetail().getKey().toString(), se);
 
             return false;
         }
@@ -310,8 +310,8 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                         "Unable to notify JobListener(s) of vetoed execution " ~
                         "while firing trigger (Trigger and Job will NOT be " ~
                         "fired!). trigger= "
-                        ~ jobExCtxt.getTrigger().getKey() ~ " job= "
-                        ~ jobExCtxt.getJobDetail().getKey(), se);
+                        ~ jobExCtxt.getTrigger().getKey().toString() ~ " job= "
+                        ~ jobExCtxt.getJobDetail().getKey().toString(), se);
 
             }
             throw new VetoedException();
@@ -324,8 +324,8 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
             qs.notifySchedulerListenersError(
                     "Unable to notify JobListener(s) of Job to be executed: "
                             ~ "(Job will NOT be executed!). trigger= "
-                            ~ jobExCtxt.getTrigger().getKey() ~ " job= "
-                            ~ jobExCtxt.getJobDetail().getKey(), se);
+                            ~ jobExCtxt.getTrigger().getKey().toString() ~ " job= "
+                            ~ jobExCtxt.getJobDetail().getKey().toString(), se);
 
             return false;
         }
@@ -340,8 +340,8 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
             qs.notifySchedulerListenersError(
                     "Unable to notify JobListener(s) of Job that was executed: "
                             ~ "(error will be ignored). trigger= "
-                            ~ jobExCtxt.getTrigger().getKey() ~ " job= "
-                            ~ jobExCtxt.getJobDetail().getKey(), se);
+                            ~ jobExCtxt.getTrigger().getKey().toString() ~ " job= "
+                            ~ jobExCtxt.getJobDetail().getKey().toString(), se);
 
             return false;
         }
@@ -357,8 +357,8 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
             qs.notifySchedulerListenersError(
                     "Unable to notify TriggerListener(s) of Job that was executed: "
                             ~ "(error will be ignored). trigger= "
-                            ~ jobExCtxt.getTrigger().getKey() ~ " job= "
-                            ~ jobExCtxt.getJobDetail().getKey(), se);
+                            ~ jobExCtxt.getTrigger().getKey().toString() ~ " job= "
+                            ~ jobExCtxt.getJobDetail().getKey().toString(), se);
 
             return false;
         }

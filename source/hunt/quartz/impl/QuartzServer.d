@@ -57,139 +57,139 @@ import std.stdio;
  *
  * @author James House
  */
-class QuartzServer : SchedulerListenerSupport {
+// class QuartzServer : SchedulerListenerSupport {
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     *
-     * Data members.
-     *
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      *
+//      * Data members.
+//      *
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    private Scheduler sched = null;
+//     private Scheduler sched = null;
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     *
-     * Constructors.
-     *
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      *
+//      * Constructors.
+//      *
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    this() {
-    }
+//     this() {
+//     }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     *
-     * Interface.
-     *
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      *
+//      * Interface.
+//      *
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    void serve(SchedulerFactory schedFact, bool console) {
-        sched = schedFact.getScheduler();
+//     void serve(SchedulerFactory schedFact, bool console) {
+//         sched = schedFact.getScheduler();
 
-        sched.start();
+//         sched.start();
 
-        try {
-            Thread.sleep(3.seconds);
-        } catch (Exception ignore) {
-        }
+//         try {
+//             Thread.sleep(3.seconds);
+//         } catch (Exception ignore) {
+//         }
 
-        writeln("\n*** The scheduler successfully started.");
+//         writeln("\n*** The scheduler successfully started.");
 
-        if (console) {
-            writeln("\n");
-            writeln("The scheduler will now run until you type \"exit\"");
-            writeln("   If it was configured to export itself via RMI,");
-            writeln("   then other process may now use it.");
+//         if (console) {
+//             writeln("\n");
+//             writeln("The scheduler will now run until you type \"exit\"");
+//             writeln("   If it was configured to export itself via RMI,");
+//             writeln("   then other process may now use it.");
 
-            while (true) {
-                writeln("Type 'exit' to shutdown the server: ");
-                if ("exit" == readln()) {
-                    break;
-                }
-            }
+//             while (true) {
+//                 writeln("Type 'exit' to shutdown the server: ");
+//                 if ("exit" == readln()) {
+//                     break;
+//                 }
+//             }
 
-            writeln("\n...Shutting down server...");
+//             writeln("\n...Shutting down server...");
 
-            sched.shutdown(true);
-        }
-    }
+//             sched.shutdown(true);
+//         }
+//     }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     *
-     * SchedulerListener Interface.
-     *
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      *
+//      * SchedulerListener Interface.
+//      *
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    /**
-     * <p>
-     * Called by the <code>{@link Scheduler}</code> when a serious error has
-     * occured within the scheduler - such as repeated failures in the <code>JobStore</code>,
-     * or the inability to instantiate a <code>Job</code> instance when its
-     * <code>Trigger</code> has fired.
-     * </p>
-     *
-     * <p>
-     * The <code>getErrorCode()</code> method of the given SchedulerException
-     * can be used to determine more specific information about the type of
-     * error that was encountered.
-     * </p>
-     */
-    override
-    void schedulerError(string msg, SchedulerException cause) {
-        System.err.println("*** " ~ msg);
-        cause.printStackTrace();
-    }
+//     /**
+//      * <p>
+//      * Called by the <code>{@link Scheduler}</code> when a serious error has
+//      * occured within the scheduler - such as repeated failures in the <code>JobStore</code>,
+//      * or the inability to instantiate a <code>Job</code> instance when its
+//      * <code>Trigger</code> has fired.
+//      * </p>
+//      *
+//      * <p>
+//      * The <code>getErrorCode()</code> method of the given SchedulerException
+//      * can be used to determine more specific information about the type of
+//      * error that was encountered.
+//      * </p>
+//      */
+//     override
+//     void schedulerError(string msg, SchedulerException cause) {
+//         System.err.println("*** " ~ msg);
+//         cause.printStackTrace();
+//     }
 
-    /**
-     * <p>
-     * Called by the <code>{@link Scheduler}</code> to inform the listener
-     * that it has shutdown.
-     * </p>
-     */
-    override
-    void schedulerShutdown() {
-        writeln("\n*** The scheduler is now shutdown.");
-        sched = null;
-    }
+//     /**
+//      * <p>
+//      * Called by the <code>{@link Scheduler}</code> to inform the listener
+//      * that it has shutdown.
+//      * </p>
+//      */
+//     override
+//     void schedulerShutdown() {
+//         writeln("\n*** The scheduler is now shutdown.");
+//         sched = null;
+//     }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     *
-     * Main Method.
-     *
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      *
+//      * Main Method.
+//      *
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    static void main(string[] args) {
+//     static void main(string[] args) {
 
-        //    //Configure Log4J
-        //    org.apache.log4j.PropertyConfigurator.configure(
-        //      System.getProperty("log4jConfigFile", "log4j.properties"));
+//         //    //Configure Log4J
+//         //    org.apache.log4j.PropertyConfigurator.configure(
+//         //      System.getProperty("log4jConfigFile", "log4j.properties"));
 
-        if (System.getSecurityManager() is null) {
-            System.setSecurityManager(new java.rmi.RMISecurityManager());
-        }
+//         // if (System.getSecurityManager() is null) {
+//         //     System.setSecurityManager(new java.rmi.RMISecurityManager());
+//         // }
 
-        try {
-            QuartzServer server = new QuartzServer();
-            if (args.length == 0) {
-                server.serve(
-                    new hunt.quartz.impl.StdSchedulerFactory(), false);
-            } else if (args.length == 1 && args[0].equalsIgnoreCase("console")) {
-                server.serve(new hunt.quartz.impl.StdSchedulerFactory(), true);
-            } else {
-                System.err.println("\nUsage: QuartzServer [console]");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//         try {
+//             QuartzServer server = new QuartzServer();
+//             if (args.length == 0) {
+//                 server.serve(
+//                     new hunt.quartz.impl.StdSchedulerFactory(), false);
+//             } else if (args.length == 1 && args[0].equalsIgnoreCase("console")) {
+//                 server.serve(new hunt.quartz.impl.StdSchedulerFactory(), true);
+//             } else {
+//                 System.err.println("\nUsage: QuartzServer [console]");
+//             }
+//         } catch (Exception e) {
+//             e.printStackTrace();
+//         }
+//     }
 
-}
+// }

@@ -88,7 +88,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    // private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = HuntCalendar.getInstance().get(HuntCalendar.YEAR) + 100;
+    // private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = LocalDateTime.getInstance().get(LocalDateTime.YEAR) + 100;
     private enum int YEAR_TO_GIVEUP_SCHEDULING_AT = 2018 + 100;
 
     /*
@@ -496,9 +496,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
                 break;
             
             //avoid infinite loop
-            HuntCalendar c = HuntCalendar.getInstance();
+            LocalDateTime c = LocalDateTime.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(LocalDateTime.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
         }
@@ -530,9 +530,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
                 break;
             
             //avoid infinite loop
-            HuntCalendar c = HuntCalendar.getInstance();
+            LocalDateTime c = LocalDateTime.getInstance();
             c.setTime(nextFireTime);
-            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(LocalDateTime.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
 
@@ -577,9 +577,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
               break;
       
           //avoid infinite loop
-          HuntCalendar c = HuntCalendar.getInstance();
+          LocalDateTime c = LocalDateTime.getInstance();
           c.setTime(nextFireTime);
-          if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+          if (c.get(LocalDateTime.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
               return null;
           }
       }
@@ -587,8 +587,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
       return nextFireTime;
     }
     
-    private HuntCalendar createCalendarTime(LocalDateTime dateTime) {
-        HuntCalendar cal = HuntCalendar.getInstance();
+    private LocalDateTime createCalendarTime(LocalDateTime dateTime) {
+        LocalDateTime cal = LocalDateTime.getInstance();
         cal.setTime(dateTime);
         return cal;
     }
@@ -710,25 +710,25 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         long startMillis = fireTimeStartDate.getTime();
         long secondsAfterStart = (fireMillis - startMillis) / 1000L;
         long repeatLong = getRepeatInterval();
-        HuntCalendar sTime = createCalendarTime(fireTimeStartDate);
+        LocalDateTime sTime = createCalendarTime(fireTimeStartDate);
         IntervalUnit repeatUnit = getRepeatIntervalUnit();
         if(repeatUnit== IntervalUnit.SECOND) {
             long jumpCount = secondsAfterStart / repeatLong;
             if(secondsAfterStart % repeatLong != 0)
                 jumpCount++;
-            sTime.add(HuntCalendar.SECOND, getRepeatInterval() * cast(int)jumpCount);
+            sTime.add(LocalDateTime.SECOND, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         } else if(repeatUnit== IntervalUnit.MINUTE) {
             long jumpCount = secondsAfterStart / (repeatLong * 60L);
             if(secondsAfterStart % (repeatLong * 60L) != 0)
                 jumpCount++;
-            sTime.add(HuntCalendar.MINUTE, getRepeatInterval() * cast(int)jumpCount);
+            sTime.add(LocalDateTime.MINUTE, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         } else if(repeatUnit== IntervalUnit.HOUR) {
             long jumpCount = secondsAfterStart / (repeatLong * 60L * 60L);
             if(secondsAfterStart % (repeatLong * 60L * 60L) != 0)
                 jumpCount++;
-            sTime.add(HuntCalendar.HOUR_OF_DAY, getRepeatInterval() * cast(int)jumpCount);
+            sTime.add(LocalDateTime.HOUR_OF_DAY, getRepeatInterval() * cast(int)jumpCount);
             fireTime = sTime.getTime();
         }
         
@@ -745,10 +745,10 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
 
     private bool isSameDay(LocalDateTime d1, LocalDateTime d2) {
     
-      HuntCalendar c1 = createCalendarTime(d1);
-      HuntCalendar c2 = createCalendarTime(d2);
+      LocalDateTime c1 = createCalendarTime(d1);
+      LocalDateTime c2 = createCalendarTime(d2);
       
-      return c1.get(HuntCalendar.YEAR) == c2.get(HuntCalendar.YEAR) && c1.get(HuntCalendar.DAY_OF_YEAR) == c2.get(HuntCalendar.DAY_OF_YEAR);
+      return c1.get(LocalDateTime.YEAR) == c2.get(LocalDateTime.YEAR) && c1.get(LocalDateTime.DAY_OF_YEAR) == c2.get(LocalDateTime.DAY_OF_YEAR);
     }
     
     /**
@@ -764,16 +764,16 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         // a. Advance or adjust to next dayOfWeek if need to first, starting next day with startTimeOfDay.
         TimeOfDay sTimeOfDay = getStartTimeOfDay();
         LocalDateTime fireTimeStartDate = sTimeOfDay.getTimeOfDayForDate(fireTime);      
-        HuntCalendar fireTimeStartDateCal = createCalendarTime(fireTimeStartDate);          
-        int dayOfWeekOfFireTime = fireTimeStartDateCal.get(HuntCalendar.DAY_OF_WEEK);
+        LocalDateTime fireTimeStartDateCal = createCalendarTime(fireTimeStartDate);          
+        int dayOfWeekOfFireTime = fireTimeStartDateCal.get(LocalDateTime.DAY_OF_WEEK);
         
         // b2. We need to advance to another day if isAfterTimePassEndTimeOfDay is true, or dayOfWeek is not set.
         Set!(int) daysOfWeekToFire = getDaysOfWeek();
         if (forceToAdvanceNextDay || !daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
           // Advance one day at a time until next available date.
           for(int i=1; i <= 7; i++) {
-            fireTimeStartDateCal.add(HuntCalendar.DATE, 1);
-            dayOfWeekOfFireTime = fireTimeStartDateCal.get(HuntCalendar.DAY_OF_WEEK);
+            fireTimeStartDateCal.add(LocalDateTime.DATE, 1);
+            dayOfWeekOfFireTime = fireTimeStartDateCal.get(LocalDateTime.DAY_OF_WEEK);
             if (daysOfWeekToFire.contains(dayOfWeekOfFireTime)) {
               fireTime = fireTimeStartDateCal.getTime();
               break;
@@ -935,7 +935,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
      * @see #getTriggerBuilder()
      */
     override
-    ScheduleBuilder!(DailyTimeIntervalTrigger) getScheduleBuilder() {
+    ScheduleBuilder getScheduleBuilder() { // !(DailyTimeIntervalTrigger)
         
         DailyTimeIntervalScheduleBuilder cb = DailyTimeIntervalScheduleBuilder.dailyTimeIntervalSchedule()
                 .withInterval(getRepeatInterval(), getRepeatIntervalUnit())

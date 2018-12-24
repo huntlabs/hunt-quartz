@@ -663,9 +663,9 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
     bool willFireOn(LocalDateTime test, bool dayOnly) {
 
-        // test = cast(HuntCalendar) test.clone();
+        // test = cast(LocalDateTime) test.clone();
         
-        // test.set(HuntCalendar.MILLISECOND, 0); // don't compare millis.
+        // test.set(LocalDateTime.MILLISECOND, 0); // don't compare millis.
         
         if(dayOnly) {
             test = LocalDateTime.of(test.getYear(), test.getMonthValue(), test.getDayOfMonth(), 0, 0, 0);
@@ -678,7 +678,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         if(fta is null)
             return false;
 
-        // HuntCalendar p = HuntCalendar.getInstance(test.getTimeZone());
+        // LocalDateTime p = LocalDateTime.getInstance(test.getTimeZone());
         // p.setTime(fta);
         
         int year = fta.getYear();
@@ -742,9 +742,9 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
             
             //avoid infinite loop
             // Use gregorian only because the constant is based on Gregorian
-            HuntCalendar c = new java.util.GregorianCalendar(); 
+            LocalDateTime c = new java.util.GregorianCalendar(); 
             c.setTime(nextFireTime);
-            if (c.get(HuntCalendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (c.get(LocalDateTime.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
             
@@ -808,7 +808,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * @see #getTriggerBuilder()
      */
     override
-    ScheduleBuilder!(CronTrigger) getScheduleBuilder() {
+    ScheduleBuilder getScheduleBuilder() { // !(CronTrigger)
         
         CronScheduleBuilder cb = CronScheduleBuilder.cronSchedule(getCronExpression())
                 .inTimeZone(getTimeZone());

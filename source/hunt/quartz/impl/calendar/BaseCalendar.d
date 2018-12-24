@@ -21,7 +21,8 @@ import hunt.quartz.Calendar;
 
 import hunt.io.common;
 import hunt.lang.common;
-import hunt.time.util.Calendar;
+// import hunt.time.util.Calendar;
+import hunt.time.ZoneId;
 
 import std.datetime;
 
@@ -53,7 +54,7 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
 
     private string description;
 
-    private TimeZone timeZone;
+    private ZoneId timeZone;
 
     this() {
     }
@@ -64,17 +65,17 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
 
     /**
      * @param timeZone The time zone to use for this Calendar, <code>null</code>
-     * if <code>{@link TimeZone#getDefault()}</code> should be used
+     * if <code>{@link ZoneId#getDefault()}</code> should be used
      */
-    this(TimeZone timeZone) {
+    this(ZoneId timeZone) {
         setTimeZone(timeZone);
     }
 
     /**
      * @param timeZone The time zone to use for this Calendar, <code>null</code>
-     * if <code>{@link TimeZone#getDefault()}</code> should be used
+     * if <code>{@link ZoneId#getDefault()}</code> should be used
      */
-    this(QuartzCalendar baseCalendar, TimeZone timeZone) {
+    this(QuartzCalendar baseCalendar, ZoneId timeZone) {
         setBaseCalendar(baseCalendar);
         setTimeZone(timeZone);
     }
@@ -87,7 +88,7 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
     //             clone.baseCalendar = (Calendar) getBaseCalendar().clone();
     //         }
     //         if(getTimeZone() !is null)
-    //             clone.timeZone = (TimeZone) getTimeZone().clone();
+    //             clone.timeZone = (ZoneId) getTimeZone().clone();
     //         return clone;
     //     } catch (CloneNotSupportedException ex) {
     //         throw new IncompatibleClassChangeError("Not Cloneable.");
@@ -140,9 +141,9 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
      * resolved.
      *
      * @return This Calendar's timezone, <code>null</code> if Calendar should
-     * use the <code>{@link TimeZone#getDefault()}</code>
+     * use the <code>{@link ZoneId#getDefault()}</code>
      */
-    TimeZone getTimeZone() {
+    ZoneId getTimeZone() {
         return timeZone;
     }
 
@@ -150,9 +151,9 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
      * Sets the time zone for which this <code>Calendar</code> will be resolved.
      *
      * @param timeZone The time zone to use for this Calendar, <code>null</code>
-     * if <code>{@link TimeZone#getDefault()}</code> should be used
+     * if <code>{@link ZoneId#getDefault()}</code> should be used
      */
-    void setTimeZone(TimeZone timeZone) {
+    void setTimeZone(ZoneId timeZone) {
         this.timeZone = timeZone;
     }
 
@@ -203,63 +204,63 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
     }
 
     /**
-     * Build a <code>{@link HuntCalendar}</code> for the given timeStamp.
+     * Build a <code>{@link LocalDateTime}</code> for the given timeStamp.
      * The new Calendar will use the <code>BaseCalendar</code> time zone if it
      * is not <code>null</code>.
      */
-    protected HuntCalendar createJavaCalendar(long timeStamp) {
-        HuntCalendar calendar = createJavaCalendar();
+    protected LocalDateTime createJavaCalendar(long timeStamp) {
+        LocalDateTime calendar = createJavaCalendar();
         calendar.setTime(new LocalDateTime(timeStamp));
         return calendar;
     }
 
     /**
-     * Build a <code>{@link HuntCalendar}</code> with the current time.
+     * Build a <code>{@link LocalDateTime}</code> with the current time.
      * The new Calendar will use the <code>BaseCalendar</code> time zone if
      * it is not <code>null</code>.
      */
-    protected HuntCalendar createJavaCalendar() {
+    protected LocalDateTime createJavaCalendar() {
         return
             (getTimeZone() is null) ?
-                HuntCalendar.getInstance() :
-                HuntCalendar.getInstance(getTimeZone());
+                LocalDateTime.getInstance() :
+                LocalDateTime.getInstance(getTimeZone());
     }
 
     /**
-     * Returns the start of the given day as a <code>{@link HuntCalendar}</code>.
+     * Returns the start of the given day as a <code>{@link LocalDateTime}</code>.
      * This calculation will take the <code>BaseCalendar</code>
      * time zone into account if it is not <code>null</code>.
      *
      * @param timeInMillis A time containing the desired date for the
      *                     start-of-day time
-     * @return A <code>{@link HuntCalendar}</code> set to the start of
+     * @return A <code>{@link LocalDateTime}</code> set to the start of
      *         the given day.
      */
-    protected HuntCalendar getStartOfDayJavaCalendar(long timeInMillis) {
-        HuntCalendar startOfDay = createJavaCalendar(timeInMillis);
-        startOfDay.set(HuntCalendar.HOUR_OF_DAY, 0);
-        startOfDay.set(HuntCalendar.MINUTE, 0);
-        startOfDay.set(HuntCalendar.SECOND, 0);
-        startOfDay.set(HuntCalendar.MILLISECOND, 0);
+    protected LocalDateTime getStartOfDayJavaCalendar(long timeInMillis) {
+        LocalDateTime startOfDay = createJavaCalendar(timeInMillis);
+        startOfDay.set(LocalDateTime.HOUR_OF_DAY, 0);
+        startOfDay.set(LocalDateTime.MINUTE, 0);
+        startOfDay.set(LocalDateTime.SECOND, 0);
+        startOfDay.set(LocalDateTime.MILLISECOND, 0);
         return startOfDay;
     }
 
     /**
-     * Returns the end of the given day <code>{@link HuntCalendar}</code>.
+     * Returns the end of the given day <code>{@link LocalDateTime}</code>.
      * This calculation will take the <code>BaseCalendar</code>
      * time zone into account if it is not <code>null</code>.
      *
      * @param timeInMillis a time containing the desired date for the
      *                     end-of-day time.
-     * @return A <code>{@link HuntCalendar}</code> set to the end of
+     * @return A <code>{@link LocalDateTime}</code> set to the end of
      *         the given day.
      */
-    protected HuntCalendar getEndOfDayJavaCalendar(long timeInMillis) {
-        HuntCalendar endOfDay = createJavaCalendar(timeInMillis);
-        endOfDay.set(HuntCalendar.HOUR_OF_DAY, 23);
-        endOfDay.set(HuntCalendar.MINUTE, 59);
-        endOfDay.set(HuntCalendar.SECOND, 59);
-        endOfDay.set(HuntCalendar.MILLISECOND, 999);
+    protected LocalDateTime getEndOfDayJavaCalendar(long timeInMillis) {
+        LocalDateTime endOfDay = createJavaCalendar(timeInMillis);
+        endOfDay.set(LocalDateTime.HOUR_OF_DAY, 23);
+        endOfDay.set(LocalDateTime.MINUTE, 59);
+        endOfDay.set(LocalDateTime.SECOND, 59);
+        endOfDay.set(LocalDateTime.MILLISECOND, 999);
         return endOfDay;
     }
 }

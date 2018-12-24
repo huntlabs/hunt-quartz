@@ -60,7 +60,7 @@ import std.datetime : TimeZone;
  * @see SimpleScheduleBuilder 
  * @see TriggerBuilder
  */
-class CalendarIntervalScheduleBuilder : ScheduleBuilder!(CalendarIntervalTrigger) {
+class CalendarIntervalScheduleBuilder : ScheduleBuilder { // !(CalendarIntervalTrigger)
 
     private int interval = 1;
     private IntervalUnit intervalUnit = IntervalUnit.DAY;

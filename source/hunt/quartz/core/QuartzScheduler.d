@@ -18,9 +18,11 @@
 
 module hunt.quartz.core.QuartzScheduler;
 
+import hunt.quartz.core.ListenerManagerImpl;
 import hunt.quartz.core.QuartzSchedulerResources;
 import hunt.quartz.core.QuartzSchedulerThread;
 import hunt.quartz.core.RemotableQuartzScheduler;
+import hunt.quartz.core.SchedulerSignalerImpl;
 
 // import hunt.io.common;
 // import java.lang.management.ManagementFactory;
@@ -60,7 +62,7 @@ import hunt.quartz.exception;
 import hunt.quartz.SchedulerListener;
 import hunt.quartz.SchedulerMetaData;
 import hunt.quartz.Trigger;
-// import static hunt.quartz.TriggerBuilder.*;
+import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.TriggerListener;
 import hunt.quartz.exception;
@@ -76,12 +78,22 @@ import hunt.quartz.spi.SchedulerPlugin;
 import hunt.quartz.spi.SchedulerSignaler;
 import hunt.quartz.spi.ThreadExecutor;
 
+import hunt.concurrent.atomic.AtomicHelper;
 import hunt.concurrent.thread;
 import hunt.container;
+import hunt.datetime;
 import hunt.io.common;
+import hunt.lang.exception;
 import hunt.logging;
+import hunt.string;
 import hunt.time.LocalDateTime;
+import hunt.time.ZoneOffset;
 
+import core.thread;
+import core.time;
+
+import std.array;
+import std.conv;
 import std.datetime;
 import std.random;
 
@@ -179,6 +191,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
     private RandomLong random; // = new Random();
 
+    private ArrayList!Object holdToPreventGC; // = new ArrayList<Object>(5);
 
     private bool signalOnSchedulingChange = true;
 
@@ -254,14 +267,14 @@ class QuartzScheduler : RemotableQuartzScheduler {
                     "Unable to bind scheduler to RMI Registry.", re);
         }
         
-        if (resources.getJMXExport()) {
-            try {
-                registerJMX();
-            } catch (Exception e) {
-                throw new SchedulerException(
-                        "Unable to register scheduler with MBeanServer.", e.msg);
-            }
-        }
+        // if (resources.getJMXExport()) {
+        //     try {
+        //         registerJMX();
+        //     } catch (Exception e) {
+        //         throw new SchedulerException(
+        //                 "Unable to register scheduler with MBeanServer.", e.msg);
+        //     }
+        // }
 
         // ManagementRESTServiceConfiguration managementRESTServiceConfiguration
         // = resources.getManagementRESTServiceConfiguration();
@@ -309,7 +322,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         
         info("Scheduler meta-data: " ~
                 (new SchedulerMetaData(getSchedulerName(),
-                        getSchedulerInstanceId(), getClass(), boundRemotely, runningSince() !is null, 
+                        getSchedulerInstanceId(), typeid(this), boundRemotely, runningSince() !is null, 
                         isInStandbyMode(), isShutdown(), runningSince(), 
                         numJobsExecuted(), getJobStoreClass(), 
                         supportsPersistence(), isClustered(), getThreadPoolClass(), 
@@ -325,8 +338,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      */
 
     string getVersion() {
-        return getVersionMajor() ~ "." ~ getVersionMinor() ~ "."
-                + getVersionIteration();
+        return getVersionMajor() ~ "." ~ getVersionMinor() ~ "." ~ getVersionIteration();
     }
 
     static string getVersionMajor() {
@@ -348,23 +360,23 @@ class QuartzScheduler : RemotableQuartzScheduler {
     /**
      * Register the scheduler in the local MBeanServer.
      */
-    private void registerJMX() {
-        string jmxObjectName = resources.getJMXObjectName();
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        jmxBean = new QuartzSchedulerMBeanImpl(this);
-        mbs.registerMBean(jmxBean, new ObjectName(jmxObjectName));
-    }
+    // private void registerJMX() {
+    //     string jmxObjectName = resources.getJMXObjectName();
+    //     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+    //     jmxBean = new QuartzSchedulerMBeanImpl(this);
+    //     mbs.registerMBean(jmxBean, new ObjectName(jmxObjectName));
+    // }
 
     /**
      * Unregister the scheduler from the local MBeanServer.
      */
-    private void unregisterJMX() {
-        string jmxObjectName = resources.getJMXObjectName();
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        mbs.unregisterMBean(new ObjectName(jmxObjectName));
-        jmxBean.setSampledStatisticsEnabled(false);
-        info("Scheduler unregistered from name '" ~ jmxObjectName ~ "' in the local MBeanServer.");
-    }
+    // private void unregisterJMX() {
+    //     string jmxObjectName = resources.getJMXObjectName();
+    //     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+    //     mbs.unregisterMBean(new ObjectName(jmxObjectName));
+    //     jmxBean.setSampledStatisticsEnabled(false);
+    //     info("Scheduler unregistered from name '" ~ jmxObjectName ~ "' in the local MBeanServer.");
+    // }
 
     /**
      * <p>
@@ -374,59 +386,61 @@ class QuartzScheduler : RemotableQuartzScheduler {
     private void bind() {
         string host = resources.getRMIRegistryHost();
         // don't export if we're not configured to do so...
-        if (host is null || host.length() == 0) {
+        if (host.empty()) {
             return;
         }
 
         RemotableQuartzScheduler exportable = null;
 
-        if(resources.getRMIServerPort() > 0) {
-            exportable = cast(RemotableQuartzScheduler) UnicastRemoteObject
-                .exportObject(this, resources.getRMIServerPort());
-        } else {
-            exportable = cast(RemotableQuartzScheduler) UnicastRemoteObject
-                .exportObject(this);
-        }
+        implementationMissing(false);
 
-        Registry registry = null;
+        // if(resources.getRMIServerPort() > 0) {
+        //     exportable = cast(RemotableQuartzScheduler) UnicastRemoteObject
+        //         .exportObject(this, resources.getRMIServerPort());
+        // } else {
+        //     exportable = cast(RemotableQuartzScheduler) UnicastRemoteObject
+        //         .exportObject(this);
+        // }
 
-        if (resources.getRMICreateRegistryStrategy().equals(
-                QuartzSchedulerResources.CREATE_REGISTRY_AS_NEEDED)) {
-            try {
-                // First try to get an existing one, instead of creating it,
-                // since if
-                // we're in a web-app being 'hot' re-depoloyed, then the JVM
-                // still
-                // has the registry that we created above the first time...
-                registry = LocateRegistry.getRegistry(resources
-                        .getRMIRegistryPort());
-                registry.list();
-            } catch (Exception e) {
-                registry = LocateRegistry.createRegistry(resources
-                        .getRMIRegistryPort());
-            }
-        } else if (resources.getRMICreateRegistryStrategy().equals(
-                QuartzSchedulerResources.CREATE_REGISTRY_ALWAYS)) {
-            try {
-                registry = LocateRegistry.createRegistry(resources
-                        .getRMIRegistryPort());
-            } catch (Exception e) {
-                // Fall back to an existing one, instead of creating it, since
-                // if
-                // we're in a web-app being 'hot' re-depoloyed, then the JVM
-                // still
-                // has the registry that we created above the first time...
-                registry = LocateRegistry.getRegistry(resources
-                        .getRMIRegistryPort());
-            }
-        } else {
-            registry = LocateRegistry.getRegistry(resources
-                    .getRMIRegistryHost(), resources.getRMIRegistryPort());
-        }
+        // Registry registry = null;
+
+        // if (resources.getRMICreateRegistryStrategy() == (
+        //         QuartzSchedulerResources.CREATE_REGISTRY_AS_NEEDED)) {
+        //     try {
+        //         // First try to get an existing one, instead of creating it,
+        //         // since if
+        //         // we're in a web-app being 'hot' re-depoloyed, then the JVM
+        //         // still
+        //         // has the registry that we created above the first time...
+        //         registry = LocateRegistry.getRegistry(resources
+        //                 .getRMIRegistryPort());
+        //         registry.list();
+        //     } catch (Exception e) {
+        //         registry = LocateRegistry.createRegistry(resources
+        //                 .getRMIRegistryPort());
+        //     }
+        // } else if (resources.getRMICreateRegistryStrategy() == (
+        //         QuartzSchedulerResources.CREATE_REGISTRY_ALWAYS)) {
+        //     try {
+        //         registry = LocateRegistry.createRegistry(resources
+        //                 .getRMIRegistryPort());
+        //     } catch (Exception e) {
+        //         // Fall back to an existing one, instead of creating it, since
+        //         // if
+        //         // we're in a web-app being 'hot' re-depoloyed, then the JVM
+        //         // still
+        //         // has the registry that we created above the first time...
+        //         registry = LocateRegistry.getRegistry(resources
+        //                 .getRMIRegistryPort());
+        //     }
+        // } else {
+        //     registry = LocateRegistry.getRegistry(resources
+        //             .getRMIRegistryHost(), resources.getRMIRegistryPort());
+        // }
 
         string bindName = resources.getRMIBindName();
         
-        registry.rebind(bindName, exportable);
+        // registry.rebind(bindName, exportable);
         
         boundRemotely = true;
 
@@ -441,20 +455,22 @@ class QuartzScheduler : RemotableQuartzScheduler {
     private void unBind() {
         string host = resources.getRMIRegistryHost();
         // don't un-export if we're not configured to do so...
-        if (host is null || host.length() == 0) {
+        if (host.empty()) {
             return;
         }
 
-        Registry registry = LocateRegistry.getRegistry(resources
-                .getRMIRegistryHost(), resources.getRMIRegistryPort());
+        implementationMissing(false);
+
+        // Registry registry = LocateRegistry.getRegistry(resources
+        //         .getRMIRegistryHost(), resources.getRMIRegistryPort());
 
         string bindName = resources.getRMIBindName();
         
-        try {
-            registry.unbind(bindName);
-            UnicastRemoteObject.unexportObject(this, true);
-        } catch (java.rmi.NotBoundException nbe) {
-        }
+        // try {
+        //     registry.unbind(bindName);
+        //     UnicastRemoteObject.unexportObject(this, true);
+        // } catch (java.rmi.NotBoundException nbe) {
+        // }
 
         info("Scheduler un-bound from name '" ~ bindName ~ "' in RMI registry");
     }
@@ -547,7 +563,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         notifySchedulerListenersStarting();
 
         if (initialStart is null) {
-            initialStart = new LocalDateTime();
+            initialStart = LocalDateTime.now();
             this.resources.getJobStore().schedulerStarted();            
             startPlugins();
         } else {
@@ -561,14 +577,14 @@ class QuartzScheduler : RemotableQuartzScheduler {
         notifySchedulerListenersStarted();
     }
 
-    void startDelayed(final int seconds) {
+    void startDelayed(int sec) {
         if (shuttingDown || closed) {
             throw new SchedulerException(
                     "The Scheduler cannot be restarted after shutdown() has been called.");
         }
 
         Thread t = new Thread( {
-            try { Thread.sleep(seconds * 1000L); }
+            try { Thread.sleep(seconds(sec)); }
             catch(InterruptedException ignore) {}
             try { start(); }
             catch(SchedulerException se) {
@@ -605,9 +621,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     }
 
     LocalDateTime runningSince() {
-        if(initialStart is null)
-            return null;
-        return new LocalDateTime(initialStart.getTime());
+        return initialStart;
     }
 
     int numJobsExecuted() {
@@ -615,7 +629,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     }
 
     TypeInfo_Class getJobStoreClass() {
-        return resources.getJobStore().getClass();
+        return typeid(resources.getJobStore());
     }
 
     bool supportsPersistence() {
@@ -627,7 +641,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     }
 
     TypeInfo_Class getThreadPoolClass() {
-        return resources.getThreadPool().getClass();
+        return typeid(resources.getThreadPool());
     }
 
     int getThreadPoolSize() {
@@ -723,18 +737,18 @@ class QuartzScheduler : RemotableQuartzScheduler {
         
         closed = true;
 
-        if (resources.getJMXExport()) {
-            try {
-                unregisterJMX();
-            } catch (Exception e) {
-            }
-        }
+        // if (resources.getJMXExport()) {
+        //     try {
+        //         unregisterJMX();
+        //     } catch (Exception e) {
+        //     }
+        // }
 
         if(boundRemotely) {
-            try {
-                unBind();
-            } catch (RemoteException re) {
-            }
+            // try {
+            //     unBind();
+            // } catch (RemoteException re) {
+            // }
         }
         
         shutdownPlugins();
@@ -819,8 +833,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      *           if the Job or Trigger cannot be added to the Scheduler, or
      *           there is an internal Scheduler error.
      */
-    LocalDateTime scheduleJob(JobDetail jobDetail,
-            Trigger trigger) {
+    LocalDateTime scheduleJob(JobDetail jobDetail, Trigger trigger) {
         validateState();
 
         if (jobDetail is null) {
@@ -843,7 +856,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         if (trigger.getJobKey() is null) {
             trig.setJobKey(jobDetail.getKey());
-        } else if (!trigger.getJobKey()== jobDetail.getKey()) {
+        } else if (trigger.getJobKey() != jobDetail.getKey()) {
             throw new SchedulerException(
                 "Trigger does not reference given job!");
         }
@@ -857,13 +870,13 @@ class QuartzScheduler : RemotableQuartzScheduler {
         LocalDateTime ft = trig.computeFirstFireTime(cal);
 
         if (ft is null) {
-            throw new SchedulerException(
-                    "Based on configured schedule, the given trigger '" ~ trigger.getKey() ~ "' will never fire.");
+            throw new SchedulerException("Based on configured schedule, the given trigger '" ~ 
+                    trigger.getKey().toString() ~ "' will never fire.");
         }
 
         resources.getJobStore().storeJobAndTrigger(jobDetail, trig);
         notifySchedulerListenersJobAdded(jobDetail);
-        notifySchedulerThread(trigger.getNextFireTime().getTime());
+        notifySchedulerThread(trigger.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
         notifySchedulerListenersSchduled(trigger);
 
         return ft;
@@ -902,12 +915,12 @@ class QuartzScheduler : RemotableQuartzScheduler {
         LocalDateTime ft = trig.computeFirstFireTime(cal);
 
         if (ft is null) {
-            throw new SchedulerException(
-                    "Based on configured schedule, the given trigger '" ~ trigger.getKey() ~ "' will never fire.");
+            throw new SchedulerException("Based on configured schedule, the given trigger '" ~ 
+                trigger.getKey().toString() ~ "' will never fire.");
         }
 
         resources.getJobStore().storeTrigger(trig, false);
-        notifySchedulerThread(trigger.getNextFireTime().getTime());
+        notifySchedulerThread(trigger.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
         notifySchedulerListenersSchduled(trigger);
 
         return ft;
@@ -963,8 +976,8 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         bool result = false;
         
-        List!Trigger triggers = getTriggersOfJob(jobKey);
-        foreach(Trigger trigger ; triggers) {
+        List!OperableTrigger triggers = getTriggersOfJob(jobKey);
+        foreach(OperableTrigger trigger; triggers) {
             if (!unscheduleJob(trigger.getKey())) {
                 StringBuilder sb = new StringBuilder().append(
                         "Unable to unschedule trigger [").append(
@@ -1033,7 +1046,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         resources.getJobStore().storeJobsAndTriggers(triggersAndJobs, replace);
         notifySchedulerThread(0L);
-        foreach(JobDetail job; triggersAndJobs.keySet())
+        foreach(JobDetail job; triggersAndJobs.byKey())
             notifySchedulerListenersJobAdded(job);
     }
 
@@ -1122,7 +1135,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         }
         
         if (resources.getJobStore().replaceTrigger(triggerKey, trig)) {
-            notifySchedulerThread(newTrigger.getNextFireTime().getTime());
+            notifySchedulerThread(newTrigger.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
             notifySchedulerListenersUnscheduled(triggerKey);
             notifySchedulerListenersSchduled(newTrigger);
         } else {
@@ -1150,7 +1163,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     void triggerJob(JobKey jobKey, JobDataMap data) {
         validateState();
 
-        OperableTrigger trig = cast(OperableTrigger) newTrigger().withIdentity(newTriggerId(), 
+        OperableTrigger trig = cast(OperableTrigger) TriggerBuilderHelper.newTrigger!(OperableTrigger)().withIdentity(newTriggerId(), 
             Scheduler.DEFAULT_GROUP).forJob(jobKey).build();
         trig.computeFirstFireTime(null);
         if(data !is null) {
@@ -1167,7 +1180,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
             }
         }
 
-        notifySchedulerThread(trig.getNextFireTime().getTime());
+        notifySchedulerThread(trig.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
         notifySchedulerListenersSchduled(trig);
     }
 
@@ -1191,7 +1204,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
             }
         }
 
-        notifySchedulerThread(trig.getNextFireTime().getTime());
+        notifySchedulerThread(trig.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
         notifySchedulerListenersSchduled(trig);
     }
     
@@ -1219,7 +1232,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         validateState();
 
         if(matcher is null) {
-            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
+            matcher = GroupMatcherHelper.groupEquals!(TriggerKey)(Scheduler.DEFAULT_GROUP);
         }
 
         Collection!(string) pausedGroups = resources.getJobStore().pauseTriggers(matcher);
@@ -1255,7 +1268,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         validateState();
 
         if(groupMatcher is null) {
-            groupMatcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
+            groupMatcher = GroupMatcherHelper.groupEquals!(JobKey)(Scheduler.DEFAULT_GROUP);
         }
         
         Collection!(string) pausedGroups = resources.getJobStore().pauseJobs(groupMatcher);
@@ -1301,7 +1314,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         validateState();
 
         if(matcher is null) {
-            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
+            matcher = GroupMatcherHelper.groupEquals!(TriggerKey)(Scheduler.DEFAULT_GROUP);
         }
 
         Collection!(string) pausedGroups = resources.getJobStore().resumeTriggers(matcher);
@@ -1353,7 +1366,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         validateState();
 
         if(matcher is null) {
-            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
+            matcher = GroupMatcherHelper.groupEquals!(JobKey)(Scheduler.DEFAULT_GROUP);
         }
         
         Collection!(string) resumedGroups = resources.getJobStore().resumeJobs(matcher);
@@ -1428,7 +1441,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         validateState();
 
         if(matcher is null) {
-            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
+            matcher = GroupMatcherHelper.groupEquals!(JobKey)(Scheduler.DEFAULT_GROUP);
         }
         
         return resources.getJobStore().getJobKeys(matcher);
@@ -1440,7 +1453,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * identified <code>{@link hunt.quartz.JobDetail}</code>.
      * </p>
      */
-    List!(Trigger) getTriggersOfJob(JobKey jobKey) {
+    List!(OperableTrigger) getTriggersOfJob(JobKey jobKey) {
         validateState();
 
         return resources.getJobStore().getTriggersForJob(jobKey);
@@ -1468,7 +1481,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         validateState();
 
         if(matcher is null) {
-            matcher = GroupMatcher.groupEquals(Scheduler.DEFAULT_GROUP);
+            matcher = GroupMatcherHelper.groupEquals!(TriggerKey)(Scheduler.DEFAULT_GROUP);
         }
         
         return resources.getJobStore().getTriggerKeys(matcher);
@@ -1627,7 +1640,7 @@ J     *
      */
     void addInternalJobListener(JobListener jobListener) {
         if (jobListener.getName() is null
-                || jobListener.getName().length() == 0) {
+                || jobListener.getName().length == 0) {
             throw new IllegalArgumentException(
                     "JobListener name cannot be empty.");
         }
@@ -1660,7 +1673,7 @@ J     *
      */
     List!(JobListener) getInternalJobListeners() {
         synchronized (internalJobListeners) {
-            return java.container.Collections.unmodifiableList(new LinkedList!(JobListener)(internalJobListeners.values()));
+            return (new LinkedList!(JobListener)(internalJobListeners.values())); // java.container.Collections.unmodifiableList
         }
     }
 
@@ -1684,7 +1697,7 @@ J     *
      */
     void addInternalTriggerListener(TriggerListener triggerListener) {
         if (triggerListener.getName() is null
-                || triggerListener.getName().length() == 0) {
+                || triggerListener.getName().length == 0) {
             throw new IllegalArgumentException(
                     "TriggerListener name cannot be empty.");
         }
@@ -1717,7 +1730,7 @@ J     *
      */
     List!(TriggerListener) getInternalTriggerListeners() {
         synchronized (internalTriggerListeners) {
-            return java.container.Collections.unmodifiableList(new LinkedList!(TriggerListener)(internalTriggerListeners.values()));
+            return (new LinkedList!(TriggerListener)(internalTriggerListeners.values())); //java.container.Collections.unmodifiableList
         }
     }
 
@@ -1768,19 +1781,19 @@ J     *
      */
     List!(SchedulerListener) getInternalSchedulerListeners() {
         synchronized (internalSchedulerListeners) {
-            return java.container.Collections.unmodifiableList(new ArrayList!(SchedulerListener)(internalSchedulerListeners));
+            return (new ArrayList!(SchedulerListener)(internalSchedulerListeners));// java.container.Collections.unmodifiableList
         }
     }
 
-    protected void notifyJobStoreJobComplete(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode) {
+    void notifyJobStoreJobComplete(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode) {
         resources.getJobStore().triggeredJobComplete(trigger, detail, instCode);
     }
 
-    protected void notifyJobStoreJobVetoed(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode) {
+    void notifyJobStoreJobVetoed(OperableTrigger trigger, JobDetail detail, CompletedExecutionInstruction instCode) {
         resources.getJobStore().triggeredJobComplete(trigger, detail, instCode);
     }
 
-    protected void notifySchedulerThread(long candidateNewNextFireTime) {
+    void notifySchedulerThread(long candidateNewNextFireTime) {
         if (isSignalOnSchedulingChange()) {
             signaler.signalSchedulingChange(candidateNewNextFireTime);
         }
@@ -1852,7 +1865,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "TriggerListener '" ~ tl.getName()
-                                ~ "' threw exception: " ~ e.getMessage(), e.msg);
+                                ~ "' threw exception: " ~ e.msg);
                 throw se;
             }
         }
@@ -1874,7 +1887,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "TriggerListener '" ~ tl.getName()
-                                ~ "' threw exception: " ~ e.getMessage(), e.msg);
+                                ~ "' threw exception: " ~ e.msg);
                 throw se;
             }
         }
@@ -1894,7 +1907,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "TriggerListener '" ~ tl.getName()
-                                ~ "' threw exception: " ~ e.getMessage(), e.msg);
+                                ~ "' threw exception: " ~ e.msg);
                 throw se;
             }
         }
@@ -1913,7 +1926,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "JobListener '" ~ jl.getName() ~ "' threw exception: "
-                                ~ e.msg, e.msg);
+                                ~ e.msg);
                 throw se;
             }
         }
@@ -1932,7 +1945,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "JobListener '" ~ jl.getName() ~ "' threw exception: "
-                        ~ e.msg, e.msg);
+                        ~ e.msg);
                 throw se;
             }
         }
@@ -1952,7 +1965,7 @@ J     *
             } catch (Exception e) {
                 SchedulerException se = new SchedulerException(
                         "JobListener '" ~ jl.getName() ~ "' threw exception: "
-                                ~ e.msg, e.msg);
+                                ~ e.msg);
                 throw se;
             }
         }
@@ -1984,7 +1997,7 @@ J     *
                 sl.jobScheduled(trigger);
             } catch (Exception e) {
                 error("Error while notifying SchedulerListener of scheduled job."
-                                ~ "  Triger=" ~ trigger.getKey(), e.msg);
+                                ~ "  Triger=" ~ trigger.getKey().toString(), e.msg);
             }
         }
     }
@@ -2002,7 +2015,7 @@ J     *
                     sl.jobUnscheduled(triggerKey);
             } catch (Exception e) {
                 error("Error while notifying SchedulerListener of unscheduled job."
-                                ~ "  Triger=" ~ (triggerKey is null ? "ALL DATA" : triggerKey), e.msg);
+                                ~ "  Triger=" ~ (triggerKey is null ? "ALL DATA" : triggerKey.toString()), e.msg);
             }
         }
     }
@@ -2017,7 +2030,7 @@ J     *
                 sl.triggerFinalized(trigger);
             } catch (Exception e) {
                 error("Error while notifying SchedulerListener of finalized trigger."
-                                ~ "  Triger=" ~ trigger.getKey(), e.msg);
+                                ~ "  Triger=" ~ trigger.getKey().toString(), e.msg);
             }
         }
     }
@@ -2032,7 +2045,7 @@ J     *
                 sl.triggerPaused(triggerKey);
             } catch (Exception e) {
                 error("Error while notifying SchedulerListener of paused trigger: "
-                                + triggerKey, e.msg);
+                                ~ triggerKey.toString(), e.msg);
             }
         }
     }
@@ -2253,7 +2266,7 @@ J     *
             throw new IllegalArgumentException("JobFactory cannot be set to null!");
         }
 
-        info("JobFactory set to: " ~ factory);
+        info("JobFactory set to: " ~ (cast(Object)factory).toString());
 
         this.jobFactory = factory;
     }
@@ -2296,7 +2309,7 @@ J     *
                     throw new UnableToInterruptJobException(
                             "Job " ~ jobDetail.getKey().toString() ~
                             " can not be interrupted, since it does not implement " ~                        
-                            typeid(InterruptableJob).name);
+                            typeid(InterruptableJob).toString());
                 }
             }                        
         }
@@ -2331,7 +2344,7 @@ J     *
                     throw new UnableToInterruptJobException(
                         "Job " ~ jec.getJobDetail().getKey().toString() ~
                         " can not be interrupted, since it does not implement " ~                        
-                        typeid(InterruptableJob).name);
+                        typeid(InterruptableJob).toString());
                 }
             }                        
         }
@@ -2340,17 +2353,13 @@ J     *
     }
     
     private void shutdownPlugins() {
-        java.util.Iterator!(SchedulerPlugin) itr = resources.getSchedulerPlugins().iterator();
-        while (itr.hasNext()) {
-            SchedulerPlugin plugin = itr.next();
+        foreach(SchedulerPlugin plugin; resources.getSchedulerPlugins().iterator()) {
             plugin.shutdown();
         }
     }
 
     private void startPlugins() {
-        java.util.Iterator!(SchedulerPlugin) itr = resources.getSchedulerPlugins().iterator();
-        while (itr.hasNext()) {
-            SchedulerPlugin plugin = itr.next();
+        foreach(SchedulerPlugin plugin; resources.getSchedulerPlugins().iterator()) {
             plugin.start();
         }
     }
@@ -2400,7 +2409,7 @@ class ExecutingJobsManager : JobListener {
     }
 
     void jobToBeExecuted(JobExecutionContext context) {
-        numJobsFired.incrementAndGet();
+        AtomicHelper.increment(numJobsFired);
 
         synchronized (executingJobs) {
             executingJobs
@@ -2416,13 +2425,12 @@ class ExecutingJobsManager : JobListener {
     }
 
     int getNumJobsFired() {
-        return numJobsFired.get();
+        return numJobsFired;
     }
 
     List!(JobExecutionContext) getExecutingJobs() {
         synchronized (executingJobs) {
-            return java.container.Collections.unmodifiableList(new ArrayList!(JobExecutionContext)(
-                    executingJobs.values()));
+            return (new ArrayList!(JobExecutionContext)(executingJobs.values())); //java.container.Collections.unmodifiableList
         }
     }
 

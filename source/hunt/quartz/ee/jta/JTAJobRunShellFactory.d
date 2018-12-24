@@ -90,9 +90,9 @@ class JTAJobRunShellFactory : JobRunShellFactory {
      * {@link hunt.quartz.core.JobRunShell}</code>.
      * </p>
      */
-    JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
-        return new JTAJobRunShell(scheduler, bundle);
-    }
+    // JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
+    //     return new JTAJobRunShell(scheduler, bundle);
+    // }
 
 
 

@@ -20,8 +20,8 @@ module hunt.quartz.ScheduleBuilder;
 import hunt.quartz.Trigger;
 import hunt.quartz.spi.MutableTrigger;
 
-abstract class ScheduleBuilder(T) if(is(T : Trigger)) { // 
+abstract class ScheduleBuilder { // (T) if(is(T : Trigger))
     
-    protected abstract MutableTrigger build();
+    abstract MutableTrigger build();
 
 }

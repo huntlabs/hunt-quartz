@@ -76,7 +76,7 @@ import std.conv;
  * @author James House
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
-class DailyTimeIntervalScheduleBuilder : ScheduleBuilder!(DailyTimeIntervalTrigger) {
+class DailyTimeIntervalScheduleBuilder : ScheduleBuilder { // !(DailyTimeIntervalTrigger)
 
     private int interval = 1;
     private IntervalUnit intervalUnit = IntervalUnit.MINUTE;

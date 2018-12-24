@@ -34,7 +34,8 @@ import hunt.container.HashMap;
 import hunt.lang.exception;
 import hunt.time.LocalDateTime;
 
-import std.datetime;
+// import std.datetime;
+import std.conv;
 
 
 class JobExecutionContextImpl : JobExecutionContext {
@@ -218,10 +219,10 @@ class JobExecutionContextImpl : JobExecutionContext {
     override
     string toString() {
         return "JobExecutionContext:" ~ " trigger: '"
-                + getTrigger().getKey() ~ " job: "
-                + getJobDetail().getKey() ~ " fireTime: '" ~ getFireTime()
-                ~ " scheduledFireTime: " ~ getScheduledFireTime()
-                ~ " previousFireTime: '" ~ getPreviousFireTime()
+                ~ getTrigger().getKey().toString() ~ " job: "
+                ~ getJobDetail().getKey().toString() ~ " fireTime: '" ~ getFireTime().toString()
+                ~ " scheduledFireTime: " ~ getScheduledFireTime().toString()
+                ~ " previousFireTime: '" ~ getPreviousFireTime().toString()
                 ~ " nextFireTime: " ~ getNextFireTime() ~ " isRecovering: "
                 ~ isRecovering().to!string() ~ " refireCount: " ~ getRefireCount().to!string();
     }

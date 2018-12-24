@@ -45,7 +45,7 @@ class SampledStatisticsImpl : SchedulerListenerSupport, SampledStatistics, JobLi
     this(QuartzScheduler scheduler) {
         this.scheduler = scheduler;
         
-        counterManager = new CounterManagerImpl(new Timer(NAME ~ "Timer"));
+        // counterManager = new CounterManagerImpl(new Timer(NAME ~ "Timer"));
         jobsScheduledCount = createSampledCounter(DEFAULT_SAMPLED_COUNTER_CONFIG);
         jobsExecutingCount = createSampledCounter(DEFAULT_SAMPLED_COUNTER_CONFIG);
         jobsCompletedCount = createSampledCounter(DEFAULT_SAMPLED_COUNTER_CONFIG);

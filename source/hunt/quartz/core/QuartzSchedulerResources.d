@@ -20,15 +20,15 @@ module hunt.quartz.core.QuartzSchedulerResources;
 
 import hunt.quartz.core.JobRunShellFactory;
 
-import hunt.container.ArrayList;
-import hunt.container.List;
-
 import hunt.quartz.management.ManagementRESTServiceConfiguration;
 import hunt.quartz.spi.JobStore;
 import hunt.quartz.spi.SchedulerPlugin;
 import hunt.quartz.spi.ThreadExecutor;
 import hunt.quartz.spi.ThreadPool;
 
+import hunt.container.ArrayList;
+import hunt.container.List;
+import hunt.lang.exception;
 import hunt.string;
 
 import std.array;
@@ -147,9 +147,8 @@ class QuartzSchedulerResources {
      *              if name is null or empty.
      */
     void setName(string name) {
-        if (name is null || name.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "Scheduler name cannot be empty.");
+        if (name is null || name.strip().length == 0) {
+            throw new IllegalArgumentException("Scheduler name cannot be empty.");
         }
 
         this.name = name;
@@ -282,7 +281,7 @@ class QuartzSchedulerResources {
      *              if name is null or empty.
      */
     void setThreadName(string threadName) {
-        if (threadName is null || threadName.trim().length() == 0) {
+        if (threadName is null || threadName.strip().length == 0) {
             throw new IllegalArgumentException(
                     "Scheduler thread name cannot be empty.");
         }
@@ -315,7 +314,7 @@ class QuartzSchedulerResources {
         } else {
             throw new IllegalArgumentException(
                     "Faild to set RMICreateRegistryStrategy - strategy unknown: '"
-                            + rmiCreateRegistryStrategy ~ "'");
+                            ~ rmiCreateRegistryStrategy ~ "'");
         }
 
         this.rmiCreateRegistryStrategy = rmiCreateRegistryStrategy;
@@ -543,7 +542,7 @@ class QuartzSchedulerResources {
      */
     static string generateJMXObjectName(string schedName, string schedInstId) {
         return "quartz:type=QuartzScheduler" ~ ",name="
-            ~ schedName.replaceAll(":|=|\n", ".")
+            ~ schedName.replace(":|=|\n", ".")
             ~ ",instance=" ~ schedInstId;
     }
 
