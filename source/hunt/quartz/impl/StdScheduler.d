@@ -17,7 +17,10 @@
 
 module hunt.quartz.impl.StdScheduler;
 
+import hunt.quartz.impl.matchers.GroupMatcher;
+
 import hunt.quartz.Calendar;
+import hunt.quartz.core.QuartzScheduler;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobDetail;
 import hunt.quartz.JobExecutionContext;
@@ -29,18 +32,15 @@ import hunt.quartz.exception;
 import hunt.quartz.SchedulerMetaData;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerKey;
-import hunt.quartz.exception;
-import hunt.quartz.Trigger : TriggerState;
-import hunt.quartz.core.QuartzScheduler;
-import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.spi.JobFactory;
+import hunt.quartz.spi.OperableTrigger;
 
 import hunt.container.List;
 import hunt.container.Map;
 import hunt.container.Set;
 import hunt.time.LocalDateTime;
 
-import std.datetime;
+// import std.datetime;
 /**
  * <p>
  * An implementation of the <code>Scheduler</code> interface that directly
@@ -111,7 +111,7 @@ class StdScheduler : Scheduler {
 
     SchedulerMetaData getMetaData() {
         return new SchedulerMetaData(getSchedulerName(),
-                getSchedulerInstanceId(), getClass(), false, isStarted(), 
+                getSchedulerInstanceId(), typeid(this), false, isStarted(), 
                 isInStandbyMode(), isShutdown(), sched.runningSince(), 
                 sched.numJobsExecuted(), sched.getJobStoreClass(), 
                 sched.supportsPersistence(), sched.isClustered(), sched.getThreadPoolClass(), 
@@ -445,7 +445,7 @@ class StdScheduler : Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    List!(Trigger) getTriggersOfJob(JobKey jobKey) {
+    List!(OperableTrigger) getTriggersOfJob(JobKey jobKey) {
         return sched.getTriggersOfJob(jobKey);
     }
 

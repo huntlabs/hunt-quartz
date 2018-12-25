@@ -35,14 +35,14 @@ class GroupMatcherHelper {
      * Create a GroupMatcher that matches job groups equaling the given string.
      */
     static GroupMatcher!(JobKey) jobGroupEquals(string compareTo) {
-        return GroupMatcher.groupEquals(compareTo);
+        return groupEquals!(JobKey)(compareTo);
     }
     
     /**
      * Create a GroupMatcher that matches trigger groups equaling the given string.
      */
     static GroupMatcher!(TriggerKey) triggerGroupEquals(string compareTo) {
-        return GroupMatcher.groupEquals(compareTo);
+        return groupEquals!(TriggerKey)(compareTo);
     }
     
     /**
@@ -56,14 +56,14 @@ class GroupMatcherHelper {
      * Create a GroupMatcher that matches job groups starting with the given string.
      */
     static GroupMatcher!(JobKey) jobGroupStartsWith(string compareTo) {
-        return GroupMatcher.groupStartsWith(compareTo);
+        return groupStartsWith!(JobKey)(compareTo);
     }
     
     /**
      * Create a GroupMatcher that matches trigger groups starting with the given string.
      */
     static GroupMatcher!(TriggerKey) triggerGroupStartsWith(string compareTo) {
-        return GroupMatcher.groupStartsWith(compareTo);
+        return groupStartsWith!(TriggerKey)(compareTo);
     }
 
     /**
@@ -77,14 +77,14 @@ class GroupMatcherHelper {
      * Create a GroupMatcher that matches job groups ending with the given string.
      */
     static GroupMatcher!(JobKey) jobGroupEndsWith(string compareTo) {
-        return GroupMatcher.groupEndsWith(compareTo);
+        return groupEndsWith!(JobKey)(compareTo);
     }
     
     /**
      * Create a GroupMatcher that matches trigger groups ending with the given string.
      */
     static GroupMatcher!(TriggerKey) triggerGroupEndsWith(string compareTo) {
-        return GroupMatcher.groupEndsWith(compareTo);
+        return groupEndsWith!(TriggerKey)(compareTo);
     }
     
     /**
@@ -98,14 +98,14 @@ class GroupMatcherHelper {
      * Create a GroupMatcher that matches job groups containing the given string.
      */
     static GroupMatcher!(JobKey) jobGroupContains(string compareTo) {
-        return GroupMatcher.groupContains(compareTo);
+        return groupContains!(JobKey)(compareTo);
     }
     
     /**
      * Create a GroupMatcher that matches trigger groups containing the given string.
      */
     static GroupMatcher!(TriggerKey) triggerGroupContains(string compareTo) {
-        return GroupMatcher.groupContains(compareTo);
+        return groupContains!(TriggerKey)(compareTo);
     }
 
     /**
@@ -119,14 +119,14 @@ class GroupMatcherHelper {
      * Create a GroupMatcher that matches job groups starting with the given string.
      */
     static GroupMatcher!(JobKey) anyJobGroup() {
-        return GroupMatcher.anyGroup();
+        return anyGroup!(JobKey)();
     }
 
     /**
      * Create a GroupMatcher that matches trigger groups starting with the given string.
      */
     static GroupMatcher!(TriggerKey) anyTriggerGroup() {
-        return GroupMatcher.anyGroup();
+        return anyGroup!(TriggerKey)();
     }
 }
 

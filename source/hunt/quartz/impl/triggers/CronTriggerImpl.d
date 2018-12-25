@@ -104,8 +104,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
     this() {
         super();
-        setStartTime(new LocalDateTime());
-        setTimeZone(TimeZone.getDefault());
+        setStartTime(LocalDateTime.now());
+        setTimeZone(ZoneId.systemDefault());
     }
 
     // /**

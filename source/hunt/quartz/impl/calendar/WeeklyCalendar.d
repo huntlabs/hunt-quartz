@@ -20,7 +20,11 @@ module hunt.quartz.impl.calendar.WeeklyCalendar;
 import hunt.quartz.impl.calendar.BaseCalendar;
 import hunt.quartz.Calendar;
 
-import std.datetime : TimeZone;
+import hunt.time.DayOfWeek;
+import hunt.time.LocalDateTime;
+import hunt.time.ZoneId;
+import hunt.time.ZoneOffset;
+// import std.datetime : ZoneId;
 
 /**
  * <p>
@@ -38,7 +42,7 @@ class WeeklyCalendar : BaseCalendar, Calendar {
 
     // An array to store the week days which are to be excluded.
     // hunt.time.util.Calendar.MONDAY etc. are used as index.
-    private bool[] excludeDays = new bool[8];
+    private bool[8] excludeDays;
 
     // Will be set to true, if all week days are excluded
     private bool excludeAll = false;
@@ -51,17 +55,21 @@ class WeeklyCalendar : BaseCalendar, Calendar {
         this(baseCalendar, null);
     }
 
-    this(TimeZone timeZone) {
+    this(ZoneId timeZone) {
         super(null, timeZone);
     }
 
-    this(Calendar baseCalendar, TimeZone timeZone) {
+    this(Calendar baseCalendar, ZoneId timeZone) {
         super(baseCalendar, timeZone);
 
-        excludeDays[hunt.time.util.Calendar.SUNDAY] = true;
-        excludeDays[hunt.time.util.Calendar.SATURDAY] = true;
+        excludeDays[DayOfWeek.SUNDAY.getValue()] = true;
+        excludeDays[DayOfWeek.SATURDAY.getValue()] = true;
         excludeAll = areAllDaysExcluded();
     }
+
+    // private void initializeMembers() {
+    //     excludeDays = new bool[8];
+    // }
 
     // override
     // Object clone() {
@@ -126,13 +134,13 @@ class WeeklyCalendar : BaseCalendar, Calendar {
      */
     bool areAllDaysExcluded() {
         return
-            isDayExcluded(hunt.time.util.Calendar.SUNDAY) &&
-            isDayExcluded(hunt.time.util.Calendar.MONDAY) &&
-            isDayExcluded(hunt.time.util.Calendar.TUESDAY) &&
-            isDayExcluded(hunt.time.util.Calendar.WEDNESDAY) &&
-            isDayExcluded(hunt.time.util.Calendar.THURSDAY) &&
-            isDayExcluded(hunt.time.util.Calendar.FRIDAY) &&
-            isDayExcluded(hunt.time.util.Calendar.SATURDAY);
+            isDayExcluded(DayOfWeek.SUNDAY.getValue()) &&
+            isDayExcluded(DayOfWeek.MONDAY.getValue()) &&
+            isDayExcluded(DayOfWeek.TUESDAY.getValue()) &&
+            isDayExcluded(DayOfWeek.WEDNESDAY.getValue()) &&
+            isDayExcluded(DayOfWeek.THURSDAY.getValue()) &&
+            isDayExcluded(DayOfWeek.FRIDAY.getValue()) &&
+            isDayExcluded(DayOfWeek.SATURDAY.getValue());
     }
 
     /**
@@ -155,8 +163,8 @@ class WeeklyCalendar : BaseCalendar, Calendar {
         // excludes the time/date, continue evaluating this calendar instance.
         if (super.isTimeIncluded(timeStamp) == false) { return false; }
 
-        hunt.time.util.Calendar cl = createJavaCalendar(timeStamp);
-        int wday = cl.get(hunt.time.util.Calendar.DAY_OF_WEEK);
+        LocalDateTime cl = createJavaCalendar(timeStamp);
+        int wday = cl.getDayOfWeek().getValue();
 
         return !(isDayExcluded(wday));
     }
@@ -185,18 +193,18 @@ class WeeklyCalendar : BaseCalendar, Calendar {
         }
 
         // Get timestamp for 00:00:00
-        hunt.time.util.Calendar cl = getStartOfDayJavaCalendar(timeStamp);
-        int wday = cl.get(hunt.time.util.Calendar.DAY_OF_WEEK);
+        LocalDateTime cl = getStartOfDayJavaCalendar(timeStamp);
+        int wday = cl.getDayOfWeek().getValue();
 
         if (!isDayExcluded(wday)) {
             return timeStamp; // return the original value
         }
 
         while (isDayExcluded(wday) == true) {
-            cl.add(hunt.time.util.Calendar.DATE, 1);
-            wday = cl.get(hunt.time.util.Calendar.DAY_OF_WEEK);
+            cl = cl.plusDays(1);
+            wday = cl.getDayOfWeek().getValue();
         }
 
-        return cl.getTime().getTime();
+        return cl.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 }

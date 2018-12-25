@@ -21,7 +21,10 @@ import hunt.quartz.Calendar;
 
 import hunt.io.common;
 import hunt.lang.common;
+import hunt.lang.exception;
 // import hunt.time.util.Calendar;
+import hunt.time.Instant;
+import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 
 import std.datetime;
@@ -192,8 +195,7 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
     long getNextIncludedTime(long timeStamp) {
 
         if (timeStamp <= 0) {
-            throw new IllegalArgumentException(
-                    "timeStamp must be greater 0");
+            throw new IllegalArgumentException("timeStamp must be greater 0");
         }
 
         if (baseCalendar !is null) {
@@ -209,9 +211,10 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
      * is not <code>null</code>.
      */
     protected LocalDateTime createJavaCalendar(long timeStamp) {
-        LocalDateTime calendar = createJavaCalendar();
-        calendar.setTime(new LocalDateTime(timeStamp));
-        return calendar;
+        // LocalDateTime calendar = createJavaCalendar();
+        // calendar.setTime(new LocalDateTime(timeStamp));
+        // return calendar;
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), getTimeZone());
     }
 
     /**
@@ -220,10 +223,9 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
      * it is not <code>null</code>.
      */
     protected LocalDateTime createJavaCalendar() {
-        return
-            (getTimeZone() is null) ?
-                LocalDateTime.getInstance() :
-                LocalDateTime.getInstance(getTimeZone());
+        return (getTimeZone() is null) ?
+                LocalDateTime.now() :
+                LocalDateTime.now(getTimeZone());
     }
 
     /**
@@ -238,11 +240,13 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
      */
     protected LocalDateTime getStartOfDayJavaCalendar(long timeInMillis) {
         LocalDateTime startOfDay = createJavaCalendar(timeInMillis);
-        startOfDay.set(LocalDateTime.HOUR_OF_DAY, 0);
-        startOfDay.set(LocalDateTime.MINUTE, 0);
-        startOfDay.set(LocalDateTime.SECOND, 0);
-        startOfDay.set(LocalDateTime.MILLISECOND, 0);
-        return startOfDay;
+        return LocalDateTime.of(startOfDay.getYear(), startOfDay.getMonthValue(), 
+            startOfDay.getDayOfMonth, 0, 0, 0);
+    }
+
+    protected LocalDateTime getStartOfDayJavaCalendar(LocalDateTime startOfDay) {
+        return LocalDateTime.of(startOfDay.getYear(), startOfDay.getMonthValue(), 
+            startOfDay.getDayOfMonth, 0, 0, 0);
     }
 
     /**
@@ -257,10 +261,7 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
      */
     protected LocalDateTime getEndOfDayJavaCalendar(long timeInMillis) {
         LocalDateTime endOfDay = createJavaCalendar(timeInMillis);
-        endOfDay.set(LocalDateTime.HOUR_OF_DAY, 23);
-        endOfDay.set(LocalDateTime.MINUTE, 59);
-        endOfDay.set(LocalDateTime.SECOND, 59);
-        endOfDay.set(LocalDateTime.MILLISECOND, 999);
-        return endOfDay;
+        return LocalDateTime.of(endOfDay.getYear(), endOfDay.getMonthValue(), 
+            endOfDay.getDayOfMonth, 23, 59, 59, 999*1000_000);
     }
 }

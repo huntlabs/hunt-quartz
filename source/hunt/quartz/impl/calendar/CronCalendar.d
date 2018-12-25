@@ -1,12 +1,15 @@
 module hunt.quartz.impl.calendar.CronCalendar;
 
 import hunt.quartz.impl.calendar.BaseCalendar;
-
-import hunt.lang.exception;
-import std.datetime;
-
 import hunt.quartz.Calendar;
 import hunt.quartz.CronExpression;
+
+import hunt.container.StringBuffer;
+import hunt.lang.exception;
+import hunt.time.Instant;
+import hunt.time.LocalDateTime;
+import hunt.time.ZoneId;
+import hunt.time.ZoneOffset;
 
 /**
  * This implementation of the Calendar excludes the set of times expressed by a
@@ -54,7 +57,7 @@ class CronCalendar : BaseCalendar {
 
     /**
      * Create a <CODE>CronCalendar</CODE> with the given cron exprssion, 
-     * <CODE>baseCalendar</CODE>, and <code>TimeZone</code>. 
+     * <CODE>baseCalendar</CODE>, and <code>ZoneId</code>. 
      * 
      * @param baseCalendar the base calendar for this calendar instance &ndash;
      *                     see {@link BaseCalendar} for more information on base
@@ -65,10 +68,10 @@ class CronCalendar : BaseCalendar {
      *          should be interpreted, i.e. the expression 0 0 10 * * ?, is
      *          resolved to 10:00 am in this time zone.  If 
      *          <code>timeZone</code> is <code>null</code> then 
-     *          <code>TimeZone.getDefault()</code> will be used.
+     *          <code>ZoneId.getDefault()</code> will be used.
      */
     this(Calendar baseCalendar,
-            string expression, TimeZone timeZone) {
+            string expression, ZoneId timeZone) {
         super(baseCalendar);
         this.cronExpression = new CronExpression(expression);
         this.cronExpression.setTimeZone(timeZone);
@@ -90,22 +93,22 @@ class CronCalendar : BaseCalendar {
      * </p>
      */
     override
-    TimeZone getTimeZone() {
+    ZoneId getTimeZone() {
         return cronExpression.getTimeZone();
     }
 
     /**
      * Sets the time zone for which the <code>CronExpression</code> of this
      * <code>CronCalendar</code> will be resolved.  If <code>timeZone</code> 
-     * is <code>null</code> then <code>TimeZone.getDefault()</code> will be 
+     * is <code>null</code> then <code>ZoneId.getDefault()</code> will be 
      * used.
      * <p>
-     * Overrides <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code> to
+     * Overrides <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code> to
      * defer to its <code>CronExpression</code>.
      * </p>
      */
     override
-    void setTimeZone(TimeZone timeZone) {
+    void setTimeZone(ZoneId timeZone) {
         cronExpression.setTimeZone(timeZone);
     }
     
@@ -123,8 +126,10 @@ class CronCalendar : BaseCalendar {
                 (getBaseCalendar().isTimeIncluded(timeInMillis) == false)) {
             return false;
         }
+
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(timeInMillis), getTimeZone());
         
-        return (!(cronExpression.isSatisfiedBy(new LocalDateTime(timeInMillis))));
+        return (!(cronExpression.isSatisfiedBy(ldt)));
     }
 
     /**
@@ -148,9 +153,10 @@ class CronCalendar : BaseCalendar {
             // baseCalendar, ask it the next time it includes and begin testing
             // from there. Failing this, add one millisecond and continue
             // testing.
-            if (cronExpression.isSatisfiedBy(new LocalDateTime(nextIncludedTime))) {
-                nextIncludedTime = cronExpression.getNextInvalidTimeAfter(
-                        new LocalDateTime(nextIncludedTime)).getTime();
+
+            LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(nextIncludedTime), getTimeZone());
+            if (cronExpression.isSatisfiedBy(ldt)) {
+                nextIncludedTime = cronExpression.getNextInvalidTimeAfter(ldt).toInstant(ZoneOffset.UTC).toEpochMilli();
             } else if ((getBaseCalendar() !is null) && 
                     (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
                 nextIncludedTime = 
@@ -174,12 +180,12 @@ class CronCalendar : BaseCalendar {
         StringBuffer buffer = new StringBuffer();
         buffer.append("base calendar: [");
         if (getBaseCalendar() !is null) {
-            buffer.append(getBaseCalendar().toString());
+            buffer.append((cast(Object)getBaseCalendar()).toString());
         } else {
             buffer.append("null");
         }
         buffer.append("], excluded cron expression: '");
-        buffer.append(cronExpression);
+        buffer.append(cronExpression.toString());
         buffer.append("'");
         return buffer.toString();
     }

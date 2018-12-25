@@ -21,6 +21,7 @@ import hunt.quartz.utils.Key;
 
 import hunt.lang.exception;
 
+import std.algorithm;
 import std.string;
 
 abstract class StringOperatorName {
@@ -102,17 +103,17 @@ abstract class StringMatcher(T) : Matcher!(T) {
 
     override
     size_t toHash() @trusted nothrow {
-        final int prime = 31;
-        int result = 1;
+        int prime = 31;
+        size_t result = 1;
         result = prime * result
-                + ((compareTo is null) ? 0 : compareTo.toHash());
+                + ((compareTo is null) ? 0 : hashOf(compareTo));
         result = prime * result
                 + ((compareWith is null) ? 0 : compareWith.toHash());
         return result;
     }
 
     override
-    bool opEquals(Object o) {
+    bool opEquals(Object obj) {
         if (this is obj)
             return true;
         if (obj is null)
@@ -123,12 +124,12 @@ abstract class StringMatcher(T) : Matcher!(T) {
         if (compareTo is null) {
             if (other.compareTo !is null)
                 return false;
-        } else if (!compareTo== other.compareTo)
+        } else if (compareTo != other.compareTo)
             return false;
         if (compareWith is null) {
             if (other.compareWith !is null)
                 return false;
-        } else if (!compareWith== other.compareWith)
+        } else if (compareWith != other.compareWith)
             return false;
         return true;
     }

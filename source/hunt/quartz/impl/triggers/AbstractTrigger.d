@@ -36,6 +36,9 @@ import hunt.quartz.spi.OperableTrigger;
 
 import hunt.lang.exception;
 import hunt.time.LocalDateTime;
+
+import std.array;
+import std.conv;
 import std.datetime;
 
 
@@ -209,9 +212,8 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      *              if name is null or empty.
      */
     void setName(string name) {
-        if (name is null || name.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "Trigger name cannot be null or empty.");
+        if (name.empty()) {
+            throw new IllegalArgumentException("Trigger name cannot be null or empty.");
         }
 
         this.name = name;
@@ -238,7 +240,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      *              if group is an empty string.
      */
     void setGroup(string group) {
-        if (group !is null && group.trim().length() == 0) {
+        if (group.empty()) {
             throw new IllegalArgumentException(
                     "Group name cannot be an empty string.");
         }
@@ -275,9 +277,8 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      *              if jobName is null or empty.
      */
     void setJobName(string jobName) {
-        if (jobName is null || jobName.trim().length() == 0) {
-            throw new IllegalArgumentException(
-                    "Job name cannot be null or empty.");
+        if (jobName.empty()) {
+            throw new IllegalArgumentException("Job name cannot be null or empty.");
         }
 
         this.jobName = jobName;
@@ -305,7 +306,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      *              if group is an empty string.
      */
     void setJobGroup(string jobGroup) {
-        if (jobGroup !is null && jobGroup.trim().length() == 0) {
+        if (jobGroup.empty()) {
             throw new IllegalArgumentException(
                     "Group name cannot be null or empty.");
         }
@@ -806,9 +807,9 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     override
     string toString() {
         return "Trigger '" ~ getFullName() ~ "':  triggerClass: '"
-                + getClass().getName() ~ " calendar: '" ~ getCalendarName() 
-                ~ "' misfireInstruction: " ~ getMisfireInstruction() 
-                ~ " nextFireTime: " ~ getNextFireTime();
+                ~ typeid(this).name ~ " calendar: '" ~ getCalendarName() 
+                ~ "' misfireInstruction: " ~ getMisfireInstruction().to!string() 
+                ~ " nextFireTime: " ~ getNextFireTime().toString();
     }
 
     /**
@@ -827,7 +828,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
         if(getKey() is null)
             return 1;
         
-        return getKey().compareTo(other.getKey());
+        return getKey().opCmp(other.getKey());
     }
 
     /**
@@ -848,10 +849,15 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
 
     override
     size_t toHash() @trusted nothrow {
-        if(getKey() is null)
+        TriggerKey key;
+        try {
+            key = getKey();
+        } catch(Exception) {
+        }
+        if(key is null)
             return super.toHash();
         
-        return getKey().toHash();
+        return key.toHash();
     }
 
     // override
@@ -874,7 +880,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     // }
     
     TriggerBuilder!(T) getTriggerBuilder() {
-        return TriggerBuilderHelper.newTrigger()
+        return TriggerBuilderHelper.newTrigger!T()
             .forJob(getJobKey())
             .modifiedByCalendar(getCalendarName())
             .usingJobData(getJobDataMap())

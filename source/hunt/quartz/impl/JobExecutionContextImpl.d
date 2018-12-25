@@ -223,7 +223,7 @@ class JobExecutionContextImpl : JobExecutionContext {
                 ~ getJobDetail().getKey().toString() ~ " fireTime: '" ~ getFireTime().toString()
                 ~ " scheduledFireTime: " ~ getScheduledFireTime().toString()
                 ~ " previousFireTime: '" ~ getPreviousFireTime().toString()
-                ~ " nextFireTime: " ~ getNextFireTime() ~ " isRecovering: "
+                ~ " nextFireTime: " ~ getNextFireTime().toString() ~ " isRecovering: "
                 ~ isRecovering().to!string() ~ " refireCount: " ~ getRefireCount().to!string();
     }
 

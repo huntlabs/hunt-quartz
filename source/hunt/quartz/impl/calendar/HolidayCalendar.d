@@ -25,7 +25,9 @@ import hunt.container.SortedSet;
 import hunt.container.TreeSet;
 
 import hunt.time.LocalDateTime;
-import std.datetime;
+import hunt.time.ZoneId;
+import hunt.time.ZoneOffset;
+// import std.datetime;
 
 /**
  * <p>
@@ -54,11 +56,11 @@ class HolidayCalendar : BaseCalendar, Calendar {
         super(baseCalendar);
     }
 
-    this(TimeZone timeZone) {
+    this(ZoneId timeZone) {
         super(timeZone);
     }
 
-    this(Calendar baseCalendar, TimeZone timeZone) {
+    this(Calendar baseCalendar, ZoneId timeZone) {
         super(baseCalendar, timeZone);
     }
 
@@ -89,7 +91,7 @@ class HolidayCalendar : BaseCalendar, Calendar {
             return false;
         }
 
-        LocalDateTime lookFor = getStartOfDayJavaCalendar(timeStamp).getTime();
+        LocalDateTime lookFor = getStartOfDayJavaCalendar(timeStamp);
 
         return !(dates.contains(lookFor));
     }
@@ -114,12 +116,12 @@ class HolidayCalendar : BaseCalendar, Calendar {
         }
 
         // Get timestamp for 00:00:00
-        hunt.time.util.Calendar day = getStartOfDayJavaCalendar(timeStamp);
-        while (isTimeIncluded(day.getTime().getTime()) == false) {
-            day.add(hunt.time.util.Calendar.DATE, 1);
+        LocalDateTime day = getStartOfDayJavaCalendar(timeStamp);
+        while (isTimeIncluded(day.toInstant(ZoneOffset.UTC).toEpochMilli()) == false) {
+            day = day.plusDays(1);
         }
 
-        return day.getTime().getTime();
+        return day.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     /**
@@ -129,7 +131,7 @@ class HolidayCalendar : BaseCalendar, Calendar {
      * </p>
      */
     void addExcludedDate(LocalDateTime excludedDate) {
-        LocalDateTime date = getStartOfDayJavaCalendar(excludedDate.getTime()).getTime();
+        LocalDateTime date = getStartOfDayJavaCalendar(excludedDate);
         /*
          * System.err.println( "HolidayCalendar.add(): date=" ~
          * excludedDate.toLocaleString());
@@ -138,7 +140,7 @@ class HolidayCalendar : BaseCalendar, Calendar {
     }
 
     void removeExcludedDate(LocalDateTime dateToRemove) {
-        LocalDateTime date = getStartOfDayJavaCalendar(dateToRemove.getTime()).getTime();
+        LocalDateTime date = getStartOfDayJavaCalendar(dateToRemove);
         dates.remove(date);
     }
 
@@ -150,6 +152,6 @@ class HolidayCalendar : BaseCalendar, Calendar {
      * </p>
      */
     SortedSet!(LocalDateTime) getExcludedDates() {
-        return Collections.unmodifiableSortedSet(dates);
+        return (dates); // Collections.unmodifiableSortedSet
     }
 }

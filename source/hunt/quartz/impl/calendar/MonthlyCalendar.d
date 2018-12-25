@@ -18,10 +18,15 @@
 module hunt.quartz.impl.calendar.MonthlyCalendar;
 
 import hunt.quartz.impl.calendar.BaseCalendar;
-
-import std.datetime : TimeZone;
-
 import hunt.quartz.Calendar;
+
+// import std.datetime : ZoneId;
+import hunt.lang.exception;
+import hunt.time.LocalDateTime;
+import hunt.time.ZoneId;
+import hunt.time.ZoneOffset;
+
+import std.conv;
 
 /**
  * <p>
@@ -42,7 +47,7 @@ class MonthlyCalendar : BaseCalendar, Calendar {
 
     // An array to store a months days which are to be excluded.
     // hunt.time.util.Calendar.get( ) as index.
-    private bool[] excludeDays = new bool[MAX_DAYS_IN_MONTH];
+    private bool[MAX_DAYS_IN_MONTH] excludeDays;
 
     // Will be set to true, if all week days are excluded
     private bool excludeAll = false;
@@ -55,11 +60,11 @@ class MonthlyCalendar : BaseCalendar, Calendar {
         this(baseCalendar, null);
     }
 
-    this(TimeZone timeZone) {
+    this(ZoneId timeZone) {
         this(null, timeZone);
     }
 
-    this(Calendar baseCalendar, TimeZone timeZone) {
+    this(Calendar baseCalendar, ZoneId timeZone) {
         super(baseCalendar, timeZone);
 
         // all days are included by default
@@ -174,8 +179,8 @@ class MonthlyCalendar : BaseCalendar, Calendar {
         // excludes the time/date, continue evaluating this calendar instance.
         if (super.isTimeIncluded(timeStamp) == false) { return false; }
 
-        hunt.time.util.Calendar cl = createJavaCalendar(timeStamp);
-        int day = cl.get(hunt.time.util.Calendar.DAY_OF_MONTH);
+        LocalDateTime cl = createJavaCalendar(timeStamp);
+        int day =  cl.getDayOfMonth();
 
         return !(isDayExcluded(day));
     }
@@ -204,18 +209,18 @@ class MonthlyCalendar : BaseCalendar, Calendar {
         }
 
         // Get timestamp for 00:00:00
-        hunt.time.util.Calendar cl = getStartOfDayJavaCalendar(timeStamp);
-        int day = cl.get(hunt.time.util.Calendar.DAY_OF_MONTH);
+        LocalDateTime cl = getStartOfDayJavaCalendar(timeStamp);
+        int day = cl.getDayOfMonth();
 
         if (!isDayExcluded(day)) {
             return timeStamp; // return the original value
         }
 
         while (isDayExcluded(day) == true) {
-            cl.add(hunt.time.util.Calendar.DATE, 1);
-            day = cl.get(hunt.time.util.Calendar.DAY_OF_MONTH);
+            cl = cl.plusDays(1);
+            day = cl.getDayOfMonth();
         }
 
-        return cl.getTime().getTime();
+        return cl.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 }

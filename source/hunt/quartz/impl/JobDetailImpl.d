@@ -423,7 +423,7 @@ class JobDetailImpl : JobDetail { // Cloneable,
         if(other.getKey() is null || getKey() is null)
             return false;
         
-        if (!other.getKey() == getKey()) {
+        if (other.getKey() != getKey()) {
             return false;
         }
             
@@ -432,8 +432,13 @@ class JobDetailImpl : JobDetail { // Cloneable,
 
     override
     size_t toHash() @trusted nothrow {
-        JobKey key = getKey();
-        return key is null ? 0 : getKey().toHash();
+        JobKey key;
+        try{
+            key = getKey();
+        } catch(Exception) {
+            
+        }
+        return key is null ? 0 : key.toHash();
     }
     
     // override

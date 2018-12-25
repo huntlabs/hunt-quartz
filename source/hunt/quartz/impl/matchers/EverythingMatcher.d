@@ -55,7 +55,7 @@ class EverythingMatcher(T) : Matcher!(T) {
     }
 
     override
-    bool opEquals(Object o) {
+    bool opEquals(Object obj) {
         if(obj is null)
             return false;
         
@@ -64,7 +64,7 @@ class EverythingMatcher(T) : Matcher!(T) {
 
     override
     size_t toHash() @trusted nothrow {
-        return toHash(typeid(this).name); // getClass().getName().toHash();
+        return hashOf(typeid(this).name); // getClass().getName().toHash();
     }
 
     

@@ -24,8 +24,10 @@ import hunt.container.ArrayList;
 import hunt.container.Collections;
 import hunt.container.Iterator;
 import hunt.lang.exception;
-// import hunt.time.util.Calendar;
+import hunt.time.Instant;
+import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
+import hunt.time.ZoneOffset;
 import hunt.util.Comparator;
 
 /**
@@ -94,32 +96,31 @@ class AnnualCalendar : BaseCalendar, QuartzCalendar {
         }
 
          // Check baseCalendar first
-        if (!super.isTimeIncluded(day.getTime().getTime())) {
+        if (!super.isTimeIncluded(day.toInstant(ZoneOffset.UTC).toEpochMilli())) {
          return true;
         } 
         
-        int dmonth = day.get(LocalDateTime.MONTH);
-        int dday = day.get(LocalDateTime.DAY_OF_MONTH);
+        int dmonth = day.getMonthValue();
+        int dday = day.getDayOfMonth();
 
-        if (dataSorted == false) {
-            Collections.sort(excludeDays, new CalendarComparator());
-            dataSorted = true;
-        }
+    // TODO: Tasks pending completion -@zxp at 12/24/2018, 6:40:42 PM
+    // 
+        // if (dataSorted == false) {
+        //     Collections.sort(excludeDays, new CalendarComparator());
+        //     dataSorted = true;
+        // }
 
-        Iterator!(LocalDateTime) iter = excludeDays.iterator();
-        while (iter.hasNext()) {
-            LocalDateTime cl = cast(LocalDateTime) iter.next();
-
+        foreach(LocalDateTime ldt; excludeDays.iterator()) {
             // remember, the list is sorted
-            if (dmonth < cl.get(LocalDateTime.MONTH)) {
+            if (dmonth < ldt.getMonthValue()) {
                 return false;
             }
 
-            if (dday != cl.get(LocalDateTime.DAY_OF_MONTH)) {
+            if (dday != ldt.getDayOfMonth()) {
                 continue;
             }
 
-            if (dmonth != cl.get(LocalDateTime.MONTH)) {
+            if (dmonth != ldt.getMonthValue()) {
                 continue;
             }
 
@@ -187,24 +188,22 @@ class AnnualCalendar : BaseCalendar, QuartzCalendar {
             return;
         }
         
-        int dmonth = day.get(LocalDateTime.MONTH);
-        int dday = day.get(LocalDateTime.DAY_OF_MONTH);
+        int dmonth = day.getMonthValue();
+        int dday = day.getDayOfMonth();
         
         // Since there is no guarantee that the given day is in the arraylist with the exact same year
         // search for the object based on month and day of month in the list and remove it
-        Iterator!(LocalDateTime) iter = excludeDays.iterator();
-        while (iter.hasNext()) {
-            LocalDateTime cl = cast(LocalDateTime) iter.next();
+        foreach(LocalDateTime ldt; excludeDays.iterator()) {
 
-            if (dmonth != cl.get(LocalDateTime.MONTH)) {
+            if (dmonth != ldt.getMonthValue()) {
                 continue;
             }
 
-            if (dday != cl.get(LocalDateTime.DAY_OF_MONTH)) {
+            if (dday != ldt.getDayOfMonth()) {
                 continue;
             }
 
-            day = cl;
+            day = ldt;
             break;
         }
         
@@ -259,43 +258,43 @@ class AnnualCalendar : BaseCalendar, QuartzCalendar {
         }
 
         while (isDayExcluded(day) == true) {
-            day.add(LocalDateTime.DATE, 1);
+            day.plusDays(1);
         }
 
-        return day.getTime().getTime();
+        return day.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 }
 
 
 /**
 */
-class CalendarComparator : Comparator!(LocalDateTime) { // , Serializable
+// class CalendarComparator : Comparator!(LocalDateTime) { // , Serializable
   
     
-    this() {
-    }
+//     this() {
+//     }
 
 
-    int compare(LocalDateTime c1, LocalDateTime c2) {
+//     int compare(LocalDateTime c1, LocalDateTime c2) {
         
-        int month1 = c1.get(LocalDateTime.MONTH);
-        int month2 = c2.get(LocalDateTime.MONTH);
+//         int month1 = c1.get(LocalDateTime.MONTH);
+//         int month2 = c2.get(LocalDateTime.MONTH);
         
-        int day1 = c1.get(LocalDateTime.DAY_OF_MONTH);
-        int day2 = c2.get(LocalDateTime.DAY_OF_MONTH);
+//         int day1 = c1.get(LocalDateTime.DAY_OF_MONTH);
+//         int day2 = c2.get(LocalDateTime.DAY_OF_MONTH);
         
-        if (month1 < month2) {
-            return -1;
-        }
-        if (month1 > month2) {
-            return 1; 
-        }
-        if (day1 < day2) {
-            return -1;
-        }
-        if (day1 > day2) {
-            return 1;
-        }
-        return 0;
-      }
-}
+//         if (month1 < month2) {
+//             return -1;
+//         }
+//         if (month1 > month2) {
+//             return 1; 
+//         }
+//         if (day1 < day2) {
+//             return -1;
+//         }
+//         if (day1 > day2) {
+//             return 1;
+//         }
+//         return 0;
+//       }
+// }

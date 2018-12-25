@@ -78,7 +78,7 @@ class SchedulerRepository {
 
         if (cast(Scheduler) schedulers.get(sched.getSchedulerName()) !is null) {
             throw new SchedulerException("Scheduler with name '"
-                    + sched.getSchedulerName() ~ "' already exists.");
+                    ~ sched.getSchedulerName() ~ "' already exists.");
         }
 
         schedulers.put(sched.getSchedulerName(), sched);
@@ -92,7 +92,7 @@ class SchedulerRepository {
         return schedulers.get(schedName);
     }
 
-    Collection!(Scheduler) lookupAll() {
+    Scheduler[] lookupAll() {
         return (schedulers.values());
     }
 

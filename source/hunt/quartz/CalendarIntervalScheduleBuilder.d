@@ -25,8 +25,12 @@ import hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 
 import hunt.lang.exception;
+// import hunt.time.LocalDateTime;
+import hunt.time.ZoneId;
+// import hunt.time.ZoneOffset;
 
-import std.datetime : TimeZone;
+
+// import std.datetime : ZoneId;
 /**
  * <code>CalendarIntervalScheduleBuilder</code> is a {@link ScheduleBuilder} 
  * that defines calendar time (day, week, month, year) interval-based 
@@ -66,7 +70,7 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder { // !(CalendarIntervalT
     private IntervalUnit intervalUnit = IntervalUnit.DAY;
 
     private int misfireInstruction = CalendarIntervalTrigger.MISFIRE_INSTRUCTION_SMART_POLICY;
-    private TimeZone timeZone;
+    private ZoneId timeZone;
     private bool _preserveHourOfDayAcrossDaylightSavings;
     private bool _skipDayIfHourDoesNotExist;
     
@@ -269,13 +273,13 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder { // !(CalendarIntervalT
         return this;
     }
     /**
-     * The <code>TimeZone</code> in which to base the schedule.
+     * The <code>ZoneId</code> in which to base the schedule.
      * 
      * @param timezone the time-zone for the schedule.
      * @return the updated CalendarIntervalScheduleBuilder
      * @see CalendarIntervalTrigger#getTimeZone()
      */
-    CalendarIntervalScheduleBuilder inTimeZone(TimeZone timezone) {
+    CalendarIntervalScheduleBuilder inTimeZone(ZoneId timezone) {
         this.timeZone = timezone;
         return this;
     }
@@ -303,7 +307,7 @@ class CalendarIntervalScheduleBuilder : ScheduleBuilder { // !(CalendarIntervalT
      * </p>
      * 
      * @see #skipDayIfHourDoesNotExist(bool)
-     * @see #inTimeZone(TimeZone)
+     * @see #inTimeZone(ZoneId)
      * @see TriggerBuilder#startAt(java.util.LocalDateTime)
      */
     CalendarIntervalScheduleBuilder preserveHourOfDayAcrossDaylightSavings(bool preserveHourOfDay) {

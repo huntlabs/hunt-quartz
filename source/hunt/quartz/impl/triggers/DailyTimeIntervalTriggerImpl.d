@@ -78,8 +78,8 @@ import hunt.container.Set;
  * @author James House
  * @author Zemian Deng <saltnlight5@gmail.com>
  */
-class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger), DailyTimeIntervalTrigger, CoreTrigger {
-    
+class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger), 
+    DailyTimeIntervalTrigger, CoreTrigger {
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -286,9 +286,9 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
      * @see CalendarIntervalScheduleBuilder
      */
     // 
-    TriggerBuilder!(SBT) withSchedule(SBT)(ScheduleBuilder!(SBT) schedBuilder) if(is(SBT : T)) {
+    TriggerBuilder!(T) withSchedule(ScheduleBuilder schedBuilder)  { // if(is(SBT : T))
         this.scheduleBuilder = schedBuilder;
-        return cast(TriggerBuilder!(SBT)) this;
+        return this;
     }
 
     /**

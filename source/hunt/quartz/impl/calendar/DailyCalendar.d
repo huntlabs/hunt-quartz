@@ -5,9 +5,17 @@ import hunt.quartz.Calendar;
 
 // import java.text.NumberFormat;
 import hunt.container.ArrayList;
-import hunt.time.util.Calendar;
+import hunt.container.StringBuffer;
+import hunt.lang.exception;
 import hunt.string.StringTokenizer;
-import std.datetime : TimeZone;
+// import hunt.time.util.Calendar;
+import hunt.time.LocalTime;
+import hunt.time.LocalDateTime;
+import hunt.time.ZoneId;
+import hunt.time.ZoneOffset;
+
+import std.conv;
+import std.format;
 
 /**
  * This implementation of the Calendar excludes (or includes - see below) a 
@@ -73,8 +81,8 @@ class DailyCalendar : BaseCalendar {
      * 
      * <p>
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
-     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
-     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * <code>{@link ZoneId#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code>
      * </p>
      *  
      * @param rangeStartingTime a string representing the starting time for the
@@ -110,8 +118,8 @@ class DailyCalendar : BaseCalendar {
      * 
      * <p>
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
-     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
-     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * <code>{@link ZoneId#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code>
      * </p>
      * 
      * @param baseCalendar      the base calendar for this calendar instance
@@ -145,8 +153,8 @@ class DailyCalendar : BaseCalendar {
      * 
      * <p>
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
-     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
-     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * <code>{@link ZoneId#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code>
      * </p>
      * 
      * @param rangeStartingHourOfDay the hour of the start of the time range
@@ -195,8 +203,8 @@ class DailyCalendar : BaseCalendar {
      * 
      * <p>
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
-     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
-     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * <code>{@link ZoneId#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code>
      * </p>
      * 
      * @param baseCalendar              the base calendar for this calendar
@@ -253,8 +261,8 @@ class DailyCalendar : BaseCalendar {
      * 
      * <p>
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
-     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
-     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * <code>{@link ZoneId#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code>
      * </p>
      * 
      * @param rangeStartingCalendar a hunt.time.util.Calendar representing the 
@@ -285,8 +293,8 @@ class DailyCalendar : BaseCalendar {
      * 
      * <p>
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
-     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
-     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>
+     * <code>{@link ZoneId#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code>
      * </p>
      * 
      * @param baseCalendar          the base calendar for this calendar instance
@@ -320,9 +328,9 @@ class DailyCalendar : BaseCalendar {
      * 
      * <p>
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
-     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
-     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>.
-     * You should use <code>{@link #DailyCalendar(QuartzCalendar, std.datetime : TimeZone, long, long)}</code>
+     * <code>{@link ZoneId#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code>.
+     * You should use <code>{@link #DailyCalendar(QuartzCalendar, std.datetime : ZoneId, long, long)}</code>
      * if you don't want the given <code>rangeStartingTimeInMillis</code> and
      * <code>rangeEndingTimeInMillis</code> to be evaluated in the default 
      * time zone.
@@ -356,9 +364,9 @@ class DailyCalendar : BaseCalendar {
      * 
      * <p>
      * <b>Note:</b> This <CODE>DailyCalendar</CODE> will use the 
-     * <code>{@link TimeZone#getDefault()}</code> time zone unless an explicit 
-     * time zone is set via <code>{@link BaseCalendar#setTimeZone(TimeZone)}</code>.
-     * You should use <code>{@link #DailyCalendar(QuartzCalendar, std.datetime : TimeZone, long, long)} </code>
+     * <code>{@link ZoneId#getDefault()}</code> time zone unless an explicit 
+     * time zone is set via <code>{@link BaseCalendar#setTimeZone(ZoneId)}</code>.
+     * You should use <code>{@link #DailyCalendar(QuartzCalendar, std.datetime : ZoneId, long, long)} </code>
      * if you don't want the given <code>rangeStartingTimeInMillis</code> and
      * <code>rangeEndingTimeInMillis</code> to be evaluated in the default 
      * time zone.
@@ -404,7 +412,7 @@ class DailyCalendar : BaseCalendar {
      * @param rangeEndingTimeInMillis   a long representing the ending time for
      *                                  the time range
      */
-    this(TimeZone timeZone,
+    this(ZoneId timeZone,
                          long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
         super(timeZone);
@@ -440,7 +448,7 @@ class DailyCalendar : BaseCalendar {
      *                                  the time range
      */
     this(QuartzCalendar baseCalendar,
-                         TimeZone timeZone,
+                         ZoneId timeZone,
                          long rangeStartingTimeInMillis,
                          long rangeEndingTimeInMillis) {
         super(baseCalendar, timeZone);
@@ -469,8 +477,8 @@ class DailyCalendar : BaseCalendar {
             return false;
         }
         
-        long startOfDayInMillis = getStartOfDayJavaCalendar(timeInMillis).getTime().getTime();
-        long endOfDayInMillis = getEndOfDayJavaCalendar(timeInMillis).getTime().getTime();
+        long startOfDayInMillis = getStartOfDayJavaCalendar(timeInMillis).toInstant(ZoneOffset.UTC).toEpochMilli();
+        long endOfDayInMillis = getEndOfDayJavaCalendar(timeInMillis).toInstant(ZoneOffset.UTC).toEpochMilli();
         long timeRangeStartingTimeInMillis = 
             getTimeRangeStartingTimeInMillis(timeInMillis);
         long timeRangeEndingTimeInMillis = 
@@ -537,7 +545,7 @@ class DailyCalendar : BaseCalendar {
                 } else if (nextIncludedTime > 
                         getTimeRangeEndingTimeInMillis(nextIncludedTime)) {
                     //(move to start of next day)
-                    nextIncludedTime = getEndOfDayJavaCalendar(nextIncludedTime).getTime().getTime();
+                    nextIncludedTime = getEndOfDayJavaCalendar(nextIncludedTime).toInstant(ZoneOffset.UTC).toEpochMilli();
                     nextIncludedTime++; 
                 } else if ((getBaseCalendar() !is null) && 
                         (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
@@ -563,11 +571,10 @@ class DailyCalendar : BaseCalendar {
      */
     long getTimeRangeStartingTimeInMillis(long timeInMillis) {
         LocalDateTime rangeStartingTime = createJavaCalendar(timeInMillis);
-        rangeStartingTime.set(LocalDateTime.HOUR_OF_DAY, rangeStartingHourOfDay);
-        rangeStartingTime.set(LocalDateTime.MINUTE, rangeStartingMinute);
-        rangeStartingTime.set(LocalDateTime.SECOND, rangeStartingSecond);
-        rangeStartingTime.set(LocalDateTime.MILLISECOND, rangeStartingMillis);
-        return rangeStartingTime.getTime().getTime();
+        rangeStartingTime = LocalDateTime.of(rangeStartingTime.getYear(), rangeStartingTime.getMonthValue(), 
+            rangeStartingTime.getDayOfMonth(), rangeStartingHourOfDay, rangeStartingMinute, 
+            rangeStartingSecond, cast(int)(rangeStartingMillis * LocalTime.NANOS_PER_MILLI));
+        return rangeStartingTime.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     /**
@@ -581,11 +588,10 @@ class DailyCalendar : BaseCalendar {
      */
     long getTimeRangeEndingTimeInMillis(long timeInMillis) {
         LocalDateTime rangeEndingTime = createJavaCalendar(timeInMillis);
-        rangeEndingTime.set(LocalDateTime.HOUR_OF_DAY, rangeEndingHourOfDay);
-        rangeEndingTime.set(LocalDateTime.MINUTE, rangeEndingMinute);
-        rangeEndingTime.set(LocalDateTime.SECOND, rangeEndingSecond);
-        rangeEndingTime.set(LocalDateTime.MILLISECOND, rangeEndingMillis);
-        return rangeEndingTime.getTime().getTime();
+        rangeEndingTime = LocalDateTime.of(rangeEndingTime.getYear(), rangeEndingTime.getMonthValue(), 
+            rangeEndingTime.getDayOfMonth(), rangeEndingHourOfDay, rangeEndingMinute, 
+            rangeEndingSecond, cast(int)(rangeEndingMillis * LocalTime.NANOS_PER_MILLI));
+        return rangeEndingTime.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     /**
@@ -616,35 +622,32 @@ class DailyCalendar : BaseCalendar {
      */
     override
     string toString() {
-        NumberFormat numberFormatter = NumberFormat.getNumberInstance();
-        numberFormatter.setMaximumFractionDigits(0);
-        numberFormatter.setMinimumIntegerDigits(2);
+        // NumberFormat numberFormatter = NumberFormat.getNumberInstance();
+        // numberFormatter.setMaximumFractionDigits(0);
+        // numberFormatter.setMinimumIntegerDigits(2);
         StringBuffer buffer = new StringBuffer();
         buffer.append("base calendar: [");
         if (getBaseCalendar() !is null) {
-            buffer.append(getBaseCalendar().toString());
+            buffer.append((cast(Object)getBaseCalendar()).toString());
         } else {
             buffer.append("null");
         }
         buffer.append("], time range: '");
-        buffer.append(numberFormatter.format(rangeStartingHourOfDay));
+        buffer.append(format("%02d", rangeStartingHourOfDay));
         buffer.append(":");
-        buffer.append(numberFormatter.format(rangeStartingMinute));
+        buffer.append(format("%02d", rangeStartingMinute));
         buffer.append(":");
-        buffer.append(numberFormatter.format(rangeStartingSecond));
+        buffer.append(format("%02d", rangeStartingSecond));
         buffer.append(":");
-        numberFormatter.setMinimumIntegerDigits(3);
-        buffer.append(numberFormatter.format(rangeStartingMillis));
-        numberFormatter.setMinimumIntegerDigits(2);
+        buffer.append(format("%03d", rangeStartingMillis));
         buffer.append(" - ");
-        buffer.append(numberFormatter.format(rangeEndingHourOfDay));
+        buffer.append(format("%02d", rangeEndingHourOfDay));
         buffer.append(":");
-        buffer.append(numberFormatter.format(rangeEndingMinute));
+        buffer.append(format("%02d", rangeEndingMinute));
         buffer.append(":");
-        buffer.append(numberFormatter.format(rangeEndingSecond));
+        buffer.append(format("%02d", rangeEndingSecond));
         buffer.append(":");
-        numberFormatter.setMinimumIntegerDigits(3);
-        buffer.append(numberFormatter.format(rangeEndingMillis));
+        buffer.append(format("%03d", rangeEndingMillis));
         buffer.append("', inverted: " ~ invertTimeRange ~ "]");
         return buffer.toString();
     }
@@ -652,10 +655,10 @@ class DailyCalendar : BaseCalendar {
     /**
      * Helper method to split the given string by the given delimiter.
      */
-    private string[] split(string string, string delim) {
+    private string[] split(string str, string delim) {
         ArrayList!(string) result = new ArrayList!(string)();
         
-        StringTokenizer stringTokenizer = new StringTokenizer(string, delim);
+        StringTokenizer stringTokenizer = new StringTokenizer(str, delim);
         while (stringTokenizer.hasMoreTokens()) {
             result.add(stringTokenizer.nextToken());
         }
@@ -693,15 +696,15 @@ class DailyCalendar : BaseCalendar {
                     rangeStartingTimeString ~ "'");
         }
         
-        rStartingHourOfDay = Integer.parseInt(rangeStartingTime[0]);
-        rStartingMinute = Integer.parseInt(rangeStartingTime[1]);
+        rStartingHourOfDay = to!int(rangeStartingTime[0]);
+        rStartingMinute = to!int(rangeStartingTime[1]);
         if (rangeStartingTime.length > 2) {
-            rStartingSecond = Integer.parseInt(rangeStartingTime[2]);
+            rStartingSecond = to!int(rangeStartingTime[2]);
         } else {
             rStartingSecond = 0;
         }
         if (rangeStartingTime.length == 4) {
-            rStartingMillis = Integer.parseInt(rangeStartingTime[3]);
+            rStartingMillis = to!int(rangeStartingTime[3]);
         } else {
             rStartingMillis = 0;
         }
@@ -713,15 +716,15 @@ class DailyCalendar : BaseCalendar {
                     rangeEndingTimeString ~ "'");
         }
         
-        rEndingHourOfDay = Integer.parseInt(rEndingTime[0]);
-        rEndingMinute = Integer.parseInt(rEndingTime[1]);
+        rEndingHourOfDay = to!int(rEndingTime[0]);
+        rEndingMinute = to!int(rEndingTime[1]);
         if (rEndingTime.length > 2) {
-            rEndingSecond = Integer.parseInt(rEndingTime[2]);
+            rEndingSecond = to!int(rEndingTime[2]);
         } else {
             rEndingSecond = 0;
         }
         if (rEndingTime.length == 4) {
-            rEndingMillis = Integer.parseInt(rEndingTime[3]);
+            rEndingMillis = to!int(rEndingTime[3]);
         } else {
             rEndingMillis = 0;
         }
@@ -770,27 +773,25 @@ class DailyCalendar : BaseCalendar {
                  rangeEndingMillis);
         
         LocalDateTime startCal = createJavaCalendar();
-        startCal.set(LocalDateTime.HOUR_OF_DAY, rangeStartingHourOfDay);
-        startCal.set(LocalDateTime.MINUTE, rangeStartingMinute);
-        startCal.set(LocalDateTime.SECOND, rangeStartingSecond);
-        startCal.set(LocalDateTime.MILLISECOND, rangeStartingMillis);
-        
+        startCal = LocalDateTime.of(startCal.getYear(), startCal.getMonthValue(), startCal.getDayOfMonth(),
+            rangeStartingHourOfDay, rangeStartingMinute, rangeStartingSecond, 
+            rangeStartingMillis * cast(int) LocalTime.NANOS_PER_MILLI);
+            
         LocalDateTime endCal = createJavaCalendar();
-        endCal.set(LocalDateTime.HOUR_OF_DAY, rangeEndingHourOfDay);
-        endCal.set(LocalDateTime.MINUTE, rangeEndingMinute);
-        endCal.set(LocalDateTime.SECOND, rangeEndingSecond);
-        endCal.set(LocalDateTime.MILLISECOND, rangeEndingMillis);
+        endCal = LocalDateTime.of(endCal.getYear(), endCal.getMonthValue(), endCal.getDayOfMonth(),
+            rangeEndingHourOfDay, rangeEndingMinute, rangeEndingSecond, 
+            rangeEndingMillis * cast(int) LocalTime.NANOS_PER_MILLI);
         
-        if (!startCal.before(endCal)) {
-            throw new IllegalArgumentException(invalidTimeRange +
-                    rangeStartingHourOfDay ~ ":" ~
-                    rangeStartingMinute ~ ":" ~
-                    rangeStartingSecond ~ ":" ~
-                    rangeStartingMillis + separator +
-                    rangeEndingHourOfDay ~ ":" ~
-                    rangeEndingMinute ~ ":" ~
-                    rangeEndingSecond ~ ":" ~
-                    rangeEndingMillis);
+        if (!startCal.isBefore(endCal)) {
+            throw new IllegalArgumentException(invalidTimeRange.to!string() ~
+                    rangeStartingHourOfDay.to!string() ~ ":" ~
+                    rangeStartingMinute.to!string() ~ ":" ~
+                    rangeStartingSecond.to!string() ~ ":" ~
+                    rangeStartingMillis.to!string() ~ separator ~
+                    rangeEndingHourOfDay.to!string() ~ ":" ~
+                    rangeEndingMinute.to!string() ~ ":" ~
+                    rangeEndingSecond.to!string() ~ ":" ~
+                    rangeEndingMillis.to!string());
         }
         
         this.rangeStartingHourOfDay = rangeStartingHourOfDay;
@@ -815,14 +816,14 @@ class DailyCalendar : BaseCalendar {
     void setTimeRange(LocalDateTime rangeStartingCalendar,
                               LocalDateTime rangeEndingCalendar) {
         setTimeRange(
-                rangeStartingCalendar.get(LocalDateTime.HOUR_OF_DAY),
-                rangeStartingCalendar.get(LocalDateTime.MINUTE),
-                rangeStartingCalendar.get(LocalDateTime.SECOND),
-                rangeStartingCalendar.get(LocalDateTime.MILLISECOND),
-                rangeEndingCalendar.get(LocalDateTime.HOUR_OF_DAY),
-                rangeEndingCalendar.get(LocalDateTime.MINUTE),
-                rangeEndingCalendar.get(LocalDateTime.SECOND),
-                rangeEndingCalendar.get(LocalDateTime.MILLISECOND));
+                rangeStartingCalendar.getHour(),
+                rangeStartingCalendar.getMinute(),
+                rangeStartingCalendar.getSecond(),
+                rangeStartingCalendar.getNano()/cast(int)LocalTime.NANOS_PER_MILLI,
+                rangeEndingCalendar.getHour(),
+                rangeEndingCalendar.getMinute(),
+                rangeEndingCalendar.getSecond(),
+                rangeEndingCalendar.getNano()/cast(int)LocalTime.NANOS_PER_MILLI);
     }
     
     /**
@@ -852,16 +853,16 @@ class DailyCalendar : BaseCalendar {
      */
     private void validate(int hourOfDay, int minute, int second, int millis) {
         if (hourOfDay < 0 || hourOfDay > 23) {
-            throw new IllegalArgumentException(invalidHourOfDay + hourOfDay);
+            throw new IllegalArgumentException(invalidHourOfDay ~ hourOfDay.to!string());
         }
         if (minute < 0 || minute > 59) {
-            throw new IllegalArgumentException(invalidMinute + minute);
+            throw new IllegalArgumentException(invalidMinute ~ minute.to!string());
         }
         if (second < 0 || second > 59) {
-            throw new IllegalArgumentException(invalidSecond + second);
+            throw new IllegalArgumentException(invalidSecond ~ second.to!string());
         }
         if (millis < 0 || millis > 999) {
-            throw new IllegalArgumentException(invalidMillis + millis);
+            throw new IllegalArgumentException(invalidMillis ~ millis.to!string());
         }
     }
 }
