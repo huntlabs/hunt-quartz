@@ -1182,7 +1182,7 @@ final class CronExpression : Cloneable { // Serializable,
         // loop until we've computed the next time, or we've past the endTime
         while (!gotOne) {
 
-            //if (endTime !is null && cl.getTime().after(endTime)) return null;
+            //if (endTime !is null && cl.getTime().isAfter(endTime)) return null;
             if(afterTime.getYear() > 2999) { // prevent endless loop...
                 return null;
             }

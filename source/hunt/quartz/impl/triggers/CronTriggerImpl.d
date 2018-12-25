@@ -35,6 +35,7 @@ import hunt.lang.exception;
 // import hunt.time.util.Calendar;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
+import hunt.time.ZoneOffset;
 
 // import std.datetime;
 
@@ -140,8 +141,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     // deprecated("")
     // this(string name, string group) {
     //     super(name, group);
-    //     setStartTime(new LocalDateTime());
-    //     setTimeZone(TimeZone.getDefault());
+    //     setStartTime(LocalDateTime.now());
+    //     setTimeZone(ZoneId.getDefault());
     // }
 
     // /**
@@ -164,8 +165,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
 
     //     setCronExpression(cronExpression);
 
-    //     setStartTime(new LocalDateTime());
-    //     setTimeZone(TimeZone.getDefault());
+    //     setStartTime(LocalDateTime.now());
+    //     setTimeZone(ZoneId.getDefault());
     // }
     
     // /**
@@ -185,8 +186,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     // this(string name, string group, string jobName,
     //         string jobGroup) {
     //     super(name, group, jobName, jobGroup);
-    //     setStartTime(new LocalDateTime());
-    //     setTimeZone(TimeZone.getDefault());
+    //     setStartTime(LocalDateTime.now());
+    //     setTimeZone(ZoneId.getDefault());
     // }
 
     // /**
@@ -207,21 +208,21 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     // this(string name, string group, string jobName,
     //         string jobGroup, string cronExpression) {
     //     this(name, group, jobName, jobGroup, null, null, cronExpression,
-    //             TimeZone.getDefault());
+    //             ZoneId.getDefault());
     // }
 
     // /**
     //  * <p>
     //  * Create a <code>CronTrigger</code> with the given name and group,
     //  * associated with the identified <code>{@link hunt.quartz.JobDetail}</code>,
-    //  * and with the given "cron" expression resolved with respect to the <code>TimeZone</code>.
+    //  * and with the given "cron" expression resolved with respect to the <code>ZoneId</code>.
     //  * </p>
     //  * 
     //  * @deprecated use a TriggerBuilder instead
     //  */
     // deprecated("")
     // this(string name, string group, string jobName,
-    //         string jobGroup, string cronExpression, TimeZone timeZone) {
+    //         string jobGroup, string cronExpression, ZoneId timeZone) {
     //     this(name, group, jobName, jobGroup, null, null, cronExpression,
     //             timeZone);
     // }
@@ -254,13 +255,13 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     //     setCronExpression(cronExpression);
 
     //     if (startTime is null) {
-    //         startTime = new LocalDateTime();
+    //         startTime = LocalDateTime.now();
     //     }
     //     setStartTime(startTime);
     //     if (endTime !is null) {
     //         setEndTime(endTime);
     //     }
-    //     setTimeZone(TimeZone.getDefault());
+    //     setTimeZone(ZoneId.getDefault());
 
     // }
 
@@ -307,20 +308,20 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     // deprecated("")
     // this(string name, string group, string jobName,
     //         string jobGroup, LocalDateTime startTime, LocalDateTime endTime,
-    //         string cronExpression, TimeZone timeZone) {
+    //         string cronExpression, ZoneId timeZone) {
     //     super(name, group, jobName, jobGroup);
 
     //     setCronExpression(cronExpression);
 
     //     if (startTime is null) {
-    //         startTime = new LocalDateTime();
+    //         startTime = LocalDateTime.now();
     //     }
     //     setStartTime(startTime);
     //     if (endTime !is null) {
     //         setEndTime(endTime);
     //     }
     //     if (timeZone is null) {
-    //         setTimeZone(TimeZone.getDefault());
+    //         setTimeZone(ZoneId.getDefault());
     //     } else {
     //         setTimeZone(timeZone);
     //     }
@@ -344,7 +345,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     // }
 
     void setCronExpression(string cronExpression) {
-        TimeZone origTz = getTimeZone();
+        ZoneId origTz = getTimeZone();
         this.cronEx = new CronExpression(cronExpression);
         this.cronEx.setTimeZone(origTz);
     }
@@ -357,7 +358,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     }
 
     /**
-     * Set the CronExpression to the given one.  The TimeZone on the passed-in
+     * Set the CronExpression to the given one.  The ZoneId on the passed-in
      * CronExpression over-rides any that was already set on the Trigger.
      */
     void setCronExpression(CronExpression cronExpression) {
@@ -382,7 +383,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         }
 
         LocalDateTime eTime = getEndTime();
-        if (eTime !is null && eTime.before(startTime)) {
+        if (eTime !is null && eTime.isBefore(startTime)) {
             throw new IllegalArgumentException(
                 "End time cannot be before start time");
         }
@@ -391,11 +392,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         // Note timeZone is not needed here as parameter for
         // Calendar.getInstance(),
         // since time zone is implicit when using a LocalDateTime in the setTime method.
-        Calendar cl = Calendar.getInstance();
-        cl.setTime(startTime);
-        cl.set(Calendar.MILLISECOND, 0);
-
-        this.startTime = cl.getTime();
+        this.startTime = startTime.withNano(0);
     }
 
     /**
@@ -414,7 +411,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     override
     void setEndTime(LocalDateTime endTime) {
         LocalDateTime sTime = getStartTime();
-        if (sTime !is null && endTime !is null && sTime.after(endTime)) {
+        if (sTime !is null && endTime !is null && sTime.isAfter(endTime)) {
             throw new IllegalArgumentException(
                     "End time cannot be before start time");
         }
@@ -487,7 +484,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         }
         
         if (timeZone is null) {
-            timeZone = ZoneId.systemDefault(); // TimeZone.getDefault();
+            timeZone = ZoneId.systemDefault(); // ZoneId.getDefault();
         }
         return timeZone;
     }
@@ -526,19 +523,19 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     override
     LocalDateTime getFireTimeAfter(LocalDateTime afterTime) {
         if (afterTime is null) {
-            afterTime = new LocalDateTime();
+            afterTime = LocalDateTime.now();
         }
 
-        if (getStartTime().after(afterTime)) {
-            afterTime = new LocalDateTime(getStartTime().getTime() - 1000);
+        if (getStartTime().isAfter(afterTime)) {
+            afterTime = getStartTime().minusSeconds(1);
         }
 
-        if (getEndTime() !is null && (afterTime.compareTo(getEndTime()) >= 0)) {
+        if (getEndTime() !is null && (afterTime.opCmp(getEndTime()) >= 0)) {
             return null;
         }
         
         LocalDateTime pot = getTimeAfter(afterTime);
-        if (getEndTime() !is null && pot !is null && pot.after(getEndTime())) {
+        if (getEndTime() !is null && pot !is null && pot.isAfter(getEndTime())) {
             return null;
         }
 
@@ -560,12 +557,12 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     LocalDateTime getFinalFireTime() {
         LocalDateTime resultTime;
         if (getEndTime() !is null) {
-            resultTime = getTimeBefore(new LocalDateTime(getEndTime().getTime() + 1000));
+            resultTime = getTimeBefore(getEndTime.plusSeconds(1));
         } else {
             resultTime = (cronEx is null) ? null : cronEx.getFinalFireTime();
         }
         
-        if ((resultTime !is null) && (getStartTime() !is null) && (resultTime.before(getStartTime()))) {
+        if ((resultTime !is null) && (getStartTime() !is null) && (resultTime.isBefore(getStartTime()))) {
             return null;
         } 
         
@@ -585,7 +582,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
 
     override
     protected bool validateMisfireInstruction(int misfireInstruction) {
-        return misfireInstruction >= MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY && misfireInstruction <= MISFIRE_INSTRUCTION_DO_NOTHING;
+        return misfireInstruction >= MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY && 
+            misfireInstruction <= MISFIRE_INSTRUCTION_DO_NOTHING;
     }
 
     /**
@@ -615,14 +613,14 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         }
 
         if (instr == MISFIRE_INSTRUCTION_DO_NOTHING) {
-            LocalDateTime newFireTime = getFireTimeAfter(new LocalDateTime());
+            LocalDateTime newFireTime = getFireTimeAfter(LocalDateTime.now());
             while (newFireTime !is null && cal !is null
-                    && !cal.isTimeIncluded(newFireTime.getTime())) {
+                    && !cal.isTimeIncluded(newFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
                 newFireTime = getFireTimeAfter(newFireTime);
             }
             setNextFireTime(newFireTime);
         } else if (instr == MISFIRE_INSTRUCTION_FIRE_ONCE_NOW) {
-            setNextFireTime(new LocalDateTime());
+            setNextFireTime(LocalDateTime.now());
         }
     }
 
@@ -691,7 +689,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
                     && day == test.getDayOfMonth());
         }
         
-        while(fta.before(testTime)) {
+        while(fta.isBefore(testTime)) {
             fta = getFireTimeAfter(fta);
         }
 
@@ -714,7 +712,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         nextFireTime = getFireTimeAfter(nextFireTime);
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
         }
     }
@@ -732,8 +730,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
             return;
         }
         
-        LocalDateTime now = new LocalDateTime();
-        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+        LocalDateTime now = LocalDateTime.now();
+        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -742,14 +740,12 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
             
             //avoid infinite loop
             // Use gregorian only because the constant is based on Gregorian
-            LocalDateTime c = new java.util.GregorianCalendar(); 
-            c.setTime(nextFireTime);
-            if (c.get(LocalDateTime.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (nextFireTime.getYear() > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
             
-            if(nextFireTime !is null && nextFireTime.before(now)) {
-                long diff = now.getTime() - nextFireTime.getTime();
+            if(nextFireTime !is null && nextFireTime.isBefore(now)) {
+                long diff = now.toInstant(ZoneOffset.UTC).toEpochMilli() - nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli();
                 if(diff >= misfireThreshold) {
                     nextFireTime = getFireTimeAfter(nextFireTime);
                 }
@@ -776,10 +772,10 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
     override
     LocalDateTime computeFirstFireTime(QuartzCalendar calendar) {
-        nextFireTime = getFireTimeAfter(new LocalDateTime(getStartTime().getTime() - 1000));
+        nextFireTime = getFireTimeAfter(getStartTime().minusSeconds(1));
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
         }
 
@@ -818,6 +814,9 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
             break;
             case MISFIRE_INSTRUCTION_FIRE_ONCE_NOW : cb.withMisfireHandlingInstructionFireAndProceed();
             break;
+
+            default: 
+                assert(false, "");
         }
         
         return cb;

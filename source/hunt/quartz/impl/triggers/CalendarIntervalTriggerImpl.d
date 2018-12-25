@@ -914,7 +914,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
             lTime = lTime.minusYears(getRepeatInterval());
         }
 
-        return lTime.getTime();
+        return lTime;
     }
 
     /**

@@ -255,7 +255,7 @@ class DailyCalendar : BaseCalendar {
      *         daily boundaries (10PM - 2AM). <I>(because only time fields are
      *         are used, it is possible for two Calendars to represent a valid
      *         time range and 
-     *         <CODE>rangeStartingCalendar.after(rangeEndingCalendar) == 
+     *         <CODE>rangeStartingCalendar.isAfter(rangeEndingCalendar) == 
      *         true</CODE>)</I></LI>  
      * </UL> 
      * 
@@ -287,7 +287,7 @@ class DailyCalendar : BaseCalendar {
      *         daily boundaries (10PM - 2AM). <I>(because only time fields are
      *         are used, it is possible for two Calendars to represent a valid
      *         time range and 
-     *         <CODE>rangeStartingCalendar.after(rangeEndingCalendar) == 
+     *         <CODE>rangeStartingCalendar.isAfter(rangeEndingCalendar) == 
      *         true</CODE>)</I></LI>  
      * </UL> 
      * 
