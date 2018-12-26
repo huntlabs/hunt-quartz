@@ -22,7 +22,8 @@ import hunt.container.List;
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerListener;
-import hunt.quartz.Trigger : CompletedExecutionInstruction;
+
+import hunt.lang.exception;
 
 /**
  * Holds a List of references to TriggerListener instances and broadcasts all
@@ -83,11 +84,10 @@ class BroadcastTriggerListener : TriggerListener {
     }
 
     bool removeListener(string listenerName) {
-        Iterator!(TriggerListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            TriggerListener l = itr.next();
-            if(l.getName()== listenerName) {
-                itr.remove();
+        foreach(TriggerListener l; listeners.iterator()) {
+            if(l.getName() == listenerName) {
+                // itr.remove();
+                listeners.remove(l);
                 return true;
             }
         }
@@ -95,23 +95,17 @@ class BroadcastTriggerListener : TriggerListener {
     }
 
     List!(TriggerListener) getListeners() {
-        return java.container.Collections.unmodifiableList(listeners);
+        return (listeners);
     }
 
     void triggerFired(Trigger trigger, JobExecutionContext context) {
-
-        Iterator!(TriggerListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            TriggerListener l = itr.next();
+        foreach(TriggerListener l; listeners.iterator()) {
             l.triggerFired(trigger, context);
         }
     }
 
     bool vetoJobExecution(Trigger trigger, JobExecutionContext context) {
-
-        Iterator!(TriggerListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            TriggerListener l = itr.next();
+        foreach(TriggerListener l; listeners.iterator()) {
             if(l.vetoJobExecution(trigger, context)) {
                 return true;
             }
@@ -120,19 +114,14 @@ class BroadcastTriggerListener : TriggerListener {
     }
 
     void triggerMisfired(Trigger trigger) {
-
-        Iterator!(TriggerListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            TriggerListener l = itr.next();
+        foreach(TriggerListener l; listeners.iterator()) {
             l.triggerMisfired(trigger);
         }
     }
 
-    void triggerComplete(Trigger trigger, JobExecutionContext context, CompletedExecutionInstruction triggerInstructionCode) {
-
-        Iterator!(TriggerListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            TriggerListener l = itr.next();
+    void triggerComplete(Trigger trigger, JobExecutionContext context, 
+        CompletedExecutionInstruction triggerInstructionCode) {
+        foreach(TriggerListener l; listeners.iterator()) {
             l.triggerComplete(trigger, context, triggerInstructionCode);
         }
     }

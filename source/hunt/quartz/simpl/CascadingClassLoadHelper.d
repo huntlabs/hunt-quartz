@@ -81,10 +81,10 @@ class CascadingClassLoadHelper : ClassLoadHelper {
     void initialize() {
         loadHelpers = new LinkedList!(ClassLoadHelper)();
 
-        loadHelpers.add(new LoadingLoaderClassLoadHelper());
-        loadHelpers.add(new SimpleClassLoadHelper());
-        loadHelpers.add(new ThreadContextClassLoadHelper());
-        loadHelpers.add(new InitThreadContextClassLoadHelper());
+        // loadHelpers.add(new LoadingLoaderClassLoadHelper());
+        // loadHelpers.add(new SimpleClassLoadHelper());
+        // loadHelpers.add(new ThreadContextClassLoadHelper());
+        // loadHelpers.add(new InitThreadContextClassLoadHelper());
         
         foreach(ClassLoadHelper loadHelper; loadHelpers) {
             loadHelper.initialize();

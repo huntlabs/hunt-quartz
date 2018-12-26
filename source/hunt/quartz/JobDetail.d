@@ -120,7 +120,7 @@ interface JobDetail : Comparable!(JobDetail) { //  : Serializable, Cloneable
      */
     bool requestsRecovery();
 
-    // Object clone();
+    Object clone();
     
     /**
      * Get a {@link JobBuilder} that is configured to produce a 

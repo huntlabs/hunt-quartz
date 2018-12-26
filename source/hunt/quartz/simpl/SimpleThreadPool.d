@@ -25,10 +25,15 @@ import hunt.container.Iterator;
 import hunt.container.LinkedList;
 import hunt.container.List;
 import hunt.lang.common;
+import hunt.lang.exception;
 import hunt.logging;
 
+import core.atomic;
+import core.sync.condition;
+import core.sync.mutex;
 import core.thread;
-
+import core.time;
+import std.conv;
 
 
 /**
@@ -75,7 +80,8 @@ class SimpleThreadPool : ThreadPool {
 
     private ThreadGroupEx threadGroup;
 
-    private Object nextRunnableLock; // = new Object();
+    private Mutex nextRunnableLock; // = new Object();
+    private Condition nextRunnableCondition; // = new Object();
 
     private List!(WorkerThread) workers;
     private LinkedList!(WorkerThread) availWorkers; // = new LinkedList!(WorkerThread)();
@@ -127,7 +133,8 @@ class SimpleThreadPool : ThreadPool {
     }
 
     private void initializeMembers() {
-        nextRunnableLock = new Object();
+        nextRunnableLock = new Mutex();
+        nextRunnableCondition = new Condition(nextRunnableLock);
         availWorkers = new LinkedList!(WorkerThread)();
         busyWorkers = new LinkedList!(WorkerThread)();
         prio = Thread.PRIORITY_DEFAULT;
@@ -257,12 +264,12 @@ class SimpleThreadPool : ThreadPool {
         }
 
         if(isThreadsInheritGroupOfInitializingThread()) {
-            threadGroup = Thread.getThis().getThreadGroup();
+            threadGroup = ThreadEx.currentThread().getThreadGroup();
         } else {
             // follow the threadGroup tree to the root thread group.
-            threadGroup = Thread.getThis().getThreadGroup();
+            threadGroup = ThreadEx.currentThread().getThreadGroup();
             ThreadGroupEx parent = threadGroup;
-            while ( !parent.getName().equals("main") ) {
+            while ( parent.getName() != ("main") ) {
                 threadGroup = parent;
                 parent = threadGroup.getParent();
             }
@@ -274,15 +281,12 @@ class SimpleThreadPool : ThreadPool {
 
 
         if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
-            info(
-                    "Job execution threads will use class loader of thread: "
-                            + Thread.getThis().name());
+            info("Job execution threads will use class loader of thread: "
+                            ~ Thread.getThis().name);
         }
 
         // create the worker threads and start them
-        Iterator!(WorkerThread) workerThreads = createWorkerThreads(count).iterator();
-        while(workerThreads.hasNext()) {
-            WorkerThread wt = workerThreads.next();
+        foreach(WorkerThread wt; createWorkerThreads(count).iterator()) {
             wt.start();
             availWorkers.add(wt);
         }
@@ -296,12 +300,13 @@ class SimpleThreadPool : ThreadPool {
                 threadPrefix = schedulerInstanceName ~ "_Worker";
             }
             WorkerThread wt = new WorkerThread(this, threadGroup,
-                threadPrefix ~ "-" ~ i,
+                threadPrefix ~ "-" ~ i.to!string(),
                 getThreadPriority(),
                 isMakeThreadsDaemons());
             if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
-                wt.setContextClassLoader(Thread.getThis()
-                        .getContextClassLoader());
+                implementationMissing(false);
+                // wt.setContextClassLoader(Thread.getThis()
+                //         .getContextClassLoader());
             }
             workers.add(wt);
         }
@@ -332,8 +337,8 @@ class SimpleThreadPool : ThreadPool {
      * </p>
      */
     void shutdown(bool waitForJobsToComplete) {
-
-        synchronized (nextRunnableLock) {
+        nextRunnableLock.lock();
+        scope(exit) nextRunnableLock.unlock();
             trace("Shutting down threadpool...");
 
             isShutdown = true;
@@ -342,9 +347,7 @@ class SimpleThreadPool : ThreadPool {
                 return;
 
             // signal each worker thread to shut down
-            Iterator!(WorkerThread) workerThreads = workers.iterator();
-            while(workerThreads.hasNext()) {
-                WorkerThread wt = workerThreads.next();
+            foreach(WorkerThread wt; workers.iterator()) {
                 wt.shutdown();
                 availWorkers.remove(wt);
             }
@@ -352,7 +355,7 @@ class SimpleThreadPool : ThreadPool {
             // Give waiting (wait(1000)) worker threads a chance to shut down.
             // Active worker threads will shut down after finishing their
             // current job.
-            nextRunnableLock.notifyAll();
+            nextRunnableCondition.notifyAll();
 
             if (waitForJobsToComplete == true) {
 
@@ -361,7 +364,7 @@ class SimpleThreadPool : ThreadPool {
                     // wait for hand-off in runInThread to complete...
                     while(handoffPending) {
                         try {
-                            nextRunnableLock.wait(100);
+                            nextRunnableCondition.wait(msecs(100));
                         } catch(InterruptedException _) {
                             interrupted = true;
                         }
@@ -371,37 +374,35 @@ class SimpleThreadPool : ThreadPool {
                     while (busyWorkers.size() > 0) {
                         WorkerThread wt = cast(WorkerThread) busyWorkers.getFirst();
                         try {
-                            trace("Waiting for thread " ~ wt.getName()
+                            trace("Waiting for thread " ~ wt.name
                                             ~ " to shut down");
 
                             // note: with waiting infinite time the
                             // application may appear to 'hang'.
-                            nextRunnableLock.wait(2000);
+                            nextRunnableCondition.wait(seconds(2));
                         } catch (InterruptedException _) {
                             interrupted = true;
                         }
                     }
 
-                    workerThreads = workers.iterator();
-                    while(workerThreads.hasNext()) {
-                        WorkerThread wt = cast(WorkerThread) workerThreads.next();
+                    foreach(WorkerThread wt; workers.iterator()) {
                         try {
                             wt.join();
-                            workerThreads.remove();
+                            // workerThreads.remove();
+                            workers.remove(wt);
                         } catch (InterruptedException _) {
                             interrupted = true;
                         }
                     }
                 } finally {
                     if (interrupted) {
-                        Thread.getThis().interrupt();
+                        ThreadEx.currentThread().interrupt();
                     }
                 }
 
                 trace("No executing jobs remaining, all threads stopped.");
             }
             trace("Shutdown of threadpool complete.");
-        }
     }
 
     /**
@@ -420,67 +421,70 @@ class SimpleThreadPool : ThreadPool {
             return false;
         }
 
-        synchronized (nextRunnableLock) {
+        nextRunnableLock.lock();
+        scope(exit) nextRunnableLock.unlock();
 
-            handoffPending = true;
 
-            // Wait until a worker thread is available
-            while ((availWorkers.size() < 1) && !isShutdown) {
-                try {
-                    nextRunnableLock.wait(500);
-                } catch (InterruptedException ignore) {
-                }
+        handoffPending = true;
+
+        // Wait until a worker thread is available
+        while ((availWorkers.size() < 1) && !isShutdown) {
+            try {
+                nextRunnableCondition.wait(msecs(500));
+            } catch (InterruptedException ignore) {
             }
-
-            if (!isShutdown) {
-                WorkerThread wt = cast(WorkerThread)availWorkers.removeFirst();
-                busyWorkers.add(wt);
-                wt.run(runnable);
-            } else {
-                // If the thread pool is going down, execute the Runnable
-                // within a new additional worker thread (no thread from the pool).
-                WorkerThread wt = new WorkerThread(this, threadGroup,
-                        "WorkerThread-LastJob", prio, isMakeThreadsDaemons(), runnable);
-                busyWorkers.add(wt);
-                workers.add(wt);
-                wt.start();
-            }
-            nextRunnableLock.notifyAll();
-            handoffPending = false;
         }
+
+        if (!isShutdown) {
+            WorkerThread wt = cast(WorkerThread)availWorkers.removeFirst();
+            busyWorkers.add(wt);
+            wt.run(runnable);
+        } else {
+            // If the thread pool is going down, execute the Runnable
+            // within a new additional worker thread (no thread from the pool).
+            WorkerThread wt = new WorkerThread(this, threadGroup,
+                    "WorkerThread-LastJob", prio, isMakeThreadsDaemons(), runnable);
+            busyWorkers.add(wt);
+            workers.add(wt);
+            wt.start();
+        }
+        nextRunnableCondition.notifyAll();
+        handoffPending = false;
 
         return true;
     }
 
     int blockForAvailableThreads() {
-        synchronized(nextRunnableLock) {
+        
+        nextRunnableLock.lock();
+        scope(exit) nextRunnableLock.unlock();
 
-            while((availWorkers.size() < 1 || handoffPending) && !isShutdown) {
-                try {
-                    nextRunnableLock.wait(500);
-                } catch (InterruptedException ignore) {
-                }
+        while((availWorkers.size() < 1 || handoffPending) && !isShutdown) {
+            try {
+                nextRunnableCondition.wait(500.msecs());
+            } catch (InterruptedException ignore) {
             }
-
-            return availWorkers.size();
         }
+
+        return availWorkers.size();
     }
 
     protected void makeAvailable(WorkerThread wt) {
-        synchronized(nextRunnableLock) {
-            if(!isShutdown) {
-                availWorkers.add(wt);
-            }
-            busyWorkers.remove(wt);
-            nextRunnableLock.notifyAll();
+        nextRunnableLock.lock();
+        scope(exit) nextRunnableLock.unlock();
+        if(!isShutdown) {
+            availWorkers.add(wt);
         }
+        busyWorkers.remove(wt);
+        nextRunnableCondition.notifyAll();
     }
 
     protected void clearFromBusyWorkersList(WorkerThread wt) {
-        synchronized(nextRunnableLock) {
-            busyWorkers.remove(wt);
-            nextRunnableLock.notifyAll();
-        }
+        
+        nextRunnableLock.lock();
+        scope(exit) nextRunnableLock.unlock();
+        busyWorkers.remove(wt);
+        nextRunnableCondition.notifyAll();
     }
 
     /*
@@ -498,7 +502,8 @@ class SimpleThreadPool : ThreadPool {
      */
     class WorkerThread : ThreadEx {
 
-        private Object lock;
+        private Mutex lock;
+        private Condition lockCondition;
 
         // A flag that signals the WorkerThread to terminate.
         private shared bool _run;
@@ -531,14 +536,15 @@ class SimpleThreadPool : ThreadPool {
         this(SimpleThreadPool tp, ThreadGroupEx threadGroup, string name,
                      int prio, bool isDaemon, Runnable runnable) {
             
-            lock = new Object();
+            lock = new Mutex();
+            lockCondition = new Condition(lock);
             super(threadGroup, name);
             this.tp = tp;
             this.runnable = runnable;
             if(runnable !is null)
                 runOnce = true;
-            setPriority(prio);
-            setDaemon(isDaemon);
+            this.priority = prio;
+            this.isDaemon = isDaemon;
         }
 
         /**
@@ -547,18 +553,18 @@ class SimpleThreadPool : ThreadPool {
          * </p>
          */
         void shutdown() {
-            _run.set(false);
+            _run = false;
         }
 
         void run(Runnable newRunnable) {
-            synchronized(lock) {
-                if(runnable !is null) {
-                    throw new IllegalStateException("Already running a Runnable!");
-                }
-
-                runnable = newRunnable;
-                lock.notifyAll();
+            lock.lock();
+            scope(exit) lock.unlock();
+            if(runnable !is null) {
+                throw new IllegalStateException("Already running a Runnable!");
             }
+
+            runnable = newRunnable;
+            lockCondition.notifyAll();
         }
 
         /**
@@ -570,18 +576,18 @@ class SimpleThreadPool : ThreadPool {
         void run() {
             bool ran = false;
             
-            while (_run.get()) {
+            while (_run) {
                 try {
-                    synchronized(lock) {
-                        while (runnable is null && _run.get()) {
-                            lock.wait(500);
-                        }
-
-                        if (runnable !is null) {
-                            ran = true;
-                            runnable.run();
-                        }
+                    lock.lock(); 
+                    while (runnable is null && _run) {
+                        lockCondition.wait(msecs(500));
                     }
+
+                    if (runnable !is null) {
+                        ran = true;
+                        runnable.run();
+                    }
+                    lock.unlock();
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called
                     try {
@@ -601,12 +607,12 @@ class SimpleThreadPool : ThreadPool {
                         runnable = null;
                     }
                     // repair the thread in case the runnable mucked it up...
-                    if(getPriority() != tp.getThreadPriority()) {
-                        setPriority(tp.getThreadPriority());
+                    if(this.priority != tp.getThreadPriority()) {
+                        this.priority = tp.getThreadPriority();
                     }
 
                     if (runOnce) {
-                           _run.set(false);
+                        atomicStore(_run, false);
                         clearFromBusyWorkersList(this);
                     } else if(ran) {
                         ran = false;

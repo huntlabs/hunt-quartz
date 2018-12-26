@@ -25,6 +25,8 @@ import hunt.quartz.exception;
 import hunt.quartz.spi.JobFactory;
 import hunt.quartz.spi.TriggerFiredBundle;
 
+import hunt.lang.exception;
+
 /**
  * The default JobFactory used by Quartz - simply calls 
  * <code>newInstance()</code> on the job class.
@@ -41,16 +43,18 @@ class SimpleJobFactory : JobFactory {
         JobDetail jobDetail = bundle.getJobDetail();
         TypeInfo_Class jobClass = jobDetail.getJobClass();
         try {
-            if(log.isDebugEnabled()) {
+            version(HUNT_DEBUG) {
                 trace("Producing instance of Job '" ~ jobDetail.getKey().toString() ~ 
-                    "', class=" ~ jobClass.getName());
+                    "', class=" ~ jobClass.name);
             }
             
-            return jobClass.newInstance();
+            implementationMissing(false);
+            // return jobClass.newInstance();
+            return null;
         } catch (Exception e) {
             SchedulerException se = new SchedulerException(
                     "Problem instantiating class '"
-                            ~ jobDetail.getJobClass().getName() ~ "'", e.msg);
+                            ~ jobDetail.getJobClass().name ~ "'", e.msg);
             throw se;
         }
     }

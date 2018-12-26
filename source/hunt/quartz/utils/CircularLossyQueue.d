@@ -20,6 +20,8 @@ module hunt.quartz.utils.CircularLossyQueue;
 // import java.util.concurrent.atomic.AtomicReference;
 
 import core.atomic;
+import std.conv;
+import hunt.lang.exception;
 import hunt.concurrent.atomic.AtomicHelper;
 
 /**
@@ -59,7 +61,10 @@ class CircularLossyQueue(T) {
      */
     void push(T newVal) {
         int index = cast(int) (AtomicHelper.increment(currentIndex) % maxSize);
-        AtomicHelper.store(circularArray[index], newVal);
+        // AtomicHelper.store(circularArray[index], newVal);
+        implementationMissing(false);
+        circularArray[index] = newVal;
+        // core.atomic.atomicStore(cast(shared)(circularArray[index]), cast(shared)newVal);
     }
 
     /**
@@ -75,7 +80,7 @@ class CircularLossyQueue(T) {
         // System.getProperties();
 
         if (type.length > maxSize) {
-            throw new IllegalArgumentException("Size of array passed in cannot be greater than " ~ maxSize);
+            throw new IllegalArgumentException("Size of array passed in cannot be greater than " ~ maxSize.to!string());
         }
 
         int curIndex = getCurrentIndex();

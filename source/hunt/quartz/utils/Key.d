@@ -22,17 +22,23 @@ module hunt.quartz.utils.Key;
 import hunt.lang.common;
 import hunt.lang.exception;
 
+import std.algorithm;
 import std.format;
 import std.uuid;
 
 interface IKey {
 
+    /**
+     * The default group for scheduling entities, with the value "DEFAULT".
+     */
+    enum string DEFAULT_GROUP = "DEFAULT";
+
     static string createUniqueName(string group) {
         if(group is null)
             group = DEFAULT_GROUP;
         
-        string n1 = UUID.randomUUID().toString();
-        string n2 = UUID.nameUUIDFromBytes(group.getBytes()).toString();
+        string n1 = randomUUID().toString();
+        string n2 = randomUUID().toString(); // UUID.nameUUIDFromBytes(group.getBytes()).toString();
         
         return format("%s-%s", n2[24 .. $], n1);
     }
@@ -47,11 +53,6 @@ interface IKey {
  */
 class Key(T) : Comparable!(Key!(T)), IKey {
   
-
-    /**
-     * The default group for scheduling entities, with the value "DEFAULT".
-     */
-    enum string DEFAULT_GROUP = "DEFAULT";
 
     private string name;
     private string group;
@@ -128,44 +129,44 @@ class Key(T) : Comparable!(Key!(T)), IKey {
 
     override
     size_t toHash() @trusted nothrow {
-        int prime = 31;
-        int result = 1;
-        result = prime * result + ((group is null) ? 0 : group.toHash());
-        result = prime * result + ((name is null) ? 0 : name.toHash());
+        size_t prime = 31;
+        size_t result = 1;
+        result = prime * result + ((group is null) ? 0 : group.hashOf());
+        result = prime * result + ((name is null) ? 0 : hashOf(name));
         return result;
     }
 
     override
-    bool opEquals(Object o) {
+    bool opEquals(Object obj) {
         if (this is obj)
             return true;
         if (obj is null)
             return false;
-        if (getClass() != obj.getClass())
+        if (typeid(this) != typeid(obj))
             return false;
         
         Key!(T) other = cast(Key!(T)) obj;
         if (group is null) {
             if (other.group !is null)
                 return false;
-        } else if (!group== other.group)
+        } else if (group != other.group)
             return false;
         if (name is null) {
             if (other.name !is null)
                 return false;
-        } else if (!name== other.name)
+        } else if (name != other.name)
             return false;
         return true;
     }
 
     int opCmp(Key!(T) o) {
         
-        if(group== DEFAULT_GROUP && !o.group== DEFAULT_GROUP)
+        if(group == DEFAULT_GROUP && o.group != DEFAULT_GROUP)
             return -1;
-        if(!group== DEFAULT_GROUP && o.group== DEFAULT_GROUP)
+        if(group != DEFAULT_GROUP && o.group == DEFAULT_GROUP)
             return 1;
             
-        int r = group.compareTo(o.getGroup());
+        int r = cmp(group, o.getGroup());
         if(r != 0)
             return r;
         

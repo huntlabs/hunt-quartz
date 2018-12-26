@@ -110,5 +110,5 @@ interface Calendar  { // : java.io.Serializable, java.lang.Cloneable
      */
     void setDescription(string description);
     
-    // Object clone();
+    Object clone();
 }

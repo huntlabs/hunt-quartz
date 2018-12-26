@@ -39,10 +39,16 @@ import hunt.quartz.spi.TriggerFiredResult;
 
 import hunt.container;
 import hunt.datetime;
+import hunt.lang.exception;
 import hunt.logging;
+import hunt.string;
+import hunt.time.LocalDateTime;
 import hunt.util.Comparator;
 
-import std.datetime;
+import core.atomic;
+import std.algorithm;
+import std.conv;
+// import std.datetime;
 
 
 
@@ -206,7 +212,7 @@ class RAMJobStore : JobStore {
             // unschedule jobs (delete triggers)
             List!(string) lst = getTriggerGroupNames();
             foreach(string group; lst) {
-                Set!(TriggerKey) keys = getTriggerKeys(GroupMatcher.triggerGroupEquals(group));
+                Set!(TriggerKey) keys = getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(group));
                 foreach(TriggerKey key; keys) {
                     removeTrigger(key);
                 }
@@ -214,7 +220,7 @@ class RAMJobStore : JobStore {
             // delete jobs
             lst = getJobGroupNames();
             foreach(string group; lst) {
-                Set!(JobKey) keys = getJobKeys(GroupMatcher.jobGroupEquals(group));
+                Set!(JobKey) keys = getJobKeys(GroupMatcherHelper.jobGroupEquals(group));
                 foreach(JobKey key; keys) {
                     removeJob(key);
                 }
@@ -409,7 +415,7 @@ class RAMJobStore : JobStore {
     
             if (retrieveJob(newTrigger.getJobKey()) is null) {
                 throw new JobPersistenceException("The job ("
-                        + newTrigger.getJobKey()
+                        ~ newTrigger.getJobKey().toString()
                         ~ ") referenced by the trigger does not exist.");
             }
 
@@ -516,7 +522,7 @@ class RAMJobStore : JobStore {
 
             if (found) {
 
-                if (!tw.getTrigger().getJobKey()== newTrigger.getJobKey()) {
+                if (tw.getTrigger().getJobKey() != newTrigger.getJobKey()) {
                     throw new JobPersistenceException("New trigger is not related to the same job as the old trigger.");
                 }
 
@@ -563,7 +569,7 @@ class RAMJobStore : JobStore {
     JobDetail retrieveJob(JobKey jobKey) {
         synchronized(lock) {
             JobWrapper jw = jobsByKey.get(jobKey);
-            return (jw !is null) ? cast(JobDetail)jw.jobDetail.clone() : null;
+            return (jw !is null) ? cast(JobDetail)jw.jobDetail : null; // .clone()
         }
     }
 
@@ -579,7 +585,7 @@ class RAMJobStore : JobStore {
         synchronized(lock) {
             TriggerWrapper tw = triggersByKey.get(triggerKey);
     
-            return (tw !is null) ? cast(OperableTrigger)tw.getTrigger().clone() : null;
+            return (tw !is null) ? cast(OperableTrigger)tw.getTrigger() : null; // .clone()
         }
     }
     
@@ -670,7 +676,7 @@ class RAMJobStore : JobStore {
      * be fired state, unless the trigger's group has been paused, in which
      * case it will go into the PAUSED state.</p>
      */
-    void resetTriggerFromErrorState(final TriggerKey triggerKey) {
+    void resetTriggerFromErrorState(TriggerKey triggerKey) {
 
         synchronized (lock) {
 
@@ -721,7 +727,7 @@ class RAMJobStore : JobStore {
         
         synchronized (lock) {
     
-            Object obj = calendarsByName.get(name);
+            Calendar obj = calendarsByName.get(name);
     
             if (obj !is null && !replaceExisting) {
                 throw new ObjectAlreadyExistsException(
@@ -848,37 +854,34 @@ class RAMJobStore : JobStore {
         Set!(JobKey) outList = null;
         synchronized (lock) {
 
-            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
+            StringOperatorName operator = matcher.getCompareWithOperator();
             string compareToValue = matcher.getCompareToValue();
 
-            switch(operator) {
-                case EQUALS:
-                    HashMap!(JobKey, JobWrapper) grpMap = jobsByGroup.get(compareToValue);
-                    if (grpMap !is null) {
-                        outList = new HashSet!(JobKey)();
+            if(operator == StringOperatorName.EQUALS) {
+                HashMap!(JobKey, JobWrapper) grpMap = jobsByGroup.get(compareToValue);
+                if (grpMap !is null) {
+                    outList = new HashSet!(JobKey)();
 
-                        foreach (JobWrapper jw ; grpMap.values()) {
+                    foreach (JobWrapper jw ; grpMap.values()) {
 
-                            if (jw !is null) {
-                                outList.add(jw.jobDetail.getKey());
+                        if (jw !is null) {
+                            outList.add(jw.jobDetail.getKey());
+                        }
+                    }
+                }
+            } else {
+                foreach (string key, HashMap!(JobKey, JobWrapper) value ; jobsByGroup) {
+                    if(operator.evaluate(key, compareToValue) && value !is null) {
+                        if(outList is null) {
+                            outList = new HashSet!(JobKey)();
+                        }
+                        foreach (JobWrapper jobWrapper ; value.values()) {
+                            if(jobWrapper !is null) {
+                                outList.add(jobWrapper.jobDetail.getKey());
                             }
                         }
                     }
-                    break;
-
-                default:
-                    foreach (string key, HashMap!(JobKey, JobWrapper) value ; jobsByGroup) {
-                        if(operator.evaluate(key, compareToValue) && value !is null) {
-                            if(outList is null) {
-                                outList = new HashSet!(JobKey)();
-                            }
-                            foreach (JobWrapper jobWrapper ; value.values()) {
-                                if(jobWrapper !is null) {
-                                    outList.add(jobWrapper.jobDetail.getKey());
-                                }
-                            }
-                        }
-                    }
+                }
             }
         }
 
@@ -912,37 +915,34 @@ class RAMJobStore : JobStore {
         Set!(TriggerKey) outList = null;
         synchronized (lock) {
 
-            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
+            StringOperatorName operator = matcher.getCompareWithOperator();
             string compareToValue = matcher.getCompareToValue();
 
-            switch(operator) {
-                case EQUALS:
-                    HashMap!(TriggerKey, TriggerWrapper) grpMap = triggersByGroup.get(compareToValue);
-                    if (grpMap !is null) {
-                        outList = new HashSet!(TriggerKey)();
+            if(operator == StringOperatorName.EQUALS) {
+                HashMap!(TriggerKey, TriggerWrapper) grpMap = triggersByGroup.get(compareToValue);
+                if (grpMap !is null) {
+                    outList = new HashSet!(TriggerKey)();
 
-                        foreach (TriggerWrapper tw ; grpMap.values()) {
+                    foreach (TriggerWrapper tw ; grpMap.values()) {
 
-                            if (tw !is null) {
-                                outList.add(tw.trigger.getKey());
+                        if (tw !is null) {
+                            outList.add(tw.trigger.getKey());
+                        }
+                    }
+                }
+            } else {
+                foreach (string key, HashMap!(TriggerKey, TriggerWrapper) value ; triggersByGroup) {
+                    if(operator.evaluate(key, compareToValue) && value !is null) {
+                        if(outList is null) {
+                            outList = new HashSet!(TriggerKey)();
+                        }
+                        foreach (TriggerWrapper triggerWrapper ; value.values()) {
+                            if(triggerWrapper !is null) {
+                                outList.add(triggerWrapper.trigger.getKey());
                             }
                         }
                     }
-                    break;
-
-                default:
-                    foreach (string key, HashMap!(TriggerKey, TriggerWrapper) value ; triggersByGroup) {
-                        if(operator.evaluate(key, compareToValue) && value !is null) {
-                            if(outList is null) {
-                                outList = new HashSet!(TriggerKey)();
-                            }
-                            foreach (TriggerWrapper triggerWrapper ; value.values()) {
-                                if(triggerWrapper !is null) {
-                                    outList.add(triggerWrapper.trigger.getKey());
-                                }
-                            }
-                        }
-                    }
+                }
             }
         }
 
@@ -1084,25 +1084,24 @@ class RAMJobStore : JobStore {
         synchronized (lock) {
             pausedGroups = new LinkedList!(string)();
 
-            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
-            switch (operator) {
-                case EQUALS:
-                    if(pausedTriggerGroups.add(matcher.getCompareToValue())) {
+            StringOperatorName operator = matcher.getCompareWithOperator();
+            if(operator == StringOperatorName.EQUALS) {
+                if(pausedTriggerGroups.add(matcher.getCompareToValue())) {
                         pausedGroups.add(matcher.getCompareToValue());
-                    }
-                    break;
-                default :
-                    foreach(string group ; triggersByGroup.keySet()) {
+                }
+            } else {
+                foreach(string group ; triggersByGroup.keySet()) {
                         if(operator.evaluate(group, matcher.getCompareToValue())) {
                             if(pausedTriggerGroups.add(matcher.getCompareToValue())) {
                                 pausedGroups.add(group);
                             }
                         }
-                    }
+                }
             }
+            
 
             foreach(string pausedGroup ; pausedGroups) {
-                Set!(TriggerKey) keys = getTriggerKeys(GroupMatcher.triggerGroupEquals(pausedGroup));
+                Set!(TriggerKey) keys = getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(pausedGroup));
 
                 foreach(TriggerKey key; keys) {
                     pauseTrigger(key);
@@ -1146,25 +1145,23 @@ class RAMJobStore : JobStore {
         List!(string) pausedGroups = new LinkedList!(string)();
         synchronized (lock) {
 
-            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
-            switch (operator) {
-                case EQUALS:
-                    if (pausedJobGroups.add(matcher.getCompareToValue())) {
+            StringOperatorName operator = matcher.getCompareWithOperator();
+            if(operator == StringOperatorName.EQUALS) {
+                if (pausedJobGroups.add(matcher.getCompareToValue())) {
                         pausedGroups.add(matcher.getCompareToValue());
-                    }
-                    break;
-                default :
-                    foreach (string group ; jobsByGroup.keySet()) {
-                        if(operator.evaluate(group, matcher.getCompareToValue())) {
-                            if (pausedJobGroups.add(group)) {
-                                pausedGroups.add(group);
-                            }
+                }
+            } else {
+                foreach (string group ; jobsByGroup.keySet()) {
+                    if(operator.evaluate(group, matcher.getCompareToValue())) {
+                        if (pausedJobGroups.add(group)) {
+                            pausedGroups.add(group);
                         }
                     }
+                }
             }
 
             foreach(string groupName ; pausedGroups) {
-                foreach (JobKey jobKey; getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+                foreach (JobKey jobKey; getJobKeys(GroupMatcherHelper.jobGroupEquals(groupName))) {
                     List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
                     foreach(OperableTrigger trigger; triggersOfJob) {
                         pauseTrigger(trigger.getKey());
@@ -1250,22 +1247,22 @@ class RAMJobStore : JobStore {
             }
 
             // Find all matching paused trigger groups, and then remove them.
-            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
+            StringOperatorName operator = matcher.getCompareWithOperator();
             LinkedList!(string) pausedGroups = new LinkedList!(string)();
             string matcherGroup = matcher.getCompareToValue();
-            switch (operator) {
-                case EQUALS:
-                    if(pausedTriggerGroups.contains(matcherGroup)) {
-                        pausedGroups.add(matcher.getCompareToValue());
+            if(operator == StringOperatorName.EQUALS) {
+                if(pausedTriggerGroups.contains(matcherGroup)) {
+                    pausedGroups.add(matcher.getCompareToValue());
+                }
+
+            } else {
+                foreach(string group ; pausedTriggerGroups) {
+                    if(operator.evaluate(group, matcherGroup)) {
+                        pausedGroups.add(group);
                     }
-                    break;
-                default :
-                    foreach(string group ; pausedTriggerGroups) {
-                        if(operator.evaluate(group, matcherGroup)) {
-                            pausedGroups.add(group);
-                        }
-                    }
+                }
             }
+            
             foreach(string pausedGroup ; pausedGroups) {
                 pausedTriggerGroups.remove(pausedGroup);
             }
@@ -1356,7 +1353,7 @@ class RAMJobStore : JobStore {
             List!(string) names = getTriggerGroupNames();
 
             foreach(string name; names) {
-                pauseTriggers(GroupMatcher.triggerGroupEquals(name));
+                pauseTriggers(GroupMatcherHelper.triggerGroupEquals(name));
             }
         }
     }
@@ -1378,19 +1375,19 @@ class RAMJobStore : JobStore {
 
         synchronized (lock) {
             pausedJobGroups.clear();
-            resumeTriggers(GroupMatcher.anyTriggerGroup());
+            resumeTriggers(GroupMatcherHelper.anyTriggerGroup());
         }
     }
 
     protected bool applyMisfire(TriggerWrapper tw) {
 
-        long misfireTime = DateTimeHelper.currentTimeMillis();
+        LocalDateTime misfireTime = LocalDateTime.now(); // DateTimeHelper.currentTimeMillis();
         if (getMisfireThreshold() > 0) {
-            misfireTime -= getMisfireThreshold();
+            misfireTime = misfireTime.minusMilliseconds(getMisfireThreshold());
         }
 
         LocalDateTime tnft = tw.trigger.getNextFireTime();
-        if (tnft is null || tnft.getTime() > misfireTime 
+        if (tnft is null || tnft > misfireTime 
                 || tw.trigger.getMisfireInstruction() == Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) { 
             return false; 
         }
@@ -1424,7 +1421,8 @@ class RAMJobStore : JobStore {
     }
 
     protected string getFiredTriggerRecordId() {
-        return string.valueOf(ftrCtr.incrementAndGet());
+        long f = atomicOp!("+=")(ftrCtr, 1);
+        return to!string(f);
     }
 
     /**
@@ -1454,7 +1452,7 @@ class RAMJobStore : JobStore {
                     if (tw is null)
                         break;
                     timeTriggers.remove(tw);
-                } catch (java.util.NoSuchElementException nsee) {
+                } catch (NoSuchElementException nsee) {
                     break;
                 }
 
@@ -1469,7 +1467,7 @@ class RAMJobStore : JobStore {
                     continue;
                 }
 
-                if (tw.getTrigger().getNextFireTime().getTime() > batchEnd) {
+                if (tw.getTrigger().getNextFireTime().toEpochMilli() > batchEnd) {
                     timeTriggers.add(tw);
                     break;
                 }
@@ -1491,7 +1489,8 @@ class RAMJobStore : JobStore {
                 tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
                 OperableTrigger trig = cast(OperableTrigger) tw.trigger.clone();
                 if (result.isEmpty()) {
-                    batchEnd = Math.max(tw.trigger.getNextFireTime().getTime(), DateTimeHelper.currentTimeMillis()) + timeWindow;
+                    batchEnd = max(tw.trigger.getNextFireTime().toEpochMilli(), 
+                        DateTimeHelper.currentTimeMillis()) + timeWindow;
                 }
                 result.add(trig);
                 if (result.size() == maxCount)
@@ -1562,7 +1561,7 @@ class RAMJobStore : JobStore {
 
                 TriggerFiredBundle bndle = new TriggerFiredBundle(retrieveJob(
                         tw.jobKey), trigger, cal,
-                        false, new LocalDateTime(), trigger.getPreviousFireTime(), prevFireTime,
+                        false, LocalDateTime.now(), trigger.getPreviousFireTime(), prevFireTime,
                         trigger.getNextFireTime());
 
                 JobDetail job = bndle.getJobDetail();
@@ -1661,12 +1660,12 @@ class RAMJobStore : JobStore {
                     timeTriggers.remove(tw);
                     signaler.signalSchedulingChange(0L);
                 } else if(triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_ERROR) {
-                    info("Trigger " ~ trigger.getKey() ~ " set to ERROR state.");
+                    info("Trigger " ~ trigger.getKey().toString() ~ " set to ERROR state.");
                     tw.state = TriggerWrapper.STATE_ERROR;
                     signaler.signalSchedulingChange(0L);
                 } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR) {
                     info("All triggers of Job " 
-                            + trigger.getJobKey() ~ " set to ERROR state.");
+                            ~ trigger.getJobKey().toString() ~ " set to ERROR state.");
                     setAllTriggersOfJobToState(trigger.getJobKey(), TriggerWrapper.STATE_ERROR);
                     signaler.signalSchedulingChange(0L);
                 } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_COMPLETE) {
@@ -1733,7 +1732,7 @@ class RAMJobStore : JobStore {
         //
     }
 
-    void setThreadPoolSize(final int poolSize) {
+    void setThreadPoolSize(int poolSize) {
         //
     }
 
@@ -1767,7 +1766,7 @@ class TriggerWrapperComparator : Comparator!(TriggerWrapper) { // , java.io.Seri
     }
 
     override
-    bool opEquals(Object o) {
+    bool opEquals(Object obj) {
         TriggerWrapperComparator c = cast(TriggerWrapperComparator)obj;
         return c !is null;
     }
@@ -1790,7 +1789,7 @@ class JobWrapper {
     }
 
     override
-    bool opEquals(Object o) {
+    bool opEquals(Object obj) {
         JobWrapper jw = cast(JobWrapper) obj;
         if (jw !is null) {
             if (jw.key == this.key) {
@@ -1843,7 +1842,7 @@ class TriggerWrapper {
     }
 
     override
-    bool opEquals(Object o) {
+    bool opEquals(Object obj) {
         TriggerWrapper tw = cast(TriggerWrapper) obj;
         if (tw !is null) {
             if (tw.key == this.key) {

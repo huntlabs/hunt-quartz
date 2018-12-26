@@ -245,7 +245,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * 
      * @return true if the key of this Trigger equals that of the given Trigger.
      */
-    bool opEquals(Object other);
+    // bool opEquals(Trigger other);
     
     /**
      * <p>

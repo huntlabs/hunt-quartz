@@ -1,8 +1,11 @@
-
 module hunt.quartz.simpl.SystemPropertyInstanceIdGenerator;
 
 import hunt.quartz.exception;
 import hunt.quartz.spi.InstanceIdGenerator;
+
+import hunt.lang.exception;
+import std.string;
+
 
 /**
  * InstanceIdGenerator that will use a {@link SystemPropertyInstanceIdGenerator#SYSTEM_PROPERTY system property}
@@ -26,7 +29,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
   private string prepend = null;
   private string postpend = null;
   private string systemPropertyName = SYSTEM_PROPERTY;
-  
+
   /**
    * Returns the cluster wide value for this scheduler instance's id, based on a system property
    * @return the value of the system property named by the value of {@link #getSystemPropertyName()} - which defaults
@@ -34,19 +37,21 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * @throws SchedulerException Shouldn't a value be found
    */
   string generateInstanceId() {
-    string property = System.getProperty(getSystemPropertyName());
-    if(property is null) {
-      throw new SchedulerException("No value for '" ~ SYSTEM_PROPERTY
-                                   ~ "' system property found, please configure your environment accordingly!");
-    }
-    if(getPrepend() !is null)
-        property = getPrepend() + property;
-    if(getPostpend() !is null)
-        property = property + getPostpend();
     
+    string property = ""; // System.getProperty(getSystemPropertyName());
+    // if (property is null) {
+    //   throw new SchedulerException(
+    //       "No value for '" ~ SYSTEM_PROPERTY
+    //       ~ "' system property found, please configure your environment accordingly!");
+    // }
+    if (getPrepend() !is null)
+      property = getPrepend() ~ property;
+    if (getPostpend() !is null)
+      property = property ~ getPostpend();
+
     return property;
   }
-  
+
   /**
    * A string of text to prepend (add to the beginning) to the instanceId 
    * found in the system property.
@@ -62,9 +67,9 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * @param prepend the value to prepend, or null if none is desired.
    */
   void setPrepend(string prepend) {
-    this.prepend = prepend is null ?  null  : prepend.trim();
+    this.prepend = prepend.strip();
   }
-    
+
   /**
    * A string of text to postpend (add to the end) to the instanceId 
    * found in the system property.
@@ -80,7 +85,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * @param postpend the value to postpend, or null if none is desired.
    */
   void setPostpend(string postpend) {
-    this.postpend = postpend is null ?  null : postpend.trim();
+    this.postpend = postpend.strip();
   }
 
   /**
@@ -88,7 +93,7 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * 
    * Defaults to {@link #SYSTEM_PROPERTY}.
    * 
-   */  
+   */
   string getSystemPropertyName() {
     return systemPropertyName;
   }
@@ -101,7 +106,8 @@ class SystemPropertyInstanceIdGenerator : InstanceIdGenerator {
    * @param systemPropertyName the system property name
    */
   void setSystemPropertyName(string systemPropertyName) {
-    this.systemPropertyName = systemPropertyName is null ? SYSTEM_PROPERTY : systemPropertyName.trim();
+    this.systemPropertyName = systemPropertyName is null ? SYSTEM_PROPERTY
+      : systemPropertyName.strip();
   }
-  
-} 
+
+}

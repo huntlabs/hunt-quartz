@@ -15,13 +15,14 @@
  */
 module hunt.quartz.listeners.BroadcastJobListener;
 
-import hunt.container.Iterator;
-import hunt.container.LinkedList;
-import hunt.container.List;
-
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.exception;
 import hunt.quartz.JobListener;
+
+import hunt.container.Iterator;
+import hunt.container.LinkedList;
+import hunt.container.List;
+import hunt.lang.exception;
 
 /**
  * Holds a List of references to JobListener instances and broadcasts all
@@ -83,44 +84,37 @@ class BroadcastJobListener : JobListener {
     }
 
     bool removeListener(string listenerName) {
-        Iterator!(JobListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            JobListener jl = itr.next();
-            if(jl.getName()== listenerName) {
-                itr.remove();
+        // JobListener[] ls;
+        foreach(JobListener jl; listeners.iterator()) {
+            if(jl.getName() == listenerName) {
+                // itr.remove();
+                // ls ~= jl;
+                listeners.remove(jl);
                 return true;
             }
         }
+        
         return false;
     }
 
     List!(JobListener) getListeners() {
-        return java.container.Collections.unmodifiableList(listeners);
+        return (listeners);
     }
 
     void jobToBeExecuted(JobExecutionContext context) {
-
-        Iterator!(JobListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            JobListener jl = itr.next();
+        foreach(JobListener jl; listeners.iterator()) {
             jl.jobToBeExecuted(context);
         }
     }
 
     void jobExecutionVetoed(JobExecutionContext context) {
-
-        Iterator!(JobListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            JobListener jl = itr.next();
+        foreach(JobListener jl; listeners.iterator()) {
             jl.jobExecutionVetoed(context);
         }
     }
 
     void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
-
-        Iterator!(JobListener) itr = listeners.iterator();
-        while(itr.hasNext()) {
-            JobListener jl = itr.next();
+        foreach(JobListener jl; listeners.iterator()) {
             jl.jobWasExecuted(context, jobException);
         }
     }

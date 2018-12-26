@@ -835,8 +835,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
     void validate() {
         super.validate();
         
-        if (repeatIntervalUnit is null || !(repeatIntervalUnit == IntervalUnit.SECOND || 
-                repeatIntervalUnit== IntervalUnit.MINUTE ||repeatIntervalUnit == IntervalUnit.HOUR))
+        if (!(repeatIntervalUnit == IntervalUnit.SECOND || 
+                repeatIntervalUnit == IntervalUnit.MINUTE ||
+                repeatIntervalUnit == IntervalUnit.HOUR))
             throw new SchedulerException("Invalid repeat IntervalUnit (must be SECOND, MINUTE or HOUR).");
         if (repeatInterval < 1) {
             throw new SchedulerException("Repeat Interval cannot be zero.");
@@ -858,7 +859,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         }        
         
         // Ensure timeOfDay is in order.
-        if (getEndTimeOfDay() !is null && !getStartTimeOfDay().isBefore(getEndTimeOfDay())) {
+        if (getEndTimeOfDay() !is null && !getStartTimeOfDay().before(getEndTimeOfDay())) {
             throw new SchedulerException("StartTimeOfDay " ~ startTimeOfDay.to!string() ~ 
                 " should not come after endTimeOfDay " ~ endTimeOfDay.to!string());
         }
@@ -942,8 +943,12 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         switch(getMisfireInstruction()) {
             case MISFIRE_INSTRUCTION_DO_NOTHING : cb.withMisfireHandlingInstructionDoNothing();
             break;
+            
             case MISFIRE_INSTRUCTION_FIRE_ONCE_NOW : cb.withMisfireHandlingInstructionFireAndProceed();
             break;
+
+            default:
+                assert(false);
         }
         
         return cb;

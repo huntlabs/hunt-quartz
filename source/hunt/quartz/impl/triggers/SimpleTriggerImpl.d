@@ -34,7 +34,9 @@ import hunt.quartz.Trigger;
 import hunt.quartz.TriggerUtils;
 
 import hunt.lang.exception;
+import hunt.time.LocalTime;
 import hunt.time.LocalDateTime;
+import hunt.time.ZoneOffset;
 
 // import std.datetime;
 
@@ -494,16 +496,14 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT) {
             LocalDateTime newFireTime = getFireTimeAfter(LocalDateTime.now());
             while (newFireTime !is null && cal !is null
-                    && !cal.isTimeIncluded(newFireTime.getTime())) {
+                    && !cal.isTimeIncluded(newFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
                 if(newFireTime is null)
                     break;
                 
                 //avoid infinite loop
-                hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
-                c.setTime(newFireTime);
-                if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+                if (nextFireTime.getYear() > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                     newFireTime = null;
                 }
             }
@@ -511,7 +511,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT) {
             LocalDateTime newFireTime = getFireTimeAfter(LocalDateTime.now());
             while (newFireTime !is null && cal !is null
-                    && !cal.isTimeIncluded(newFireTime.getTime())) {
+                    && !cal.isTimeIncluded(newFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
                 if(newFireTime is null)
@@ -536,7 +536,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
                 setTimesTriggered(0);
             }
             
-            if (getEndTime() !is null && getEndTime().before(newFireTime)) {
+            if (getEndTime() !is null && getEndTime().isBefore(newFireTime)) {
                 setNextFireTime(null); // We are past the end time
             } else {
                 setStartTime(newFireTime);
@@ -558,7 +558,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
                 setTimesTriggered(0);
             }
 
-            if (getEndTime() !is null && getEndTime().before(newFireTime)) {
+            if (getEndTime() !is null && getEndTime().isBefore(newFireTime)) {
                 setNextFireTime(null); // We are past the end time
             } else {
                 setStartTime(newFireTime);
@@ -585,7 +585,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         nextFireTime = getFireTimeAfter(nextFireTime);
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
             
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -593,9 +593,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
                 break;
             
             //avoid infinite loop
-            hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
-            c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (nextFireTime.getYear() > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
         }
@@ -614,7 +612,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         }
         
         LocalDateTime now = LocalDateTime.now();
-        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -622,14 +620,12 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
                 break;
             
             //avoid infinite loop
-            hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
-            c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (nextFireTime.getYear() > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 nextFireTime = null;
             }
 
-            if(nextFireTime !is null && nextFireTime.before(now)) {
-                long diff = now.getTime() - nextFireTime.getTime();
+            if(nextFireTime !is null && nextFireTime.isBefore(now)) {
+                long diff = now.toInstant(ZoneOffset.UTC).toEpochMilli() - nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli();
                 if(diff >= misfireThreshold) {
                     nextFireTime = getFireTimeAfter(nextFireTime);
                 }
@@ -659,16 +655,14 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         nextFireTime = getStartTime();
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
             
             if(nextFireTime is null)
                 break;
             
             //avoid infinite loop
-            hunt.time.util.Calendar c = hunt.time.util.Calendar.getInstance();
-            c.setTime(nextFireTime);
-            if (c.get(hunt.time.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+            if (nextFireTime.getYear() > YEAR_TO_GIVEUP_SCHEDULING_AT) {
                 return null;
             }
         }
@@ -756,21 +750,20 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             afterTime = LocalDateTime.now();
         }
 
-        if (repeatCount == 0 && afterTime.compareTo(getStartTime()) >= 0) {
+        if (repeatCount == 0 && afterTime.opCmp(getStartTime()) >= 0) {
             return null;
         }
 
-        long startMillis = getStartTime().getTime();
-        long afterMillis = afterTime.getTime();
-        long endMillis = (getEndTime() is null) ? Long.MAX_VALUE : getEndTime()
-                .getTime();
+        long startMillis = getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli();
+        long afterMillis = afterTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+        LocalDateTime endMillis = (getEndTime() is null) ? LocalDateTime.MAX : getEndTime();
 
-        if (endMillis <= afterMillis) {
+        if (endMillis <= afterTime) {
             return null;
         }
 
-        if (afterMillis < startMillis) {
-            return new LocalDateTime(startMillis);
+        if (afterTime < getStartTime()) {
+            return getStartTime();
         }
 
         long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
@@ -780,9 +773,10 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return null;
         }
 
-        LocalDateTime time = new LocalDateTime(startMillis + (numberOfTimesExecuted * repeatInterval));
+        LocalDateTime time =  getStartTime().plusNanos(numberOfTimesExecuted * 
+            repeatInterval * LocalTime.NANOS_PER_MILLI);
 
-        if (endMillis <= time.getTime()) {
+        if (endMillis <= time) {
             return null;
         }
 
@@ -797,13 +791,13 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * </p>
      */
     LocalDateTime getFireTimeBefore(LocalDateTime end) {
-        if (end.getTime() < getStartTime().getTime()) {
+        if (end < getStartTime()) {
             return null;
         }
 
         int numFires = computeNumTimesFiredBetween(getStartTime(), end);
 
-        return new LocalDateTime(getStartTime().getTime() + (numFires * repeatInterval));
+        return getStartTime().plusNanos(numFires * repeatInterval * LocalTime.NANOS_PER_MILLI);
     }
 
     int computeNumTimesFiredBetween(LocalDateTime start, LocalDateTime end) {
@@ -812,7 +806,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return 0;
         }
         
-        long time = end.getTime() - start.getTime();
+        long time = end.toInstant(ZoneOffset.UTC).toEpochMilli() - start.toInstant(ZoneOffset.UTC).toEpochMilli();
 
         return cast(int) (time / repeatInterval);
     }
@@ -837,10 +831,10 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return (getEndTime() is null) ? null : getFireTimeBefore(getEndTime()); 
         }
 
-        long lastTrigger = startTime.getTime() + (repeatCount * repeatInterval);
+        LocalDateTime lastTrigger = startTime.plusMilliseconds((repeatCount * repeatInterval));
 
-        if ((getEndTime() is null) || (lastTrigger < getEndTime().getTime())) { 
-            return new LocalDateTime(lastTrigger);
+        if ((getEndTime() is null) || (lastTrigger < getEndTime())) { 
+            return lastTrigger;
         } else {
             return getFireTimeBefore(getEndTime());
         }
@@ -900,14 +894,21 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         switch(getMisfireInstruction()) {
             case MISFIRE_INSTRUCTION_FIRE_NOW : sb.withMisfireHandlingInstructionFireNow();
             break;
+
             case MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT : sb.withMisfireHandlingInstructionNextWithExistingCount();
             break;
+
             case MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT : sb.withMisfireHandlingInstructionNextWithRemainingCount();
             break;
+
             case MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT : sb.withMisfireHandlingInstructionNowWithExistingCount();
             break;
+
             case MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT : sb.withMisfireHandlingInstructionNowWithRemainingCount();
             break;
+
+            default:
+                assert(false);
         }
         
         return sb;

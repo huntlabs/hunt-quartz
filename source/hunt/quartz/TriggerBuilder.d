@@ -425,7 +425,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
      */
     TriggerBuilder!(T) usingJobData(JobDataMap newJobDataMap) {
         // add any existing data to this new map
-        foreach(string dataKey; jobDataMap.keySet()) {
+        foreach(string dataKey; jobDataMap.byKey()) {
             newJobDataMap.put(dataKey, jobDataMap.get(dataKey));
         }
         jobDataMap = newJobDataMap; // set new map as the map to use

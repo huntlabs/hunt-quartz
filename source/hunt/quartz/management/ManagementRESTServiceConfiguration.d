@@ -15,6 +15,8 @@
  */
 module hunt.quartz.management.ManagementRESTServiceConfiguration;
 
+import hunt.lang.exception;
+import std.conv;
 import std.string;
 
 /**
@@ -142,7 +144,7 @@ class ManagementRESTServiceConfiguration {
         if (split.length != 2) {
             throw new IllegalArgumentException("invalid bind format (should be IP:port)");
         }
-        return Integer.parseInt(split[1]);
+        return to!int(split[1]);
     }
 
     /**

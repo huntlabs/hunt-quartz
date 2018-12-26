@@ -25,7 +25,6 @@ import std.conv;
  * @since 1.8
  */
 class TimeStampedCounterValue { //  : Serializable
-  
     
     private long counterValue;
     private long timestamp;

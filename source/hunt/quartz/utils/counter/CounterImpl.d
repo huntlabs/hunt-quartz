@@ -19,8 +19,8 @@ module hunt.quartz.utils.counter.CounterImpl;
 import hunt.quartz.utils.counter.Counter;
 
 import hunt.io.common;
-
-// import java.util.concurrent.atomic.AtomicLong;
+import hunt.concurrent.atomic.AtomicHelper;
+import core.atomic;
 
 /**
  * A simple counter implementation
@@ -31,7 +31,6 @@ import hunt.io.common;
  */
 class CounterImpl : Counter, Serializable {
   
-    
     private shared long value;
 
     /**
@@ -47,56 +46,56 @@ class CounterImpl : Counter, Serializable {
      * @param initialValue
      */
     this(long initialValue) {
-        this.value = new AtomicLong(initialValue);
+        this.value = initialValue;
     }
 
     /**
      * {@inheritDoc}
      */
     long increment() {
-        return value.incrementAndGet();
+        return increment(1);
     }
 
     /**
      * {@inheritDoc}
      */
     long decrement() {
-        return value.decrementAndGet();
+        return decrement(1);
     }
 
     /**
      * {@inheritDoc}
      */
     long getAndSet(long newValue) {
-        return value.getAndSet(newValue);
+        return AtomicHelper.getAndSet(value, newValue);
     }
 
     /**
      * {@inheritDoc}
      */
     long getValue() {
-        return value.get();
+        return atomicLoad(value);
     }
 
     /**
      * {@inheritDoc}
      */
     long increment(long amount) {
-        return value.addAndGet(amount);
+        return atomicOp!("+=")(value, amount);
     }
 
     /**
      * {@inheritDoc}
      */
     long decrement(long amount) {
-        return value.addAndGet(amount * -1);
+        return atomicOp!("-=")(value, amount);
     }
 
     /**
      * {@inheritDoc}
      */
     void setValue(long newValue) {
-        value.set(newValue);
+        atomicStore(value, newValue);
     }
 
 }

@@ -20,11 +20,14 @@ module hunt.quartz.utils.DirtyFlagMap;
 // import hunt.quartz.utils.DirtyFlagIterator;
 
 // import java.lang.reflect.Array;
+import hunt.container.ArrayList;
 import hunt.container.Collection;
 import hunt.container.HashMap;
 import hunt.container.Iterator;
 import hunt.container.Map;
 import hunt.container.Set;
+
+import hunt.lang.exception;
 
 /**
  * <p>
@@ -167,9 +170,9 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
         return map.isEmpty();
     }
 
-    Set!(K) keySet() {
-        return new DirtyFlagSet!(K)(map.keySet());
-    }
+    // Set!(K) keySet() {
+    //     return new DirtyFlagSet!(K)(map.byKey());
+    // }
 
     V put(K key, V val) {
         dirty = true;
@@ -204,8 +207,10 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
     }
 
     // override
-    //  // suppress warnings on generic cast of super.clone() and map.clone() lines.
-    // Object clone() {
+     // suppress warnings on generic cast of super.clone() and map.clone() lines.
+    Object clone() {
+        implementationMissing(false);
+        return this;
     //     DirtyFlagMap!(K,V) copy;
     //     try {
     //         copy = (DirtyFlagMap!(K,V)) super.clone();
@@ -217,7 +222,7 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
     //     }
 
     //     return copy;
-    // }
+    }
 
     /**
      * Wrap a Collection so we can mark the DirtyFlagMap as dirty if
@@ -225,6 +230,10 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
      */
     private class DirtyFlagCollection(T) : Collection!(T) {
         private Collection!(T) collection;
+
+        this(T[] c) {
+            collection = new ArrayList!T(c);
+        }
 
         this(Collection!(T) c) {
             collection = c;
@@ -234,11 +243,11 @@ class DirtyFlagMap(K,V) : Map!(K,V) { // , Cloneable, java.io.Serializable
             return collection;
         }
 
-        Iterator!(T) iterator() {
-            return new DirtyFlagIterator!(T)(collection.iterator());
-        }
+        // Iterator!(T) iterator() {
+        //     return new DirtyFlagIterator!(T)(collection.iterator());
+        // }
 
-        bool remove(Object o) {
+        bool remove(T o) {
             bool removed = collection.remove(o);
             if (removed) {
                 dirty = true;

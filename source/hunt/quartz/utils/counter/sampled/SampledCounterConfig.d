@@ -19,6 +19,8 @@ module hunt.quartz.utils.counter.sampled.SampledCounterConfig;
 import hunt.quartz.utils.counter.Counter;
 import hunt.quartz.utils.counter.CounterConfig;
 
+import hunt.lang.exception;
+
 /**
  * Config for a {@link SampledCounter}
  * 
