@@ -44,6 +44,7 @@ import hunt.time.ZoneOffset;
 
 import core.thread;
 import std.algorithm;
+import std.conv;
 import std.random;
 import core.sync.condition;
 import core.sync.mutex;
@@ -317,7 +318,7 @@ class QuartzSchedulerThread : ThreadEx {
                                 now + idleWaitTime, min(availThreadCount, qsRsrcs.getMaxBatchSize()), qsRsrcs.getBatchTimeWindow());
                         acquiresFailed = 0;
                         version(HUNT_DEBUG)
-                            trace("batch acquisition of " ~ (triggers is null ? 0 : triggers.size()) ~ " triggers");
+                            trace("batch acquisition of " ~  to!string(triggers is null ? 0 : triggers.size()) ~ " triggers");
                     } catch (JobPersistenceException jpe) {
                         if (acquiresFailed == 0) {
                             qs.notifySchedulerListenersError(

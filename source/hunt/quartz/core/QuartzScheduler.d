@@ -123,11 +123,14 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private __gshared string VERSION_MAJOR = "UNKNOWN";
-    private __gshared string VERSION_MINOR = "UNKNOWN";
-    private __gshared string VERSION_ITERATION = "UNKNOWN";
+    private __gshared immutable string VERSION_MAJOR; // = "UNKNOWN";
+    private __gshared immutable string VERSION_MINOR; // = "UNKNOWN";
+    private __gshared immutable string VERSION_ITERATION; // = "UNKNOWN";
 
     shared static this() {
+        VERSION_MAJOR = "2";
+        VERSION_MINOR = "3";
+        VERSION_ITERATION = "0";
         // Properties props = new Properties();
         // InputStream is = null;
         // try {
