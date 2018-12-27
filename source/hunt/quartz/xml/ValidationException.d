@@ -28,119 +28,119 @@ import hunt.string;
  * 
  * @author <a href="mailto:bonhamcm@thirdeyeconsulting.com">Chris Bonham</a>
  */
-class ValidationException : Exception {
+// class ValidationException : Exception {
 
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Data members.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Data members.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    private Collection!(Exception) validationExceptions;
+//     private Collection!(Exception) validationExceptions;
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Constructors.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Constructors.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    /**
-     * Constructor for ValidationException.
-     */
-    this() {
-        super();
-    }
+//     /**
+//      * Constructor for ValidationException.
+//      */
+//     this() {
+//         super();
+//     }
 
-    /**
-     * Constructor for ValidationException.
-     * 
-     * @param message
-     *          exception message.
-     */
-    this(string message) {
-        super(message);
-    }
+//     /**
+//      * Constructor for ValidationException.
+//      * 
+//      * @param message
+//      *          exception message.
+//      */
+//     this(string message) {
+//         super(message);
+//     }
 
-    /**
-     * Constructor for ValidationException.
-     * 
-     * @param errors
-     *          collection of validation exceptions.
-     */
-    this(Collection!(Exception) errors) {
-        this();
-        this.validationExceptions = Collections
-                .unmodifiableCollection(validationExceptions);
-        initCause(errors.iterator().next());
-    }
+//     /**
+//      * Constructor for ValidationException.
+//      * 
+//      * @param errors
+//      *          collection of validation exceptions.
+//      */
+//     this(Collection!(Exception) errors) {
+//         this();
+//         this.validationExceptions = Collections
+//                 .unmodifiableCollection(validationExceptions);
+//         initCause(errors.iterator().next());
+//     }
     
 
-    /**
-     * Constructor for ValidationException.
-     * 
-     * @param message
-     *          exception message.
-     * @param errors
-     *          collection of validation exceptions.
-     */
-    this(string message, Collection!(Exception) errors) {
-        this(message);
-        this.validationExceptions = Collections
-                .unmodifiableCollection(validationExceptions);
-        initCause(errors.iterator().next());
-    }
+//     /**
+//      * Constructor for ValidationException.
+//      * 
+//      * @param message
+//      *          exception message.
+//      * @param errors
+//      *          collection of validation exceptions.
+//      */
+//     this(string message, Collection!(Exception) errors) {
+//         this(message);
+//         this.validationExceptions = Collections
+//                 .unmodifiableCollection(validationExceptions);
+//         initCause(errors.iterator().next());
+//     }
 
-    private void initialize() {
-        validationExceptions = new ArrayList!(Exception)();
-    }
+//     private void initialize() {
+//         validationExceptions = new ArrayList!(Exception)();
+//     }
 
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * 
-     * Interface.
-     * 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
+//     /*
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      * 
+//      * Interface.
+//      * 
+//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//      */
 
-    /**
-     * Returns collection of errors.
-     * 
-     * @return collection of errors.
-     */
-    Collection!(Exception) getValidationExceptions() {
-        return validationExceptions;
-    }
+//     /**
+//      * Returns collection of errors.
+//      * 
+//      * @return collection of errors.
+//      */
+//     Collection!(Exception) getValidationExceptions() {
+//         return validationExceptions;
+//     }
 
-    /**
-     * Returns the detail message string.
-     * 
-     * @return the detail message string.
-     */
-    string getMessage() {
-        if (getValidationExceptions().size() == 0) { return super.getMessage(); }
+//     /**
+//      * Returns the detail message string.
+//      * 
+//      * @return the detail message string.
+//      */
+//     string getMessage() {
+//         if (getValidationExceptions().size() == 0) { return super.getMessage(); }
 
-        StringBuffer sb = new StringBuffer();
+//         StringBuffer sb = new StringBuffer();
 
-        bool first = true;
+//         bool first = true;
 
-        for (Iterator!(Exception) iter = getValidationExceptions().iterator(); iter.hasNext(); ) {
-            Exception e = iter.next();
+//         for (Iterator!(Exception) iter = getValidationExceptions().iterator(); iter.hasNext(); ) {
+//             Exception e = iter.next();
 
-            if (!first) {
-                sb.append('\n');
-                first = false;
-            }
+//             if (!first) {
+//                 sb.append('\n');
+//                 first = false;
+//             }
 
-            sb.append(e.getMessage());
-        }
+//             sb.append(e.getMessage());
+//         }
 
-        return sb.toString();
-    }
+//         return sb.toString();
+//     }
     
     
-}
+// }

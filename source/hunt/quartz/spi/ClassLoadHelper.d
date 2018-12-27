@@ -70,7 +70,7 @@ interface ClassLoadHelper {
      * @param name name of the desired resource
      * @return a java.io.InputStream object
      */
-    InputStream getResourceAsStream(string name);
+    // InputStream getResourceAsStream(string name);
 
     /**
      * Enable sharing of the class-loader with 3rd party (e.g. digester).

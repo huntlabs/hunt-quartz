@@ -20,7 +20,7 @@ import hunt.quartz.utils.counter.sampled.SampledRateCounterConfig;
 
 import hunt.util.timer;
 
-class SampledStatisticsImpl : SchedulerListenerSupport, SampledStatistics, JobListener, SchedulerListener {
+class SampledStatisticsImpl : SchedulerListenerSupport, SampledStatistics, JobListener {
     private QuartzScheduler scheduler;
     
     private enum string NAME = "QuartzSampledStatistics";

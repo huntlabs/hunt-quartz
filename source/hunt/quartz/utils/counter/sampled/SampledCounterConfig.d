@@ -16,10 +16,13 @@
 
 module hunt.quartz.utils.counter.sampled.SampledCounterConfig;
 
+import hunt.quartz.utils.counter.sampled.SampledCounterImpl;
 import hunt.quartz.utils.counter.Counter;
 import hunt.quartz.utils.counter.CounterConfig;
 
+
 import hunt.lang.exception;
+import std.conv;
 
 /**
  * Config for a {@link SampledCounter}
@@ -46,10 +49,12 @@ class SampledCounterConfig : CounterConfig {
     this(int intervalSecs, int historySize, bool isResetOnSample, long initialValue) {
         super(initialValue);
         if (intervalSecs < 1) {
-            throw new IllegalArgumentException("Interval (" ~ intervalSecs ~ ") must be greater than or equal to 1");
+            throw new IllegalArgumentException("Interval (" ~ 
+                intervalSecs.to!string() ~ ") must be greater than or equal to 1");
         }
         if (historySize < 1) {
-            throw new IllegalArgumentException("History size (" ~ historySize ~ ") must be greater than or equal to 1");
+            throw new IllegalArgumentException("History size (" ~ 
+                historySize.to!string() ~ ") must be greater than or equal to 1");
         }
 
         this.intervalSecs = intervalSecs;

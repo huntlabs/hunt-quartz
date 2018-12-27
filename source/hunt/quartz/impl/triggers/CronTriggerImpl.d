@@ -29,6 +29,7 @@ import hunt.quartz.exception;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.Scheduler;
 import hunt.quartz.Trigger;
+import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerUtils;
 
 import hunt.lang.exception;
@@ -796,6 +797,11 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
     bool hasAdditionalProperties() { 
         return false;
+    }
+
+
+    override TriggerBuilder!(CronTrigger) getTriggerBuilder() {
+        return super.getTriggerBuilder();
     }
     /**
      * Get a {@link ScheduleBuilder} that is configured to produce a 

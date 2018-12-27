@@ -819,7 +819,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      * according to the natural (i.e. alphabetical) order of their keys.
      * </p>
      */
-    int compareTo(Trigger other) {
+    int opCmp(Trigger other) {
 
         if(other.getKey() is null && getKey() is null)
             return 0;
@@ -861,7 +861,9 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     }
 
     // override
-    // Object clone() {
+    Object clone() {
+        implementationMissing(false);
+        return this;
     //     AbstractTrigger<?> copy;
     //     try {
     //         copy = (AbstractTrigger<?>) super.clone();
@@ -877,7 +879,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     //         throw new IncompatibleClassChangeError("Not Cloneable.");
     //     }
     //     return copy;
-    // }
+    }
     
     TriggerBuilder!(T) getTriggerBuilder() {
         return TriggerBuilderHelper.newTrigger!T()

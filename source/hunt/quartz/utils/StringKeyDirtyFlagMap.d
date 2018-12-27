@@ -64,10 +64,6 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
     //     return super== obj;
     // }
 
-    override
-    size_t toHash() @trusted nothrow {
-        return getWrappedMap().toHash();
-    }
     
     /**
      * Get a copy of the Map's string keys in an array of Strings.
@@ -236,7 +232,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      * </p>
      */
     void put(string key, string value) {
-        super.put(key, value);
+        super.put(key, new String(value));
     }
 
     /**

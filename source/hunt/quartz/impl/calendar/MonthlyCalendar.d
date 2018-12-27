@@ -40,7 +40,7 @@ import std.conv;
  *
  * @author Juergen Donnerstag
  */
-class MonthlyCalendar : BaseCalendar, Calendar {
+class MonthlyCalendar : BaseCalendar {
 
 
     private enum int MAX_DAYS_IN_MONTH = 31;

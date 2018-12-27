@@ -55,7 +55,6 @@ import hunt.quartz.utils.Key;
  * @see Key#DEFAULT_GROUP
  */
 final class JobKey : Key!(JobKey) {
-
     
     this(string name) {
         super(name, null);

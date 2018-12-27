@@ -458,7 +458,7 @@ class DailyCalendar : BaseCalendar {
 
     // override
     // Object clone() {
-    //     DailyCalendar clone = (DailyCalendar) super.clone();
+    //     DailyCalendar clone = cast(DailyCalendar) super.clone();
     //     return clone;
     // }
     

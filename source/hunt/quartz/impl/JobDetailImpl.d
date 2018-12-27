@@ -66,7 +66,7 @@ import std.conv;
  * @author Sharada Jambula
  */
 
-class JobDetailImpl : JobDetail { // Cloneable, 
+class JobDetailImpl : JobDetail {
 
     
     /*
@@ -440,9 +440,17 @@ class JobDetailImpl : JobDetail { // Cloneable,
         }
         return key is null ? 0 : key.toHash();
     }
+
+    int opCmp(JobDetail o) {
+        implementationMissing(false);
+        return 0;
+    }
+
+    alias opCmp = Object.opCmp;
     
-    // override
-    // Object clone() {
+    Object clone() {
+        implementationMissing(false);
+        return this;
     //     JobDetailImpl copy;
     //     try {
     //         copy = (JobDetailImpl) super.clone();
@@ -454,7 +462,7 @@ class JobDetailImpl : JobDetail { // Cloneable,
     //     }
 
     //     return copy;
-    // }
+    }
 
     JobBuilder getJobBuilder() {
         JobBuilder b = JobBuilder.newJob()

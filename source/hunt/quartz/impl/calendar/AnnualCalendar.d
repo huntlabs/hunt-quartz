@@ -41,7 +41,7 @@ import hunt.util.Comparator;
  * 
  * @author Juergen Donnerstag
  */
-class AnnualCalendar : BaseCalendar, QuartzCalendar {
+class AnnualCalendar : BaseCalendar {
 
 
     private ArrayList!(LocalDateTime) excludeDays;
@@ -68,12 +68,12 @@ class AnnualCalendar : BaseCalendar, QuartzCalendar {
         excludeDays = new ArrayList!(LocalDateTime)();
     }
 
-    // override
-    // Object clone() {
-    //     AnnualCalendar clone = (AnnualCalendar) super.clone();
-    //     clone.excludeDays = new ArrayList!(LocalDateTime)(excludeDays);
-    //     return clone;
-    // }
+    override
+    Object clone() {
+        AnnualCalendar clone = cast(AnnualCalendar) super.clone();
+        clone.excludeDays = new ArrayList!(LocalDateTime)(excludeDays);
+        return clone;
+    }
 
     /**
      * <p>

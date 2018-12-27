@@ -84,7 +84,9 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
     }
 
     // override
-    // Object clone()  {
+    Object clone()  {
+        implementationMissing(false);
+        return this;
     //     try {
     //         BaseCalendar clone = (BaseCalendar) super.clone();
     //         if (getBaseCalendar() !is null) {
@@ -96,7 +98,7 @@ class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
     //     } catch (CloneNotSupportedException ex) {
     //         throw new IncompatibleClassChangeError("Not Cloneable.");
     //     }
-    // }
+    }
 
     /**
      * <p>

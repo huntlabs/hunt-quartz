@@ -20,8 +20,10 @@ module hunt.quartz.CronTrigger;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerBuilder;
 
-import hunt.time.util.Calendar;
-import std.datetime : TimeZone;
+import hunt.time.ZoneId;
+
+// import hunt.time.util.Calendar;
+// import std.datetime : TimeZone;
 
 /**
  * The interface for inspecting settings specific to a CronTrigger, .
@@ -201,7 +203,7 @@ interface CronTrigger : Trigger {
      * this <code>CronTrigger</code> will be resolved.
      * </p>
      */
-    TimeZone getTimeZone();
+    ZoneId getTimeZone();
 
     string getExpressionSummary();
 

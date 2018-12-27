@@ -21,8 +21,8 @@ import hunt.quartz.DateBuilder : IntervalUnit;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerBuilder;
 
-import hunt.time.util.Calendar;
-import std.datetime : TimeZone;
+// import hunt.time.util.Calendar;
+import hunt.time.ZoneId;
 
 /**
  * A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>
@@ -100,10 +100,10 @@ interface CalendarIntervalTrigger : Trigger {
      * </p>
      * 
      * <p>
-     * If null, the system default TimeZone will be used.
+     * If null, the system default ZoneId will be used.
      * </p>
      */
-    TimeZone getTimeZone();
+    ZoneId getTimeZone();
     
     
     /**

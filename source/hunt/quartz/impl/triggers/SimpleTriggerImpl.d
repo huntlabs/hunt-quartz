@@ -31,6 +31,7 @@ import hunt.quartz.exception;
 import hunt.quartz.SimpleScheduleBuilder;
 import hunt.quartz.SimpleTrigger;
 import hunt.quartz.Trigger;
+import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerUtils;
 
 import hunt.lang.exception;
@@ -876,6 +877,11 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      */
     bool hasAdditionalProperties() {
         return false;
+    }
+
+    override 
+    TriggerBuilder!(SimpleTrigger) getTriggerBuilder() {
+        return super.getTriggerBuilder();
     }
 
     /**

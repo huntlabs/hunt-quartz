@@ -172,4 +172,6 @@ class Key(T) : Comparable!(Key!(T)), IKey {
         
         return name == o.getName();
     }
+
+    alias opCmp = Object.opCmp;
 }

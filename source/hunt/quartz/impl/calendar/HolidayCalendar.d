@@ -44,7 +44,7 @@ import hunt.time.ZoneOffset;
  * @author Sharada Jambula
  * @author Juergen Donnerstag
  */
-class HolidayCalendar : BaseCalendar, Calendar {
+class HolidayCalendar : BaseCalendar {
     
     // A sorted set to store the holidays
     private TreeSet!(LocalDateTime) dates;

@@ -25,6 +25,8 @@ import hunt.quartz.core.JobRunShell;
 import hunt.quartz.core.JobRunShellFactory;
 import hunt.quartz.spi.TriggerFiredBundle;
 
+import hunt.lang.exception;
+
 /**
  * <p>
  * Responsible for creating the instances of <code>{@link hunt.quartz.ee.jta.JTAJobRunShell}</code>
@@ -90,9 +92,11 @@ class JTAJobRunShellFactory : JobRunShellFactory {
      * {@link hunt.quartz.core.JobRunShell}</code>.
      * </p>
      */
-    // JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
-    //     return new JTAJobRunShell(scheduler, bundle);
-    // }
+    JobRunShell createJobRunShell(TriggerFiredBundle bundle) {
+        // return new JTAJobRunShell(scheduler, bundle);
+        implementationMissing(false);
+        return null;
+    }
 
 
 

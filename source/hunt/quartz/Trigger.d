@@ -254,7 +254,7 @@ interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,
      * according to the natural (i.e. alphabetical) order of their keys.
      * </p>
      */
-    int compareTo(Trigger other);
+    // int compareTo(Trigger other);
 
 }
 

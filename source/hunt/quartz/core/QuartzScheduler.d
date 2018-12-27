@@ -976,8 +976,8 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         bool result = false;
         
-        List!OperableTrigger triggers = getTriggersOfJob(jobKey);
-        foreach(OperableTrigger trigger; triggers) {
+        List!Trigger triggers = getTriggersOfJob(jobKey);
+        foreach(Trigger trigger; triggers) {
             if (!unscheduleJob(trigger.getKey())) {
                 StringBuilder sb = new StringBuilder().append(
                         "Unable to unschedule trigger [").append(
@@ -1453,7 +1453,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * identified <code>{@link hunt.quartz.JobDetail}</code>.
      * </p>
      */
-    List!(OperableTrigger) getTriggersOfJob(JobKey jobKey) {
+    List!(Trigger) getTriggersOfJob(JobKey jobKey) {
         validateState();
 
         return resources.getJobStore().getTriggersForJob(jobKey);

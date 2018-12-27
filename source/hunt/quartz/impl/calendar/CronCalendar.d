@@ -77,12 +77,12 @@ class CronCalendar : BaseCalendar {
         this.cronExpression.setTimeZone(timeZone);
     }
     
-    // override
-    // Object clone() {
-    //     CronCalendar clone = (CronCalendar) super.clone();
-    //     clone.cronExpression = new CronExpression(cronExpression);
-    //     return clone;
-    // }
+    override
+    Object clone() {
+        CronCalendar clone = cast(CronCalendar) super.clone();
+        clone.cronExpression = new CronExpression(cronExpression);
+        return clone;
+    }
 
     /**
      * Returns the time zone for which the <code>CronExpression</code> of

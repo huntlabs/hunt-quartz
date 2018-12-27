@@ -38,7 +38,7 @@ import hunt.time.ZoneOffset;
  *
  * @author Juergen Donnerstag
  */
-class WeeklyCalendar : BaseCalendar, Calendar {
+class WeeklyCalendar : BaseCalendar {
 
     // An array to store the week days which are to be excluded.
     // hunt.time.util.Calendar.MONDAY etc. are used as index.
@@ -71,12 +71,12 @@ class WeeklyCalendar : BaseCalendar, Calendar {
     //     excludeDays = new bool[8];
     // }
 
-    // override
-    // Object clone() {
-    //     WeeklyCalendar clone = (WeeklyCalendar) super.clone();
-    //     clone.excludeDays = excludeDays.clone();
-    //     return clone;
-    // }
+    override
+    Object clone() {
+        WeeklyCalendar clone = cast(WeeklyCalendar) super.clone();
+        clone.excludeDays[0..$] = excludeDays[0..$];
+        return clone;
+    }
 
     /**
      * <p>

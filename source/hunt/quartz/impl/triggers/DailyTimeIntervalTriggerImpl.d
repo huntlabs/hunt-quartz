@@ -30,6 +30,7 @@ import hunt.quartz.Scheduler;
 import hunt.quartz.exception;
 import hunt.quartz.TimeOfDay;
 import hunt.quartz.Trigger;
+import hunt.quartz.TriggerBuilder;
 import hunt.quartz.DateBuilder : IntervalUnit;
 
 import hunt.container.Set;
@@ -925,6 +926,11 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
                     "End time of day cannot be before start time of day");
         }
         this.endTimeOfDay = endTimeOfDay;
+    }
+
+
+    override TriggerBuilder!(DailyTimeIntervalTrigger) getTriggerBuilder() {
+        return super.getTriggerBuilder();
     }
     
     /**

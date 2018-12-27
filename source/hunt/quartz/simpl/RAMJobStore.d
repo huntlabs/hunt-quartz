@@ -314,8 +314,8 @@ class RAMJobStore : JobStore {
         bool found = false;
 
         synchronized (lock) {
-            List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
-            foreach(OperableTrigger trig; triggersOfJob) {
+            List!(Trigger) triggersOfJob = getTriggersForJob(jobKey);
+            foreach(Trigger trig; triggersOfJob) {
                 this.removeTrigger(trig.getKey());
                 found = true;
             }
@@ -494,7 +494,7 @@ class RAMJobStore : JobStore {
 
                 if (removeOrphanedJob) {
                     JobWrapper jw = jobsByKey.get(tw.jobKey);
-                    List!(OperableTrigger) trigs = getTriggersForJob(tw.jobKey);
+                    List!(Trigger) trigs = getTriggersForJob(tw.jobKey);
                     if ((trigs is null || trigs.size() == 0) && !jw.jobDetail.isDurable()) {
                         if (removeJob(jw.key)) {
                             signaler.notifySchedulerListenersJobDeleted(jw.key);
@@ -990,14 +990,14 @@ class RAMJobStore : JobStore {
      * If there are no matches, a zero-length array should be returned.
      * </p>
      */
-    List!(OperableTrigger) getTriggersForJob(JobKey jobKey) {
-        ArrayList!(OperableTrigger) trigList = new ArrayList!(OperableTrigger)();
+    List!(Trigger) getTriggersForJob(JobKey jobKey) {
+        ArrayList!(Trigger) trigList = new ArrayList!(Trigger)();
 
         synchronized (lock) {
             List!(TriggerWrapper) jobList = triggersByJob.get(jobKey);
             if(jobList !is null) {
                 foreach(TriggerWrapper tw ; jobList) {
-                    trigList.add(cast(OperableTrigger) tw.trigger.clone());
+                    trigList.add(cast(Trigger) tw.trigger.clone());
                 }
             }
         }
@@ -1121,8 +1121,8 @@ class RAMJobStore : JobStore {
      */
     void pauseJob(JobKey jobKey) {
         synchronized (lock) {
-            List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
-            foreach(OperableTrigger trigger; triggersOfJob) {
+            List!(Trigger) triggersOfJob = getTriggersForJob(jobKey);
+            foreach(Trigger trigger; triggersOfJob) {
                 pauseTrigger(trigger.getKey());
             }
         }
@@ -1162,8 +1162,8 @@ class RAMJobStore : JobStore {
 
             foreach(string groupName ; pausedGroups) {
                 foreach (JobKey jobKey; getJobKeys(GroupMatcherHelper.jobGroupEquals(groupName))) {
-                    List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
-                    foreach(OperableTrigger trigger; triggersOfJob) {
+                    List!(Trigger) triggersOfJob = getTriggersForJob(jobKey);
+                    foreach(Trigger trigger; triggersOfJob) {
                         pauseTrigger(trigger.getKey());
                     }
                 }
@@ -1287,8 +1287,8 @@ class RAMJobStore : JobStore {
     void resumeJob(JobKey jobKey) {
 
         synchronized (lock) {
-            List!(OperableTrigger) triggersOfJob = getTriggersForJob(jobKey);
-            foreach(OperableTrigger trigger; triggersOfJob) {
+            List!(Trigger) triggersOfJob = getTriggersForJob(jobKey);
+            foreach(Trigger trigger; triggersOfJob) {
                 resumeTrigger(trigger.getKey());
             }
         }
@@ -1323,8 +1323,8 @@ class RAMJobStore : JobStore {
             }
 
             foreach(JobKey key; keys) {
-                List!(OperableTrigger) triggersOfJob = getTriggersForJob(key);
-                foreach(OperableTrigger trigger; triggersOfJob) {
+                List!(Trigger) triggersOfJob = getTriggersForJob(key);
+                foreach(Trigger trigger; triggersOfJob) {
                     resumeTrigger(trigger.getKey());
                 }
             }

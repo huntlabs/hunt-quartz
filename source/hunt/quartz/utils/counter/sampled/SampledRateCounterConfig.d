@@ -17,6 +17,7 @@
 module hunt.quartz.utils.counter.sampled.SampledRateCounterConfig;
 
 import hunt.quartz.utils.counter.sampled.SampledCounterConfig;
+import hunt.quartz.utils.counter.sampled.SampledRateCounterImpl;
 import hunt.quartz.utils.counter.Counter;
 
 /**

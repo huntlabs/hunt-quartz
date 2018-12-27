@@ -40,11 +40,11 @@ class ListenerManagerImpl : ListenerManager {
     }
 
     
-    // void addJobListener(JobListener jobListener, Matcher!(JobKey)[] matchers ... ) {
+    void addJobListener(JobListener jobListener, Matcher!(JobKey)[] matchers ... ) {
     //     addJobListener(jobListener, Arrays.asList(matchers));
     // }
 
-    void addJobListener(JobListener jobListener, List!(Matcher!(JobKey)) matchers) {
+    // void addJobListener(JobListener jobListener, List!(Matcher!(JobKey)) matchers) {
         if (jobListener.getName().empty) {
             throw new IllegalArgumentException("JobListener name cannot be empty.");
         }
@@ -52,7 +52,7 @@ class ListenerManagerImpl : ListenerManager {
         synchronized (globalJobListeners) {
             globalJobListeners.put(jobListener.getName(), jobListener);
             LinkedList!(Matcher!(JobKey)) matchersL = new  LinkedList!(Matcher!(JobKey))();
-            if(matchers !is null && matchers.size() > 0)
+            if(matchers !is null && matchers.length > 0)
                 matchersL.addAll(matchers);
             else
                 matchersL.add(EverythingMatcherHelper.allJobs());
@@ -151,11 +151,11 @@ class ListenerManagerImpl : ListenerManager {
         }
     }
 
-    // void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey)[] matchers... ) {
+    void addTriggerListener(TriggerListener triggerListener, Matcher!(TriggerKey)[] matchers... ) {
     //     addTriggerListener(triggerListener, Arrays.asList(matchers));
     // }
     
-    void addTriggerListener(TriggerListener triggerListener, List!(Matcher!(TriggerKey)) matchers) {
+    // void addTriggerListener(TriggerListener triggerListener, List!(Matcher!(TriggerKey)) matchers) {
         if (triggerListener.getName() is null
                 || triggerListener.getName().length == 0) {
             throw new IllegalArgumentException(
@@ -166,7 +166,7 @@ class ListenerManagerImpl : ListenerManager {
             globalTriggerListeners.put(triggerListener.getName(), triggerListener);
 
             LinkedList!(Matcher!(TriggerKey)) matchersL = new  LinkedList!(Matcher!(TriggerKey))();
-            if(matchers !is null && matchers.size() > 0)
+            if(matchers.length > 0)
                 matchersL.addAll(matchers);
             else
                 matchersL.add(EverythingMatcherHelper.allTriggers());

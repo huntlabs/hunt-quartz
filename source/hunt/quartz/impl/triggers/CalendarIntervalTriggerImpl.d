@@ -33,6 +33,7 @@ import hunt.quartz.Scheduler;
 import hunt.quartz.exception;
 import hunt.quartz.SimpleTrigger;
 import hunt.quartz.Trigger;
+import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerUtils;
 
 import hunt.lang.exception;
@@ -944,6 +945,10 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         if (repeatInterval < 1) {
             throw new SchedulerException("Repeat Interval cannot be zero.");
         }
+    }
+
+    override TriggerBuilder!(CalendarIntervalTrigger) getTriggerBuilder() {
+        return super.getTriggerBuilder();
     }
 
     /**

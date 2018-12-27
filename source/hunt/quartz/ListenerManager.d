@@ -89,7 +89,7 @@ interface ListenerManager {
      * @see Matcher
      * @see hunt.quartz.impl.matchers.EverythingMatcher
      */
-    void addJobListener(JobListener jobListener, List!(Matcher!(JobKey)) matchers);
+    // void addJobListener(JobListener jobListener, List!(Matcher!(JobKey)) matchers);
 
     /**
      * Add the given Matcher to the set of matchers for which the listener
@@ -197,7 +197,7 @@ interface ListenerManager {
      * @see Matcher
      * @see hunt.quartz.impl.matchers.EverythingMatcher
      */
-    void addTriggerListener(TriggerListener triggerListener, List!(Matcher!(TriggerKey)) matchers);
+    // void addTriggerListener(TriggerListener triggerListener, List!(Matcher!(TriggerKey)) matchers);
 
     /**
      * Add the given Matcher to the set of matchers for which the listener
