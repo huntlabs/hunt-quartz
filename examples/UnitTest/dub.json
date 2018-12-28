@@ -3,7 +3,7 @@
     "authors": [
         "Hunt Labs"
     ],
-	"description": "All the unittests for hunt-http.",
+	"description": "All the unit tests for hunt-quartz.",
 	"copyright": "Copyright (C) 2018, HuntLabs.cn",
 	"license": "Apache-2.0",
 	"dependencies": {
