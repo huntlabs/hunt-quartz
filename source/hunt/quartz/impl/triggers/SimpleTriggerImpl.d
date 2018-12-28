@@ -757,7 +757,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
 
         long startMillis = getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli();
         long afterMillis = afterTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-        LocalDateTime endMillis = (getEndTime() is null) ? LocalDateTime.MAX : getEndTime();
+        // LocalDateTime endMillis = (getEndTime() is null) ? LocalDateTime.MAX : getEndTime();
+        LocalDateTime endMillis = getEndTime();
 
         if (endMillis <= afterTime) {
             return null;

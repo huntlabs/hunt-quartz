@@ -199,7 +199,7 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         return obj;
     }
 
-    override int size() const {
+    override int size() {
         return map.size();
     }
 
@@ -284,7 +284,7 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         }
 
         // Pure wrapper methods
-        override int size() const {
+        override int size() {
             return collection.size();
         }
 

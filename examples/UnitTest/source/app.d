@@ -4,9 +4,11 @@ import hunt.util.UnitTest;
 
 import std.stdio;
 
+import test.quartz.CronExpressionTest;
 import test.quartz.VersionTest;
 
 void main()
 {
-	testUnits!(VersionTest);
+	testUnits!(CronExpressionTest);
+	// testUnits!(VersionTest);
 }

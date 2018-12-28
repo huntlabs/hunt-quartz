@@ -42,6 +42,7 @@ import std.range;
 import std.regex;
 import std.string;
 
+version (HUNT_DEBUG) import hunt.logging.ConsoleLogger;
 
 /**
  * Provides a parser and evaluator for unix-like cron expressions. Cron 
@@ -328,7 +329,7 @@ final class CronExpression : Cloneable { // Serializable,
      */
     bool isSatisfiedBy(LocalDateTime date) {
         LocalDateTime originalDate = date;
-        date.plusSeconds(-1);
+        date = date.plusSeconds(-1);
         LocalDateTime timeAfter = getTimeAfter(date);
 
         return ((timeAfter !is null) && (timeAfter == originalDate));
@@ -475,11 +476,14 @@ final class CronExpression : Cloneable { // Serializable,
 
             int exprOn = SECOND;
 
+                version (HUNT_DEBUG) tracef(expression);
+
             StringTokenizer exprsTok = new StringTokenizer(expression, " \t",
                     false);
-
+                
             while (exprsTok.hasMoreTokens() && exprOn <= YEAR) {
                 string expr = exprsTok.nextToken().strip();
+                version (HUNT_DEBUG) tracef(expr);
 
                 // throw an exception if L is used with other days of the month
                 if(exprOn == DAY_OF_MONTH && expr.indexOf('L') != -1 && expr.length > 1 && expr.contains(",")) {
@@ -517,6 +521,12 @@ final class CronExpression : Cloneable { // Serializable,
             // Copying the logic from the UnsupportedOperationException below
             bool dayOfMSpec = !dom.contains(NO_SPEC);
             bool dayOfWSpec = !dow.contains(NO_SPEC);
+            
+            version (HUNT_DEBUG) {
+                
+                tracef("dayOfMSpec: %d, exprOn: %d", dow.size(), exprOn);
+                tracef("dayOfMSpec: %s, dayOfWSpec: %s", dayOfMSpec, dayOfWSpec);
+            }
 
             if (!dayOfMSpec || dayOfWSpec) {
                 if (!dayOfWSpec || dayOfMSpec) {
