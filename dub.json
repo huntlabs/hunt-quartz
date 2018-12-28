@@ -1,10 +1,8 @@
 {
 	"name": "hunt-quartz",
-	"authors": [
-		"Putao Lab"
-	],
+	"authors": ["HuntLabs.net"],
 	"description": "A job scheduling library for D based on Quartz.",
-	"copyright": "Copyright © 2018, HuntLabs.cn",
+	"copyright": "Copyright © 2018, HuntLabs.net",
 	"license": "Apache-2.0",
 	"dependencies": {
 		"hunt" : {"path": "../hunt"}
