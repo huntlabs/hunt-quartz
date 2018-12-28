@@ -21,7 +21,7 @@ import hunt.container;
 import hunt.lang.common;
 import hunt.lang.exception;
 import hunt.string;
-import hunt.time.util.Calendar;
+// import hunt.time.util.Calendar;
 import hunt.time.util.Locale;
 import hunt.time.DayOfWeek;
 import hunt.time.LocalDateTime;
@@ -475,15 +475,14 @@ final class CronExpression : Cloneable { // Serializable,
             }
 
             int exprOn = SECOND;
-
-                version (HUNT_DEBUG) tracef(expression);
+            version (HUNT_DEBUG) tracef(expression);
 
             StringTokenizer exprsTok = new StringTokenizer(expression, " \t",
                     false);
                 
             while (exprsTok.hasMoreTokens() && exprOn <= YEAR) {
                 string expr = exprsTok.nextToken().strip();
-                version (HUNT_DEBUG) tracef(expr);
+                // version (HUNT_DEBUG) tracef(expr);
 
                 // throw an exception if L is used with other days of the month
                 if(exprOn == DAY_OF_MONTH && expr.indexOf('L') != -1 && expr.length > 1 && expr.contains(",")) {
@@ -522,11 +521,10 @@ final class CronExpression : Cloneable { // Serializable,
             bool dayOfMSpec = !dom.contains(NO_SPEC);
             bool dayOfWSpec = !dow.contains(NO_SPEC);
             
-            version (HUNT_DEBUG) {
-                
-                tracef("dayOfMSpec: %d, exprOn: %d", dow.size(), exprOn);
-                tracef("dayOfMSpec: %s, dayOfWSpec: %s", dayOfMSpec, dayOfWSpec);
-            }
+            // version (HUNT_DEBUG) {
+            //     tracef("dayOfMSpec: %d, exprOn: %d", dow.size(), exprOn);
+            //     tracef("dayOfMSpec: %s, dayOfWSpec: %s", dayOfMSpec, dayOfWSpec);
+            // }
 
             if (!dayOfMSpec || dayOfWSpec) {
                 if (!dayOfWSpec || dayOfMSpec) {
@@ -552,7 +550,7 @@ final class CronExpression : Cloneable { // Serializable,
         char c = s[i];
         auto pattern = ctRegex!("^L-[0-9]*[W]?");
         if ((c >= 'A') && (c <= 'Z') && (!s.equals("L")) && 
-            (!s.equals("LW")) && (!(matchFirst(s, pattern).empty))) {
+            (!s.equals("LW")) && (matchFirst(s, pattern).empty)) {
             string sub = s.substring(i, i + 3);
             int sval = -1;
             int eval = -1;
@@ -608,13 +606,13 @@ final class CronExpression : Cloneable { // Serializable,
                 }
 
             } else {
-                throw new ParseException(
-                        "Illegal characters for this position: '" ~ sub ~ "'",
-                        i);
+                throw new ParseException("Illegal characters for this position: '" ~ sub ~ "'", i);
             }
+
             if (eval != -1) {
                 incr = 1;
             }
+
             addToSet(sval, eval, incr, type);
             return (i + 3);
         }
@@ -1191,7 +1189,6 @@ final class CronExpression : Cloneable { // Serializable,
         bool gotOne = false;
         // loop until we've computed the next time, or we've past the endTime
         while (!gotOne) {
-
             //if (endTime !is null && cl.getTime().isAfter(endTime)) return null;
             if(afterTime.getYear() > 2999) { // prevent endless loop...
                 return null;
@@ -1267,6 +1264,7 @@ final class CronExpression : Cloneable { // Serializable,
             // get day...................................................
             bool dayOfMSpec = !daysOfMonth.contains(NO_SPEC);
             bool dayOfWSpec = !daysOfWeek.contains(NO_SPEC);
+            // version (HUNT_DEBUG) tracef("dayOfMSpec=%s, dayOfWSpec=%s", dayOfMSpec, dayOfWSpec);
             if (dayOfMSpec && !dayOfWSpec) { // get day by day of month rule
                 st = daysOfMonth.tailSet(day);
                 if (lastdayOfMonth) {
@@ -1294,13 +1292,13 @@ final class CronExpression : Cloneable { // Serializable,
                         int ldom = getLastDayOfMonth(mon, afterTimeYear);
                         int dow = tTime.getDayOfWeek().getValue();
 
-                        if(dow == Calendar.SATURDAY && day == 1) {
+                        if(dow == DayOfWeek.SATURDAY.getValue() && day == 1) {
                             day += 2;
-                        } else if(dow == Calendar.SATURDAY) {
+                        } else if(dow == DayOfWeek.SATURDAY.getValue()) {
                             day -= 1;
-                        } else if(dow == Calendar.SUNDAY && day == ldom) { 
+                        } else if(dow == DayOfWeek.SUNDAY.getValue() && day == ldom) { 
                             day -= 2;
-                        } else if(dow == Calendar.SUNDAY) { 
+                        } else if(dow == DayOfWeek.SUNDAY.getValue()) { 
                             day += 1;
                         }
 
@@ -1320,13 +1318,13 @@ final class CronExpression : Cloneable { // Serializable,
                     int ldom = getLastDayOfMonth(mon, afterTimeYear);
                     int dow = tTime.getDayOfWeek().getValue();
 
-                    if(dow == Calendar.SATURDAY && day == 1) {
+                    if(dow == DayOfWeek.SATURDAY.getValue() && day == 1) {
                         day += 2;
-                    } else if(dow == Calendar.SATURDAY) {
+                    } else if(dow == DayOfWeek.SATURDAY.getValue()) {
                         day -= 1;
-                    } else if(dow == Calendar.SUNDAY && day == ldom) { 
+                    } else if(dow == DayOfWeek.SUNDAY.getValue() && day == ldom) { 
                         day -= 2;
-                    } else if(dow == Calendar.SUNDAY) { 
+                    } else if(dow == DayOfWeek.SUNDAY.getValue()) { 
                         day += 1;
                     }
 
@@ -1349,6 +1347,8 @@ final class CronExpression : Cloneable { // Serializable,
                     mon++;
                 }
                 
+                    // version (HUNT_DEBUG) tracef("day:%d, t:%d, mon:%d, tmon:%d=>", day, t, mon, tmon);
+
                 if (day != t || mon != tmon) {
                     afterTime = LocalDateTime.of(afterTimeYear, mon, day, 0, 0, 0);
                     continue;
@@ -1455,6 +1455,7 @@ final class CronExpression : Cloneable { // Serializable,
                 throw new UnsupportedOperationException(
                         "Support for specifying both a day-of-week AND a day-of-month parameter is not implemented.");
             }
+
             afterTime = afterTime.withDayOfMonth(day);
 
             mon = afterTime.getMonthValue();
@@ -1499,7 +1500,6 @@ final class CronExpression : Cloneable { // Serializable,
                 continue;
             }
             afterTime = afterTime.withYear(year);
-
             gotOne = true;
         } // while( !done )
 

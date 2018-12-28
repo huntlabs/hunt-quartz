@@ -88,49 +88,47 @@ class CronExpressionTest  { // : SerializationTestSupport
     /*
      * Test method for 'org.quartz.CronExpression.isSatisfiedBy(Date)'.
      */
-    void testIsSatisfiedBy() {
-        CronExpression cronExpression = new CronExpression("0 15 10 * * ? 2005");
+    // void testIsSatisfiedBy() {
+    //     CronExpression cronExpression = new CronExpression("0 15 10 * * ? 2005");
         
-        LocalDateTime cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 15, 0);
+    //     LocalDateTime cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 15, 0);
+    //     assertTrue(cronExpression.isSatisfiedBy(cal));
+        
+    //     cal = cal.withYear(2006);
+    //     assertFalse(cronExpression.isSatisfiedBy(cal));
+
+    //     cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 16, 0);
+    //     assertFalse(cronExpression.isSatisfiedBy(cal));
+
+    //     cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 14, 0);
+    //     assertFalse(cronExpression.isSatisfiedBy(cal));
+    // }
+
+    void testLastDayOffset() {
+        CronExpression cronExpression = new CronExpression("0 15 10 L-2 * ? 2010");
+        
+        LocalDateTime cal = LocalDateTime.of(2010, Month.OCTOBER, 29, 10, 15, 0); // last day - 2
         assertTrue(cronExpression.isSatisfiedBy(cal));
         
-        cal = cal.withYear(2006);
+        cal = LocalDateTime.of(2010, Month.OCTOBER, 28, 10, 15, 0);
         assertFalse(cronExpression.isSatisfiedBy(cal));
-
-        cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 16, 0);
-        assertFalse(cronExpression.isSatisfiedBy(cal));
-
-        cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 14, 0);
-        assertFalse(cronExpression.isSatisfiedBy(cal));
+        
+        cronExpression = new CronExpression("0 15 10 L-5W * ? 2010");
+        
+        cal = LocalDateTime.of(2010, Month.OCTOBER, 26, 10, 15, 0); // last day - 5
+        assertTrue(cronExpression.isSatisfiedBy(cal));
+        
+        cronExpression = new CronExpression("0 15 10 L-1 * ? 2010");
+        
+        cal = LocalDateTime.of(2010, Month.OCTOBER, 30, 10, 15, 0); // last day - 1
+        assertTrue(cronExpression.isSatisfiedBy(cal));
+        
+        cronExpression = new CronExpression("0 15 10 L-1W * ? 2010");
+        
+        cal = LocalDateTime.of(2010, Month.OCTOBER, 29, 10, 15, 0); // nearest weekday to last day - 1 (29th is a friday in 2010)
+        assertTrue(cronExpression.isSatisfiedBy(cal));
+        
     }
-
-    // void testLastDayOffset() {
-    //     CronExpression cronExpression = new CronExpression("0 15 10 L-2 * ? 2010");
-        
-    //     LocalDateTime cal = LocalDateTime.getInstance();
-        
-    //     cal.set(2010, LocalDateTime.OCTOBER, 29, 10, 15, 0); // last day - 2
-    //     assertTrue(cronExpression.isSatisfiedBy(cal.getTime()));
-        
-    //     cal.set(2010, LocalDateTime.OCTOBER, 28, 10, 15, 0);
-    //     assertFalse(cronExpression.isSatisfiedBy(cal.getTime()));
-        
-    //     cronExpression = new CronExpression("0 15 10 L-5W * ? 2010");
-        
-    //     cal.set(2010, LocalDateTime.OCTOBER, 26, 10, 15, 0); // last day - 5
-    //     assertTrue(cronExpression.isSatisfiedBy(cal.getTime()));
-        
-    //     cronExpression = new CronExpression("0 15 10 L-1 * ? 2010");
-        
-    //     cal.set(2010, LocalDateTime.OCTOBER, 30, 10, 15, 0); // last day - 1
-    //     assertTrue(cronExpression.isSatisfiedBy(cal.getTime()));
-        
-    //     cronExpression = new CronExpression("0 15 10 L-1W * ? 2010");
-        
-    //     cal.set(2010, LocalDateTime.OCTOBER, 29, 10, 15, 0); // nearest weekday to last day - 1 (29th is a friday in 2010)
-    //     assertTrue(cronExpression.isSatisfiedBy(cal.getTime()));
-        
-    // }
 
     // /*
     //  * QUARTZ-571: Showing that expressions with months correctly serialize.
