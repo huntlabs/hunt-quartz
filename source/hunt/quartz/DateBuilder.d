@@ -22,7 +22,7 @@ import hunt.time.util.Calendar;
 import hunt.time.util.Locale;
 import hunt.time.LocalDateTime;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 
 import std.conv;
 import std.datetime;

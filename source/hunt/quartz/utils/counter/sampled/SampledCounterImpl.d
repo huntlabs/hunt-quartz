@@ -24,7 +24,7 @@ import hunt.quartz.utils.counter.sampled.TimeStampedCounterValue;
 
 import hunt.quartz.utils.CircularLossyQueue;
 import hunt.quartz.utils.counter.CounterImpl;
-import hunt.datetime;
+import hunt.util.DateTime;
 
 /**
  * An implementation of {@link SampledCounter}

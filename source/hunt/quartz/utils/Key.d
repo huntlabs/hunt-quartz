@@ -17,10 +17,8 @@
 
 module hunt.quartz.utils.Key;
 
-// import java.util.UUID;
-
-import hunt.lang.common;
-import hunt.lang.exception;
+import hunt.util.Common;
+import hunt.Exceptions;
 
 import std.algorithm;
 import std.format;

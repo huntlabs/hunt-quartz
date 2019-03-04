@@ -27,7 +27,7 @@ import hunt.quartz.core.JobRunShellFactory;
 import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.utils.ClassUtils;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 
 /**
  * <p>

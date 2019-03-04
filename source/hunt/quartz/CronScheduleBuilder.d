@@ -26,7 +26,7 @@ import hunt.quartz.Trigger;
 import hunt.quartz.impl.triggers.CronTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 import hunt.time.ZoneId;
 
 import std.conv;

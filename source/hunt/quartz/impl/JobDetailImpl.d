@@ -31,7 +31,7 @@ import hunt.quartz.StatefulJob;
 import hunt.quartz.Trigger;
 import hunt.quartz.utils.ClassUtils;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 
 import std.array;
 import std.conv;

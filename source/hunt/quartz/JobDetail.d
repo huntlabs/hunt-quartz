@@ -21,7 +21,7 @@ import hunt.quartz.JobBuilder;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobKey;
 
-import hunt.lang.common;
+import hunt.util.Common;
 
 /**
  * Conveys the detail properties of a given <code>Job</code> instance. JobDetails are

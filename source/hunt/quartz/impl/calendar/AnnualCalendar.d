@@ -20,10 +20,10 @@ module hunt.quartz.impl.calendar.AnnualCalendar;
 import hunt.quartz.impl.calendar.BaseCalendar;
 import hunt.quartz.Calendar;
 
-import hunt.container.ArrayList;
-import hunt.container.Collections;
-import hunt.container.Iterator;
-import hunt.lang.exception;
+import hunt.collection.ArrayList;
+import hunt.collection.Collections;
+import hunt.collection.Iterator;
+import hunt.Exceptions;
 import hunt.time.Instant;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
@@ -50,17 +50,21 @@ class AnnualCalendar : BaseCalendar {
     private bool dataSorted = false;
 
     this() {
+        initialize();
     }
 
     this(QuartzCalendar baseCalendar) {
+        initialize();
         super(baseCalendar);
     }
 
     this(ZoneId timeZone) {
+        initialize();
         super(timeZone);
     }
 
     this(QuartzCalendar baseCalendar, ZoneId timeZone) {
+        initialize();
         super(baseCalendar, timeZone);
     }
 
@@ -103,14 +107,16 @@ class AnnualCalendar : BaseCalendar {
         int dmonth = day.getMonthValue();
         int dday = day.getDayOfMonth();
 
+
     // TODO: Tasks pending completion -@zxp at 12/24/2018, 6:40:42 PM
     // 
-        // if (dataSorted == false) {
-        //     Collections.sort(excludeDays, new CalendarComparator());
-        //     dataSorted = true;
-        // }
+        if (dataSorted == false) {
+            // Collections.sort(excludeDays, new CalendarComparator());
+            excludeDays.sort(new CalendarComparator());
+            dataSorted = true;
+        }
 
-        foreach(LocalDateTime ldt; excludeDays.iterator()) {
+        foreach(LocalDateTime ldt; excludeDays) {
             // remember, the list is sorted
             if (dmonth < ldt.getMonthValue()) {
                 return false;
@@ -268,33 +274,33 @@ class AnnualCalendar : BaseCalendar {
 
 /**
 */
-// class CalendarComparator : Comparator!(LocalDateTime) { // , Serializable
+class CalendarComparator : Comparator!(LocalDateTime) { // hunt.text.
   
     
-//     this() {
-//     }
+    this() {
+    }
 
 
-//     int compare(LocalDateTime c1, LocalDateTime c2) {
+    int compare(LocalDateTime c1, LocalDateTime c2) nothrow {
         
-//         int month1 = c1.get(LocalDateTime.MONTH);
-//         int month2 = c2.get(LocalDateTime.MONTH);
+        int month1 = c1.getMonthValue();
+        int month2 = c2.getMonthValue();
         
-//         int day1 = c1.get(LocalDateTime.DAY_OF_MONTH);
-//         int day2 = c2.get(LocalDateTime.DAY_OF_MONTH);
+        int day1 = c1.getDayOfMonth();
+        int day2 = c2.getDayOfMonth();
         
-//         if (month1 < month2) {
-//             return -1;
-//         }
-//         if (month1 > month2) {
-//             return 1; 
-//         }
-//         if (day1 < day2) {
-//             return -1;
-//         }
-//         if (day1 > day2) {
-//             return 1;
-//         }
-//         return 0;
-//       }
-// }
+        if (month1 < month2) {
+            return -1;
+        }
+        if (month1 > month2) {
+            return 1; 
+        }
+        if (day1 < day2) {
+            return -1;
+        }
+        if (day1 > day2) {
+            return 1;
+        }
+        return 0;
+      }
+}

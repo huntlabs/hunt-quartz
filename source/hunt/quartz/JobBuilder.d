@@ -24,11 +24,11 @@ import hunt.quartz.JobKey;
 import hunt.quartz.impl.JobDetailImpl;
 import hunt.quartz.utils.Key;
 
-import hunt.lang.Boolean;
-import hunt.lang.Double;
-import hunt.lang.Float;
-import hunt.lang.Integer;
-import hunt.lang.Long;
+import hunt.Boolean;
+import hunt.Double;
+import hunt.Float;
+import hunt.Integer;
+import hunt.Long;
 
 /**
  * <code>JobBuilder</code> is used to instantiate {@link JobDetail}s.

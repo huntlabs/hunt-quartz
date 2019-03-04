@@ -21,8 +21,8 @@ module hunt.quartz.utils.CircularLossyQueue;
 
 import core.atomic;
 import std.conv;
-import hunt.lang.exception;
-import hunt.concurrent.atomic.AtomicHelper;
+import hunt.Exceptions;
+import hunt.concurrency.atomic.AtomicHelper;
 
 /**
  * An implementation of a CircularQueue data-structure.

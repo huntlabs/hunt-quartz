@@ -19,9 +19,9 @@
 module hunt.quartz.Scheduler;
 
 import std.datetime;
-import hunt.container.List;
-import hunt.container.Map;
-import hunt.container.Set;
+import hunt.collection.List;
+import hunt.collection.Map;
+import hunt.collection.Set;
 import hunt.time.LocalDateTime;
 
 import hunt.quartz.Calendar;

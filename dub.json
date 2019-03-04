@@ -5,6 +5,7 @@
 	"copyright": "Copyright © 2018, HuntLabs.net",
 	"license": "Apache-2.0",
 	"dependencies": {
-		"hunt" : {"path": "../hunt"}
+		"hunt" : {"path": "../hunt"},
+		"hunt-time" : {"path": "../hunt-time"}
 	}
 }

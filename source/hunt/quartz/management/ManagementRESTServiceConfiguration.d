@@ -15,7 +15,7 @@
  */
 module hunt.quartz.management.ManagementRESTServiceConfiguration;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 import std.conv;
 import std.string;
 

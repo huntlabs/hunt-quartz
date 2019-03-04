@@ -19,13 +19,13 @@ module hunt.quartz.impl.calendar.BaseCalendar;
 
 import hunt.quartz.Calendar;
 
-import hunt.io.common;
-import hunt.lang.common;
-import hunt.lang.exception;
+import hunt.Exceptions;
+import hunt.text.Common;
 // import hunt.time.util.Calendar;
 import hunt.time.Instant;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
+import hunt.util.Common;
 
 import std.datetime;
 
@@ -49,7 +49,7 @@ import std.datetime;
  * @author Juergen Donnerstag
  * @author James House
  */
-class BaseCalendar : QuartzCalendar, Serializable, Cloneable {
+class BaseCalendar : QuartzCalendar, Cloneable {
 
 
     // <p>A optional base calendar.</p>

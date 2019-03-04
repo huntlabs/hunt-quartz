@@ -19,7 +19,7 @@ module hunt.quartz.spi.ThreadPool;
 
 import hunt.quartz.exception;
 
-import hunt.lang.common;
+import hunt.util.Common;
 
 /**
  * <p>

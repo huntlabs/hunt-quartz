@@ -18,12 +18,12 @@
 
 module hunt.quartz.JobDataMap;
 
-import hunt.container.Map;
+import hunt.collection.Map;
 
 import hunt.quartz.utils.StringKeyDirtyFlagMap;
 
-import hunt.lang.Nullable;
-import hunt.lang.String;
+import hunt.Nullable;
+import hunt.String;
 
 import std.conv;
 

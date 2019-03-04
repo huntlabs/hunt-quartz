@@ -17,11 +17,11 @@
 
 module hunt.quartz.xml.ValidationException;
 
-import hunt.container.ArrayList;
-import hunt.container.Collection;
-import hunt.container.Collections;
-import hunt.container.Iterator;
-import hunt.string;
+import hunt.collection.ArrayList;
+import hunt.collection.Collection;
+import hunt.collection.Collections;
+import hunt.collection.Iterator;
+import hunt.String;
 
 /**
  * Reports JobSchedulingDataLoader validation exceptions.

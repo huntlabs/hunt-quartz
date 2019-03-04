@@ -18,8 +18,8 @@
 module hunt.quartz.jobs.ee.jmx.JMXInvokerJob;
 
 
-// import hunt.container.LinkedList;
-// import hunt.string.StringTokenizer;
+// import hunt.collection.LinkedList;
+// import hunt.text.StringTokenizer;
 
 // import javax.management.MBeanServer;
 // import javax.management.MBeanServerFactory;

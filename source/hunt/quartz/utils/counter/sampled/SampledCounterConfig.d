@@ -21,7 +21,7 @@ import hunt.quartz.utils.counter.Counter;
 import hunt.quartz.utils.counter.CounterConfig;
 
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 import std.conv;
 
 /**

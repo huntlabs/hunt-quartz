@@ -17,15 +17,15 @@ module hunt.quartz.utils.StringKeyDirtyFlagMap;
 
 import hunt.quartz.utils.DirtyFlagMap;
 
-import hunt.lang.exception;
-import hunt.lang.Boolean;
-import hunt.lang.Double;
-import hunt.lang.Float;
-import hunt.lang.Integer;
-import hunt.lang.Long;
-import hunt.lang.Number;
-import hunt.lang.String;
-import hunt.lang.Character;
+import hunt.Exceptions;
+import hunt.Boolean;
+import hunt.Char;
+import hunt.Double;
+import hunt.Float;
+import hunt.Integer;
+import hunt.Long;
+import hunt.Number;
+import hunt.String;
 
 /**
  * <p>
@@ -223,7 +223,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      * </p>
      */
     void put(string key, char value) {
-        super.put(key, Character.valueOf(value));
+        super.put(key, Char.valueOf(value));
     }
 
     /**
@@ -362,7 +362,7 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         Object obj = get(key);
     
         try {
-            Character n = cast(Character) obj;
+            Char n = cast(Char) obj;
             if(n !is null)
                 return n.charValue();
             return (obj.toString())[0];

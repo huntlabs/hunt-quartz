@@ -24,7 +24,7 @@ import hunt.quartz.Trigger;
 import hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 // import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 // import hunt.time.ZoneOffset;

@@ -20,7 +20,7 @@ module hunt.quartz.SchedulerFactory;
 
 import hunt.quartz.Scheduler;
 
-import hunt.container.Collection;
+import hunt.collection.Collection;
 
 /**
  * Provides a mechanism for obtaining client-usable handles to <code>Scheduler</code>

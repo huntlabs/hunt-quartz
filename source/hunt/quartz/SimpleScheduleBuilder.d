@@ -25,7 +25,7 @@ import hunt.quartz.Trigger;
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 import hunt.quartz.spi.MutableTrigger;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 
 import std.conv;
 

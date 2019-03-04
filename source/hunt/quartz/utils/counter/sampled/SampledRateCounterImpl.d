@@ -20,7 +20,7 @@ import hunt.quartz.utils.counter.sampled.SampledRateCounter;
 import hunt.quartz.utils.counter.sampled.SampledCounterImpl;
 import hunt.quartz.utils.counter.sampled.SampledRateCounterConfig;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 
 /**
  * An implementation of {@link SampledRateCounter}

@@ -3,8 +3,8 @@ module hunt.quartz.core.jmx.JobDetailSupport;
 // import static javax.management.openmbean.SimpleType.BOOLEAN;
 // import static javax.management.openmbean.SimpleType.STRING;
 
-// import hunt.container.ArrayList;
-// import hunt.container.Map;
+// import hunt.collection.ArrayList;
+// import hunt.collection.Map;
 
 // import javax.management.openmbean.CompositeData;
 // import javax.management.openmbean.CompositeDataSupport;

@@ -1,6 +1,6 @@
 module hunt.quartz.exception;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 
 
 class SchedulerException : Exception {

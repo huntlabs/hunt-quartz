@@ -3,7 +3,7 @@ module hunt.quartz.simpl.SystemPropertyInstanceIdGenerator;
 import hunt.quartz.exception;
 import hunt.quartz.spi.InstanceIdGenerator;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 import std.string;
 
 

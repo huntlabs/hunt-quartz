@@ -20,17 +20,17 @@ module hunt.quartz.utils.DirtyFlagMap;
 // import hunt.quartz.utils.DirtyFlagIterator;
 
 // import java.lang.reflect.Array;
-import hunt.container.AbstractMap;
-import hunt.container.ArrayList;
-import hunt.container.AbstractCollection;
-import hunt.container.Collection;
-import hunt.container.HashMap;
-import hunt.container.Iterator;
-import hunt.container.Map;
-import hunt.container.Set;
+import hunt.collection.AbstractMap;
+import hunt.collection.ArrayList;
+import hunt.collection.AbstractCollection;
+import hunt.collection.Collection;
+import hunt.collection.HashMap;
+import hunt.collection.Iterator;
+import hunt.collection.Map;
+import hunt.collection.Set;
 
-import hunt.lang.exception;
-import hunt.lang.Object;
+import hunt.Exceptions;
+import hunt.Object;
 
 /**
  * <p>

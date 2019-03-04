@@ -17,8 +17,8 @@
 
 module hunt.quartz.impl.SchedulerRepository;
 
-import hunt.container.Collection;
-import hunt.container.HashMap;
+import hunt.collection.Collection;
+import hunt.collection.HashMap;
 
 import hunt.quartz.Scheduler;
 import hunt.quartz.exception;

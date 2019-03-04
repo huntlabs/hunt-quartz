@@ -18,8 +18,8 @@ module hunt.quartz.utils.counter.CounterImpl;
 
 import hunt.quartz.utils.counter.Counter;
 
-import hunt.io.common;
-import hunt.concurrent.atomic.AtomicHelper;
+import hunt.util.Common;
+import hunt.concurrency.atomic.AtomicHelper;
 import core.atomic;
 
 /**
@@ -29,7 +29,7 @@ import core.atomic;
  * @since 1.8
  * 
  */
-class CounterImpl : Counter, Serializable {
+class CounterImpl : Counter {
   
     private shared long value;
 

@@ -24,8 +24,8 @@ import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerKey;
 
-import hunt.lang.common;
 import hunt.time.LocalDateTime;
+import hunt.util.Common;
 import hunt.util.Comparator;
 import std.datetime;
 
@@ -332,8 +332,12 @@ class TriggerTimeComparator : Comparator!(Trigger) {
     }
 
 
-    int compare(Trigger t1, Trigger t2) {
-        return compare(t1.getNextFireTime(), t1.getPriority(), t1.getKey(), 
-            t2.getNextFireTime(), t2.getPriority(), t2.getKey());
+    int compare(Trigger t1, Trigger t2) nothrow { 
+        try {
+            return compare(t1.getNextFireTime(), t1.getPriority(), t1.getKey(), 
+                t2.getNextFireTime(), t2.getPriority(), t2.getKey());
+        } catch(Exception) {
+            return 0;
+        }
     }
 }    

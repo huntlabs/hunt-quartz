@@ -25,7 +25,7 @@ import hunt.quartz.exception;
 import hunt.quartz.spi.JobFactory;
 import hunt.quartz.spi.TriggerFiredBundle;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 
 /**
  * The default JobFactory used by Quartz - simply calls 

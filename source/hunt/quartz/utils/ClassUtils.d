@@ -17,7 +17,7 @@ module hunt.quartz.utils.ClassUtils;
 
 // import java.lang.annotation.Annotation;
 // import java.util.Arrays;
-// import hunt.container.LinkedList;
+// import hunt.collection.LinkedList;
 // import java.util.Queue;
 
 // class ClassUtils {

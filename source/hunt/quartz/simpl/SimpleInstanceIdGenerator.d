@@ -20,7 +20,7 @@ module hunt.quartz.simpl.SimpleInstanceIdGenerator;
 
 import hunt.quartz.exception;
 import hunt.quartz.spi.InstanceIdGenerator;
-import hunt.datetime;
+import hunt.util.DateTime;
 
 import std.conv;
 import std.socket;

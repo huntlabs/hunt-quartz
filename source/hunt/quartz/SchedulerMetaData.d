@@ -20,7 +20,7 @@ module hunt.quartz.SchedulerMetaData;
 
 import hunt.quartz.exception;
 
-import hunt.string;
+import hunt.text;
 import hunt.time.LocalDateTime;
 
 import std.datetime;

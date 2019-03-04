@@ -27,10 +27,10 @@ import hunt.time.LocalDateTime;
 import hunt.time.Month;
 import hunt.time.ZoneId;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
 import hunt.util.UnitTest;
-import hunt.util.Assert;
+import hunt.Assert;
 
 alias assertTrue = Assert.assertTrue;
 alias assertFalse = Assert.assertFalse;
@@ -88,21 +88,21 @@ class CronExpressionTest  { // : SerializationTestSupport
     /*
      * Test method for 'org.quartz.CronExpression.isSatisfiedBy(Date)'.
      */
-    // void testIsSatisfiedBy() {
-    //     CronExpression cronExpression = new CronExpression("0 15 10 * * ? 2005");
+    void testIsSatisfiedBy() {
+        CronExpression cronExpression = new CronExpression("0 15 10 * * ? 2005");
         
-    //     LocalDateTime cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 15, 0);
-    //     assertTrue(cronExpression.isSatisfiedBy(cal));
+        LocalDateTime cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 15, 0);
+        assertTrue(cronExpression.isSatisfiedBy(cal));
         
-    //     cal = cal.withYear(2006);
-    //     assertFalse(cronExpression.isSatisfiedBy(cal));
+        cal = cal.withYear(2006);
+        assertFalse(cronExpression.isSatisfiedBy(cal));
 
-    //     cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 16, 0);
-    //     assertFalse(cronExpression.isSatisfiedBy(cal));
+        cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 16, 0);
+        assertFalse(cronExpression.isSatisfiedBy(cal));
 
-    //     cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 14, 0);
-    //     assertFalse(cronExpression.isSatisfiedBy(cal));
-    // }
+        cal = LocalDateTime.of(2005, Month.JUNE, 1, 10, 14, 0);
+        assertFalse(cronExpression.isSatisfiedBy(cal));
+    }
 
     void testLastDayOffset() {
         CronExpression cronExpression = new CronExpression("0 15 10 L-2 * ? 2010");

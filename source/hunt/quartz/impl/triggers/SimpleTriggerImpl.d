@@ -34,7 +34,7 @@ import hunt.quartz.Trigger;
 import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerUtils;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 import hunt.time.LocalTime;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;

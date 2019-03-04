@@ -18,7 +18,7 @@
 
 module hunt.quartz.SchedulerContext;
 
-import hunt.container.Map;
+import hunt.collection.Map;
 
 import hunt.quartz.utils.StringKeyDirtyFlagMap;
 

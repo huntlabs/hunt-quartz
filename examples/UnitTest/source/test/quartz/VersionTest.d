@@ -17,10 +17,10 @@ module test.quartz.VersionTest;
 
 import hunt.quartz.core.QuartzScheduler;
 
-import hunt.lang.exception;
+import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
 import hunt.util.UnitTest;
-import hunt.util.Assert;
+import hunt.Assert;
 
 alias assertTrue = Assert.assertTrue;
 alias assertFalse = Assert.assertFalse;
