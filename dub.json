@@ -6,6 +6,7 @@
 	"license": "Apache-2.0",
 	"dependencies": {
 		"hunt" : {"path": "../hunt"},
+		"hunt-database" : {"path": "../hunt-database"},
 		"hunt-time" : {"path": "../hunt-time"}
 	}
 }

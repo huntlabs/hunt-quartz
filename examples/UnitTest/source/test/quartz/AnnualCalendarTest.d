@@ -146,7 +146,7 @@ public class AnnualCalendarTest {
         annualCalendar.setDayExcluded(day, true);
         
         day = day.withYear(2008).withMonth(MonthCode.FEBRUARY).withDayOfMonth(1);
-        annualCalendar.setDayExcluded(day, false);
+        annualCalendar.setDayExcluded(day, true);
  
     	assertTrue("The day 1 February is expected to be excluded but it is not", annualCalendar.isDayExcluded(day));    	
     }

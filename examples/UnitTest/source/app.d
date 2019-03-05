@@ -10,7 +10,7 @@ import test.quartz.VersionTest;
 
 void main()
 {
-	testUnits!(AnnualCalendarTest);
+	// testUnits!(AnnualCalendarTest);
 	// testUnits!(CronExpressionTest);
 	// testUnits!(VersionTest);
 }

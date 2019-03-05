@@ -54,7 +54,7 @@ module hunt.quartz.utils.ClassUtils;
 //         }
 
 //         //Check interfaces (breadth first)
-//         Queue<TypeInfo_Class> q = new LinkedList<TypeInfo_Class>();
+//         Queue!(TypeInfo_Class) q = new LinkedList!(TypeInfo_Class)();
 //         q.add(clazz);
 //         while (!q.isEmpty()) {
 //             TypeInfo_Class c = q.remove();

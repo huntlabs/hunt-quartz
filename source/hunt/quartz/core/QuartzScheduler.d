@@ -194,7 +194,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
     private RandomLong random; // = new Random();
 
-    private ArrayList!Object holdToPreventGC; // = new ArrayList<Object>(5);
+    private ArrayList!Object holdToPreventGC; // = new ArrayList!(Object)(5);
 
     private bool signalOnSchedulingChange = true;
 

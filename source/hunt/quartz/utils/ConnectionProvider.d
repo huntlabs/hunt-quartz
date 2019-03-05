@@ -17,37 +17,36 @@
 
 module hunt.quartz.utils.ConnectionProvider;
 
-// import java.sql.Connection;
-// import java.sql.SQLException;
+import hunt.database.driver.Connection;
 
-// /**
-//  * Implementations of this interface used by <code>DBConnectionManager</code>
-//  * to provide connections from various sources.
-//  * 
-//  * @see DBConnectionManager
-//  * @see PoolingConnectionProvider
-//  * @see JNDIConnectionProvider
-//  * @see hunt.quartz.utils.weblogic.WeblogicConnectionProvider
-//  * 
-//  * @author Mohammad Rezaei
-//  */
-// interface ConnectionProvider {
-//     /*
-//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//      * 
-//      * Interface.
-//      * 
-//      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//      */
+/**
+ * Implementations of this interface used by <code>DBConnectionManager</code>
+ * to provide connections from various sources.
+ * 
+ * @see DBConnectionManager
+ * @see PoolingConnectionProvider
+ * @see JNDIConnectionProvider
+ * @see hunt.quartz.utils.weblogic.WeblogicConnectionProvider
+ * 
+ * @author Mohammad Rezaei
+ */
+interface ConnectionProvider {
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Interface.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
 
-//     /**
-//      * @return connection managed by this provider
-//      * @throws SQLException
-//      */
-//     Connection getConnection();
+    /**
+     * @return connection managed by this provider
+     * @throws SQLException
+     */
+    Connection getConnection();
     
     
-//     void shutdown();
+    void shutdown();
     
-//     void initialize();
-// }
+    void initialize();
+}

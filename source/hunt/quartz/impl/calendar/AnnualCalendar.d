@@ -199,7 +199,7 @@ class AnnualCalendar : BaseCalendar {
         
         // Since there is no guarantee that the given day is in the arraylist with the exact same year
         // search for the object based on month and day of month in the list and remove it
-        foreach(LocalDateTime ldt; excludeDays.iterator()) {
+        foreach(LocalDateTime ldt; excludeDays) {
 
             if (dmonth != ldt.getMonthValue()) {
                 continue;

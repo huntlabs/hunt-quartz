@@ -384,7 +384,7 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         }
 
         // override
-        // Iterator<MapEntry!(K,V)> iterator() {
+        // Iterator!(MapEntry!(K,V)) iterator() {
         //     return new DirtyFlagMapEntryIterator(getWrappedSet().iterator());
         // }
 
@@ -406,7 +406,7 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         //         array.length < size ?
         //             (U[])Array.newInstance(array.getClass().getComponentType(), size) : array;
 
-        //     Iterator<MapEntry!(K,V)> entryIter = iterator(); // Will return DirtyFlagMapEntry objects
+        //     Iterator!(MapEntry!(K,V)) entryIter = iterator(); // Will return DirtyFlagMapEntry objects
         //     for (int i = 0; i < size; i++) {
         //         result[i] = ( U ) entryIter.next();
         //     }
