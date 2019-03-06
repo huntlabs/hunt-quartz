@@ -64,6 +64,6 @@ interface SchedulerFactory {
      * within this jvm.).
      * </p>
      */
-    Collection!(Scheduler) getAllSchedulers();
+    Scheduler[] getAllSchedulers();
 
 }

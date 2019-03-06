@@ -93,7 +93,7 @@ class SchedulerRepository {
     }
 
     Scheduler[] lookupAll() {
-        return (schedulers.values());
+        return schedulers.values();
     }
 
 }

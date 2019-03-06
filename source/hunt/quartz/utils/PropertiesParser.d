@@ -330,25 +330,24 @@ class PropertiesParser {
         }
     }
 
-    // string[] getPropertyGroups(string prefix) {
-    //     Enumeration<?> keys = props.propertyNames();
-    //     HashSet!(string) groups = new HashSet!(string)(10);
+    string[] getPropertyGroups(string prefix) {
+        HashSet!(string) groups = new HashSet!(string)(10);
 
-    //     if (!prefix.endsWith(".")) {
-    //         prefix += ".";
-    //     }
+        if (!prefix.endsWith(".")) {
+            prefix ~= ".";
+        }
 
-    //     while (keys.hasMoreElements()) {
-    //         string key = (string) keys.nextElement();
-    //         if (key.startsWith(prefix)) {
-    //             string groupName = key.substring(prefix.length(), key.indexOf(
-    //                     '.', prefix.length()));
-    //             groups.add(groupName);
-    //         }
-    //     }
+        foreach(string key; props.byKey()) {
+            if (key.startsWith(prefix)) {
+                ptrdiff_t endIndex = key.indexOf('.', prefix.length);
+                size_t beginIndex = prefix.length;
+                string groupName = key[beginIndex .. beginIndex+endIndex];
+                groups.add(groupName);
+            }
+        }
 
-    //     return (string[]) groups.toArray(new string[groups.size()]);
-    // }
+        return groups.toArray();
+    }
 
     Properties getPropertyGroup(string prefix) {
         return getPropertyGroup(prefix, false, null);

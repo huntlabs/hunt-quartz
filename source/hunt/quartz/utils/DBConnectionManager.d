@@ -109,7 +109,7 @@ class DBConnectionManager {
         ConnectionProvider provider = providers.get(dsName);
         if (provider is null) {
             throw new SQLException("There is no DataSource named '"
-                    + dsName ~ "'");
+                    ~ dsName ~ "'");
         }
 
         return provider.getConnection();

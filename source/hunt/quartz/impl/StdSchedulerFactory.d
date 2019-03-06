@@ -17,6 +17,12 @@
 
 module hunt.quartz.impl.StdSchedulerFactory;
 
+import hunt.quartz.impl.matchers.EverythingMatcher;
+import hunt.quartz.impl.DefaultThreadExecutor;
+import hunt.quartz.impl.SchedulerDetailsSetter;
+import hunt.quartz.impl.SchedulerRepository;
+import hunt.quartz.impl.StdScheduler;
+
 import hunt.quartz.JobListener;
 import hunt.quartz.Scheduler;
 import hunt.quartz.exception;
@@ -32,11 +38,10 @@ import hunt.quartz.core.QuartzSchedulerResources;
 // import hunt.quartz.impl.jdbcjobstore.JobStoreSupport;
 // import hunt.quartz.impl.jdbcjobstore.Semaphore;
 // import hunt.quartz.impl.jdbcjobstore.TablePrefixAware;
-import hunt.quartz.impl.matchers.EverythingMatcher;
-import hunt.quartz.impl.SchedulerRepository;
 import hunt.quartz.management.ManagementRESTServiceConfiguration;
 import hunt.quartz.simpl.RAMJobStore;
 import hunt.quartz.simpl.SimpleThreadPool;
+import hunt.quartz.simpl.SimpleInstanceIdGenerator;
 import hunt.quartz.spi.ClassLoadHelper;
 import hunt.quartz.spi.InstanceIdGenerator;
 import hunt.quartz.spi.JobFactory;
@@ -66,9 +71,11 @@ import hunt.quartz.utils.PropertiesParser;
 
 
 import hunt.collection.Collection;
-// import hunt.io.common;
+import hunt.Exceptions;
 import hunt.logging;
 import hunt.time.util.Locale;
+
+import std.array;
 
 /**
  * <p>
@@ -370,104 +377,106 @@ class StdSchedulerFactory : SchedulerFactory {
      * <code>{@link java.lang.System#getProperties()}</code>.
      * </p>
      */
-//     void initialize() {
-//         // short-circuit if already initialized
-//         if (cfg !is null) {
-//             return;
-//         }
-//         if (initException !is null) {
-//             throw initException;
-//         }
+    void initialize() {
+        // short-circuit if already initialized
+        if (cfg !is null) {
+            return;
+        }
+        if (initException !is null) {
+            throw initException;
+        }
 
-//         string requestedFile = System.getProperty(PROPERTIES_FILE);
-//         string propFileName = requestedFile !is null ? requestedFile
-//                 : "quartz.properties";
-//         File propFile = new File(propFileName);
+        implementationMissing(false);
 
-//         Properties props = new Properties();
+        // string requestedFile = System.getProperty(PROPERTIES_FILE);
+        // string propFileName = requestedFile !is null ? requestedFile
+        //         : "quartz.properties";
+        // File propFile = new File(propFileName);
 
-//         InputStream in = null;
+        // Properties props = new Properties();
 
-//         try {
-//             if (propFile.exists()) {
-//                 try {
-//                     if (requestedFile !is null) {
-//                         propSrc = "specified file: '" ~ requestedFile ~ "'";
-//                     } else {
-//                         propSrc = "default file in current working dir: 'quartz.properties'";
-//                     }
+        // InputStream in = null;
 
-//                     in = new BufferedInputStream(new FileInputStream(propFileName));
-//                     props.load(in);
+        // try {
+        //     if (propFile.exists()) {
+        //         try {
+        //             if (requestedFile !is null) {
+        //                 propSrc = "specified file: '" ~ requestedFile ~ "'";
+        //             } else {
+        //                 propSrc = "default file in current working dir: 'quartz.properties'";
+        //             }
 
-//                 } catch (IOException ioe) {
-//                     initException = new SchedulerException("Properties file: '"
-//                             + propFileName ~ "' could not be read.", ioe);
-//                     throw initException;
-//                 }
-//             } else if (requestedFile !is null) {
-//                 in =
-//                     Thread.getThis().getContextClassLoader().getResourceAsStream(requestedFile);
+        //             in = new BufferedInputStream(new FileInputStream(propFileName));
+        //             props.load(in);
 
-//                 if(in is null) {
-//                     initException = new SchedulerException("Properties file: '"
-//                         + requestedFile ~ "' could not be found.");
-//                     throw initException;
-//                 }
+        //         } catch (IOException ioe) {
+        //             initException = new SchedulerException("Properties file: '"
+        //                     + propFileName ~ "' could not be read.", ioe);
+        //             throw initException;
+        //         }
+        //     } else if (requestedFile !is null) {
+        //         in =
+        //             Thread.getThis().getContextClassLoader().getResourceAsStream(requestedFile);
 
-//                 propSrc = "specified file: '" ~ requestedFile ~ "' in the class resource path.";
+        //         if(in is null) {
+        //             initException = new SchedulerException("Properties file: '"
+        //                 + requestedFile ~ "' could not be found.");
+        //             throw initException;
+        //         }
 
-//                 in = new BufferedInputStream(in);
-//                 try {
-//                     props.load(in);
-//                 } catch (IOException ioe) {
-//                     initException = new SchedulerException("Properties file: '"
-//                             + requestedFile ~ "' could not be read.", ioe);
-//                     throw initException;
-//                 }
+        //         propSrc = "specified file: '" ~ requestedFile ~ "' in the class resource path.";
 
-//             } else {
-//                 propSrc = "default resource file in Quartz package: 'quartz.properties'";
+        //         in = new BufferedInputStream(in);
+        //         try {
+        //             props.load(in);
+        //         } catch (IOException ioe) {
+        //             initException = new SchedulerException("Properties file: '"
+        //                     + requestedFile ~ "' could not be read.", ioe);
+        //             throw initException;
+        //         }
 
-//                 ClassLoader cl = getClass().getClassLoader();
-//                 if(cl is null)
-//                     cl = findClassloader();
-//                 if(cl is null)
-//                     throw new SchedulerConfigException("Unable to find a class loader on the current thread or class.");
+        //     } else {
+        //         propSrc = "default resource file in Quartz package: 'quartz.properties'";
 
-//                 in = cl.getResourceAsStream(
-//                         "quartz.properties");
+        //         ClassLoader cl = getClass().getClassLoader();
+        //         if(cl is null)
+        //             cl = findClassloader();
+        //         if(cl is null)
+        //             throw new SchedulerConfigException("Unable to find a class loader on the current thread or class.");
 
-//                 if (in is null) {
-//                     in = cl.getResourceAsStream(
-//                             "/quartz.properties");
-//                 }
-//                 if (in is null) {
-//                     in = cl.getResourceAsStream(
-//                             "org/quartz/quartz.properties");
-//                 }
-//                 if (in is null) {
-//                     initException = new SchedulerException(
-//                             "Default quartz.properties not found in class path");
-//                     throw initException;
-//                 }
-//                 try {
-//                     props.load(in);
-//                 } catch (IOException ioe) {
-//                     initException = new SchedulerException(
-//                             "Resource properties file: 'org/quartz/quartz.properties' "
-//                                     ~ "could not be read from the classpath.", ioe);
-//                     throw initException;
-//                 }
-//             }
-//         } finally {
-//             if(in !is null) {
-//                 try { in.close(); } catch(IOException ignore) { /* ignore */ }
-//             }
-//         }
+        //         in = cl.getResourceAsStream(
+        //                 "quartz.properties");
 
-//         initialize(overrideWithSysProps(props));
-//     }
+        //         if (in is null) {
+        //             in = cl.getResourceAsStream(
+        //                     "/quartz.properties");
+        //         }
+        //         if (in is null) {
+        //             in = cl.getResourceAsStream(
+        //                     "org/quartz/quartz.properties");
+        //         }
+        //         if (in is null) {
+        //             initException = new SchedulerException(
+        //                     "Default quartz.properties not found in class path");
+        //             throw initException;
+        //         }
+        //         try {
+        //             props.load(in);
+        //         } catch (IOException ioe) {
+        //             initException = new SchedulerException(
+        //                     "Resource properties file: 'org/quartz/quartz.properties' "
+        //                             ~ "could not be read from the classpath.", ioe);
+        //             throw initException;
+        //         }
+        //     }
+        // } finally {
+        //     if(in !is null) {
+        //         try { in.close(); } catch(IOException ignore) { /* ignore */ }
+        //     }
+        // }
+
+        // initialize(overrideWithSysProps(props));
+    }
 
 //     /**
 //      * Add all System properties to the given <code>props</code>.  Will override
@@ -643,7 +652,7 @@ class StdSchedulerFactory : SchedulerFactory {
 
         userTXLocation = cfg.getStringProperty(PROP_SCHED_USER_TX_URL,
                 userTXLocation);
-        if (userTXLocation !is null && userTXLocation.trim().length() == 0) {
+        if (userTXLocation.empty()) {
             userTXLocation = null;
         }
 
@@ -708,18 +717,19 @@ class StdSchedulerFactory : SchedulerFactory {
         // ~~~~~~~~~~~~~~~~~~
         if (rmiProxy) {
 
-            if (autoId) {
-                schedInstId = DEFAULT_INSTANCE_ID;
-            }
+            // if (autoId) {
+            //     schedInstId = DEFAULT_INSTANCE_ID;
+            // }
 
-            string uid = (rmiBindName is null) ? QuartzSchedulerResources.getUniqueIdentifier(
-                    schedName, schedInstId) : rmiBindName;
+            // string uid = (rmiBindName is null) ? QuartzSchedulerResources.getUniqueIdentifier(
+            //         schedName, schedInstId) : rmiBindName;
 
-            RemoteScheduler remoteScheduler = new RemoteScheduler(uid, rmiHost, rmiPort);
+            // RemoteScheduler remoteScheduler = new RemoteScheduler(uid, rmiHost, rmiPort);
 
-            schedRep.bind(remoteScheduler);
+            // schedRep.bind(remoteScheduler);
 
-            return remoteScheduler;
+            // return remoteScheduler;
+            implementationMissing(false);
         }
 
 
@@ -779,31 +789,39 @@ class StdSchedulerFactory : SchedulerFactory {
 
         
         JobFactory jobFactory = null;
-        if(jobFactoryClass !is null) {
-            try {
-                jobFactory = (JobFactory) loadHelper.loadClass(jobFactoryClass)
-                        .newInstance();
-            } catch (Exception e) {
-                throw new SchedulerConfigException(
-                        "Unable to instantiate JobFactory class: "
-                                ~ e.msg, e);
-            }
+        if(!jobFactoryClass.empty()) {
+            implementationMissing(false);
+            
+            // try {
+            //     jobFactory = (JobFactory) loadHelper.loadClass(jobFactoryClass)
+            //             .newInstance();
+            // } catch (Exception e) {
+            //     throw new SchedulerConfigException(
+            //             "Unable to instantiate JobFactory class: "
+            //                     ~ e.msg, e);
+            // }
 
-            tProps = cfg.getPropertyGroup(PROP_SCHED_JOB_FACTORY_PREFIX, true);
-            try {
-                setBeanProps(jobFactory, tProps);
-            } catch (Exception e) {
-                initException = new SchedulerException("JobFactory class '"
-                        + jobFactoryClass ~ "' props could not be configured.", e);
-                throw initException;
-            }
+            // tProps = cfg.getPropertyGroup(PROP_SCHED_JOB_FACTORY_PREFIX, true);
+            // try {
+            //     setBeanProps(jobFactory, tProps);
+            // } catch (Exception e) {
+            //     initException = new SchedulerException("JobFactory class '"
+            //             + jobFactoryClass ~ "' props could not be configured.", e);
+            //     throw initException;
+            // }
         }
 
         InstanceIdGenerator instanceIdGenerator = null;
-        if(instanceIdGeneratorClass !is null) {
+        if(!instanceIdGeneratorClass.empty()) {
             try {
-                instanceIdGenerator = (InstanceIdGenerator) loadHelper.loadClass(instanceIdGeneratorClass)
-                    .newInstance();
+                // instanceIdGenerator = cast(InstanceIdGenerator) loadHelper.loadClass(instanceIdGeneratorClass)
+                //     .newInstance();
+                Object o = factory(instanceIdGeneratorClass);
+                if(o is null) {
+                    warningf("Can't create a object from %s", instanceIdGeneratorClass);
+                }
+                instanceIdGenerator = cast(InstanceIdGenerator)o;
+                // instanceIdGenerator = new SimpleInstanceIdGenerator();
             } catch (Exception e) {
                 throw new SchedulerConfigException(
                         "Unable to instantiate InstanceIdGenerator class: "
@@ -811,47 +829,47 @@ class StdSchedulerFactory : SchedulerFactory {
             }
 
             tProps = cfg.getPropertyGroup(PROP_SCHED_INSTANCE_ID_GENERATOR_PREFIX, true);
-            try {
-                setBeanProps(instanceIdGenerator, tProps);
-            } catch (Exception e) {
-                initException = new SchedulerException("InstanceIdGenerator class '"
-                        + instanceIdGeneratorClass ~ "' props could not be configured.", e);
-                throw initException;
-            }
+            // try {
+            //     setBeanProps(instanceIdGenerator, tProps);
+            // } catch (Exception e) {
+            //     initException = new SchedulerException("InstanceIdGenerator class '"
+            //             + instanceIdGeneratorClass ~ "' props could not be configured.", e);
+            //     throw initException;
+            // }
         }
 
         // Get ThreadPool Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        string tpClass = cfg.getStringProperty(PROP_THREAD_POOL_CLASS, SimpleThreadPool.class.getName());
+        string tpClass = cfg.getStringProperty(PROP_THREAD_POOL_CLASS, typeid(SimpleThreadPool).name);
 
-        if (tpClass is null) {
+        if (tpClass.empty()) {
             initException = new SchedulerException(
                     "ThreadPool class not specified. ");
             throw initException;
         }
 
         try {
-            tp = (ThreadPool) loadHelper.loadClass(tpClass).newInstance();
+            tp = cast(ThreadPool)factory(tpClass);
         } catch (Exception e) {
             initException = new SchedulerException("ThreadPool class '"
-                    + tpClass ~ "' could not be instantiated.", e);
+                    ~ tpClass ~ "' could not be instantiated.", e);
             throw initException;
         }
         tProps = cfg.getPropertyGroup(PROP_THREAD_POOL_PREFIX, true);
-        try {
-            setBeanProps(tp, tProps);
-        } catch (Exception e) {
-            initException = new SchedulerException("ThreadPool class '"
-                    + tpClass ~ "' props could not be configured.", e);
-            throw initException;
-        }
+        // try {
+        //     setBeanProps(tp, tProps);
+        // } catch (Exception e) {
+        //     initException = new SchedulerException("ThreadPool class '"
+        //             + tpClass ~ "' props could not be configured.", e);
+        //     throw initException;
+        // }
 
         // Get JobStore Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         string jsClass = cfg.getStringProperty(PROP_JOB_STORE_CLASS,
-                RAMJobStore.class.getName());
+                typeid(RAMJobStore).name);
 
         if (jsClass is null) {
             initException = new SchedulerException(
@@ -860,189 +878,189 @@ class StdSchedulerFactory : SchedulerFactory {
         }
 
         try {
-            js = (JobStore) loadHelper.loadClass(jsClass).newInstance();
+            js = cast(JobStore)factory(jsClass);
         } catch (Exception e) {
             initException = new SchedulerException("JobStore class '" ~ jsClass
                     ~ "' could not be instantiated.", e);
             throw initException;
         }
 
-        SchedulerDetailsSetter.setDetails(js, schedName, schedInstId);
+        SchedulerDetailsSetter.setDetails(cast(Object)js, schedName, schedInstId);
 
-        tProps = cfg.getPropertyGroup(PROP_JOB_STORE_PREFIX, true, new string[] {PROP_JOB_STORE_LOCK_HANDLER_PREFIX});
-        try {
-            setBeanProps(js, tProps);
-        } catch (Exception e) {
-            initException = new SchedulerException("JobStore class '" ~ jsClass
-                    ~ "' props could not be configured.", e);
-            throw initException;
-        }
+        // tProps = cfg.getPropertyGroup(PROP_JOB_STORE_PREFIX, true, [PROP_JOB_STORE_LOCK_HANDLER_PREFIX]);
+        // try {
+        //     setBeanProps(js, tProps);
+        // } catch (Exception e) {
+        //     initException = new SchedulerException("JobStore class '" ~ jsClass
+        //             ~ "' props could not be configured.", e);
+        //     throw initException;
+        // }
+        // JobStoreSupport jss = cast(JobStoreSupport)js;
+        // if (jss !is null) {
+        //     // Install custom lock handler (Semaphore)
+        //     string lockHandlerClass = cfg.getStringProperty(PROP_JOB_STORE_LOCK_HANDLER_CLASS);
+        //     if (!lockHandlerClass.empty()) {
+        //         try {
+        //             Semaphore lockHandler = cast(Semaphore)factory(lockHandlerClass);
 
-        if (js instanceof JobStoreSupport) {
-            // Install custom lock handler (Semaphore)
-            string lockHandlerClass = cfg.getStringProperty(PROP_JOB_STORE_LOCK_HANDLER_CLASS);
-            if (lockHandlerClass !is null) {
-                try {
-                    Semaphore lockHandler = (Semaphore)loadHelper.loadClass(lockHandlerClass).newInstance();
+        //             tProps = cfg.getPropertyGroup(PROP_JOB_STORE_LOCK_HANDLER_PREFIX, true);
 
-                    tProps = cfg.getPropertyGroup(PROP_JOB_STORE_LOCK_HANDLER_PREFIX, true);
+        //             // If this lock handler requires the table prefix, add it to its properties.
+        //             if (lockHandler instanceof TablePrefixAware) {
+        //                 tProps.setProperty(
+        //                         PROP_TABLE_PREFIX, ((JobStoreSupport)js).getTablePrefix());
+        //                 tProps.setProperty(
+        //                         PROP_SCHED_NAME, schedName);
+        //             }
 
-                    // If this lock handler requires the table prefix, add it to its properties.
-                    if (lockHandler instanceof TablePrefixAware) {
-                        tProps.setProperty(
-                                PROP_TABLE_PREFIX, ((JobStoreSupport)js).getTablePrefix());
-                        tProps.setProperty(
-                                PROP_SCHED_NAME, schedName);
-                    }
+        //             // try {
+        //             //     setBeanProps(lockHandler, tProps);
+        //             // } catch (Exception e) {
+        //             //     initException = new SchedulerException("JobStore LockHandler class '" ~ lockHandlerClass
+        //             //             ~ "' props could not be configured.", e);
+        //             //     throw initException;
+        //             // }
 
-                    try {
-                        setBeanProps(lockHandler, tProps);
-                    } catch (Exception e) {
-                        initException = new SchedulerException("JobStore LockHandler class '" ~ lockHandlerClass
-                                ~ "' props could not be configured.", e);
-                        throw initException;
-                    }
-
-                    ((JobStoreSupport)js).setLockHandler(lockHandler);
-                    info("Using custom data access locking (synchronization): " ~ lockHandlerClass);
-                } catch (Exception e) {
-                    initException = new SchedulerException("JobStore LockHandler class '" ~ lockHandlerClass
-                            ~ "' could not be instantiated.", e);
-                    throw initException;
-                }
-            }
-        }
+        //             ((JobStoreSupport)js).setLockHandler(lockHandler);
+        //             info("Using custom data access locking (synchronization): " ~ lockHandlerClass);
+        //         } catch (Exception e) {
+        //             initException = new SchedulerException("JobStore LockHandler class '" ~ lockHandlerClass
+        //                     ~ "' could not be instantiated.", e);
+        //             throw initException;
+        //         }
+        //     }
+        // }
 
         // Set up any DataSources
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         string[] dsNames = cfg.getPropertyGroups(PROP_DATASOURCE_PREFIX);
-        for (int i = 0; i < dsNames.length; i++) {
+        for (size_t i = 0; i < dsNames.length; i++) {
             PropertiesParser pp = new PropertiesParser(cfg.getPropertyGroup(
                     PROP_DATASOURCE_PREFIX ~ "." ~ dsNames[i], true));
 
             string cpClass = pp.getStringProperty(PROP_CONNECTION_PROVIDER_CLASS, null);
 
             // custom connectionProvider...
-            if(cpClass !is null) {
-                ConnectionProvider cp = null;
-                try {
-                    cp = (ConnectionProvider) loadHelper.loadClass(cpClass).newInstance();
-                } catch (Exception e) {
-                    initException = new SchedulerException("ConnectionProvider class '" ~ cpClass
-                            ~ "' could not be instantiated.", e);
-                    throw initException;
-                }
+            // if(!cpClass.empty()) {
+            //     ConnectionProvider cp = null;
+            //     try {
+            //         cp = cast(ConnectionProvider)factory(cpClass);
+            //     } catch (Exception e) {
+            //         initException = new SchedulerException("ConnectionProvider class '" ~ cpClass
+            //                 ~ "' could not be instantiated.", e);
+            //         throw initException;
+            //     }
 
-                try {
-                    // remove the class name, so it isn't attempted to be set
-                    pp.getUnderlyingProperties().remove(
-                            PROP_CONNECTION_PROVIDER_CLASS);
+            //     try {
+            //         // remove the class name, so it isn't attempted to be set
+            //         pp.getUnderlyingProperties().remove(
+            //                 PROP_CONNECTION_PROVIDER_CLASS);
+            //         PoolingConnectionProvider pcp = cast(PoolingConnectionProvider)cp;
+            //         if (pcp !is null) {
+            //             populateProviderWithExtraProps(pcp, pp.getUnderlyingProperties());
+            //         } else {
+            //             // setBeanProps(cp, pp.getUnderlyingProperties());
+            //         }
+            //         cp.initialize();
+            //     } catch (Exception e) {
+            //         initException = new SchedulerException("ConnectionProvider class '" ~ cpClass
+            //                 ~ "' props could not be configured.", e);
+            //         throw initException;
+            //     }
 
-                    if (cp instanceof PoolingConnectionProvider) {
-                        populateProviderWithExtraProps((PoolingConnectionProvider)cp, pp.getUnderlyingProperties());
-                    } else {
-                        setBeanProps(cp, pp.getUnderlyingProperties());
-                    }
-                    cp.initialize();
-                } catch (Exception e) {
-                    initException = new SchedulerException("ConnectionProvider class '" ~ cpClass
-                            ~ "' props could not be configured.", e);
-                    throw initException;
-                }
+            //     dbMgr = DBConnectionManager.getInstance();
+            //     dbMgr.addConnectionProvider(dsNames[i], cp);
+            // } else {
+            //     string dsJndi = pp.getStringProperty(PROP_DATASOURCE_JNDI_URL, null);
 
-                dbMgr = DBConnectionManager.getInstance();
-                dbMgr.addConnectionProvider(dsNames[i], cp);
-            } else {
-                string dsJndi = pp.getStringProperty(PROP_DATASOURCE_JNDI_URL, null);
+            //     if (dsJndi !is null) {
+            //         bool dsAlwaysLookup = pp.getBooleanProperty(
+            //                 PROP_DATASOURCE_JNDI_ALWAYS_LOOKUP);
+            //         string dsJndiInitial = pp.getStringProperty(
+            //                 PROP_DATASOURCE_JNDI_INITIAL);
+            //         string dsJndiProvider = pp.getStringProperty(
+            //                 PROP_DATASOURCE_JNDI_PROVDER);
+            //         string dsJndiPrincipal = pp.getStringProperty(
+            //                 PROP_DATASOURCE_JNDI_PRINCIPAL);
+            //         string dsJndiCredentials = pp.getStringProperty(
+            //                 PROP_DATASOURCE_JNDI_CREDENTIALS);
+            //         Properties props = null;
+            //         if (null != dsJndiInitial || null != dsJndiProvider
+            //                 || null != dsJndiPrincipal || null != dsJndiCredentials) {
+            //             props = new Properties();
+            //             if (dsJndiInitial !is null) {
+            //                 props.put(PROP_DATASOURCE_JNDI_INITIAL,
+            //                         dsJndiInitial);
+            //             }
+            //             if (dsJndiProvider !is null) {
+            //                 props.put(PROP_DATASOURCE_JNDI_PROVDER,
+            //                         dsJndiProvider);
+            //             }
+            //             if (dsJndiPrincipal !is null) {
+            //                 props.put(PROP_DATASOURCE_JNDI_PRINCIPAL,
+            //                         dsJndiPrincipal);
+            //             }
+            //             if (dsJndiCredentials !is null) {
+            //                 props.put(PROP_DATASOURCE_JNDI_CREDENTIALS,
+            //                         dsJndiCredentials);
+            //             }
+            //         }
+            //         JNDIConnectionProvider cp = new JNDIConnectionProvider(dsJndi,
+            //                 props, dsAlwaysLookup);
+            //         dbMgr = DBConnectionManager.getInstance();
+            //         dbMgr.addConnectionProvider(dsNames[i], cp);
+            //     } else {
+            //         string poolingProvider = pp.getStringProperty(PoolingConnectionProvider.POOLING_PROVIDER);
+            //         string dsDriver = pp.getStringProperty(PoolingConnectionProvider.DB_DRIVER);
+            //         string dsURL = pp.getStringProperty(PoolingConnectionProvider.DB_URL);
 
-                if (dsJndi !is null) {
-                    bool dsAlwaysLookup = pp.getBooleanProperty(
-                            PROP_DATASOURCE_JNDI_ALWAYS_LOOKUP);
-                    string dsJndiInitial = pp.getStringProperty(
-                            PROP_DATASOURCE_JNDI_INITIAL);
-                    string dsJndiProvider = pp.getStringProperty(
-                            PROP_DATASOURCE_JNDI_PROVDER);
-                    string dsJndiPrincipal = pp.getStringProperty(
-                            PROP_DATASOURCE_JNDI_PRINCIPAL);
-                    string dsJndiCredentials = pp.getStringProperty(
-                            PROP_DATASOURCE_JNDI_CREDENTIALS);
-                    Properties props = null;
-                    if (null != dsJndiInitial || null != dsJndiProvider
-                            || null != dsJndiPrincipal || null != dsJndiCredentials) {
-                        props = new Properties();
-                        if (dsJndiInitial !is null) {
-                            props.put(PROP_DATASOURCE_JNDI_INITIAL,
-                                    dsJndiInitial);
-                        }
-                        if (dsJndiProvider !is null) {
-                            props.put(PROP_DATASOURCE_JNDI_PROVDER,
-                                    dsJndiProvider);
-                        }
-                        if (dsJndiPrincipal !is null) {
-                            props.put(PROP_DATASOURCE_JNDI_PRINCIPAL,
-                                    dsJndiPrincipal);
-                        }
-                        if (dsJndiCredentials !is null) {
-                            props.put(PROP_DATASOURCE_JNDI_CREDENTIALS,
-                                    dsJndiCredentials);
-                        }
-                    }
-                    JNDIConnectionProvider cp = new JNDIConnectionProvider(dsJndi,
-                            props, dsAlwaysLookup);
-                    dbMgr = DBConnectionManager.getInstance();
-                    dbMgr.addConnectionProvider(dsNames[i], cp);
-                } else {
-                    string poolingProvider = pp.getStringProperty(PoolingConnectionProvider.POOLING_PROVIDER);
-                    string dsDriver = pp.getStringProperty(PoolingConnectionProvider.DB_DRIVER);
-                    string dsURL = pp.getStringProperty(PoolingConnectionProvider.DB_URL);
+            //         if (dsDriver is null) {
+            //             initException = new SchedulerException(
+            //                     "Driver not specified for DataSource: "
+            //                             + dsNames[i]);
+            //             throw initException;
+            //         }
+            //         if (dsURL is null) {
+            //             initException = new SchedulerException(
+            //                     "DB URL not specified for DataSource: "
+            //                             + dsNames[i]);
+            //             throw initException;
+            //         }
+            //         // we load even these "core" providers by class name in order to avoid a static dependency on
+            //         // the c3p0 and hikaricp libraries
+            //         if(poolingProvider !is null && poolingProvider== PoolingConnectionProvider.POOLING_PROVIDER_HIKARICP) {
+            //             cpClass = "hunt.quartz.utils.HikariCpPoolingConnectionProvider";
+            //         }
+            //         else {
+            //             cpClass = "hunt.quartz.utils.C3p0PoolingConnectionProvider";
+            //         }
+            //         info("Using ConnectionProvider class '" ~ cpClass ~ "' for data source '" ~ dsNames[i] ~ "'");
 
-                    if (dsDriver is null) {
-                        initException = new SchedulerException(
-                                "Driver not specified for DataSource: "
-                                        + dsNames[i]);
-                        throw initException;
-                    }
-                    if (dsURL is null) {
-                        initException = new SchedulerException(
-                                "DB URL not specified for DataSource: "
-                                        + dsNames[i]);
-                        throw initException;
-                    }
-                    // we load even these "core" providers by class name in order to avoid a static dependency on
-                    // the c3p0 and hikaricp libraries
-                    if(poolingProvider !is null && poolingProvider== PoolingConnectionProvider.POOLING_PROVIDER_HIKARICP) {
-                        cpClass = "hunt.quartz.utils.HikariCpPoolingConnectionProvider";
-                    }
-                    else {
-                        cpClass = "hunt.quartz.utils.C3p0PoolingConnectionProvider";
-                    }
-                    info("Using ConnectionProvider class '" ~ cpClass ~ "' for data source '" ~ dsNames[i] ~ "'");
+            //         try {
+            //             ConnectionProvider cp = null;
+            //             try {
+            //                 Constructor constructor = loadHelper.loadClass(cpClass).getConstructor(Properties.class);
+            //                 cp = (ConnectionProvider) constructor.newInstance(pp.getUnderlyingProperties());
+            //             } catch (Exception e) {
+            //                 initException = new SchedulerException("ConnectionProvider class '" ~ cpClass
+            //                         ~ "' could not be instantiated.", e);
+            //                 throw initException;
+            //             }
+            //             dbMgr = DBConnectionManager.getInstance();
+            //             dbMgr.addConnectionProvider(dsNames[i], cp);
 
-                    try {
-                        ConnectionProvider cp = null;
-                        try {
-                            Constructor constructor = loadHelper.loadClass(cpClass).getConstructor(Properties.class);
-                            cp = (ConnectionProvider) constructor.newInstance(pp.getUnderlyingProperties());
-                        } catch (Exception e) {
-                            initException = new SchedulerException("ConnectionProvider class '" ~ cpClass
-                                    ~ "' could not be instantiated.", e);
-                            throw initException;
-                        }
-                        dbMgr = DBConnectionManager.getInstance();
-                        dbMgr.addConnectionProvider(dsNames[i], cp);
+            //             // Populate the underlying C3P0/HikariCP data source pool properties
+            //             populateProviderWithExtraProps((PoolingConnectionProvider)cp, pp.getUnderlyingProperties());
+            //         } catch (Exception sqle) {
+            //             initException = new SchedulerException(
+            //                     "Could not initialize DataSource: " ~ dsNames[i],
+            //                     sqle);
+            //             throw initException;
+            //         }
+            //     }
 
-                        // Populate the underlying C3P0/HikariCP data source pool properties
-                        populateProviderWithExtraProps((PoolingConnectionProvider)cp, pp.getUnderlyingProperties());
-                    } catch (Exception sqle) {
-                        initException = new SchedulerException(
-                                "Could not initialize DataSource: " ~ dsNames[i],
-                                sqle);
-                        throw initException;
-                    }
-                }
-
-            }
+            // }
 
         }
 
@@ -1051,133 +1069,132 @@ class StdSchedulerFactory : SchedulerFactory {
 
         string[] pluginNames = cfg.getPropertyGroups(PROP_PLUGIN_PREFIX);
         SchedulerPlugin[] plugins = new SchedulerPlugin[pluginNames.length];
-        for (int i = 0; i < pluginNames.length; i++) {
+        for (size_t i = 0; i < pluginNames.length; i++) {
             Properties pp = cfg.getPropertyGroup(PROP_PLUGIN_PREFIX ~ "."
-                    + pluginNames[i], true);
+                    ~ pluginNames[i], true);
 
-            string plugInClass = pp.getProperty(PROP_PLUGIN_CLASS, null);
+            string plugInClass = pp.get(PROP_PLUGIN_CLASS, null);
 
-            if (plugInClass is null) {
-                initException = new SchedulerException(
-                        "SchedulerPlugin class not specified for plugin '"
-                                + pluginNames[i] ~ "'");
-                throw initException;
-            }
-            SchedulerPlugin plugin = null;
-            try {
-                plugin = (SchedulerPlugin)
-                        loadHelper.loadClass(plugInClass).newInstance();
-            } catch (Exception e) {
-                initException = new SchedulerException(
-                        "SchedulerPlugin class '" ~ plugInClass
-                                ~ "' could not be instantiated.", e);
-                throw initException;
-            }
-            try {
-                setBeanProps(plugin, pp);
-            } catch (Exception e) {
-                initException = new SchedulerException(
-                        "JobStore SchedulerPlugin '" ~ plugInClass
-                                ~ "' props could not be configured.", e);
-                throw initException;
-            }
+            // if (plugInClass is null) {
+            //     initException = new SchedulerException(
+            //             "SchedulerPlugin class not specified for plugin '"
+            //                     ~ pluginNames[i] ~ "'");
+            //     throw initException;
+            // }
+            // SchedulerPlugin plugin = null;
+            // try {
+            //     plugin = cast(SchedulerPlugin)factory(plugInClass);
+            // } catch (Exception e) {
+            //     initException = new SchedulerException(
+            //             "SchedulerPlugin class '" ~ plugInClass
+            //                     ~ "' could not be instantiated.", e);
+            //     throw initException;
+            // }
+            // try {
+            //     setBeanProps(plugin, pp);
+            // } catch (Exception e) {
+            //     initException = new SchedulerException(
+            //             "JobStore SchedulerPlugin '" ~ plugInClass
+            //                     ~ "' props could not be configured.", e);
+            //     throw initException;
+            // }
 
-            plugins[i] = plugin;
+            // plugins[i] = plugin;
         }
 
         // Set up any JobListeners
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        TypeInfo_Class[] strArg = new Class[] { string.class };
-        string[] jobListenerNames = cfg.getPropertyGroups(PROP_JOB_LISTENER_PREFIX);
-        JobListener[] jobListeners = new JobListener[jobListenerNames.length];
-        for (int i = 0; i < jobListenerNames.length; i++) {
-            Properties lp = cfg.getPropertyGroup(PROP_JOB_LISTENER_PREFIX ~ "."
-                    + jobListenerNames[i], true);
+        // TypeInfo_Class[] strArg = new Class[] { string.class };
+        // string[] jobListenerNames = cfg.getPropertyGroups(PROP_JOB_LISTENER_PREFIX);
+        // JobListener[] jobListeners = new JobListener[jobListenerNames.length];
+        // for (int i = 0; i < jobListenerNames.length; i++) {
+        //     Properties lp = cfg.getPropertyGroup(PROP_JOB_LISTENER_PREFIX ~ "."
+        //             + jobListenerNames[i], true);
 
-            string listenerClass = lp.getProperty(PROP_LISTENER_CLASS, null);
+        //     string listenerClass = lp.getProperty(PROP_LISTENER_CLASS, null);
 
-            if (listenerClass is null) {
-                initException = new SchedulerException(
-                        "JobListener class not specified for listener '"
-                                + jobListenerNames[i] ~ "'");
-                throw initException;
-            }
-            JobListener listener = null;
-            try {
-                listener = (JobListener)
-                       loadHelper.loadClass(listenerClass).newInstance();
-            } catch (Exception e) {
-                initException = new SchedulerException(
-                        "JobListener class '" ~ listenerClass
-                                ~ "' could not be instantiated.", e);
-                throw initException;
-            }
-            try {
-                Method nameSetter = null;
-                try { 
-                    nameSetter = listener.getClass().getMethod("setName", strArg);
-                }
-                catch(NoSuchMethodException ignore) { 
-                    /* do nothing */ 
-                }
-                if(nameSetter !is null) {
-                    nameSetter.invoke(listener, new Object[] {jobListenerNames[i] } );
-                }
-                setBeanProps(listener, lp);
-            } catch (Exception e) {
-                initException = new SchedulerException(
-                        "JobListener '" ~ listenerClass
-                                ~ "' props could not be configured.", e);
-                throw initException;
-            }
-            jobListeners[i] = listener;
-        }
+        //     if (listenerClass is null) {
+        //         initException = new SchedulerException(
+        //                 "JobListener class not specified for listener '"
+        //                         + jobListenerNames[i] ~ "'");
+        //         throw initException;
+        //     }
+        //     JobListener listener = null;
+        //     try {
+        //         listener = (JobListener)
+        //                loadHelper.loadClass(listenerClass).newInstance();
+        //     } catch (Exception e) {
+        //         initException = new SchedulerException(
+        //                 "JobListener class '" ~ listenerClass
+        //                         ~ "' could not be instantiated.", e);
+        //         throw initException;
+        //     }
+        //     try {
+        //         Method nameSetter = null;
+        //         try { 
+        //             nameSetter = listener.getClass().getMethod("setName", strArg);
+        //         }
+        //         catch(NoSuchMethodException ignore) { 
+        //             /* do nothing */ 
+        //         }
+        //         if(nameSetter !is null) {
+        //             nameSetter.invoke(listener, new Object[] {jobListenerNames[i] } );
+        //         }
+        //         setBeanProps(listener, lp);
+        //     } catch (Exception e) {
+        //         initException = new SchedulerException(
+        //                 "JobListener '" ~ listenerClass
+        //                         ~ "' props could not be configured.", e);
+        //         throw initException;
+        //     }
+        //     jobListeners[i] = listener;
+        // }
 
         // Set up any TriggerListeners
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         string[] triggerListenerNames = cfg.getPropertyGroups(PROP_TRIGGER_LISTENER_PREFIX);
         TriggerListener[] triggerListeners = new TriggerListener[triggerListenerNames.length];
-        for (int i = 0; i < triggerListenerNames.length; i++) {
+        for (size_t i = 0; i < triggerListenerNames.length; i++) {
             Properties lp = cfg.getPropertyGroup(PROP_TRIGGER_LISTENER_PREFIX ~ "."
-                    + triggerListenerNames[i], true);
+                    ~ triggerListenerNames[i], true);
 
-            string listenerClass = lp.getProperty(PROP_LISTENER_CLASS, null);
+            string listenerClass = lp.get(PROP_LISTENER_CLASS, null);
 
-            if (listenerClass is null) {
+            if (listenerClass.empty) {
                 initException = new SchedulerException(
                         "TriggerListener class not specified for listener '"
-                                + triggerListenerNames[i] ~ "'");
+                                ~ triggerListenerNames[i] ~ "'");
                 throw initException;
             }
-            TriggerListener listener = null;
-            try {
-                listener = (TriggerListener)
-                       loadHelper.loadClass(listenerClass).newInstance();
-            } catch (Exception e) {
-                initException = new SchedulerException(
-                        "TriggerListener class '" ~ listenerClass
-                                ~ "' could not be instantiated.", e);
-                throw initException;
-            }
-            try {
-                Method nameSetter = null;
-                try { 
-                    nameSetter = listener.getClass().getMethod("setName", strArg);
-                }
-                catch(NoSuchMethodException ignore) { /* do nothing */ }
-                if(nameSetter !is null) {
-                    nameSetter.invoke(listener, new Object[] {triggerListenerNames[i] } );
-                }
-                setBeanProps(listener, lp);
-            } catch (Exception e) {
-                initException = new SchedulerException(
-                        "TriggerListener '" ~ listenerClass
-                                ~ "' props could not be configured.", e);
-                throw initException;
-            }
-            triggerListeners[i] = listener;
+            // TriggerListener listener = null;
+            // try {
+            //     listener = cast(TriggerListener)
+            //            loadHelper.loadClass(listenerClass).newInstance();
+            // } catch (Exception e) {
+            //     initException = new SchedulerException(
+            //             "TriggerListener class '" ~ listenerClass
+            //                     ~ "' could not be instantiated.", e);
+            //     throw initException;
+            // }
+            // try {
+            //     Method nameSetter = null;
+            //     try { 
+            //         nameSetter = listener.getClass().getMethod("setName", strArg);
+            //     }
+            //     catch(NoSuchMethodException ignore) { /* do nothing */ }
+            //     if(nameSetter !is null) {
+            //         nameSetter.invoke(listener, new Object[] {triggerListenerNames[i] } );
+            //     }
+            //     setBeanProps(listener, lp);
+            // } catch (Exception e) {
+            //     initException = new SchedulerException(
+            //             "TriggerListener '" ~ listenerClass
+            //                     ~ "' props could not be configured.", e);
+            //     throw initException;
+            // }
+            // triggerListeners[i] = listener;
         }
 
         bool tpInited = false;
@@ -1188,13 +1205,13 @@ class StdSchedulerFactory : SchedulerFactory {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         string threadExecutorClass = cfg.getStringProperty(PROP_THREAD_EXECUTOR_CLASS);
-        if (threadExecutorClass !is null) {
+        if (!threadExecutorClass.empty()) {
             tProps = cfg.getPropertyGroup(PROP_THREAD_EXECUTOR, true);
             try {
-                threadExecutor = (ThreadExecutor) loadHelper.loadClass(threadExecutorClass).newInstance();
+                threadExecutor = cast(ThreadExecutor)factory(threadExecutorClass);
                 info("Using custom implementation for ThreadExecutor: " ~ threadExecutorClass);
 
-                setBeanProps(threadExecutor, tProps);
+                // setBeanProps(threadExecutor, tProps);
             } catch (Exception e) {
                 initException = new SchedulerException(
                         "ThreadExecutor class '" ~ threadExecutorClass ~ "' could not be instantiated.", e);
@@ -1214,15 +1231,15 @@ class StdSchedulerFactory : SchedulerFactory {
     
             JobRunShellFactory jrsf = null; // Create correct run-shell factory...
     
-            if (userTXLocation !is null) {
-                UserTransactionHelper.setUserTxLocation(userTXLocation);
-            }
+            // if (userTXLocation !is null) {
+            //     UserTransactionHelper.setUserTxLocation(userTXLocation);
+            // }
     
-            if (wrapJobInTx) {
-                jrsf = new JTAJobRunShellFactory();
-            } else {
-                jrsf = new JTAAnnotationAwareJobRunShellFactory();
-            }
+            // if (wrapJobInTx) {
+            //     jrsf = new JTAJobRunShellFactory();
+            // } else {
+            //     jrsf = new JTAAnnotationAwareJobRunShellFactory();
+            // }
     
             if (autoId) {
                 try {
@@ -1236,34 +1253,36 @@ class StdSchedulerFactory : SchedulerFactory {
                 }
             }
 
-            if (js.getClass().getName().startsWith("org.terracotta.quartz")) {
-                try {
-                    string uuid = (string) js.getClass().getMethod("getUUID").invoke(js);
-                    if(schedInstId== DEFAULT_INSTANCE_ID) {
-                        schedInstId = "TERRACOTTA_CLUSTERED,node=" ~ uuid;
-                        if (jmxObjectName is null) {
-                            jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId);
-                        }
-                    } else if(jmxObjectName is null) {
-                        jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId ~ ",node=" ~ uuid);
-                    }
-                } catch(Exception e) {
-                    throw new RuntimeException("Problem obtaining node id from TerracottaJobStore.", e);
-                }
+            string jsName = typeid(cast(Object)js).name;
 
-                if(null == cfg.getStringProperty(PROP_SCHED_JMX_EXPORT)) {
-                    jmxExport = true;
-                }
-            }
+            // if (jsName.startsWith("org.terracotta.quartz")) {
+            //     try {
+            //         string uuid = (string) js.getClass().getMethod("getUUID").invoke(js);
+            //         if(schedInstId== DEFAULT_INSTANCE_ID) {
+            //             schedInstId = "TERRACOTTA_CLUSTERED,node=" ~ uuid;
+            //             if (jmxObjectName is null) {
+            //                 jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId);
+            //             }
+            //         } else if(jmxObjectName is null) {
+            //             jmxObjectName = QuartzSchedulerResources.generateJMXObjectName(schedName, schedInstId ~ ",node=" ~ uuid);
+            //         }
+            //     } catch(Exception e) {
+            //         throw new RuntimeException("Problem obtaining node id from TerracottaJobStore.", e);
+            //     }
+
+            //     if(null == cfg.getStringProperty(PROP_SCHED_JMX_EXPORT)) {
+            //         jmxExport = true;
+            //     }
+            // }
             
-            if (js instanceof JobStoreSupport) {
-                JobStoreSupport jjs = (JobStoreSupport)js;
-                jjs.setDbRetryInterval(dbFailureRetry);
-                if(threadsInheritInitalizersClassLoader)
-                    jjs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
+            // JobStoreSupport jjs = cast(JobStoreSupport)js;
+            // if (jjs !is null) {
+            //     jjs.setDbRetryInterval(dbFailureRetry);
+            //     if(threadsInheritInitalizersClassLoader)
+            //         jjs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
                 
-                jjs.setThreadExecutor(threadExecutor);
-            }
+            //     jjs.setThreadExecutor(threadExecutor);
+            // }
     
             QuartzSchedulerResources rsrcs = new QuartzSchedulerResources();
             rsrcs.setName(schedName);
@@ -1287,22 +1306,24 @@ class StdSchedulerFactory : SchedulerFactory {
             }
     
             if (rmiExport) {
-                rsrcs.setRMIRegistryHost(rmiHost);
-                rsrcs.setRMIRegistryPort(rmiPort);
-                rsrcs.setRMIServerPort(rmiServerPort);
-                rsrcs.setRMICreateRegistryStrategy(rmiCreateRegistry);
-                rsrcs.setRMIBindName(rmiBindName);
+                implementationMissing(false);
+                // rsrcs.setRMIRegistryHost(rmiHost);
+                // rsrcs.setRMIRegistryPort(rmiPort);
+                // rsrcs.setRMIServerPort(rmiServerPort);
+                // rsrcs.setRMICreateRegistryStrategy(rmiCreateRegistry);
+                // rsrcs.setRMIBindName(rmiBindName);
             }
     
-            SchedulerDetailsSetter.setDetails(tp, schedName, schedInstId);
+            SchedulerDetailsSetter.setDetails(cast(Object)tp, schedName, schedInstId);
 
             rsrcs.setThreadExecutor(threadExecutor);
             threadExecutor.initialize();
 
             rsrcs.setThreadPool(tp);
-            if(tp instanceof SimpleThreadPool) {
+            SimpleThreadPool stp = cast(SimpleThreadPool)tp;
+            if(tp !is null) {
                 if(threadsInheritInitalizersClassLoader)
-                    ((SimpleThreadPool)tp).setThreadsInheritContextClassLoaderOfInitializingThread(threadsInheritInitalizersClassLoader);
+                    (cast(SimpleThreadPool)tp).setThreadsInheritContextClassLoaderOfInitializingThread(threadsInheritInitalizersClassLoader);
             }
             tp.initialize();
             tpInited = true;
@@ -1310,11 +1331,11 @@ class StdSchedulerFactory : SchedulerFactory {
             rsrcs.setJobStore(js);
     
             // add plugins
-            for (int i = 0; i < plugins.length; i++) {
+            for (size_t i = 0; i < plugins.length; i++) {
                 rsrcs.addSchedulerPlugin(plugins[i]);
             }
     
-            qs = new QuartzScheduler(rsrcs, idleWaitTime, dbFailureRetry);
+            qs = new QuartzScheduler(rsrcs, idleWaitTime);
             qsInited = true;
     
             // Create Scheduler ref...
@@ -1326,22 +1347,22 @@ class StdSchedulerFactory : SchedulerFactory {
             }
     
             // Initialize plugins now that we have a Scheduler instance.
-            for (int i = 0; i < plugins.length; i++) {
-                plugins[i].initialize(pluginNames[i], scheduler, loadHelper);
+            for (size_t i = 0; i < plugins.length; i++) {
+                plugins[i].initialize(pluginNames[i], scheduler);
             }
     
             // add listeners
-            for (int i = 0; i < jobListeners.length; i++) {
-                qs.getListenerManager().addJobListener(jobListeners[i], EverythingMatcher.allJobs());
-            }
-            for (int i = 0; i < triggerListeners.length; i++) {
-                qs.getListenerManager().addTriggerListener(triggerListeners[i], EverythingMatcher.allTriggers());
-            }
+            // for (size_t i = 0; i < jobListeners.length; i++) {
+            //     qs.getListenerManager().addJobListener(jobListeners[i], EverythingMatcher.allJobs());
+            // }
+
+            // for (size_t i = 0; i < triggerListeners.length; i++) {
+            //     qs.getListenerManager().addTriggerListener(triggerListeners[i], EverythingMatcher.allTriggers());
+            // }
     
             // set scheduler context data...
-            foreach(Object key; schedCtxtProps.keySet()) {
-                string val = schedCtxtProps.getProperty((string) key);    
-                scheduler.getContext().put((string)key, val);
+            foreach(string key, string val; schedCtxtProps) {
+                scheduler.getContext().put(key, val);
             }
     
             // fire up job store, and runshell factory
@@ -1349,7 +1370,7 @@ class StdSchedulerFactory : SchedulerFactory {
             js.setInstanceId(schedInstId);
             js.setInstanceName(schedName);
             js.setThreadPoolSize(tp.getPoolSize());
-            js.initialize(loadHelper, qs.getSchedulerSignaler());
+            js.initialize(qs.getSchedulerSignaler());
 
             jrsf.initialize(scheduler);
             
@@ -1400,22 +1421,21 @@ class StdSchedulerFactory : SchedulerFactory {
 //         setBeanProps(cp.getDataSource(), copyProps);
 //     }
 
-//     private void shutdownFromInstantiateException(ThreadPool tp, QuartzScheduler qs, bool tpInited, bool qsInited) {
-//         try {
-//             if(qsInited)
-//                 qs.shutdown(false);
-//             else if(tpInited)
-//                 tp.shutdown(false);
-//         } catch (Exception e) {
-//             error("Got another exception while shutting down after instantiation exception", e);
-//         }
-//     }
+    private void shutdownFromInstantiateException(ThreadPool tp, QuartzScheduler qs, bool tpInited, bool qsInited) {
+        try {
+            if(qsInited)
+                qs.shutdown(false);
+            else if(tpInited)
+                tp.shutdown(false);
+        } catch (Exception e) {
+            error("Got another exception while shutting down after instantiation exception", e.msg);
+        }
+    }
 
-//     protected Scheduler instantiate(QuartzSchedulerResources rsrcs, QuartzScheduler qs) {
-
-//         Scheduler scheduler = new StdScheduler(qs);
-//         return scheduler;
-//     }
+    protected Scheduler instantiate(QuartzSchedulerResources rsrcs, QuartzScheduler qs) {
+        Scheduler scheduler = new StdScheduler(qs);
+        return scheduler;
+    }
 
 
 //     // private void setBeanProps(Object obj, Properties props) IllegalAccessException,
@@ -1585,7 +1605,7 @@ class StdSchedulerFactory : SchedulerFactory {
      * StdSchedulerFactory instance.).
      * </p>
      */
-    Collection!(Scheduler) getAllSchedulers() {
+    Scheduler[] getAllSchedulers() {
         return SchedulerRepository.getInstance().lookupAll();
     }
 }

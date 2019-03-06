@@ -88,7 +88,7 @@ interface SchedulerPlugin {
      * @throws hunt.quartz.SchedulerConfigException
      *           if there is an error initializing.
      */
-    void initialize(string name, Scheduler scheduler, ClassLoadHelper loadHelper);
+    void initialize(string name, Scheduler scheduler);
 
     /**
      * <p>

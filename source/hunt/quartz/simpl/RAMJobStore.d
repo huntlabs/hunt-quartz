@@ -148,7 +148,7 @@ class RAMJobStore : JobStore {
      * used, in order to give the it a chance to initialize.
      * </p>
      */
-    void initialize(ClassLoadHelper loadHelper, SchedulerSignaler schedSignaler) {
+    void initialize(SchedulerSignaler schedSignaler) {
 
         this.signaler = schedSignaler;
 
