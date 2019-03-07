@@ -380,23 +380,24 @@ class PropertiesParser {
         }
 
         foreach(string key; props.byKey()) {
-            if (key.startsWith(prefix)) {
-                bool exclude = false;
-                if (excludedPrefixes !is null) {
-                    for (size_t i = 0; (i < excludedPrefixes.length) && !exclude; i++) {
-                        exclude = key.startsWith(excludedPrefixes[i]);
-                    }
-                }
+            if (!key.startsWith(prefix)) 
+                continue;
 
-                if (!exclude) {
-                    string value = getStringProperty(key, "");
-                    
-                    if (stripPrefix) { 
-                        string k = key[0 .. prefix.length];
-                        group[k] = value;
-                    } else {
-                        group[key] = value;
-                    }
+            bool exclude = false;
+            if (excludedPrefixes !is null) {
+                for (size_t i = 0; (i < excludedPrefixes.length) && !exclude; i++) {
+                    exclude = key.startsWith(excludedPrefixes[i]);
+                }
+            }
+
+            if (!exclude) {
+                string value = getStringProperty(key, "");
+                
+                if (stripPrefix) { 
+                    string k = key[prefix.length .. $];
+                    group[k] = value;
+                } else {
+                    group[key] = value;
                 }
             }
         }

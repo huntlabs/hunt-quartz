@@ -109,4 +109,16 @@ class ZeroSizeThreadPool : ThreadPool {
     void setInstanceName(string schedName) {
     }
 
+    void setThreadCount(int count) {
+
+    }
+    
+    void setThreadPriority(int prio) {
+
+    }
+
+    int getThreadPriority() {
+        return 0;
+    }
+
 }

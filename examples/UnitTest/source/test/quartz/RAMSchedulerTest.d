@@ -1,14 +1,33 @@
 module test.quartz.RAMSchedulerTest;
 
+import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.impl.StdScheduler;
 import hunt.quartz.impl.StdSchedulerFactory;
+import hunt.quartz.Job;
+import hunt.quartz.JobBuilder;
+import hunt.quartz.JobDetail;
+import hunt.quartz.JobExecutionContext;
+import hunt.quartz.JobKey;
+import hunt.quartz.Scheduler;
+import hunt.quartz.SimpleScheduleBuilder;
+import hunt.quartz.StatefulJob;
+import hunt.quartz.Trigger;
+import hunt.quartz.TriggerBuilder;
+import hunt.quartz.TriggerKey;
 
+import hunt.Assert;
+import hunt.collection.List;
+import hunt.collection.Set;
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
+import hunt.util.Traits;
 import hunt.util.UnitTest;
-import hunt.Assert;
 
 import std.conv;
+
+alias jobKey = JobKey.jobKey;
+alias simpleSchedule = SimpleScheduleBuilder.simpleSchedule;
+alias triggerKey = TriggerKey.triggerKey;
 
 alias assertTrue = Assert.assertTrue;
 alias assertFalse = Assert.assertFalse;
@@ -20,13 +39,15 @@ alias assertNull = Assert.assertNull;
 
 class RAMSchedulerTest {
 
+    // protected abstract Scheduler createScheduler(string name, int threadPoolSize);
+
     protected Scheduler createScheduler(string name, int threadPoolSize) 
     {
         string[string] config;
-        config["org.quartz.scheduler.instanceName"] = name ~ "Scheduler";
-        config["org.quartz.scheduler.instanceId"] = "AUTO";
-        config["org.quartz.threadPool.threadCount"] = threadPoolSize.to!string();
-        config["org.quartz.threadPool.class"] = "org.quartz.simpl.SimpleThreadPool";
+        config["hunt.quartz.scheduler.instanceName"] = name ~ "Scheduler";
+        config["hunt.quartz.scheduler.instanceId"] = "AUTO";
+        config["hunt.quartz.threadPool.threadCount"] = threadPoolSize.to!string();
+        config["hunt.quartz.threadPool.class"] = "hunt.quartz.simpl.SimpleThreadPool.SimpleThreadPool";
         return new StdSchedulerFactory(config).getScheduler();
     }
 
@@ -38,40 +59,42 @@ class RAMSchedulerTest {
     
     static class TestStatefulJob : StatefulJob {
         void execute(JobExecutionContext context){
+            info("executing the job...");
         }
     }
 
     static class TestJob : Job {
         void execute(JobExecutionContext context){
+            info("executing the job...");
         }
     }
     
 	enum TEST_TIMEOUT_SECONDS = 125;
     
-    static class TestJobWithSync : Job {
-        void execute(JobExecutionContext context){
+    // static class TestJobWithSync : Job {
+    //     void execute(JobExecutionContext context){
         	
-			try {
+	// 		try {
 				
-				List!(Long) jobExecTimestamps = cast(List!(Long))context.getScheduler().getContext().get(DATE_STAMPS);
-				CyclicBarrier barrier =  cast(CyclicBarrier)context.getScheduler().getContext().get(BARRIER);
+	// 			List!(Long) jobExecTimestamps = cast(List!(Long))context.getScheduler().getContext().get(DATE_STAMPS);
+	// 			CyclicBarrier barrier =  cast(CyclicBarrier)context.getScheduler().getContext().get(BARRIER);
 
-	        	jobExecTimestamps.add(System.currentTimeMillis());
+	//         	jobExecTimestamps.add(System.currentTimeMillis());
 	        	
-				barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-			} catch (Throwable e) {
-				e.printStackTrace();
-				throw new AssertionError("Await on barrier was interrupted: " ~ e.toString());
-			} 
-        }
-    }
+	// 			barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+	// 		} catch (Throwable e) {
+	// 			e.printStackTrace();
+	// 			throw new AssertionError("Await on barrier was interrupted: " ~ e.toString());
+	// 		} 
+    //     }
+    // }
     
     static class TestAnnotatedJob : Job {
         void execute(JobExecutionContext context){
+            info("executing the job...");
         }
     }
     
-    protected abstract Scheduler createScheduler(string name, int threadPoolSize);
 
     @Test
     void testBasicStorageFunctions(){
@@ -79,17 +102,19 @@ class RAMSchedulerTest {
 
         // test basic storage functions of scheduler...
         
-        JobDetail job = newJob()
-            .ofType(TestJob.class)
+        JobDetail job = JobBuilder.newJob()
+            .ofType(typeid(TestJob))
             .withIdentity("j1")
             .storeDurably()
             .build();
 
-        assertFalse("Unexpected existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+        assertFalse("Unexpected existence of job named 'j1'.", 
+            sched.checkExists(jobKey("j1")));
 
         sched.addJob(job, false); 
 
-        assertTrue("Expected existence of job named 'j1' but checkExists return false.", sched.checkExists(jobKey("j1")));
+        assertTrue("Expected existence of job named 'j1' but checkExists return false.", 
+            sched.checkExists(jobKey("j1")));
 
         job = sched.getJobDetail(jobKey("j1"));
 
@@ -97,7 +122,7 @@ class RAMSchedulerTest {
         
         sched.deleteJob(jobKey("j1"));
         
-        Trigger trigger = newTrigger()
+        Trigger trigger = TriggerBuilderHelper.newTrigger!Trigger()
             .withIdentity("t1")
             .forJob(job)
             .startNow()
@@ -120,12 +145,12 @@ class RAMSchedulerTest {
 
         assertNotNull("Stored trigger not found!", trigger);
 
-        job = newJob()
-            .ofType(TestJob.class)
+        job = JobBuilder.newJob()
+            .ofType(typeid(TestJob))
             .withIdentity("j2", "g1")
             .build();
     
-        trigger = newTrigger()
+        trigger = TriggerBuilderHelper.newTrigger!Trigger()
             .withIdentity("t2", "g1")
             .forJob(job)
             .startNow()
@@ -136,12 +161,12 @@ class RAMSchedulerTest {
 
         sched.scheduleJob(job, trigger);
         
-        job = newJob()
-            .ofType(TestJob.class)
+        job = JobBuilder.newJob()
+            .ofType(typeid(TestJob))
             .withIdentity("j3", "g1")
             .build();
     
-        trigger = newTrigger()
+        trigger = TriggerBuilderHelper.newTrigger!Trigger()
             .withIdentity("t3", "g1")
             .forJob(job)
             .startNow()
@@ -159,42 +184,42 @@ class RAMSchedulerTest {
         assertTrue("Job group list size expected to be = 2 ", jobGroups.size() == 2);
         assertTrue("Trigger group list size expected to be = 2 ", triggerGroups.size() == 2);
         
-        Set!(JobKey) jobKeys = sched.getJobKeys(GroupMatcher.jobGroupEquals(JobKey.DEFAULT_GROUP));
-        Set!(TriggerKey) triggerKeys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
+        Set!(JobKey) jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals(JobKey.DEFAULT_GROUP));
+        Set!(TriggerKey) triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
 
         assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1);
         assertTrue("Number of triggers expected in default group was 1 ", triggerKeys.size() == 1);
 
-        jobKeys = sched.getJobKeys(GroupMatcher.jobGroupEquals("g1"));
-        triggerKeys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals("g1"));
+        jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals("g1"));
+        triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals("g1"));
 
         assertTrue("Number of jobs expected in 'g1' group was 2 ", jobKeys.size() == 2);
         assertTrue("Number of triggers expected in 'g1' group was 2 ", triggerKeys.size() == 2);
 
         
         TriggerState s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s == TriggerState.NORMAL);
         
         sched.pauseTrigger(triggerKey("t2", "g1"));
         s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be PAUSED ", s.equals(TriggerState.PAUSED));
+        assertTrue("State of trigger t2 expected to be PAUSED ", s == TriggerState.PAUSED);
 
         sched.resumeTrigger(triggerKey("t2", "g1"));
         s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s == TriggerState.NORMAL);
 
         Set!(string) pausedGroups = sched.getPausedTriggerGroups();
         assertTrue("Size of paused trigger groups list expected to be 0 ", pausedGroups.size() == 0);
         
-        sched.pauseTriggers(GroupMatcher.triggerGroupEquals("g1"));
+        sched.pauseTriggers(GroupMatcherHelper.triggerGroupEquals("g1"));
         
         // test that adding a trigger to a paused group causes the new trigger to be paused also... 
-        job = newJob()
-            .ofType(TestJob.class)
+        job = JobBuilder.newJob()
+            .ofType(typeid(TestJob))
             .withIdentity("j4", "g1")
             .build();
     
-        trigger = newTrigger()
+        trigger = TriggerBuilderHelper.newTrigger!Trigger()
             .withIdentity("t4", "g1")
             .forJob(job)
             .startNow()
@@ -209,16 +234,16 @@ class RAMSchedulerTest {
         assertTrue("Size of paused trigger groups list expected to be 1 ", pausedGroups.size() == 1);
 
         s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be PAUSED ", s.equals(TriggerState.PAUSED));
+        assertTrue("State of trigger t2 expected to be PAUSED ", s == TriggerState.PAUSED);
 
         s = sched.getTriggerState(triggerKey("t4", "g1"));
-        assertTrue("State of trigger t4 expected to be PAUSED ", s.equals(TriggerState.PAUSED));
+        assertTrue("State of trigger t4 expected to be PAUSED ", s == TriggerState.PAUSED);
         
-        sched.resumeTriggers(GroupMatcher.triggerGroupEquals("g1"));
+        sched.resumeTriggers(GroupMatcherHelper.triggerGroupEquals("g1"));
         s = sched.getTriggerState(triggerKey("t2", "g1"));
-        assertTrue("State of trigger t2 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s == TriggerState.NORMAL);
         s = sched.getTriggerState(triggerKey("t4", "g1"));
-        assertTrue("State of trigger t4 expected to be NORMAL ", s.equals(TriggerState.NORMAL));
+        assertTrue("State of trigger t4 expected to be NORMAL ", s == TriggerState.NORMAL);
         pausedGroups = sched.getPausedTriggerGroups();
         assertTrue("Size of paused trigger groups list expected to be 0 ", pausedGroups.size() == 0);
 
@@ -227,16 +252,16 @@ class RAMSchedulerTest {
 
         assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", sched.unscheduleJob(triggerKey("t3", "g1")));
         
-        jobKeys = sched.getJobKeys(GroupMatcher.jobGroupEquals("g1"));
-        triggerKeys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals("g1"));
+        jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals("g1"));
+        triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals("g1"));
 
         assertTrue("Number of jobs expected in 'g1' group was 1 ", jobKeys.size() == 2); // job should have been deleted also, because it is non-durable
         assertTrue("Number of triggers expected in 'g1' group was 1 ", triggerKeys.size() == 2);
 
         assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", sched.unscheduleJob(triggerKey("t1")));
         
-        jobKeys = sched.getJobKeys(GroupMatcher.jobGroupEquals(JobKey.DEFAULT_GROUP));
-        triggerKeys = sched.getTriggerKeys(GroupMatcher.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
+        jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals(JobKey.DEFAULT_GROUP));
+        triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
 
         assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1); // job should have been left in place, because it is non-durable
         assertTrue("Number of triggers expected in default group was 0 ", triggerKeys.size() == 0);
@@ -250,8 +275,8 @@ class RAMSchedulerTest {
     //     try {
     //         // test basic storage functions of scheduler...
 
-    //         JobDetail job = newJob()
-    //                 .ofType(TestJob.class)
+    //         JobDetail job = JobBuilder.newJob()
+    //                 .ofType(typeid(TestJob))
     //                 .withIdentity("j1")
     //                 .storeDurably()
     //                 .build();
@@ -262,8 +287,8 @@ class RAMSchedulerTest {
 
     //         assertTrue("Unexpected non-existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
 
-    //         JobDetail nonDurableJob = newJob()
-    //                 .ofType(TestJob.class)
+    //         JobDetail nonDurableJob = JobBuilder.newJob()
+    //                 .ofType(typeid(TestJob))
     //                 .withIdentity("j2")
     //                 .build();
 
@@ -343,7 +368,7 @@ class RAMSchedulerTest {
     //     Thread.yield();
         
 	// 	JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
-	// 	Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
+	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger().forJob(job1).build(); 
 		
 	// 	long sTime = System.currentTimeMillis();
 		
@@ -399,7 +424,7 @@ class RAMSchedulerTest {
     //     sched.getContext().put(DATE_STAMPS, jobExecTimestamps);
         
 	// 	JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
-	// 	Trigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).build(); 
+	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger().forJob(job1).build(); 
 		
 	// 	long sTime = System.currentTimeMillis();
 		
@@ -420,14 +445,14 @@ class RAMSchedulerTest {
 
 		
 	// 	JobDetail job = newJob(TestJob.class).withIdentity("job1", "group1").build();
-	// 	Trigger trigger1 = newTrigger()
+	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger()
 	// 			.withIdentity("trigger1", "group1")
 	// 			.startNow()
 	// 			.withSchedule(
 	// 					SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
 	// 							.repeatForever())
 	// 			.build();
-	// 	Trigger trigger2 = newTrigger()
+	// 	Trigger trigger2 = TriggerBuilderHelper.newTrigger!Trigger()
 	// 			.withIdentity("trigger2", "group1")
 	// 			.startNow()
 	// 			.withSchedule(
@@ -457,7 +482,7 @@ class RAMSchedulerTest {
     //         scheduler.getContext().put(BARRIER, barrier);
     //         scheduler.start();
     //         scheduler.addJob(newJob().ofType(UncleanShutdownJob.class).withIdentity("job").storeDurably().build(), false);
-    //         scheduler.scheduleJob(newTrigger().forJob("job").startNow().build());
+    //         scheduler.scheduleJob(newTrigger!Trigger().forJob("job").startNow().build());
     //         while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
     //             Thread.sleep(50);
     //         }
@@ -497,7 +522,7 @@ class RAMSchedulerTest {
     //         scheduler.getContext().put(DATE_STAMPS, jobExecTimestamps);
     //         scheduler.start();
     //         scheduler.addJob(newJob().ofType(TestJobWithSync.class).withIdentity("job").storeDurably().build(), false);
-    //         scheduler.scheduleJob(newTrigger().forJob("job").startNow().build());
+    //         scheduler.scheduleJob(newTrigger!Trigger().forJob("job").startNow().build());
     //         while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
     //             Thread.sleep(50);
     //         }

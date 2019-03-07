@@ -123,4 +123,10 @@ interface ThreadPool {
      */
     void setInstanceName(string schedName);
 
+    void setThreadCount(int count);
+
+    void setThreadPriority(int prio);
+
+    int getThreadPriority();
+
 }

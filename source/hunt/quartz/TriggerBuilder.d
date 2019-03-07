@@ -49,6 +49,9 @@ class TriggerBuilderHelper {
     static TriggerBuilder!(T) newTrigger(T)() if(is(T : Trigger)) {
         return new TriggerBuilder!(T)();
     }
+    // static TriggerBuilder!(Trigger) newTrigger() {
+    //     return new TriggerBuilder!(Trigger)();
+    // }
 }
 
 /**

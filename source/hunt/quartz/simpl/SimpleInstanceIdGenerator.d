@@ -16,8 +16,6 @@
  */
 module hunt.quartz.simpl.SimpleInstanceIdGenerator;
 
-// import java.net.InetAddress;
-
 import hunt.quartz.exception;
 import hunt.quartz.spi.InstanceIdGenerator;
 import hunt.util.DateTime;
@@ -33,6 +31,10 @@ import std.socket;
  * @see HostnameInstanceIdGenerator
  */
 class SimpleInstanceIdGenerator : InstanceIdGenerator {
+
+    this() {
+
+    }
     string generateInstanceId() {
         try {
             return Socket.hostName() ~ DateTimeHelper.currentTimeMillis().to!string();

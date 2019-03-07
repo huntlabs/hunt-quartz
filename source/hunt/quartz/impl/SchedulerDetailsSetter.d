@@ -23,6 +23,8 @@ import hunt.logging;
 import hunt.Exceptions;
 import hunt.quartz.exception;
 
+import hunt.util.Traits;
+
 /**
  * This utility calls methods reflectively on the given objects even though the
  * methods are likely on a proper interface (ThreadPool, JobStore, etc). The
@@ -38,11 +40,13 @@ class SchedulerDetailsSetter {
         //
     }
 
-    static void setDetails(Object target, string schedulerName,
+    static void setDetails(T)(T target, string schedulerName,
             string schedulerId) {
-        implementationMissing(false);
+        // implementationMissing(false);
         // set(target, "setInstanceName", schedulerName);
         // set(target, "setInstanceId", schedulerId);
+        setProperty(target, "InstanceName", schedulerName);
+        setProperty(target, "InstanceId", schedulerId);
     }
 
     // private static void set(Object target, string method, string value) {

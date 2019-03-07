@@ -258,35 +258,37 @@ class SimpleThreadPool : ThreadPool {
             throw new SchedulerConfigException(
                     "Thread count must be > 0");
         }
-        if (prio <= 0 || prio > 9) {
-            throw new SchedulerConfigException(
-                    "Thread priority must be > 0 and <= 9");
-        }
+        // if (prio <= 0 || prio > 9) {
+        //     throw new SchedulerConfigException(
+        //             "Thread priority must be > 0 and <= 9");
+        // }
 
-        if(isThreadsInheritGroupOfInitializingThread()) {
-            threadGroup = ThreadEx.currentThread().getThreadGroup();
-        } else {
-            // follow the threadGroup tree to the root thread group.
-            threadGroup = ThreadEx.currentThread().getThreadGroup();
-            ThreadGroupEx parent = threadGroup;
-            while ( parent.getName() != ("main") ) {
-                threadGroup = parent;
-                parent = threadGroup.getParent();
-            }
-            threadGroup = new ThreadGroupEx(parent, schedulerInstanceName ~ "-SimpleThreadPool");
-            if (isMakeThreadsDaemons()) {
-                threadGroup.setDaemon(true);
-            }
-        }
+        // FIXME: Needing refactor or cleanup -@zxp at 3/7/2019, 8:06:43 PM
+        // 
+        // if(isThreadsInheritGroupOfInitializingThread()) {
+        //     threadGroup = ThreadEx.currentThread().getThreadGroup();
+        // } else {
+        //     // follow the threadGroup tree to the root thread group.
+        //     threadGroup = ThreadEx.currentThread().getThreadGroup();
+        //     ThreadGroupEx parent = threadGroup;
+        //     while ( parent.getName() != ("main") ) {
+        //         threadGroup = parent;
+        //         parent = threadGroup.getParent();
+        //     }
+        //     threadGroup = new ThreadGroupEx(parent, schedulerInstanceName ~ "-SimpleThreadPool");
+        //     if (isMakeThreadsDaemons()) {
+        //         threadGroup.setDaemon(true);
+        //     }
+        // }
 
 
         if (isThreadsInheritContextClassLoaderOfInitializingThread()) {
-            info("Job execution threads will use class loader of thread: "
+            trace("Job execution threads will use class loader of thread: "
                             ~ Thread.getThis().name);
         }
 
         // create the worker threads and start them
-        foreach(WorkerThread wt; createWorkerThreads(count).iterator()) {
+        foreach(WorkerThread wt; createWorkerThreads(count)) {
             wt.start();
             availWorkers.add(wt);
         }
@@ -347,7 +349,7 @@ class SimpleThreadPool : ThreadPool {
                 return;
 
             // signal each worker thread to shut down
-            foreach(WorkerThread wt; workers.iterator()) {
+            foreach(WorkerThread wt; workers) {
                 wt.shutdown();
                 availWorkers.remove(wt);
             }
@@ -385,7 +387,7 @@ class SimpleThreadPool : ThreadPool {
                         }
                     }
 
-                    foreach(WorkerThread wt; workers.iterator()) {
+                    foreach(WorkerThread wt; workers) {
                         try {
                             wt.join();
                             // workerThreads.remove();

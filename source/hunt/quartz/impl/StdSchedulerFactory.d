@@ -26,7 +26,6 @@ import hunt.quartz.impl.StdScheduler;
 import hunt.quartz.JobListener;
 import hunt.quartz.Scheduler;
 import hunt.quartz.exception;
-import hunt.quartz.exception;
 import hunt.quartz.SchedulerFactory;
 import hunt.quartz.TriggerListener;
 import hunt.quartz.core.JobRunShellFactory;
@@ -55,27 +54,14 @@ import hunt.quartz.utils.JNDIConnectionProvider;
 import hunt.quartz.utils.PoolingConnectionProvider;
 import hunt.quartz.utils.PropertiesParser;
 
-// import java.beans.BeanInfo;
-// import java.beans.IntrospectionException;
-// import java.beans.Introspector;
-// import java.beans.PropertyDescriptor;
-// import java.io.BufferedInputStream;
-// import java.io.File;
-// import java.io.FileInputStream;
-// import java.io.IOException;
-// import java.lang.reflect.Constructor;
-// import java.lang.reflect.Method;
-// import java.security.AccessControlException;
-// import java.sql.SQLException;
-// import java.util.Properties;
-
-
 import hunt.collection.Collection;
 import hunt.Exceptions;
 import hunt.logging;
 import hunt.time.util.Locale;
+import hunt.util.Traits;
 
 import std.array;
+import std.format;
 
 /**
  * <p>
@@ -599,6 +585,17 @@ class StdSchedulerFactory : SchedulerFactory {
         this.cfg = new PropertiesParser(props);
     }
 
+    private T createObject(T)(string fullClassName) {
+        Object o = Object.factory(fullClassName);
+        if(o is null) {
+            string msg = format("Can't create a object from %s", fullClassName);
+            warningf(msg);
+            throw new Exception(msg);
+        } else {
+            return cast(T)o;
+        }
+    }
+
     private Scheduler instantiate() {
         if (cfg is null) {
             initialize();
@@ -642,12 +639,12 @@ class StdSchedulerFactory : SchedulerFactory {
             autoId = true;
             instanceIdGeneratorClass = cfg.getStringProperty(
                     PROP_SCHED_INSTANCE_ID_GENERATOR_CLASS,
-                    "hunt.quartz.simpl.SimpleInstanceIdGenerator");
+                    "hunt.quartz.simpl.SimpleInstanceIdGenerator.SimpleInstanceIdGenerator");
         }
         else if (schedInstId== SYSTEM_PROPERTY_AS_INSTANCE_ID) {
             autoId = true;
             instanceIdGeneratorClass = 
-                    "hunt.quartz.simpl.SystemPropertyInstanceIdGenerator";
+                    "hunt.quartz.simpl.SystemPropertyInstanceIdGenerator.SystemPropertyInstanceIdGenerator";
         }
 
         userTXLocation = cfg.getStringProperty(PROP_SCHED_USER_TX_URL,
@@ -658,7 +655,7 @@ class StdSchedulerFactory : SchedulerFactory {
 
         classLoadHelperClass = cfg.getStringProperty(
                 PROP_SCHED_CLASS_LOAD_HELPER_CLASS,
-                "hunt.quartz.simpl.CascadingClassLoadHelper");
+                "hunt.quartz.simpl.CascadingClassLoadHelper.CascadingClassLoadHelper");
         wrapJobInTx = cfg.getBooleanProperty(PROP_SCHED_WRAP_JOB_IN_USER_TX,
                 wrapJobInTx);
 
@@ -814,28 +811,20 @@ class StdSchedulerFactory : SchedulerFactory {
         InstanceIdGenerator instanceIdGenerator = null;
         if(!instanceIdGeneratorClass.empty()) {
             try {
-                // instanceIdGenerator = cast(InstanceIdGenerator) loadHelper.loadClass(instanceIdGeneratorClass)
-                //     .newInstance();
-                Object o = factory(instanceIdGeneratorClass);
-                if(o is null) {
-                    warningf("Can't create a object from %s", instanceIdGeneratorClass);
-                }
-                instanceIdGenerator = cast(InstanceIdGenerator)o;
-                // instanceIdGenerator = new SimpleInstanceIdGenerator();
+                instanceIdGenerator = createObject!InstanceIdGenerator(instanceIdGeneratorClass);
             } catch (Exception e) {
                 throw new SchedulerConfigException(
-                        "Unable to instantiate InstanceIdGenerator class: "
-                        ~ e.msg, e);
+                        "Unable to instantiate InstanceIdGenerator class", e);
             }
 
             tProps = cfg.getPropertyGroup(PROP_SCHED_INSTANCE_ID_GENERATOR_PREFIX, true);
-            // try {
-            //     setBeanProps(instanceIdGenerator, tProps);
-            // } catch (Exception e) {
-            //     initException = new SchedulerException("InstanceIdGenerator class '"
-            //             + instanceIdGeneratorClass ~ "' props could not be configured.", e);
-            //     throw initException;
-            // }
+            try {
+                setBeanProps(instanceIdGenerator, tProps);
+            } catch (Exception e) {
+                initException = new SchedulerException("InstanceIdGenerator class '"
+                        ~ instanceIdGeneratorClass ~ "' props could not be configured.", e);
+                throw initException;
+            }
         }
 
         // Get ThreadPool Properties
@@ -850,20 +839,20 @@ class StdSchedulerFactory : SchedulerFactory {
         }
 
         try {
-            tp = cast(ThreadPool)factory(tpClass);
+            tp = createObject!ThreadPool(tpClass);
         } catch (Exception e) {
             initException = new SchedulerException("ThreadPool class '"
                     ~ tpClass ~ "' could not be instantiated.", e);
             throw initException;
         }
         tProps = cfg.getPropertyGroup(PROP_THREAD_POOL_PREFIX, true);
-        // try {
-        //     setBeanProps(tp, tProps);
-        // } catch (Exception e) {
-        //     initException = new SchedulerException("ThreadPool class '"
-        //             + tpClass ~ "' props could not be configured.", e);
-        //     throw initException;
-        // }
+        try {
+            setBeanProps(tp, tProps);
+        } catch (Exception e) {
+            initException = new SchedulerException("ThreadPool class '"
+                    ~ tpClass ~ "' props could not be configured.", e);
+            throw initException;
+        }
 
         // Get JobStore Properties
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -878,14 +867,14 @@ class StdSchedulerFactory : SchedulerFactory {
         }
 
         try {
-            js = cast(JobStore)factory(jsClass);
+            js = cast(JobStore)Object.factory(jsClass);
         } catch (Exception e) {
             initException = new SchedulerException("JobStore class '" ~ jsClass
                     ~ "' could not be instantiated.", e);
             throw initException;
         }
 
-        SchedulerDetailsSetter.setDetails(cast(Object)js, schedName, schedInstId);
+        SchedulerDetailsSetter.setDetails(js, schedName, schedInstId);
 
         // tProps = cfg.getPropertyGroup(PROP_JOB_STORE_PREFIX, true, [PROP_JOB_STORE_LOCK_HANDLER_PREFIX]);
         // try {
@@ -901,7 +890,7 @@ class StdSchedulerFactory : SchedulerFactory {
         //     string lockHandlerClass = cfg.getStringProperty(PROP_JOB_STORE_LOCK_HANDLER_CLASS);
         //     if (!lockHandlerClass.empty()) {
         //         try {
-        //             Semaphore lockHandler = cast(Semaphore)factory(lockHandlerClass);
+        //             Semaphore lockHandler = cast(Semaphore)Object.factory(lockHandlerClass);
 
         //             tProps = cfg.getPropertyGroup(PROP_JOB_STORE_LOCK_HANDLER_PREFIX, true);
 
@@ -945,7 +934,7 @@ class StdSchedulerFactory : SchedulerFactory {
             // if(!cpClass.empty()) {
             //     ConnectionProvider cp = null;
             //     try {
-            //         cp = cast(ConnectionProvider)factory(cpClass);
+            //         cp = cast(ConnectionProvider)Object.factory(cpClass);
             //     } catch (Exception e) {
             //         initException = new SchedulerException("ConnectionProvider class '" ~ cpClass
             //                 ~ "' could not be instantiated.", e);
@@ -1083,7 +1072,7 @@ class StdSchedulerFactory : SchedulerFactory {
             // }
             // SchedulerPlugin plugin = null;
             // try {
-            //     plugin = cast(SchedulerPlugin)factory(plugInClass);
+            //     plugin = cast(SchedulerPlugin)Object.factory(plugInClass);
             // } catch (Exception e) {
             //     initException = new SchedulerException(
             //             "SchedulerPlugin class '" ~ plugInClass
@@ -1208,20 +1197,19 @@ class StdSchedulerFactory : SchedulerFactory {
         if (!threadExecutorClass.empty()) {
             tProps = cfg.getPropertyGroup(PROP_THREAD_EXECUTOR, true);
             try {
-                threadExecutor = cast(ThreadExecutor)factory(threadExecutorClass);
-                info("Using custom implementation for ThreadExecutor: " ~ threadExecutorClass);
+                threadExecutor = cast(ThreadExecutor)Object.factory(threadExecutorClass);
+                trace("Using custom implementation for ThreadExecutor: " ~ threadExecutorClass);
 
-                // setBeanProps(threadExecutor, tProps);
+                setBeanProps(threadExecutor, tProps);
             } catch (Exception e) {
                 initException = new SchedulerException(
                         "ThreadExecutor class '" ~ threadExecutorClass ~ "' could not be instantiated.", e);
                 throw initException;
             }
         } else {
-            info("Using default implementation for ThreadExecutor");
+            trace("Using default implementation for ThreadExecutor");
             threadExecutor = new DefaultThreadExecutor();
         }
-
 
 
         // Fire everything up
@@ -1288,7 +1276,9 @@ class StdSchedulerFactory : SchedulerFactory {
             rsrcs.setName(schedName);
             rsrcs.setThreadName(threadName);
             rsrcs.setInstanceId(schedInstId);
-            rsrcs.setJobRunShellFactory(jrsf);
+            // TODO: Tasks pending completion -@zxp at 3/6/2019, 3:41:50 PM
+            // 
+            // rsrcs.setJobRunShellFactory(jrsf);
             rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
             rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
             rsrcs.setBatchTimeWindow(batchTimeWindow);
@@ -1314,14 +1304,14 @@ class StdSchedulerFactory : SchedulerFactory {
                 // rsrcs.setRMIBindName(rmiBindName);
             }
     
-            SchedulerDetailsSetter.setDetails(cast(Object)tp, schedName, schedInstId);
+            SchedulerDetailsSetter.setDetails(tp, schedName, schedInstId);
 
             rsrcs.setThreadExecutor(threadExecutor);
             threadExecutor.initialize();
 
             rsrcs.setThreadPool(tp);
             SimpleThreadPool stp = cast(SimpleThreadPool)tp;
-            if(tp !is null) {
+            if(stp !is null) {
                 if(threadsInheritInitalizersClassLoader)
                     (cast(SimpleThreadPool)tp).setThreadsInheritContextClassLoaderOfInitializingThread(threadsInheritInitalizersClassLoader);
             }
@@ -1372,7 +1362,8 @@ class StdSchedulerFactory : SchedulerFactory {
             js.setThreadPoolSize(tp.getPoolSize());
             js.initialize(qs.getSchedulerSignaler());
 
-            jrsf.initialize(scheduler);
+            if(jrsf !is null)
+                jrsf.initialize(scheduler);
             
             qs.initialize();
     
@@ -1437,105 +1428,112 @@ class StdSchedulerFactory : SchedulerFactory {
         return scheduler;
     }
 
+    private void setBeanProps(T)(T obj, Properties props) {
+        foreach(string key, string value; props) {
+            infof("key=%s, value=%s", key, value);
+            setProperty(obj, key, value);
+        }
+    }
 
-//     // private void setBeanProps(Object obj, Properties props) IllegalAccessException,
-//     //         java.lang.reflect.InvocationTargetException,
-//     //         IntrospectionException, SchedulerConfigException {
-//     //     props.remove("class");
-//     //     props.remove(PoolingConnectionProvider.POOLING_PROVIDER);
 
-//     //     BeanInfo bi = Introspector.getBeanInfo(obj.getClass());
-//     //     PropertyDescriptor[] propDescs = bi.getPropertyDescriptors();
-//     //     PropertiesParser pp = new PropertiesParser(props);
+    // private void setBeanProps(Object obj, Properties props) IllegalAccessException,
+    //         java.lang.reflect.InvocationTargetException,
+    //         IntrospectionException, SchedulerConfigException {
+    //     props.remove("class");
+    //     props.remove(PoolingConnectionProvider.POOLING_PROVIDER);
 
-//     //     java.util.Enumeration!(Object) keys = props.keys();
-//     //     while (keys.hasMoreElements()) {
-//     //         string name = (string) keys.nextElement();
-//     //         string c = name.substring(0, 1).toUpperCase(Locale.US);
-//     //         string methName = "set" ~ c + name.substring(1);
+    //     BeanInfo bi = Introspector.getBeanInfo(obj.getClass());
+    //     PropertyDescriptor[] propDescs = bi.getPropertyDescriptors();
+    //     PropertiesParser pp = new PropertiesParser(props);
 
-//     //         java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);
+    //     java.util.Enumeration!(Object) keys = props.keys();
+    //     while (keys.hasMoreElements()) {
+    //         string name = (string) keys.nextElement();
+    //         string c = name.substring(0, 1).toUpperCase(Locale.US);
+    //         string methName = "set" ~ c + name.substring(1);
 
-//     //         try {
-//     //             if (setMeth is null) {
-//     //                 throw new NoSuchMethodException(
-//     //                         "No setter for property '" ~ name ~ "'");
-//     //             }
+    //         java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);
 
-//     //             TypeInfo_Class[] params = setMeth.getParameterTypes();
-//     //             if (params.length != 1) {
-//     //                 throw new NoSuchMethodException(
-//     //                     "No 1-argument setter for property '" ~ name ~ "'");
-//     //             }
+    //         try {
+    //             if (setMeth is null) {
+    //                 throw new NoSuchMethodException(
+    //                         "No setter for property '" ~ name ~ "'");
+    //             }
+
+    //             TypeInfo_Class[] params = setMeth.getParameterTypes();
+    //             if (params.length != 1) {
+    //                 throw new NoSuchMethodException(
+    //                     "No 1-argument setter for property '" ~ name ~ "'");
+    //             }
                 
-//     //             // does the property value reference another property's value? If so, swap to look at its value
-//     //             PropertiesParser refProps = pp;
-//     //             string refName = pp.getStringProperty(name);
-//     //             if(refName !is null && refName.startsWith("$@")) {
-//     //                 refName =  refName.substring(2);
-//     //                 refProps = cfg;
-//     //             }
-//     //             else
-//     //                 refName = name;
+    //             // does the property value reference another property's value? If so, swap to look at its value
+    //             PropertiesParser refProps = pp;
+    //             string refName = pp.getStringProperty(name);
+    //             if(refName !is null && refName.startsWith("$@")) {
+    //                 refName =  refName.substring(2);
+    //                 refProps = cfg;
+    //             }
+    //             else
+    //                 refName = name;
                 
-//     //             if (params[0]== int.class) {
-//     //                 setMeth.invoke(obj, new Object[]{Integer.valueOf(refProps.getIntProperty(refName))});
-//     //             } else if (params[0]== long.class) {
-//     //                 setMeth.invoke(obj, new Object[]{Long.valueOf(refProps.getLongProperty(refName))});
-//     //             } else if (params[0]== float.class) {
-//     //                 setMeth.invoke(obj, new Object[]{Float.valueOf(refProps.getFloatProperty(refName))});
-//     //             } else if (params[0]== double.class) {
-//     //                 setMeth.invoke(obj, new Object[]{Double.valueOf(refProps.getDoubleProperty(refName))});
-//     //             } else if (params[0]== bool.class) {
-//     //                 setMeth.invoke(obj, new Object[]{Boolean.valueOf(refProps.getBooleanProperty(refName))});
-//     //             } else if (params[0]== string.class) {
-//     //                 setMeth.invoke(obj, new Object[]{refProps.getStringProperty(refName)});
-//     //             } else {
-//     //                 throw new NoSuchMethodException(
-//     //                         "No primitive-type setter for property '" ~ name
-//     //                                 ~ "'");
-//     //             }
-//     //         } catch (NumberFormatException nfe) {
-//     //             throw new SchedulerConfigException("Could not parse property '"
-//     //                     + name ~ "' into correct data type: " ~ nfe.toString());
-//     //         }
-//     //     }
-//     // }
+    //             if (params[0]== int.class) {
+    //                 setMeth.invoke(obj, new Object[]{Integer.valueOf(refProps.getIntProperty(refName))});
+    //             } else if (params[0]== long.class) {
+    //                 setMeth.invoke(obj, new Object[]{Long.valueOf(refProps.getLongProperty(refName))});
+    //             } else if (params[0]== float.class) {
+    //                 setMeth.invoke(obj, new Object[]{Float.valueOf(refProps.getFloatProperty(refName))});
+    //             } else if (params[0]== double.class) {
+    //                 setMeth.invoke(obj, new Object[]{Double.valueOf(refProps.getDoubleProperty(refName))});
+    //             } else if (params[0]== bool.class) {
+    //                 setMeth.invoke(obj, new Object[]{Boolean.valueOf(refProps.getBooleanProperty(refName))});
+    //             } else if (params[0]== string.class) {
+    //                 setMeth.invoke(obj, new Object[]{refProps.getStringProperty(refName)});
+    //             } else {
+    //                 throw new NoSuchMethodException(
+    //                         "No primitive-type setter for property '" ~ name
+    //                                 ~ "'");
+    //             }
+    //         } catch (NumberFormatException nfe) {
+    //             throw new SchedulerConfigException("Could not parse property '"
+    //                     + name ~ "' into correct data type: " ~ nfe.toString());
+    //         }
+    //     }
+    // }
 
-//     // private java.lang.reflect.Method getSetMethod(string name,
-//     //         PropertyDescriptor[] props) {
-//     //     for (int i = 0; i < props.length; i++) {
-//     //         java.lang.reflect.Method wMeth = props[i].getWriteMethod();
+    // private java.lang.reflect.Method getSetMethod(string name,
+    //         PropertyDescriptor[] props) {
+    //     for (int i = 0; i < props.length; i++) {
+    //         java.lang.reflect.Method wMeth = props[i].getWriteMethod();
 
-//     //         if (wMeth !is null && wMeth.getName()== name) {
-//     //             return wMeth;
-//     //         }
-//     //     }
+    //         if (wMeth !is null && wMeth.getName()== name) {
+    //             return wMeth;
+    //         }
+    //     }
 
-//     //     return null;
-//     // }
+    //     return null;
+    // }
 
-//     // private TypeInfo_Class loadClass(string className) {
+    // private TypeInfo_Class loadClass(string className) {
 
-//     //     try {
-//     //         ClassLoader cl = findClassloader();
-//     //         if(cl !is null)
-//     //             return cl.loadClass(className);
-//     //         throw new SchedulerConfigException("Unable to find a class loader on the current thread or class.");
-//     //     } catch (ClassNotFoundException e) {
-//     //         if(getClass().getClassLoader() !is null)
-//     //             return getClass().getClassLoader().loadClass(className);
-//     //         throw e;
-//     //     }
-//     // }
+    //     try {
+    //         ClassLoader cl = findClassloader();
+    //         if(cl !is null)
+    //             return cl.loadClass(className);
+    //         throw new SchedulerConfigException("Unable to find a class loader on the current thread or class.");
+    //     } catch (ClassNotFoundException e) {
+    //         if(getClass().getClassLoader() !is null)
+    //             return getClass().getClassLoader().loadClass(className);
+    //         throw e;
+    //     }
+    // }
 
-//     // private ClassLoader findClassloader() {
-//     //     // work-around set context loader for windows-service started jvms (QUARTZ-748)
-//     //     if(Thread.getThis().getContextClassLoader() is null && getClass().getClassLoader() !is null) {
-//     //         Thread.getThis().setContextClassLoader(getClass().getClassLoader());
-//     //     }
-//     //     return Thread.getThis().getContextClassLoader();
-//     // }
+    // private ClassLoader findClassloader() {
+    //     // work-around set context loader for windows-service started jvms (QUARTZ-748)
+    //     if(Thread.getThis().getContextClassLoader() is null && getClass().getClassLoader() !is null) {
+    //         Thread.getThis().setContextClassLoader(getClass().getClassLoader());
+    //     }
+    //     return Thread.getThis().getContextClassLoader();
+    // }
 
     private string getSchedulerName() {
         return cfg.getStringProperty(PROP_SCHED_INSTANCE_NAME,
