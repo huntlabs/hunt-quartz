@@ -609,8 +609,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     void standby() {
         resources.getJobStore().schedulerPaused();
         schedThread.togglePause(true);
-        info(
-                "Scheduler " ~ resources.getUniqueIdentifier() ~ " paused.");
+        trace("Scheduler " ~ resources.getUniqueIdentifier() ~ " paused.");
         notifySchedulerListenersInStandbyMode();        
     }
 
@@ -688,8 +687,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         
         shuttingDown = true;
 
-        info(
-                "Scheduler " ~ resources.getUniqueIdentifier()
+        trace("Scheduler " ~ resources.getUniqueIdentifier()
                         ~ " shutting down.");
         // bool removeMgmtSvr = false;
         // if (registeredManagementServerBind !is null) {
@@ -764,7 +762,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         holdToPreventGC.clear();
         
-        info("Scheduler " ~ resources.getUniqueIdentifier()
+        trace("Scheduler " ~ resources.getUniqueIdentifier()
                         ~ " shutdown complete.");
     }
 
@@ -2356,13 +2354,13 @@ J     *
     }
     
     private void shutdownPlugins() {
-        foreach(SchedulerPlugin plugin; resources.getSchedulerPlugins().iterator()) {
+        foreach(SchedulerPlugin plugin; resources.getSchedulerPlugins()) {
             plugin.shutdown();
         }
     }
 
     private void startPlugins() {
-        foreach(SchedulerPlugin plugin; resources.getSchedulerPlugins().iterator()) {
+        foreach(SchedulerPlugin plugin; resources.getSchedulerPlugins()) {
             plugin.start();
         }
     }

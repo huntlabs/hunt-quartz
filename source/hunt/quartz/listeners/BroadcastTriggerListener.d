@@ -84,7 +84,7 @@ class BroadcastTriggerListener : TriggerListener {
     }
 
     bool removeListener(string listenerName) {
-        foreach(TriggerListener l; listeners.iterator()) {
+        foreach(TriggerListener l; listeners) {
             if(l.getName() == listenerName) {
                 // itr.remove();
                 listeners.remove(l);
@@ -99,13 +99,13 @@ class BroadcastTriggerListener : TriggerListener {
     }
 
     void triggerFired(Trigger trigger, JobExecutionContext context) {
-        foreach(TriggerListener l; listeners.iterator()) {
+        foreach(TriggerListener l; listeners) {
             l.triggerFired(trigger, context);
         }
     }
 
     bool vetoJobExecution(Trigger trigger, JobExecutionContext context) {
-        foreach(TriggerListener l; listeners.iterator()) {
+        foreach(TriggerListener l; listeners) {
             if(l.vetoJobExecution(trigger, context)) {
                 return true;
             }
@@ -114,14 +114,14 @@ class BroadcastTriggerListener : TriggerListener {
     }
 
     void triggerMisfired(Trigger trigger) {
-        foreach(TriggerListener l; listeners.iterator()) {
+        foreach(TriggerListener l; listeners) {
             l.triggerMisfired(trigger);
         }
     }
 
     void triggerComplete(Trigger trigger, JobExecutionContext context, 
         CompletedExecutionInstruction triggerInstructionCode) {
-        foreach(TriggerListener l; listeners.iterator()) {
+        foreach(TriggerListener l; listeners) {
             l.triggerComplete(trigger, context, triggerInstructionCode);
         }
     }

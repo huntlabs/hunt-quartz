@@ -1,5 +1,6 @@
 module test.quartz.RAMSchedulerTest;
 
+import hunt.quartz.exception;
 import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.impl.StdScheduler;
 import hunt.quartz.impl.StdSchedulerFactory;
@@ -16,10 +17,13 @@ import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerKey;
 
 import hunt.Assert;
+import hunt.collection.HashSet;
 import hunt.collection.List;
+import hunt.collection.Map;
 import hunt.collection.Set;
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
+import hunt.util.DateTime;
 import hunt.util.Traits;
 import hunt.util.UnitTest;
 
@@ -35,6 +39,7 @@ alias assertThat = Assert.assertThat;
 alias assertEquals = Assert.assertEquals;
 alias assertNotNull = Assert.assertNotNull;
 alias assertNull = Assert.assertNull;
+alias fail = Assert.fail;
 
 
 class RAMSchedulerTest {
@@ -57,44 +62,7 @@ class RAMSchedulerTest {
     private enum string JOB_THREAD = "JOB_THREAD";
 
     
-    static class TestStatefulJob : StatefulJob {
-        void execute(JobExecutionContext context){
-            info("executing the job...");
-        }
-    }
-
-    static class TestJob : Job {
-        void execute(JobExecutionContext context){
-            info("executing the job...");
-        }
-    }
-    
 	enum TEST_TIMEOUT_SECONDS = 125;
-    
-    // static class TestJobWithSync : Job {
-    //     void execute(JobExecutionContext context){
-        	
-	// 		try {
-				
-	// 			List!(Long) jobExecTimestamps = cast(List!(Long))context.getScheduler().getContext().get(DATE_STAMPS);
-	// 			CyclicBarrier barrier =  cast(CyclicBarrier)context.getScheduler().getContext().get(BARRIER);
-
-	//         	jobExecTimestamps.add(System.currentTimeMillis());
-	        	
-	// 			barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-	// 		} catch (Throwable e) {
-	// 			e.printStackTrace();
-	// 			throw new AssertionError("Await on barrier was interrupted: " ~ e.toString());
-	// 		} 
-    //     }
-    // }
-    
-    static class TestAnnotatedJob : Job {
-        void execute(JobExecutionContext context){
-            info("executing the job...");
-        }
-    }
-    
 
     @Test
     void testBasicStorageFunctions(){
@@ -269,47 +237,49 @@ class RAMSchedulerTest {
         sched.shutdown(true);
     }
 
-    // @Test
-    // void testDurableStorageFunctions(){
-    //     Scheduler sched = createScheduler("testDurableStorageFunctions", 2);
-    //     try {
-    //         // test basic storage functions of scheduler...
+    @Test
+    void testDurableStorageFunctions(){
+        Scheduler sched = createScheduler("testDurableStorageFunctions", 2);
+        try {
+            // test basic storage functions of scheduler...
 
-    //         JobDetail job = JobBuilder.newJob()
-    //                 .ofType(typeid(TestJob))
-    //                 .withIdentity("j1")
-    //                 .storeDurably()
-    //                 .build();
+            JobDetail job = JobBuilder.newJob()
+                    .ofType(typeid(TestJob))
+                    .withIdentity("j1")
+                    .storeDurably()
+                    .build();
 
-    //         assertFalse("Unexpected existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+            assertFalse("Unexpected existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
 
-    //         sched.addJob(job, false);
+            sched.addJob(job, false);
 
-    //         assertTrue("Unexpected non-existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+            assertTrue("Unexpected non-existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
 
-    //         JobDetail nonDurableJob = JobBuilder.newJob()
-    //                 .ofType(typeid(TestJob))
-    //                 .withIdentity("j2")
-    //                 .build();
+            JobDetail nonDurableJob = JobBuilder.newJob()
+                    .ofType(typeid(TestJob))
+                    .withIdentity("j2")
+                    .build();
 
-    //         try {
-    //             sched.addJob(nonDurableJob, false);
-    //             fail("Storage of non-durable job should not have succeeded.");
-    //         }
-    //         catch(SchedulerException expected) {
-    //             assertFalse("Unexpected existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
-    //         }
+            try {
+                sched.addJob(nonDurableJob, false);
+                fail("Storage of non-durable job should not have succeeded.");
+            }
+            catch(SchedulerException expected) {
+                assertFalse("Unexpected existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
+            }
 
-    //         sched.addJob(nonDurableJob, false, true);
+            sched.addJob(nonDurableJob, false, true);
 
-    //         assertTrue("Unexpected non-existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
-    //     } finally {
-    //         sched.shutdown(true);
-    //     }
-    // }
+            assertTrue("Unexpected non-existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
+        } finally {
+            sched.shutdown(true);
+        }
+    }
 
     // @Test
     // void testShutdownWithSleepReturnsAfterAllThreadsAreStopped(){
+    //    // TODO: Tasks pending completion -@zxp at 3/8/2019, 11:07:16 AM
+    //    // 
     //   Map!(Thread, StackTraceElement[]) allThreadsStart = Thread.getAllStackTraces();
     //   int threadPoolSize = 5;
     //   Scheduler scheduler = createScheduler("testShutdownWithSleepReturnsAfterAllThreadsAreStopped", threadPoolSize);
@@ -325,7 +295,7 @@ class RAMSchedulerTest {
     //   Map!(Thread, StackTraceElement[]) allThreadsEnd = Thread.getAllStackTraces();
     //   Set!(Thread) endingThreads = new HashSet!(Thread)(allThreadsEnd.keySet());
     //   // remove all pre-existing threads from the set
-    //   for(Thread t: allThreadsStart.keySet()) {
+    //   foreach(Thread t; allThreadsStart.byKey()) {
     //     allThreadsEnd.remove(t);
     //   }
     //   // remove threads that are known artifacts of the test
@@ -369,8 +339,7 @@ class RAMSchedulerTest {
         
 	// 	JobDetail job1 = JobBuilder.newJob(TestJobWithSync.class).withIdentity("job1").build();
 	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger().forJob(job1).build(); 
-		
-	// 	long sTime = System.currentTimeMillis();
+	// 	long sTime = DateTimeHelper.currentTimeMillis();
 		
 	// 	sched.scheduleJob(job1, trigger1);
 		
@@ -440,39 +409,38 @@ class RAMSchedulerTest {
 	// 	assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  // This is dangerously subjective!  but what else to do?
     // }
     
-    // @Test
-	// void testScheduleMultipleTriggersForAJob(){
-
+    @Test
+	void testScheduleMultipleTriggersForAJob(){
 		
-	// 	JobDetail job = newJob(TestJob.class).withIdentity("job1", "group1").build();
-	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger()
-	// 			.withIdentity("trigger1", "group1")
-	// 			.startNow()
-	// 			.withSchedule(
-	// 					SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
-	// 							.repeatForever())
-	// 			.build();
-	// 	Trigger trigger2 = TriggerBuilderHelper.newTrigger!Trigger()
-	// 			.withIdentity("trigger2", "group1")
-	// 			.startNow()
-	// 			.withSchedule(
-	// 					SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
-	// 							.repeatForever())
-	// 			.build();
-	// 	Set!(Trigger) triggersForJob = new HashSet!(Trigger)(); 
-	// 	triggersForJob.add(trigger1);
-	// 	triggersForJob.add(trigger2);
+		JobDetail job = JobBuilder.newJob(typeid(TestJob)).withIdentity("job1", "group1").build();
+		Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger()
+				.withIdentity("trigger1", "group1")
+				.startNow()
+				.withSchedule(
+						SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
+								.repeatForever())
+				.build();
+		Trigger trigger2 = TriggerBuilderHelper.newTrigger!Trigger()
+				.withIdentity("trigger2", "group1")
+				.startNow()
+				.withSchedule(
+						SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
+								.repeatForever())
+				.build();
+		Set!(Trigger) triggersForJob = new HashSet!(Trigger)(); 
+		triggersForJob.add(trigger1);
+		triggersForJob.add(trigger2);
 		
-	// 	Scheduler sched = createScheduler("testScheduleMultipleTriggersForAJob", 5);
-	// 	sched.scheduleJob(job,triggersForJob, true);
+		Scheduler sched = createScheduler("testScheduleMultipleTriggersForAJob", 5);
+		sched.scheduleJob(job,triggersForJob, true);
 		
-	// 	List<? extends Trigger> triggersOfJob = sched.getTriggersOfJob(job.getKey());
-	// 	assertEquals(2,triggersOfJob.size());
-	// 	assertTrue(triggersOfJob.contains(trigger1));
-	// 	assertTrue(triggersOfJob.contains(trigger2));
+		List!(Trigger) triggersOfJob = sched.getTriggersOfJob(job.getKey());
+		assertEquals(2,triggersOfJob.size());
+		assertTrue(triggersOfJob.contains(trigger1));
+		assertTrue(triggersOfJob.contains(trigger2));
 		
-	// 	sched.shutdown(true);
-	// }
+		sched.shutdown(true);
+	}
     
     // @Test
     // void testShutdownWithoutWaitIsUnclean(){
@@ -496,20 +464,6 @@ class RAMSchedulerTest {
     //     jobThread.join(TimeUnit.SECONDS.toMillis(TEST_TIMEOUT_SECONDS));
     // }
     
-    // static class UncleanShutdownJob : Job {
-    //     @Override
-    //     void execute(JobExecutionContext context){
-    //         try {
-    //             SchedulerContext schedulerContext = context.getScheduler().getContext();
-    //             schedulerContext.put(JOB_THREAD, Thread.currentThread());
-    //             CyclicBarrier barrier =  (CyclicBarrier) schedulerContext.get(BARRIER);
-    //             barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    //         } catch (Throwable e) {
-    //             e.printStackTrace();
-    //             throw new AssertionError("Await on barrier was interrupted: " ~ e.toString());
-    //         } 
-    //     }
-    // }
 
     // @Test
     // void testShutdownWithWaitIsClean(){
@@ -546,3 +500,57 @@ class RAMSchedulerTest {
     //     }
     // }    
 }
+
+
+    
+class TestStatefulJob : StatefulJob {
+    void execute(JobExecutionContext context){
+        info("executing the job...");
+    }
+}
+
+class TestJob : Job {
+    void execute(JobExecutionContext context){
+        info("executing the job...");
+    }
+}
+    
+    // class TestJobWithSync : Job {
+    //     void execute(JobExecutionContext context){
+        	
+	// 		try {
+				
+	// 			List!(Long) jobExecTimestamps = cast(List!(Long))context.getScheduler().getContext().get(DATE_STAMPS);
+	// 			CyclicBarrier barrier =  cast(CyclicBarrier)context.getScheduler().getContext().get(BARRIER);
+
+	//         	jobExecTimestamps.add(System.currentTimeMillis());
+	        	
+	// 			barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+	// 		} catch (Throwable e) {
+	// 			e.printStackTrace();
+	// 			throw new AssertionError("Await on barrier was interrupted: " ~ e.toString());
+	// 		} 
+    //     }
+    // }
+    
+class TestAnnotatedJob : Job {
+    void execute(JobExecutionContext context){
+        info("executing the job...");
+    }
+}
+    
+
+// class UncleanShutdownJob : Job {
+//     override
+//     void execute(JobExecutionContext context){
+//         try {
+//             SchedulerContext schedulerContext = context.getScheduler().getContext();
+//             schedulerContext.put(JOB_THREAD, Thread.currentThread());
+//             CyclicBarrier barrier =  (CyclicBarrier) schedulerContext.get(BARRIER);
+//             barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+//         } catch (Throwable e) {
+//             e.printStackTrace();
+//             throw new AssertionError("Await on barrier was interrupted: " ~ e.toString());
+//         } 
+//     }
+// }

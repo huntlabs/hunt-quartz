@@ -95,11 +95,11 @@ class JobBuilder {
      * 
      * @return a new JobBuilder
      */
-    // static JobBuilder newJob(Class <? extends Job> jobClass) {
-    //     JobBuilder b = new JobBuilder();
-    //     b.ofType(jobClass);
-    //     return b;
-    // }
+    static JobBuilder newJob(TypeInfo_Class jobClass) {
+        JobBuilder b = new JobBuilder();
+        b.ofType(jobClass);
+        return b;
+    }
 
     /**
      * Produce the <code>JobDetail</code> instance defined by this 

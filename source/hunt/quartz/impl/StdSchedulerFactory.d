@@ -1430,7 +1430,7 @@ class StdSchedulerFactory : SchedulerFactory {
 
     private void setBeanProps(T)(T obj, Properties props) {
         foreach(string key, string value; props) {
-            infof("key=%s, value=%s", key, value);
+            // infof("key=%s, value=%s", key, value);
             setProperty(obj, key, value);
         }
     }

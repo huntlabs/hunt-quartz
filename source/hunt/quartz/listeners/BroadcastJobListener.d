@@ -85,7 +85,7 @@ class BroadcastJobListener : JobListener {
 
     bool removeListener(string listenerName) {
         // JobListener[] ls;
-        foreach(JobListener jl; listeners.iterator()) {
+        foreach(JobListener jl; listeners) {
             if(jl.getName() == listenerName) {
                 // itr.remove();
                 // ls ~= jl;
@@ -102,19 +102,19 @@ class BroadcastJobListener : JobListener {
     }
 
     void jobToBeExecuted(JobExecutionContext context) {
-        foreach(JobListener jl; listeners.iterator()) {
+        foreach(JobListener jl; listeners) {
             jl.jobToBeExecuted(context);
         }
     }
 
     void jobExecutionVetoed(JobExecutionContext context) {
-        foreach(JobListener jl; listeners.iterator()) {
+        foreach(JobListener jl; listeners) {
             jl.jobExecutionVetoed(context);
         }
     }
 
     void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
-        foreach(JobListener jl; listeners.iterator()) {
+        foreach(JobListener jl; listeners) {
             jl.jobWasExecuted(context, jobException);
         }
     }

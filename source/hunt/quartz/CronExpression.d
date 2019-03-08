@@ -926,9 +926,8 @@ final class CronExpression : Cloneable { // Serializable,
 
         StringBuilder buf = new StringBuilder();
 
-        InputRange!(int) itr = set.iterator();
         bool first = true;
-        foreach(int iVal; itr) {
+        foreach(int iVal; set) {
             string val = iVal.to!string();
             if (!first) {
                 buf.append(",");
@@ -951,9 +950,8 @@ final class CronExpression : Cloneable { // Serializable,
 
         StringBuilder buf = new StringBuilder();
 
-        InputRange!(int) itr = list.iterator();
         bool first = true;
-        foreach(int iVal; itr) {
+        foreach(int iVal; list) {
             string val = iVal.to!string();
             if (!first) {
                 buf.append(",");
