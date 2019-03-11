@@ -1,10 +1,10 @@
-module hunt.quartz.dbstore.model.Triggers;
+module hunt.quartz.dbstore.model.Calendars;
 
 import hunt.quartz.dbstore.TableConstants;
 import hunt.entity;
 
-@Table(TableConstants.TABLE_TRIGGERS)
-class Triggers : Model {
+@Table(TableConstants.TABLE_CALENDARS)
+class Calendars : Model {
     mixin MakeModel;
 
     // @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
@@ -13,4 +13,3 @@ class Triggers : Model {
     // @PrimaryKey @Column(TableConstants.COL_LOCK_NAME)
     // string lockName;
 }
-

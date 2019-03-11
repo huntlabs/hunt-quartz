@@ -1,6 +1,7 @@
 module hunt.quartz.dbstore.model;
 
 public import hunt.quartz.dbstore.model.BlobTriggers;
+public import hunt.quartz.dbstore.model.Calendars;
 public import hunt.quartz.dbstore.model.CronTriggers;
 public import hunt.quartz.dbstore.model.FiredTriggers;
 public import hunt.quartz.dbstore.model.JobDetails;
@@ -10,3 +11,175 @@ public import hunt.quartz.dbstore.model.SchedulerState;
 public import hunt.quartz.dbstore.model.SimpleTriggers;
 public import hunt.quartz.dbstore.model.SimpropTriggers;
 public import hunt.quartz.dbstore.model.Triggers;
+
+
+
+/**
+ */
+struct ModelConstants {
+
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Constants.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+    // Model names
+    enum string MODEL_JOB_DETAILS = JobDetails.stringof;
+
+    enum string MODEL_TRIGGERS = Triggers.stringof;
+
+    enum string MODEL_SIMPLE_TRIGGERS = SimpleTriggers.stringof;
+
+    enum string MODEL_CRON_TRIGGERS = CronTriggers.stringof;
+
+    enum string MODEL_BLOB_TRIGGERS = BlobTriggers.stringof;
+
+    enum string MODEL_FIRED_TRIGGERS = FiredTriggers.stringof;
+
+    enum string MODEL_CALENDARS = Calendars.stringof;
+
+    enum string MODEL_PAUSED_TRIGGERS = PausedTriggerGrps.stringof;
+
+    enum string MODEL_LOCKS = Locks.stringof;
+
+    enum string MODEL_SCHEDULER_STATE = SchedulerState.stringof;
+
+    // FIXME: Needing refactor or cleanup -@zxp at 3/11/2019, 5:54:11 PM
+    // 
+
+    // MODEL_JOB_DETAILS columns names
+    
+    enum string COL_SCHEDULER_NAME = "SCHED_NAME";
+    
+    enum string COL_JOB_NAME = "JOB_NAME";
+
+    enum string COL_JOB_GROUP = "JOB_GROUP";
+
+    enum string COL_IS_DURABLE = "IS_DURABLE";
+
+    enum string COL_IS_VOLATILE = "IS_VOLATILE";
+
+    enum string COL_IS_NONCONCURRENT = "IS_NONCONCURRENT";
+
+    enum string COL_IS_UPDATE_DATA = "IS_UPDATE_DATA";
+
+    enum string COL_REQUESTS_RECOVERY = "REQUESTS_RECOVERY";
+
+    enum string COL_JOB_DATAMAP = "JOB_DATA";
+
+    enum string COL_JOB_CLASS = "JOB_CLASS_NAME";
+
+    enum string COL_DESCRIPTION = "DESCRIPTION";
+
+    // MODEL_TRIGGERS columns names
+    enum string COL_TRIGGER_NAME = "TRIGGER_NAME";
+
+    enum string COL_TRIGGER_GROUP = "TRIGGER_GROUP";
+
+    enum string COL_NEXT_FIRE_TIME = "NEXT_FIRE_TIME";
+
+    enum string COL_PREV_FIRE_TIME = "PREV_FIRE_TIME";
+
+    enum string COL_TRIGGER_STATE = "TRIGGER_STATE";
+
+    enum string COL_TRIGGER_TYPE = "TRIGGER_TYPE";
+
+    enum string COL_START_TIME = "START_TIME";
+
+    enum string COL_END_TIME = "END_TIME";
+
+    enum string COL_PRIORITY = "PRIORITY";
+
+    enum string COL_MISFIRE_INSTRUCTION = "MISFIRE_INSTR";
+
+    enum string ALIAS_COL_NEXT_FIRE_TIME = "ALIAS_NXT_FR_TM";
+
+    // MODEL_SIMPLE_TRIGGERS columns names
+    enum string COL_REPEAT_COUNT = "REPEAT_COUNT";
+
+    enum string COL_REPEAT_INTERVAL = "REPEAT_INTERVAL";
+
+    enum string COL_TIMES_TRIGGERED = "TIMES_TRIGGERED";
+
+    // MODEL_CRON_TRIGGERS columns names
+    enum string COL_CRON_EXPRESSION = "CRON_EXPRESSION";
+
+    // MODEL_BLOB_TRIGGERS columns names
+    enum string COL_BLOB = "BLOB_DATA";
+
+    enum string COL_TIME_ZONE_ID = "TIME_ZONE_ID";
+
+    // MODEL_FIRED_TRIGGERS columns names
+    enum string COL_INSTANCE_NAME = "INSTANCE_NAME";
+
+    enum string COL_FIRED_TIME = "FIRED_TIME";
+
+    enum string COL_SCHED_TIME = "SCHED_TIME";
+    
+    enum string COL_ENTRY_ID = "ENTRY_ID";
+
+    enum string COL_ENTRY_STATE = "STATE";
+
+    // MODEL_CALENDARS columns names
+    enum string COL_CALENDAR_NAME = "CALENDAR_NAME";
+
+    enum string COL_CALENDAR = "CALENDAR";
+
+    // MODEL_LOCKS columns names
+    enum string COL_LOCK_NAME = "LOCK_NAME";
+
+    // MODEL_LOCKS columns names
+    enum string COL_LAST_CHECKIN_TIME = "LAST_CHECKIN_TIME";
+
+    enum string COL_CHECKIN_INTERVAL = "CHECKIN_INTERVAL";
+
+    // MISC CONSTANTS
+    enum string DEFAULT_MODEL_PREFIX = "QRTZ_";
+
+    // STATES
+    enum string STATE_WAITING = "WAITING";
+
+    enum string STATE_ACQUIRED = "ACQUIRED";
+
+    enum string STATE_EXECUTING = "EXECUTING";
+
+    enum string STATE_COMPLETE = "COMPLETE";
+
+    enum string STATE_BLOCKED = "BLOCKED";
+
+    enum string STATE_ERROR = "ERROR";
+
+    enum string STATE_PAUSED = "PAUSED";
+
+    enum string STATE_PAUSED_BLOCKED = "PAUSED_BLOCKED";
+
+    enum string STATE_DELETED = "DELETED";
+
+    /**
+     * @deprecated Whether a trigger has misfired is no longer a state, but 
+     * rather now identified dynamically by whether the trigger's next fire 
+     * time is more than the misfire threshold time in the past.
+     */
+    enum string STATE_MISFIRED = "MISFIRED";
+
+    enum string ALL_GROUPS_PAUSED = "_$_ALL_GROUPS_PAUSED_$_";
+
+    // TRIGGER TYPES
+    /** Simple Trigger type. */
+    enum string TTYPE_SIMPLE = "SIMPLE";
+
+    /** Cron Trigger type. */
+    enum string TTYPE_CRON = "CRON";
+
+    /** Calendar Interval Trigger type. */
+    enum string TTYPE_CAL_INT = "CAL_INT";
+
+    /** Daily Time Interval Trigger type. */
+    enum string TTYPE_DAILY_TIME_INT = "DAILY_I";
+
+    /** A general blob Trigger type. */
+    enum string TTYPE_BLOB = "BLOB";
+}

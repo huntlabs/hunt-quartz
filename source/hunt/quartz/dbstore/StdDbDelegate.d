@@ -116,7 +116,7 @@ class StdDbDelegate {
      * </p>
      */
     this() {
-        triggerPersistenceDelegates = new LinkedList!(TriggerPersistenceDelegate)();
+        // triggerPersistenceDelegates = new LinkedList!(TriggerPersistenceDelegate)();
     }
 
     /*

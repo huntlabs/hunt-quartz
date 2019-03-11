@@ -225,7 +225,7 @@ abstract class JobStoreSupport : JobStore{
             useProp = "false";
         }
 
-        this.useProperties = Boolean.valueOf(useProp);
+        this.useProperties = to!bool(useProp);
     }
 
     /**
@@ -263,7 +263,7 @@ abstract class JobStoreSupport : JobStore{
         this.instanceName = instanceName;
     }
 
-    void setThreadPoolSize(final int poolSize) {
+    void setThreadPoolSize(int poolSize) {
         //
     }
     

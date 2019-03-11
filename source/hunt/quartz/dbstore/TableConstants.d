@@ -44,6 +44,8 @@ struct TableConstants {
 
     enum string TABLE_SIMPLE_TRIGGERS = "SIMPLE_TRIGGERS";
 
+    enum string TABLE_SIMPROP_TRIGGERS = "SIMPROP_TRIGGERS";
+
     enum string TABLE_CRON_TRIGGERS = "CRON_TRIGGERS";
 
     enum string TABLE_BLOB_TRIGGERS = "BLOB_TRIGGERS";
