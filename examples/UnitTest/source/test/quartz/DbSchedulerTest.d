@@ -1,4 +1,5 @@
-module test.quartz.RAMSchedulerTest;
+module test.quartz.DbSchedulerTest;
+
 
 import hunt.quartz.exception;
 import hunt.quartz.impl.matchers.GroupMatcher;
@@ -50,18 +51,24 @@ enum string JOB_THREAD = "JOB_THREAD";
 enum TEST_TIMEOUT_SECONDS = 125;
 
 
-class RAMSchedulerTest {
+class DbSchedulerTest {
 
     // protected abstract Scheduler createScheduler(string name, int threadPoolSize);
 
     protected Scheduler createScheduler(string name, int threadPoolSize) 
     {
-        string[string] config;
-        config["hunt.quartz.scheduler.instanceName"] = name ~ "Scheduler";
-        config["hunt.quartz.scheduler.instanceId"] = "AUTO";
-        config["hunt.quartz.threadPool.threadCount"] = threadPoolSize.to!string();
-        config["hunt.quartz.threadPool.class"] = "hunt.quartz.simpl.SimpleThreadPool.SimpleThreadPool";
-        return new StdSchedulerFactory(config).getScheduler();
+        return null;
+        // try {
+        //     JdbcQuartzTestUtilities.createDatabase(name ~ "Database");
+        // } catch (SQLException e) {
+        //     throw new AssertionError(e);
+        // }
+        // JobStoreTX jobStore = new JobStoreTX();
+        // jobStore.setDataSource(name + "Database");
+        // jobStore.setTablePrefix("QRTZ_");
+        // jobStore.setInstanceId("AUTO");
+        // DirectSchedulerFactory.getInstance().createScheduler(name + "Scheduler", "AUTO", new SimpleThreadPool(threadPoolSize, Thread.NORM_PRIORITY), jobStore);
+        // return SchedulerRepository.getInstance().lookup(name + "Scheduler");
     }
 
     @Test
