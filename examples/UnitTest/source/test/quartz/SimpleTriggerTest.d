@@ -16,7 +16,10 @@
 module test.quartz.SimpleTriggerTest;
 
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
+import hunt.quartz.SimpleTrigger;
+import hunt.quartz.Trigger;
 
+import hunt.time.Duration;
 import hunt.time.Instant;
 import hunt.time.LocalDateTime;
 import hunt.time.Month;
@@ -35,6 +38,7 @@ alias assertThat = Assert.assertThat;
 alias assertEquals = Assert.assertEquals;
 alias assertNotNull = Assert.assertNotNull;
 alias assertNull = Assert.assertNull;
+alias fail = Assert.fail;
 
 /**
  * Unit test for SimpleTrigger serialization backwards compatibility.
@@ -44,22 +48,12 @@ class SimpleTriggerTest {
     private __gshared ZoneId EST_TIME_ZONE;
     private __gshared ZonedDateTime START_TIME;
     private __gshared ZonedDateTime END_TIME;
-
-    // private static final TimeZone EST_TIME_ZONE = TimeZone.getTimeZone("US/Eastern"); 
-    // private static final ZonedDateTime START_TIME = ZonedDateTime.getInstance();
-    // private static final ZonedDateTime END_TIME = ZonedDateTime.getInstance();
     
     shared static this()
     {
         EST_TIME_ZONE = ZoneId.of("US/Eastern"); 
-        START_TIME = ZonedDateTime.of(2006, Month.JUNE, 1, 10, 5, 15, EST_TIME_ZONE);
-        END_TIME = ZonedDateTime.of(2006, Month.JUNE, 1, 10, 5, 15, EST_TIME_ZONE);
-        // START_TIME.clear();
-        // START_TIME.set(2006, ZonedDateTime.JUNE, 1, 10, 5, 15);
-        // START_TIME.setTimeZone(EST_TIME_ZONE);
-        // END_TIME.clear();
-        // END_TIME.set(2008, ZonedDateTime.MAY, 2, 20, 15, 30);
-        // END_TIME.setTimeZone(EST_TIME_ZONE);
+        START_TIME = ZonedDateTime.of(2006, Month.JUNE, 1, 10, 5, 15, 0, EST_TIME_ZONE);
+        END_TIME = ZonedDateTime.of(2006, Month.JUNE, 1, 10, 5, 15, 0, EST_TIME_ZONE);
     }
     
     /**
@@ -124,54 +118,58 @@ class SimpleTriggerTest {
         SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
         simpleTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT);
         simpleTrigger.setRepeatCount(5);
-        simpleTrigger.setStartTime(startTime.getTime());
-        simpleTrigger.setEndTime(endTime.getTime());
+        simpleTrigger.setStartTime(startTime);
+        simpleTrigger.setEndTime(endTime);
         
         simpleTrigger.updateAfterMisfire(null);
-        assertEquals(startTime.getTime(), simpleTrigger.getStartTime());
-        assertEquals(endTime.getTime(), simpleTrigger.getEndTime());
+        assertEquals(startTime, simpleTrigger.getStartTime());
+        assertEquals(endTime, simpleTrigger.getEndTime());
         assertNull(simpleTrigger.getNextFireTime());
     }
     
     void testGetFireTimeAfter() {
         SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
+        LocalDateTime startTime = LocalDateTime.now();
 
-        simpleTrigger.setStartTime(new Date(0));
+        simpleTrigger.setStartTime(startTime);
         simpleTrigger.setRepeatInterval(10);
         simpleTrigger.setRepeatCount(4);
         
-        Date fireTimeAfter = simpleTrigger.getFireTimeAfter(new Date(34));
-        assertEquals(40, fireTimeAfter.getTime());
+        LocalDateTime fireTimeAfter = simpleTrigger.getFireTimeAfter(startTime.plusMilliseconds(34));
+        assert(fireTimeAfter !is null);
+        Duration dur = Duration.between(startTime, fireTimeAfter);
+        assertEquals(40, dur.toMillis());
     }
     
     void testClone() {
-        SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
+        implementationMissing(false);
+        // SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
         
-        // Make sure empty sub-objects are cloned okay
-        Trigger clone = cast(Trigger)simpleTrigger.clone();
-        assertEquals(0, clone.getJobDataMap().size());
+        // // Make sure empty sub-objects are cloned okay
+        // Trigger clone = cast(Trigger)simpleTrigger.clone();
+        // assertEquals(0, clone.getJobDataMap().size());
         
-        // Make sure non-empty sub-objects are cloned okay
-        simpleTrigger.getJobDataMap().put("K1", "V1");
-        simpleTrigger.getJobDataMap().put("K2", "V2");
-        clone = cast(Trigger)simpleTrigger.clone();
-        assertEquals(2, clone.getJobDataMap().size());
-        assertEquals("V1", clone.getJobDataMap().get("K1"));
-        assertEquals("V2", clone.getJobDataMap().get("K2"));
+        // // Make sure non-empty sub-objects are cloned okay
+        // simpleTrigger.getJobDataMap().put("K1", "V1");
+        // simpleTrigger.getJobDataMap().put("K2", "V2");
+        // clone = cast(Trigger)simpleTrigger.clone();
+        // assertEquals(2, clone.getJobDataMap().size());
+        // assertEquals("V1", clone.getJobDataMap().get("K1"));
+        // assertEquals("V2", clone.getJobDataMap().get("K2"));
         
-        // Make sure sub-object collections have really been cloned by ensuring 
-        // their modification does not change the source Trigger 
-        clone.getJobDataMap().remove("K1");
-        assertEquals(1, clone.getJobDataMap().size());
+        // // Make sure sub-object collections have really been cloned by ensuring 
+        // // their modification does not change the source Trigger 
+        // clone.getJobDataMap().remove("K1");
+        // assertEquals(1, clone.getJobDataMap().size());
         
-        assertEquals(2, simpleTrigger.getJobDataMap().size());
-        assertEquals("V1", simpleTrigger.getJobDataMap().get("K1"));
-        assertEquals("V2", simpleTrigger.getJobDataMap().get("K2"));
+        // assertEquals(2, simpleTrigger.getJobDataMap().size());
+        // assertEquals("V1", simpleTrigger.getJobDataMap().get("K1"));
+        // assertEquals("V2", simpleTrigger.getJobDataMap().get("K2"));
     }
     
     // NPE in equals()
     void testQuartz665() {
-        new SimpleTriggerImpl().equals(new SimpleTriggerImpl());
+        new SimpleTriggerImpl().opEquals(new SimpleTriggerImpl());
     }
     
     void testMisfireInstructionValidity(){
@@ -187,7 +185,7 @@ class SimpleTriggerTest {
             trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT);
         }
         catch(Exception e) {
-            fail("Unexpected exception while setting misfire instruction: " ~ e.getMessage());
+            fail("Unexpected exception while setting misfire instruction: " ~ e.msg);
         }
         
         try {

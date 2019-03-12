@@ -35,11 +35,12 @@ import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerUtils;
 
 import hunt.Exceptions;
+import hunt.time.Duration;
 import hunt.time.LocalTime;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;
 
-// import std.datetime;
+import hunt.logging.ConsoleLogger;
 
 
 /**
@@ -755,10 +756,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return null;
         }
 
-        long startMillis = getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli();
-        long afterMillis = afterTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-        // LocalDateTime endMillis = (getEndTime() is null) ? LocalDateTime.MAX : getEndTime();
-        LocalDateTime endMillis = getEndTime();
+        LocalDateTime endMillis = (getEndTime() is null) ? LocalDateTime.MAX : getEndTime();
+        // LocalDateTime endMillis = getEndTime();
 
         if (endMillis <= afterTime) {
             return null;
@@ -768,7 +767,14 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return getStartTime();
         }
 
-        long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
+        // long startMillis = getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli();
+        // long afterMillis = afterTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+
+        // long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
+        Duration dur = Duration.between(getStartTime(), afterTime);
+        tracef("sec: %d, nano: %d , mi:%d", dur.getSeconds, dur.getNano, dur.toMillis());
+        long numberOfTimesExecuted = (dur.toMillis() / repeatInterval) + 1;
+        tracef("numberOfTimesExecuted: %d, repeatCount: %d", numberOfTimesExecuted, repeatCount);
 
         if ((numberOfTimesExecuted > repeatCount) && 
             (repeatCount != REPEAT_INDEFINITELY)) {
