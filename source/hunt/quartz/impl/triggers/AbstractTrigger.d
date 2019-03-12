@@ -806,10 +806,11 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
      */
     override
     string toString() {
-        return "Trigger '" ~ getFullName() ~ "':  triggerClass: '"
-                ~ typeid(this).name ~ " calendar: '" ~ getCalendarName() 
-                ~ "' misfireInstruction: " ~ getMisfireInstruction().to!string() 
-                ~ " nextFireTime: " ~ getNextFireTime().toString();
+        import std.format;
+        string str = format("Trigger '%s':  triggerClass: '%s calendar: '%s'" ~
+                " misfireInstruction: %s nextFireTime: %s", 
+                getFullName(), typeid(this).name, getCalendarName(), getMisfireInstruction(), getNextFireTime());
+        return str;
     }
 
     /**
