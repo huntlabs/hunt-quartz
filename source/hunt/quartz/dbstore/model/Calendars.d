@@ -8,7 +8,7 @@ class Calendars : Model {
     mixin MakeModel;
 
     // @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
-    // string schedulerName;
+    // string COL_SCHEDULER_NAME;
 
     // @PrimaryKey @Column(TableConstants.COL_LOCK_NAME)
     // string lockName;
