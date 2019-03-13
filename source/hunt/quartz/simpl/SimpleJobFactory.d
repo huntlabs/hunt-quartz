@@ -48,9 +48,14 @@ class SimpleJobFactory : JobFactory {
                     "', class=" ~ jobClass.name);
             }
             
-            implementationMissing(false);
+            // implementationMissing(false);
             // return jobClass.newInstance();
-            return null;
+            // return null;
+            Job j = cast(Job)Object.factory(jobClass.name);
+            if(j is null) {
+                warningf("Failed to create JobFactory instance from %s", jobClass.name);
+            }
+            return j;
         } catch (Exception e) {
             SchedulerException se = new SchedulerException(
                     "Problem instantiating class '"

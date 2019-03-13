@@ -407,11 +407,13 @@ class JobDetailImpl : JobDetail {
      */
     override
     string toString() {
-        return "JobDetail '" ~ getFullName() ~ "':  jobClass: '"
-                ~ ((getJobClass() is null) ? "null" : getJobClass().name)
-                ~ " concurrentExectionDisallowed: " ~ isConcurrentExectionDisallowed().to!string() 
-                ~ " persistJobDataAfterExecution: " ~ isPersistJobDataAfterExecution().to!string() 
-                ~ " isDurable: " ~ isDurable().to!string() ~ " requestsRecovers: " ~ requestsRecovery().to!string();
+        import std.format;
+        string str = format("JobDetail '%s':  jobClass: %s concurrentExectionDisallowed: %s" ~ 
+                " persistJobDataAfterExecution: %s isDurable: %s" ~ " requestsRecovers: %s",
+                getFullName(), ((getJobClass() is null) ? "null" : getJobClass().name),
+                isConcurrentExectionDisallowed(), isPersistJobDataAfterExecution(),
+                isDurable(), requestsRecovery());
+        return str;
     }
 
     override

@@ -97,7 +97,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
 
     private TriggerKey key;
     private string description;
-    private LocalDateTime startTime; // = new LocalDateTime();
+    private LocalDateTime startTime; 
     private LocalDateTime endTime;
     private int priority = Trigger.DEFAULT_PRIORITY;
     private string calendarName;
@@ -108,6 +108,7 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
     
     private this() {
         jobDataMap = new JobDataMap();
+        startTime = LocalDateTime.now();
     }
     
     /**

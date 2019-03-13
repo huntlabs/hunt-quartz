@@ -22,7 +22,6 @@ import hunt.quartz.core.JobRunShell;
 import hunt.quartz.core.QuartzScheduler;
 import hunt.quartz.core.QuartzSchedulerResources;
 
-
 import hunt.quartz.exception;
 import hunt.quartz.Trigger;
 import hunt.quartz.Trigger : CompletedExecutionInstruction;
@@ -31,23 +30,24 @@ import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.spi.TriggerFiredResult;
 
+import hunt.Exceptions;
 import hunt.concurrency.atomic.AtomicHelper;
 import hunt.concurrency.thread;
 import hunt.collection.ArrayList;
 import hunt.collection.List;
-import hunt.util.DateTime;
-import hunt.Exceptions;
-import hunt.logging;
+import hunt.logging.ConsoleLogger;
 import hunt.time.LocalDateTime;
 import hunt.time.Instant;
 import hunt.time.ZoneOffset;
+import hunt.util.DateTime;
 
+import core.sync.condition;
+import core.sync.mutex;
 import core.thread;
+
 import std.algorithm;
 import std.conv;
 import std.random;
-import core.sync.condition;
-import core.sync.mutex;
 
 /**
  * <p>
@@ -139,6 +139,8 @@ class QuartzSchedulerThread : ThreadEx {
         // so processing doesn't start yet...
         paused = true;
         halted = false;
+
+        trace("Initializing QuartzSchedulerThread...");
     }
 
     /*
@@ -273,6 +275,8 @@ class QuartzSchedulerThread : ThreadEx {
     override
     void run() {
         int acquiresFailed = 0;
+
+        warning("runing QuartzSchedulerThread...");
 
         while (!halted) {
             try {
@@ -423,9 +427,11 @@ class QuartzSchedulerThread : ThreadEx {
                             JobRunShell shell = null;
                             try {
                                 shell = qsRsrcs.getJobRunShellFactory().createJobRunShell(bndle);
+                                // shell = new JobRunShell(scheduler, bndle);
                                 shell.initialize(qs);
                             } catch (SchedulerException se) {
-                                qsRsrcs.getJobStore().triggeredJobComplete(triggers.get(i), bndle.getJobDetail(), CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
+                                qsRsrcs.getJobStore().triggeredJobComplete(triggers.get(i), 
+                                    bndle.getJobDetail(), CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
                                 continue;
                             }
 

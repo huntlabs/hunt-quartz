@@ -60,7 +60,7 @@ class SchedulerSignalerImpl : SchedulerSignaler {
         this.sched = sched;
         this.schedThread = schedThread;
         
-        info("Initialized Scheduler Signaller of type: " ~ typeid(this).name);
+        trace("Initialized Scheduler Signaller of type: " ~ typeid(this).name);
     }
 
     /*

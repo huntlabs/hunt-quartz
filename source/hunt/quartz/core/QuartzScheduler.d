@@ -184,7 +184,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
     private ArrayList!(SchedulerListener) internalSchedulerListeners;
 
-    private JobFactory jobFactory; // = new PropertySettingJobFactory();
+    private JobFactory jobFactory; 
     
     ExecutingJobsManager jobMgr = null;
 
@@ -228,6 +228,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * @see QuartzSchedulerResources
      */
     this(QuartzSchedulerResources resources, long idleWaitTime) {
+        jobFactory = new PropertySettingJobFactory();
         defaultInitialize();
         this.resources = resources;
         JobListener j = cast(JobListener)resources.getJobStore();
@@ -249,7 +250,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         signaler = new SchedulerSignalerImpl(this, this.schedThread);
         
-        info("Quartz Scheduler v." ~ getVersion() ~ " created.");
+        trace("Quartz Scheduler v." ~ getVersion() ~ " created.");
     }
 
     private void defaultInitialize() {
@@ -323,7 +324,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         // }
 
         
-        info("Scheduler meta-data: " ~
+        trace("Scheduler meta-data: " ~
                 (new SchedulerMetaData(getSchedulerName(),
                         getSchedulerInstanceId(), typeid(this), boundRemotely, runningSince() !is null, 
                         isInStandbyMode(), isShutdown(), runningSince(), 
@@ -575,7 +576,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         schedThread.togglePause(false);
 
-        info("Scheduler " ~ resources.getUniqueIdentifier() ~ " started.");
+        trace("Scheduler " ~ resources.getUniqueIdentifier() ~ " started.");
         
         notifySchedulerListenersStarted();
     }

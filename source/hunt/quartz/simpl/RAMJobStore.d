@@ -152,7 +152,7 @@ class RAMJobStore : JobStore {
 
         this.signaler = schedSignaler;
 
-        info("RAMJobStore initialized.");
+        trace("RAMJobStore initialized.");
     }
 
     void schedulerStarted() {
@@ -1660,11 +1660,11 @@ class RAMJobStore : JobStore {
                     timeTriggers.remove(tw);
                     signaler.signalSchedulingChange(0L);
                 } else if(triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_ERROR) {
-                    info("Trigger " ~ trigger.getKey().toString() ~ " set to ERROR state.");
+                    trace("Trigger " ~ trigger.getKey().toString() ~ " set to ERROR state.");
                     tw.state = TriggerWrapper.STATE_ERROR;
                     signaler.signalSchedulingChange(0L);
                 } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR) {
-                    info("All triggers of Job " 
+                    trace("All triggers of Job " 
                             ~ trigger.getJobKey().toString() ~ " set to ERROR state.");
                     setAllTriggersOfJobToState(trigger.getJobKey(), TriggerWrapper.STATE_ERROR);
                     signaler.signalSchedulingChange(0L);

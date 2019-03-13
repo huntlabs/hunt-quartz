@@ -579,14 +579,17 @@ class SimpleThreadPool : ThreadPool {
             bool ran = false;
             
             while (_run) {
+                trace("ddddddddddd");
                 try {
                     lock.lock(); 
                     while (runnable is null && _run) {
+                trace("ddddddddddd");
                         lockCondition.wait(msecs(500));
                     }
 
                     if (runnable !is null) {
                         ran = true;
+                trace("666666666666666");
                         runnable.run();
                     }
                     lock.unlock();
@@ -625,11 +628,7 @@ class SimpleThreadPool : ThreadPool {
             }
 
             //version(HUNT_DEBUG)
-            try {
-                trace("WorkerThread is shut down.");
-            } catch(Exception e) {
-                // ignore to help with a tomcat glitch
-            }
+            trace("WorkerThread is shut down.");
         }
     }
 }

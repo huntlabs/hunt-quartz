@@ -34,6 +34,7 @@ import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 
 import hunt.util.DateTime;
+import hunt.logging.ConsoleLogger;
 import hunt.util.Common;
 import hunt.logging;
 

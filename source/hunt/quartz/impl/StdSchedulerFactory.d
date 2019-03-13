@@ -31,7 +31,7 @@ import hunt.quartz.TriggerListener;
 import hunt.quartz.core.JobRunShellFactory;
 import hunt.quartz.core.QuartzScheduler;
 import hunt.quartz.core.QuartzSchedulerResources;
-// import hunt.quartz.ee.jta.JTAAnnotationAwareJobRunShellFactory;
+import hunt.quartz.ee.jta.JTAAnnotationAwareJobRunShellFactory;
 // import hunt.quartz.ee.jta.JTAJobRunShellFactory;
 // import hunt.quartz.ee.jta.UserTransactionHelper;
 // import hunt.quartz.impl.jdbcjobstore.JobStoreSupport;
@@ -1226,7 +1226,7 @@ class StdSchedulerFactory : SchedulerFactory {
             // if (wrapJobInTx) {
             //     jrsf = new JTAJobRunShellFactory();
             // } else {
-            //     jrsf = new JTAAnnotationAwareJobRunShellFactory();
+                jrsf = new JTAAnnotationAwareJobRunShellFactory();
             // }
     
             if (autoId) {
@@ -1275,10 +1275,8 @@ class StdSchedulerFactory : SchedulerFactory {
             QuartzSchedulerResources rsrcs = new QuartzSchedulerResources();
             rsrcs.setName(schedName);
             rsrcs.setThreadName(threadName);
-            rsrcs.setInstanceId(schedInstId);
-            // TODO: Tasks pending completion -@zxp at 3/6/2019, 3:41:50 PM
-            // 
-            // rsrcs.setJobRunShellFactory(jrsf);
+            rsrcs.setInstanceId(schedInstId);            
+            rsrcs.setJobRunShellFactory(jrsf);
             rsrcs.setMakeSchedulerThreadDaemon(makeSchedulerThreadDaemon);
             rsrcs.setThreadsInheritInitializersClassLoadContext(threadsInheritInitalizersClassLoader);
             rsrcs.setBatchTimeWindow(batchTimeWindow);
@@ -1367,10 +1365,10 @@ class StdSchedulerFactory : SchedulerFactory {
             
             qs.initialize();
     
-            info("Quartz scheduler '" ~ scheduler.getSchedulerName()
+            trace("Quartz scheduler '" ~ scheduler.getSchedulerName()
                             ~ "' initialized from " ~ propSrc);
     
-            info("Quartz scheduler version: " ~ qs.getVersion());
+            trace("Quartz scheduler version: " ~ qs.getVersion());
     
             // prevents the repository from being garbage collected
             qs.addNoGCObject(schedRep);

@@ -18,8 +18,8 @@ void main()
 {
 	// testUnits!(AnnualCalendarTest);
 	// testUnits!(CronExpressionTest);
-	testUnits!(CronTriggerTest);
-	// testUnits!(RAMSchedulerTest);
+	// testUnits!(CronTriggerTest);
+	testUnits!(RAMSchedulerTest);
 	// testUnits!(SimpleTriggerTest);
 	// testUnits!(VersionTest);
 
