@@ -17,6 +17,7 @@
 
 module hunt.quartz.JobBuilder;
 
+import hunt.quartz.Job;
 import hunt.quartz.JobDetail;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobKey;
@@ -98,6 +99,12 @@ class JobBuilder {
     static JobBuilder newJob(TypeInfo_Class jobClass) {
         JobBuilder b = new JobBuilder();
         b.ofType(jobClass);
+        return b;
+    }
+
+    static JobBuilder newJob(T)() if(is(T : Job)) {
+        JobBuilder b = new JobBuilder();
+        b.ofType(typeid(T));
         return b;
     }
 
