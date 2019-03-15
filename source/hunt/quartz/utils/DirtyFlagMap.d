@@ -217,22 +217,23 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
     }
 
 
-    // override
+    override
     // suppress warnings on generic cast of super.clone() and map.clone() lines.
     Object clone() {
         implementationMissing(false);
         return this;
-        //     DirtyFlagMap!(K,V) copy;
-        //     try {
-        //         copy = (DirtyFlagMap!(K,V)) super.clone();
-        //         if (map instanceof HashMap) {
-        //             copy.map = (Map!(K,V))((HashMap!(K,V))map).clone();
-        //         }
-        //     } catch (CloneNotSupportedException ex) {
-        //         throw new IncompatibleClassChangeError("Not Cloneable.");
+        // DirtyFlagMap!(K,V) copy;
+        // try {
+        //     copy = cast(DirtyFlagMap!(K,V)) super.clone();
+        //     HashMap!(K,V) hashMap = cast(HashMap!(K,V))map;
+        //     if (hashMap !is null) {
+        //         copy.map = cast(Map!(K,V))(hashMap.clone());
         //     }
+        // } catch (CloneNotSupportedException ex) {
+        //     throw new IncompatibleClassChangeError("Not Cloneable.");
+        // }
 
-        //     return copy;
+        // return copy;
     }
 
 }

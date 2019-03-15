@@ -864,10 +864,11 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     // override
     Object clone() {
         implementationMissing(false);
-        return this;
         // AbstractTrigger!T copy;
         // try {
-        //     copy = (AbstractTrigger!T) super.clone();
+        //     // copy = (AbstractTrigger!T) super.clone();
+        //     // copy = (cast(TypeInfo_Class)typeid(this)).create();
+        //     copy = cast(AbstractTrigger!T)typeid(this).create();
 
         //     // Shallow copy the jobDataMap.  Note that this means that if a user
         //     // modifies a value object in this map from the cloned Trigger
@@ -880,6 +881,8 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
         //     throw new IncompatibleClassChangeError("Not Cloneable.");
         // }
         // return copy;
+
+        return this;
     }
     
     TriggerBuilder!(T) getTriggerBuilder() {

@@ -349,9 +349,8 @@ class SimpleThreadPool : ThreadPool {
             return;
 
         version(HUNT_DEBUG) {
-            infof("available workers: %d", availWorkers.size());
+            tracef("available workers: %d, workers: %d", availWorkers.size(), workers.size());
         }
-        
 
         // signal each worker thread to shut down
         foreach(WorkerThread wt; workers) {
