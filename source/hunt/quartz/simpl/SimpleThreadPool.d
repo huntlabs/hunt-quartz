@@ -288,13 +288,10 @@ class SimpleThreadPool : ThreadPool {
         }
 
         // create the worker threads and start them
-
-
         foreach(WorkerThread wt; createWorkerThreads(count)) {
             wt.start();
             availWorkers.add(wt);
         }
-        warningf("ddd availWorkers: %d", availWorkers.size);
     }
 
     protected List!(WorkerThread) createWorkerThreads(int createCount) {
@@ -351,7 +348,10 @@ class SimpleThreadPool : ThreadPool {
         if(workers is null) // case where the pool wasn't even initialize()ed
             return;
 
-        infof("availWorkers: %d", availWorkers.size());
+        version(HUNT_DEBUG) {
+            infof("available workers: %d", availWorkers.size());
+        }
+        
 
         // signal each worker thread to shut down
         foreach(WorkerThread wt; workers) {
@@ -477,7 +477,7 @@ class SimpleThreadPool : ThreadPool {
         nextRunnableLock.lock();
         scope(exit) nextRunnableLock.unlock();
 
-warningf("isShutdown: %s, thread: %s", isShutdown,  wt.name);
+        // warningf("isShutdown: %s, thread: %s", isShutdown,  wt.name);
 
         if(!isShutdown) {
             availWorkers.add(wt);
@@ -565,7 +565,7 @@ warningf("removing=>", wt.name);
          * </p>
          */
         void shutdown() {
-            version(HUNT_DEBUG) infof("Shutting down %s...", this.name);
+            // version(HUNT_DEBUG) tracef("Shutting down %s...", this.name);
             _run = false;
         }
 

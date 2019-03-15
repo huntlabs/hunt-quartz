@@ -525,18 +525,14 @@ class TestJobWithSync : Job {
         
         try {
             
+            trace("executing a job...");
             List!(long) jobExecTimestamps = cast(List!(long))context.getScheduler().getContext().get(DATE_STAMPS);
             Barrier barrier =  cast(Barrier)context.getScheduler().getContext().get(BARRIER);
             jobExecTimestamps.add(DateTimeHelper.currentTimeMillis());
-            trace("a job awaiting...");
             barrier.wait();
-            trace("a job done.");
-
-            // jobExecTimestamps.add(System.currentTimeMillis());
-            
+            trace("a job executed.");
             // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (Throwable e) {
-            // e.printStackTrace();
             error(e.msg);
             throw new AssertionError("Await on barrier was interrupted: " ~ e.msg);
         } 
@@ -559,7 +555,7 @@ class UncleanShutdownJob : Job {
             barrier.wait();
             // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (Throwable e) {
-            // e.printStackTrace();
+            error(e.msg);
             throw new AssertionError("Await on barrier was interrupted: " ~ e.msg);
         } 
     }

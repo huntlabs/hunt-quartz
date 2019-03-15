@@ -334,11 +334,8 @@ class TriggerTimeComparator : Comparator!(Trigger) {
 
     int compare(Trigger t1, Trigger t2) nothrow { 
         try {
-            
-            int r =  compare(t1.getNextFireTime(), t1.getPriority(), t1.getKey(), 
+            return compare(t1.getNextFireTime(), t1.getPriority(), t1.getKey(), 
                 t2.getNextFireTime(), t2.getPriority(), t2.getKey());
-            info("xxxxxx=>", r);
-            return r;
         } catch(Exception e) {
             debug warning(e.toString());
             return 0;

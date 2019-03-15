@@ -207,7 +207,6 @@ class RAMJobStore : JobStore {
      * @throws JobPersistenceException
      */
     void clearAllSchedulingData() {
-trace("1111111111");
         synchronized (lock) {
             // unschedule jobs (delete triggers)
             List!(string) lst = getTriggerGroupNames();
@@ -271,7 +270,6 @@ trace("1111111111");
         JobWrapper jw = new JobWrapper(cast(JobDetail)newJob.clone());
 
         bool repl = false;
-trace("1111111111");
         synchronized (lock) {
             if (jobsByKey.get(jw.key) !is null) {
                 if (!replaceExisting) {
@@ -313,8 +311,7 @@ trace("1111111111");
 
         bool found = false;
 
-        // synchronized (lock) 
-        {
+        synchronized (lock) {
             List!(Trigger) triggersOfJob = getTriggersForJob(jobKey);
             foreach(Trigger trig; triggersOfJob) {
                 this.removeTrigger(trig.getKey());
@@ -340,7 +337,7 @@ trace("1111111111");
     bool removeJobs(List!(JobKey) jobKeys) {
         bool allFound = true;
 
-        // synchronized (lock) 
+        synchronized (lock) 
         {
             foreach(JobKey key; jobKeys)
                 allFound = removeJob(key) && allFound;
@@ -352,7 +349,7 @@ trace("1111111111");
     bool removeTriggers(List!(TriggerKey) triggerKeys) {
         bool allFound = true;
 
-        // synchronized (lock) 
+        synchronized (lock) 
         {
             foreach(TriggerKey key; triggerKeys)
                 allFound = removeTrigger(key) && allFound;
@@ -364,7 +361,7 @@ trace("1111111111");
     void storeJobsAndTriggers(
             Map!(JobDetail, Set!(Trigger)) triggersAndJobs, bool replace) {
 
-        // synchronized (lock) 
+        synchronized (lock) 
         {
             // make sure there are no collisions...
             if(!replace) {
@@ -408,7 +405,7 @@ trace("1111111111");
     void storeTrigger(OperableTrigger newTrigger, bool replaceExisting) {
         TriggerWrapper tw = new TriggerWrapper(cast(OperableTrigger)newTrigger.clone());
 
-        // synchronized (lock) 
+        synchronized (lock) 
         {
             if (triggersByKey.get(tw.key) !is null) {
                 if (!replaceExisting) {
@@ -472,10 +469,10 @@ trace("1111111111");
     private bool removeTrigger(TriggerKey key, bool removeOrphanedJob) {
 
         bool found;
-version(HUNT_DEBUG) trace("try to remove a trigger");
-        // synchronized (lock) 
+        version(HUNT_DEBUG) trace("try to remove a trigger");
+        synchronized (lock) 
         {
-version(HUNT_DEBUG) trace("removing a trigger");
+            // version(HUNT_DEBUG) trace("removing a trigger");
             // remove from triggers by FQN map
             TriggerWrapper tw = triggersByKey.remove(key);
             found = tw !is null;
@@ -522,8 +519,7 @@ version(HUNT_DEBUG) trace("removing a trigger");
 
         bool found;
 
-        // synchronized (lock) 
-        {
+        synchronized (lock) {
             // remove from triggers by FQN map
             TriggerWrapper tw = triggersByKey.remove(triggerKey);
             found = (tw !is null);
@@ -590,8 +586,7 @@ version(HUNT_DEBUG) trace("removing a trigger");
      *         match.
      */
     OperableTrigger retrieveTrigger(TriggerKey triggerKey) {
-        // synchronized(lock) 
-        {
+        synchronized(lock) {
             TriggerWrapper tw = triggersByKey.get(triggerKey);
     
             return (tw !is null) ? cast(OperableTrigger)tw.getTrigger() : null; // .clone()
@@ -686,7 +681,6 @@ version(HUNT_DEBUG) trace("removing a trigger");
      * case it will go into the PAUSED state.</p>
      */
     void resetTriggerFromErrorState(TriggerKey triggerKey) {
-trace("1111111111");
         synchronized (lock) {
 
             TriggerWrapper tw = triggersByKey.get(triggerKey);
@@ -733,8 +727,7 @@ trace("1111111111");
             Calendar calendar, bool replaceExisting, bool updateTriggers) {
 
         calendar = cast(Calendar) calendar.clone();
-        trace("1111111111");
-        synchronized (lock) {
+                synchronized (lock) {
     
             Calendar obj = calendarsByName.get(name);
     
@@ -779,7 +772,6 @@ trace("1111111111");
      */
     bool removeCalendar(string calName) {
         int numRefs = 0;
-trace("1111111111");
         synchronized (lock) {
             foreach (TriggerWrapper trigger ; triggersByKey.values()) {
                 OperableTrigger trigg = trigger.trigger;
@@ -809,8 +801,7 @@ trace("1111111111");
      *         match.
      */
     Calendar retrieveCalendar(string calName) {
-        trace("1111111111");
-        synchronized (lock) {
+                synchronized (lock) {
             Calendar cal = calendarsByName.get(calName);
             if(cal !is null)
                 return cast(Calendar) cal.clone();
@@ -825,8 +816,7 @@ trace("1111111111");
      * </p>
      */
     int getNumberOfJobs() {
-        trace("1111111111");
-        synchronized (lock) {
+                synchronized (lock) {
             return jobsByKey.size();
         }
     }
@@ -838,8 +828,7 @@ trace("1111111111");
      * </p>
      */
     int getNumberOfTriggers() {
-        trace("1111111111");
-        synchronized (lock) {
+                synchronized (lock) {
             return triggersByKey.size();
         }
     }
@@ -851,8 +840,7 @@ trace("1111111111");
      * </p>
      */
     int getNumberOfCalendars() {
-        trace("1111111111");
-        synchronized (lock) {
+                synchronized (lock) {
             return calendarsByName.size();
         }
     }
@@ -865,8 +853,7 @@ trace("1111111111");
      */
     Set!(JobKey) getJobKeys(GroupMatcher!(JobKey) matcher) {
         Set!(JobKey) outList = null;
-        trace("1111111111");
-        synchronized (lock) {
+                synchronized (lock) {
 
             StringOperatorName operator = matcher.getCompareWithOperator();
             string compareToValue = matcher.getCompareToValue();
@@ -927,8 +914,7 @@ trace("1111111111");
      */
     Set!(TriggerKey) getTriggerKeys(GroupMatcher!(TriggerKey) matcher) {
         Set!(TriggerKey) outList = null;
-        trace("1111111111");
-        synchronized (lock) {
+                synchronized (lock) {
 
             StringOperatorName operator = matcher.getCompareWithOperator();
             string compareToValue = matcher.getCompareToValue();
@@ -972,7 +958,6 @@ trace("1111111111");
      */
     List!(string) getJobGroupNames() {
         List!(string) outList;
-trace("1111111111");
         synchronized (lock) {
             outList = new LinkedList!(string)(jobsByGroup.keySet());
         }
@@ -988,7 +973,6 @@ trace("1111111111");
      */
     List!(string) getTriggerGroupNames() {
         LinkedList!(string) outList;
-trace("1111111111");
         synchronized (lock) {
             outList = new LinkedList!(string)(triggersByGroup.keySet());
         }
@@ -1008,8 +992,7 @@ trace("1111111111");
     List!(Trigger) getTriggersForJob(JobKey jobKey) {
         ArrayList!(Trigger) trigList = new ArrayList!(Trigger)();
 
-        // synchronized (lock) 
-        {
+        synchronized (lock) {
             List!(TriggerWrapper) jobList = triggersByJob.get(jobKey);
             if(jobList !is null) {
                 foreach(TriggerWrapper tw ; jobList) {
@@ -1023,7 +1006,6 @@ trace("1111111111");
 
     protected ArrayList!(TriggerWrapper) getTriggerWrappersForJob(JobKey jobKey) {
         ArrayList!(TriggerWrapper) trigList = new ArrayList!(TriggerWrapper)();
-trace("1111111111");
         synchronized (lock) {
             List!(TriggerWrapper) jobList = triggersByJob.get(jobKey);
             if(jobList !is null) {
@@ -1038,11 +1020,10 @@ trace("1111111111");
 
     protected ArrayList!(TriggerWrapper) getTriggerWrappersForCalendar(string calName) {
         ArrayList!(TriggerWrapper) trigList = new ArrayList!(TriggerWrapper)();
-trace("1111111111");
         synchronized (lock) {
             foreach(TriggerWrapper tw ; triggersByKey.values()) {
                 string tcalName = tw.getTrigger().getCalendarName();
-                if (tcalName !is null && tcalName== calName) {
+                if (tcalName !is null && tcalName == calName) {
                     trigList.add(tw);
                 }
             }
@@ -1058,7 +1039,6 @@ trace("1111111111");
      *
      */
     void pauseTrigger(TriggerKey triggerKey) {
-trace("1111111111");
         synchronized (lock) {
             TriggerWrapper tw = triggersByKey.get(triggerKey);
     
@@ -1095,7 +1075,6 @@ trace("1111111111");
      *
      */
     List!(string) pauseTriggers(GroupMatcher!(TriggerKey) matcher) {
-trace("1111111111");
         List!(string) pausedGroups;
         synchronized (lock) {
             pausedGroups = new LinkedList!(string)();
@@ -1136,8 +1115,7 @@ trace("1111111111");
      *
      */
     void pauseJob(JobKey jobKey) {
-        trace("1111111111");
-        synchronized (lock) {
+                synchronized (lock) {
             List!(Trigger) triggersOfJob = getTriggersForJob(jobKey);
             foreach(Trigger trigger; triggersOfJob) {
                 pauseTrigger(trigger.getKey());
@@ -1160,7 +1138,6 @@ trace("1111111111");
      */
     List!(string) pauseJobs(GroupMatcher!(JobKey) matcher) {
         List!(string) pausedGroups = new LinkedList!(string)();
-trace("1111111111");        
         synchronized (lock) {
 
             StringOperatorName operator = matcher.getCompareWithOperator();
@@ -1204,7 +1181,6 @@ trace("1111111111");
      *
      */
     void resumeTrigger(TriggerKey triggerKey) {
-trace("1111111111");
         synchronized (lock) {
             TriggerWrapper tw = triggersByKey.get(triggerKey);
     
@@ -1249,7 +1225,6 @@ trace("1111111111");
      */
     List!(string) resumeTriggers(GroupMatcher!(TriggerKey) matcher) {
         Set!(string) groups = new HashSet!(string)();
-trace("1111111111");
         synchronized (lock) {
             Set!(TriggerKey) keys = getTriggerKeys(matcher);
 
@@ -1303,7 +1278,6 @@ trace("1111111111");
      *
      */
     void resumeJob(JobKey jobKey) {
-trace("1111111111");
         synchronized (lock) {
             List!(Trigger) triggersOfJob = getTriggersForJob(jobKey);
             foreach(Trigger trigger; triggersOfJob) {
@@ -1327,7 +1301,6 @@ trace("1111111111");
      */
     Collection!(string) resumeJobs(GroupMatcher!(JobKey) matcher) {
         Set!(string) resumedGroups = new HashSet!(string)();
-trace("1111111111");        
         synchronized (lock) {
             Set!(JobKey) keys = getJobKeys(matcher);
 
@@ -1367,7 +1340,6 @@ trace("1111111111");
      * @see #pauseTriggers(hunt.quartz.impl.matchers.GroupMatcher)
      */
     void pauseAll() {
-trace("1111111111");
         synchronized (lock) {
             List!(string) names = getTriggerGroupNames();
 
@@ -1391,7 +1363,6 @@ trace("1111111111");
      * @see #pauseAll()
      */
     void resumeAll() {
-trace("1111111111");
         synchronized (lock) {
             pausedJobGroups.clear();
             resumeTriggers(GroupMatcherHelper.anyTriggerGroup());
@@ -1453,10 +1424,6 @@ trace("1111111111");
      * @see #releaseAcquiredTrigger(OperableTrigger)
      */
     List!(OperableTrigger) acquireNextTriggers(long noLaterThan, int maxCount, long timeWindow) {
-trace("1111111111");   
-scope(exit) {
-    info("2222222222222222222");
-}
         synchronized (lock) {
             List!(OperableTrigger) result = new ArrayList!(OperableTrigger)();
             Set!(JobKey) acquiredJobKeysForNoConcurrentExec = new HashSet!(JobKey)();
@@ -1464,7 +1431,9 @@ scope(exit) {
             long batchEnd = noLaterThan;
             
 
-infof("timeTriggers: %d", timeTriggers.size());   
+            version(HUNT_DEBUG) {
+                tracef("remaining triggers: %d", timeTriggers.size()); 
+            }  
 
             // return empty list if store has no triggers.
             if (timeTriggers.size() == 0)
@@ -1482,17 +1451,14 @@ infof("timeTriggers: %d", timeTriggers.size());
                     break;
                 }
 
-    infof("trigger: %s, size: %d", tw.trigger.getJobKey().toString(), timeTriggers.size());
+                version(HUNT_DEBUG) {
+                    tracef("current trigger: %s, remaining triggers: %d", 
+                        tw.trigger.getJobKey().toString(), timeTriggers.size());
+                }
                 if (tw.trigger.getNextFireTime() is null) {
-    // info("555555555555555");
-    import core.thread;
-    import core.time;
-    Thread.sleep(300.msecs);
-    info("555555555555555");
                     continue;
                 }
 
-    info("4444444444444444");
                 if (applyMisfire(tw)) {
                     if (tw.trigger.getNextFireTime() !is null) {
                         timeTriggers.add(tw);
@@ -1500,13 +1466,11 @@ infof("timeTriggers: %d", timeTriggers.size());
                     continue;
                 }
 
-    info("4444444444444444");
                 if (tw.getTrigger().getNextFireTime().toEpochMilli() > batchEnd) {
                     timeTriggers.add(tw);
                     break;
                 }
-     
-    info("55555555555555");           
+             
                 // If trigger's job is set as @DisallowConcurrentExecution, and it has already been added to result, then
                 // put it back into the timeTriggers set and continue to search for next trigger.
                 JobKey jobKey = tw.trigger.getJobKey();
@@ -1520,7 +1484,6 @@ infof("timeTriggers: %d", timeTriggers.size());
                     }
                 }
 
-    info("666666666666666");   
                 tw.state = TriggerWrapper.STATE_ACQUIRED;
                 tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
                 OperableTrigger trig = cast(OperableTrigger) tw.trigger.clone();
@@ -1548,7 +1511,6 @@ infof("timeTriggers: %d", timeTriggers.size());
      * </p>
      */
     void releaseAcquiredTrigger(OperableTrigger trigger) {
-trace("1111111111");        
         synchronized (lock) {
             TriggerWrapper tw = triggersByKey.get(trigger.getKey());
             if (tw !is null && tw.state == TriggerWrapper.STATE_ACQUIRED) {
@@ -1566,10 +1528,6 @@ trace("1111111111");
      * </p>
      */
     List!(TriggerFiredResult) triggersFired(List!(OperableTrigger) firedTriggers) {
-trace("1111111111");
-scope(exit) {
-    info("triggersFired=>222222222222222");
-}
         synchronized (lock) {
             List!(TriggerFiredResult) results = new ArrayList!(TriggerFiredResult)();
 
@@ -1741,7 +1699,6 @@ scope(exit) {
     
     
     protected string peekTriggers() {
-trace("1111111111");
         StringBuilder str = new StringBuilder();
         synchronized (lock) {
             foreach (TriggerWrapper triggerWrapper ; triggersByKey.values()) {
