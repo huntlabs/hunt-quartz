@@ -596,9 +596,12 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             
             //avoid infinite loop
             if (nextFireTime.getYear() > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+                trace("dddddddddddddddddddddd");
                 nextFireTime = null;
             }
         }
+
+        tracef("nextFireTime is null: %s", nextFireTime is null);
     }
 
     /**
@@ -610,6 +613,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         nextFireTime = getFireTimeAfter(previousFireTime);
 
         if (nextFireTime is null || calendar is null) {
+        tracef("nextFireTime is null: %s", nextFireTime is null);
             return;
         }
         
@@ -633,6 +637,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
                 }
             }
         }
+
+        tracef("nextFireTime is null: %s", nextFireTime is null);
     }
 
     /**
@@ -655,6 +661,10 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     override
     LocalDateTime computeFirstFireTime(Calendar calendar) {
         nextFireTime = getStartTime();
+
+        scope(exit) {
+            tracef("nextFireTime is null: %s", nextFireTime is null);
+        }
 
         while (nextFireTime !is null && calendar !is null
                 && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
@@ -715,6 +725,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      */
     void setNextFireTime(LocalDateTime nextFireTime) {
         this.nextFireTime = nextFireTime;
+        tracef("nextFireTime is null: %s", nextFireTime is null);
+        
     }
 
     /**

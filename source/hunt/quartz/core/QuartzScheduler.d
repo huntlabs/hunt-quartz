@@ -681,6 +681,8 @@ class QuartzScheduler : RemotableQuartzScheduler {
      *          to return until all currently executing jobs have completed.
      */
     void shutdown(bool waitForJobsToComplete) {
+
+        info("Shutting down a scheduler...");
         
         if(shuttingDown || closed) {
             return;
@@ -718,7 +720,6 @@ class QuartzScheduler : RemotableQuartzScheduler {
         schedThread.halt(waitForJobsToComplete);
         
         notifySchedulerListenersShuttingdown();
-        
         if( (resources.isInterruptJobsOnShutdown() && !waitForJobsToComplete) || 
                 (resources.isInterruptJobsOnShutdownWithWait() && waitForJobsToComplete)) {
             List!(JobExecutionContext) jobs = getCurrentlyExecutingJobs();
@@ -734,9 +735,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
                     }
             }
         }
-        
         resources.getThreadPool().shutdown(waitForJobsToComplete);
-        
         closed = true;
 
         // if (resources.getJMXExport()) {

@@ -17,9 +17,6 @@
 
 module hunt.quartz.utils.DirtyFlagMap;
 
-// import hunt.quartz.utils.DirtyFlagIterator;
-
-// import java.lang.reflect.Array;
 import hunt.collection.AbstractMap;
 import hunt.collection.ArrayList;
 import hunt.collection.AbstractCollection;
@@ -31,6 +28,8 @@ import hunt.collection.Set;
 
 import hunt.Exceptions;
 import hunt.Object;
+
+import std.range;
 
 /**
  * <p>
@@ -145,10 +144,23 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
     override bool containsValue(V val) {
         return map.containsValue(val);
     }
+    
+    override int opApply(scope int delegate(ref K, ref V) dg) {
+        return map.opApply(dg);
+    }
 
-    // Set!(Entry!(K,V)) entrySet() {
-    //     return new DirtyFlagMapEntrySet(map.entrySet());
-    // }
+    override int opApply(scope int delegate(MapEntry!(K, V) entry) dg) {
+        return map.opApply(dg);
+    }
+
+    override InputRange!K byKey() {
+        return map.byKey();
+    }
+
+    override InputRange!V byValue() {
+        return map.byValue();
+    }
+
 
     // override
     // bool opEquals(Object o) {
@@ -171,9 +183,6 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         return map.isEmpty();
     }
 
-    // Set!(K) keySet() {
-    //     return new DirtyFlagSet!(K)(map.byKey());
-    // }
 
     override V put(K key, V val) {
         dirty = true;
@@ -207,9 +216,6 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         return map.values();
     }
 
-    // Collection!(V) values() {
-    //     return new DirtyFlagCollection!(V)(map.values());
-    // }
 
     // override
     // suppress warnings on generic cast of super.clone() and map.clone() lines.
@@ -229,249 +235,4 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         //     return copy;
     }
 
-    /**
-     * Wrap a Collection so we can mark the DirtyFlagMap as dirty if
-     * the underlying Collection is modified.
-     */
-    private class DirtyFlagCollection(T) : AbstractCollection!(T) {
-        private Collection!(T) collection;
-
-        this(T[] c) {
-            collection = new ArrayList!T(c);
-        }
-
-        this(Collection!(T) c) {
-            collection = c;
-        }
-
-        protected Collection!(T) getWrappedCollection() {
-            return collection;
-        }
-
-        // Iterator!(T) iterator() {
-        //     return new DirtyFlagIterator!(T)(collection.iterator());
-        // }
-
-        override bool remove(T o) {
-            bool removed = collection.remove(o);
-            if (removed) {
-                dirty = true;
-            }
-            return removed;
-        }
-
-        override bool removeAll(Collection!T c) {
-            bool changed = collection.removeAll(c);
-            if (changed) {
-                dirty = true;
-            }
-            return changed;
-        }
-
-        override bool retainAll(Collection!T c) {
-            bool changed = collection.retainAll(c);
-            if (changed) {
-                dirty = true;
-            }
-            return changed;
-        }
-
-        override void clear() {
-            if (collection.isEmpty() == false) {
-                dirty = true;
-            }
-            collection.clear();
-        }
-
-        // Pure wrapper methods
-        override int size() {
-            return collection.size();
-        }
-
-        override bool isEmpty() {
-            return collection.isEmpty();
-        }
-
-        override bool contains(T o) {
-            return collection.contains(o);
-        }
-
-        override bool add(T o) {
-            return collection.add(o);
-        } // Not supported
-
-        override bool addAll(Collection!T c) {
-            return collection.addAll(c);
-        } // Not supported
-
-        override bool containsAll(Collection!T c) {
-            return collection.containsAll(c);
-        }
-
-        override T[] toArray() {
-            return collection.toArray();
-        }
-        // T[] toArray(T[] array) { return collection.toArray(array); }
-    }
-
-    /**
-     * Wrap a Set so we can mark the DirtyFlagMap as dirty if
-     * the underlying Collection is modified.
-     */
-    private class DirtyFlagSet(T) : DirtyFlagCollection!(T), Set!(T) {
-        this(Set!(T) set) {
-            super(set);
-        }
-
-        protected Set!(T) getWrappedSet() {
-            return cast(Set!(T)) getWrappedCollection();
-        }
-
-
-        override bool opEquals(IObject o) {
-            return opEquals(cast(Object) o);
-        }
-        
-        override bool opEquals(Object o) {
-            return super.opEquals(o);
-        }
-
-        override size_t toHash() @trusted nothrow {
-            return super.toHash();
-        }
-
-        override string toString() {
-            return super.toString();
-        }        
-    }
-
-    /**
-     * Wrap an Iterator so that we can mark the DirtyFlagMap as dirty if an
-     * element is removed.
-     */
-    private class DirtyFlagIterator(T) : Iterator!(T) {
-        private Iterator!(T) iterator;
-
-        this(Iterator!(T) iterator) {
-            this.iterator = iterator;
-        }
-
-        void remove() {
-            dirty = true;
-            implementationMissing(false);
-            // iterator.remove();
-        }
-
-        // Pure wrapper methods
-        bool hasNext() {
-            return iterator.hasNext();
-        }
-
-        T next() {
-            return iterator.next();
-        }
-    }
-
-    /**
-     * Wrap a MapEntry Set so we can mark the Map as dirty if
-     * the Set is modified, and return MapEntry objects
-     * wrapped in the <code>DirtyFlagMapEntry</code> class.
-     */
-    private class DirtyFlagMapEntrySet : DirtyFlagSet!(MapEntry!(K, V)) {
-
-        this(Set!(MapEntry!(K, V)) set) {
-            super(set);
-        }
-
-        // override
-        // Iterator!(MapEntry!(K,V)) iterator() {
-        //     return new DirtyFlagMapEntryIterator(getWrappedSet().iterator());
-        // }
-
-        // override
-        // V[] toArray() {
-        //     return toArray(new Object[super.size()]);
-        // }
-
-        //  // suppress warnings on both U[] and U casting.
-        // override
-        // <U> U[] toArray(U[] array) {
-        //     if (array.getClass().getComponentType().isAssignableFrom(MapEntry.class) == false) {
-        //         throw new IllegalArgumentException("Array must be of type assignable from MapEntry");
-        //     }
-
-        //     int size = super.size();
-
-        //     U[] result =
-        //         array.length < size ?
-        //             (U[])Array.newInstance(array.getClass().getComponentType(), size) : array;
-
-        //     Iterator!(MapEntry!(K,V)) entryIter = iterator(); // Will return DirtyFlagMapEntry objects
-        //     for (int i = 0; i < size; i++) {
-        //         result[i] = ( U ) entryIter.next();
-        //     }
-
-        //     if (result.length > size) {
-        //         result[size] = null;
-        //     }
-
-        //     return result;
-        // }
-    }
-
-    /**
-     * Wrap an Iterator over MapEntry objects so that we can
-     * mark the Map as dirty if an element is removed or modified.
-     */
-    private class DirtyFlagMapEntryIterator : DirtyFlagIterator!(MapEntry!(K, V)) {
-        this(Iterator!(MapEntry!(K, V)) iterator) {
-            super(iterator);
-        }
-
-        override DirtyFlagMapEntry next() {
-            return new DirtyFlagMapEntry(super.next());
-        }
-    }
-
-    /**
-     * Wrap a MapEntry so we can mark the Map as dirty if
-     * a value is set.
-     */
-    private class DirtyFlagMapEntry : MapEntry!(K, V) {
-        private MapEntry!(K, V) entry;
-
-        this(MapEntry!(K, V) entry) {
-            this.entry = entry;
-        }
-
-        V setValue(V o) {
-            dirty = true;
-            return entry.setValue(o);
-        }
-
-        // Pure wrapper methods
-        K getKey() {
-            return entry.getKey();
-        }
-
-        V getValue() {
-            return entry.getValue();
-        }
-
-        override bool opEquals(IObject o) {
-            return opEquals(cast(Object) o);
-        }        
-
-        override bool opEquals(Object o) {
-            return entry == o;
-        }
-
-        override size_t toHash() @trusted nothrow {
-            return super.toHash();
-        }
-
-        override string toString() {
-            return super.toString();
-        }
-    }
 }

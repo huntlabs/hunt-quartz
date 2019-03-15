@@ -187,22 +187,24 @@ class QuartzSchedulerThread : ThreadEx {
     void halt(bool wait) {
         sigLock.lock();
         scope(exit) sigLock.unlock();
-        {
-            halted = true;
 
-            if (paused) {
-                sigCondition.notifyAll();
-            } else {
-                signalSchedulingChange(0);
-            }
+        halted = true;
+
+        if (paused) {
+            sigCondition.notifyAll();
+        } else {
+            signalSchedulingChange(0);
         }
-        
+
         if (wait) {
             bool interrupted = false;
             try {
                 while (true) {
                     try {
-                        join();
+                        implementationMissing(false);
+                        // FIXME: Needing refactor or cleanup -@zxp at 3/14/2019, 10:06:18 AM
+                        // 
+                        // join();
                         break;
                     } catch (InterruptedException _) {
                         interrupted = true;
@@ -276,7 +278,8 @@ class QuartzSchedulerThread : ThreadEx {
     void run() {
         int acquiresFailed = 0;
 
-        warning("runing QuartzSchedulerThread...");
+        version(HUNT_DEBUG)
+            trace("runing QuartzSchedulerThread...");
 
         while (!halted) {
             try {

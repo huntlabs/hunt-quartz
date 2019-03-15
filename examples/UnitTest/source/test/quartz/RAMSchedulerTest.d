@@ -349,9 +349,7 @@ class RAMSchedulerTest {
 		sched.scheduleJob(job1, trigger1);
 		
 	    // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        trace("xxxxxxxxxxx");
         barrier.wait();
-        trace("yyyyyyyyyy");
 	    sched.shutdown(true);
 		long fTime = jobExecTimestamps.get(0);
 
@@ -530,9 +528,9 @@ class TestJobWithSync : Job {
             List!(long) jobExecTimestamps = cast(List!(long))context.getScheduler().getContext().get(DATE_STAMPS);
             Barrier barrier =  cast(Barrier)context.getScheduler().getContext().get(BARRIER);
             jobExecTimestamps.add(DateTimeHelper.currentTimeMillis());
-            trace("11111111111");
+            trace("a job awaiting...");
             barrier.wait();
-            trace("22222222222");
+            trace("a job done.");
 
             // jobExecTimestamps.add(System.currentTimeMillis());
             

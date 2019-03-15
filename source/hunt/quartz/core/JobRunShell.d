@@ -33,10 +33,9 @@ import hunt.quartz.listeners.SchedulerListenerSupport;
 import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.spi.TriggerFiredBundle;
 
-import hunt.util.DateTime;
 import hunt.logging.ConsoleLogger;
+import hunt.util.DateTime;
 import hunt.util.Common;
-import hunt.logging;
 
 
 /**
@@ -150,7 +149,11 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
     void run() {
         qs.addInternalSchedulerListener(this);
 
-        try {
+        scope(exit) {
+            qs.removeInternalSchedulerListener(this);
+        }
+
+        // try {
             OperableTrigger trigger = cast(OperableTrigger) jec.getTrigger();
             JobDetail jobDetail = jec.getJobDetail();
 
@@ -198,18 +201,18 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
 
                 // execute the job
                 try {
-                    trace("Calling execute on job " ~ jobDetail.getKey().toString());
+                    version(HUNT_DEBUG) trace("Calling execute on job " ~ jobDetail.getKey().toString());
                     job.execute(jec);
                     endTime = DateTimeHelper.currentTimeMillis();
                 } catch (JobExecutionException jee) {
                     endTime = DateTimeHelper.currentTimeMillis();
                     jobExEx = jee;
-                    info("Job " ~ jobDetail.getKey().toString() ~
-                            " threw a JobExecutionException: ", jobExEx);
+                    warning("Job " ~ jobDetail.getKey().toString() ~
+                            " threw a JobExecutionException: ", jee.msg);
                 } catch (Throwable e) {
                     endTime = DateTimeHelper.currentTimeMillis();
                     error("Job " ~ jobDetail.getKey().toString() ~
-                            " threw an unhandled Exception: ", e);
+                            " threw an unhandled Exception: ", e.msg);
                     SchedulerException se = new SchedulerException(
                             "Job threw an unhandled exception.", e);
                     qs.notifySchedulerListenersError("Job ("
@@ -224,13 +227,13 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                 if (!notifyJobListenersComplete(jec, jobExEx)) {
                     break;
                 }
-
                 CompletedExecutionInstruction instCode = CompletedExecutionInstruction.NOOP;
 
                 // update the trigger
                 try {
                     instCode = trigger.executionComplete(jec, jobExEx);
                 } catch (Exception e) {
+                    warning(e.msg);
                     // If this happens, there's a bug in the trigger...
                     SchedulerException se = new SchedulerException(
                             "Trigger threw an unhandled exception.", e);
@@ -238,7 +241,6 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                             "Please report this error to the Quartz developers.",
                             se);
                 }
-
                 // notify all trigger listeners
                 if (!notifyTriggerListenersComplete(jec, instCode)) {
                     break;
@@ -250,29 +252,33 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                     try {
                         complete(false);
                     } catch (SchedulerException se) {
+                        warning(se.msg);
                         qs.notifySchedulerListenersError("Error executing Job ("
                                 ~ jec.getJobDetail().getKey().toString()
                                 ~ ": couldn't finalize execution.", se);
                     }
                     continue;
                 }
-
                 try {
                     complete(true);
                 } catch (SchedulerException se) {
+                    warning(se.msg);
                     qs.notifySchedulerListenersError("Error executing Job ("
                             ~ jec.getJobDetail().getKey().toString()
                             ~ ": couldn't finalize execution.", se);
                     continue;
                 }
-
+// FIXME: Needing refactor or cleanup -@zxp at 3/14/2019, 2:15:22 PM
+// 
+                version(HUNT_DEBUG) trace("start to notify JobStore that a job completed.");
                 qs.notifyJobStoreJobComplete(trigger, jobDetail, instCode);
+                version(HUNT_DEBUG) trace("notifying JobStore ended.");
                 break;
             } while (true);
 
-        } finally {
-            qs.removeInternalSchedulerListener(this);
-        }
+        // } finally {
+        //     qs.removeInternalSchedulerListener(this);
+        // }
     }
 
     protected void begin() {

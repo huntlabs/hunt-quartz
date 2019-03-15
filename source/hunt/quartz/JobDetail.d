@@ -127,7 +127,4 @@ interface JobDetail : Comparable!(JobDetail) { //  : Serializable, Cloneable
      * <code>JobDetail</code> identical to this one.
      */
     JobBuilder getJobBuilder();
-
-    
-
 }

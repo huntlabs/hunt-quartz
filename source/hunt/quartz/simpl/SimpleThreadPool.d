@@ -288,10 +288,13 @@ class SimpleThreadPool : ThreadPool {
         }
 
         // create the worker threads and start them
+
+
         foreach(WorkerThread wt; createWorkerThreads(count)) {
             wt.start();
             availWorkers.add(wt);
         }
+        warningf("ddd availWorkers: %d", availWorkers.size);
     }
 
     protected List!(WorkerThread) createWorkerThreads(int createCount) {
@@ -341,70 +344,70 @@ class SimpleThreadPool : ThreadPool {
     void shutdown(bool waitForJobsToComplete) {
         nextRunnableLock.lock();
         scope(exit) nextRunnableLock.unlock();
-            trace("Shutting down threadpool...");
 
-            isShutdown = true;
+        trace("Shutting down thread pool...");
 
-            if(workers is null) // case where the pool wasn't even initialize()ed
-                return;
+        isShutdown = true;
+        if(workers is null) // case where the pool wasn't even initialize()ed
+            return;
 
-            // signal each worker thread to shut down
-            foreach(WorkerThread wt; workers) {
-                wt.shutdown();
-                availWorkers.remove(wt);
-            }
+        infof("availWorkers: %d", availWorkers.size());
 
-            // Give waiting (wait(1000)) worker threads a chance to shut down.
-            // Active worker threads will shut down after finishing their
-            // current job.
-            nextRunnableCondition.notifyAll();
+        // signal each worker thread to shut down
+        foreach(WorkerThread wt; workers) {
+            wt.shutdown();
+            availWorkers.remove(wt);
+        }
 
-            if (waitForJobsToComplete == true) {
+        // Give waiting (wait(1000)) worker threads a chance to shut down.
+        // Active worker threads will shut down after finishing their
+        // current job.
+        nextRunnableCondition.notifyAll();
 
-                bool interrupted = false;
-                try {
-                    // wait for hand-off in runInThread to complete...
-                    while(handoffPending) {
-                        try {
-                            nextRunnableCondition.wait(msecs(100));
-                        } catch(InterruptedException _) {
-                            interrupted = true;
-                        }
-                    }
+        if (waitForJobsToComplete == true) {
 
-                    // Wait until all worker threads are shut down
-                    while (busyWorkers.size() > 0) {
-                        WorkerThread wt = cast(WorkerThread) busyWorkers.getFirst();
-                        try {
-                            trace("Waiting for thread " ~ wt.name
-                                            ~ " to shut down");
-
-                            // note: with waiting infinite time the
-                            // application may appear to 'hang'.
-                            nextRunnableCondition.wait(seconds(2));
-                        } catch (InterruptedException _) {
-                            interrupted = true;
-                        }
-                    }
-
-                    foreach(WorkerThread wt; workers) {
-                        try {
-                            wt.join();
-                            // workerThreads.remove();
-                            workers.remove(wt);
-                        } catch (InterruptedException _) {
-                            interrupted = true;
-                        }
-                    }
-                } finally {
-                    if (interrupted) {
-                        ThreadEx.currentThread().interrupt();
+            bool interrupted = false;
+            try {
+                // wait for hand-off in runInThread to complete...
+                while(handoffPending) {
+                    try {
+                        nextRunnableCondition.wait(msecs(100));
+                    } catch(InterruptedException _) {
+                        interrupted = true;
                     }
                 }
 
-                trace("No executing jobs remaining, all threads stopped.");
+                // Wait until all worker threads are shut down
+                while (busyWorkers.size() > 0) {
+                    WorkerThread wt = cast(WorkerThread) busyWorkers.getFirst();
+                    try {
+                        trace("Waiting for thread " ~ wt.name ~ " to shut down");
+                        // note: with waiting infinite time the
+                        // application may appear to 'hang'.
+                        nextRunnableCondition.wait(seconds(2));
+                    } catch (InterruptedException _) {
+                        interrupted = true;
+                    }
+                }
+
+                foreach(WorkerThread wt; workers) {
+                    try {
+                        wt.join();
+                        // workerThreads.remove();
+                        workers.remove(wt);
+                    } catch (InterruptedException _) {
+                        interrupted = true;
+                    }
+                }
+            } finally {
+                if (interrupted) {
+                    ThreadEx.currentThread().interrupt();
+                }
             }
-            trace("Shutdown of threadpool complete.");
+
+            trace("No executing jobs remaining, all threads stopped.");
+        }
+        trace("Shutdown of threadpool complete.");
     }
 
     /**
@@ -425,7 +428,6 @@ class SimpleThreadPool : ThreadPool {
 
         nextRunnableLock.lock();
         scope(exit) nextRunnableLock.unlock();
-
 
         handoffPending = true;
 
@@ -474,6 +476,9 @@ class SimpleThreadPool : ThreadPool {
     protected void makeAvailable(WorkerThread wt) {
         nextRunnableLock.lock();
         scope(exit) nextRunnableLock.unlock();
+
+warningf("isShutdown: %s, thread: %s", isShutdown,  wt.name);
+
         if(!isShutdown) {
             availWorkers.add(wt);
         }
@@ -482,9 +487,10 @@ class SimpleThreadPool : ThreadPool {
     }
 
     protected void clearFromBusyWorkersList(WorkerThread wt) {
-        
         nextRunnableLock.lock();
         scope(exit) nextRunnableLock.unlock();
+
+warningf("removing=>", wt.name);
         busyWorkers.remove(wt);
         nextRunnableCondition.notifyAll();
     }
@@ -497,6 +503,10 @@ class SimpleThreadPool : ThreadPool {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+
+}
+
+
     /**
      * <p>
      * A Worker loops, waiting to execute tasks.
@@ -508,7 +518,7 @@ class SimpleThreadPool : ThreadPool {
         private Condition lockCondition;
 
         // A flag that signals the WorkerThread to terminate.
-        private shared bool _run;
+        private shared bool _run = true;
 
         private SimpleThreadPool tp;
 
@@ -555,6 +565,7 @@ class SimpleThreadPool : ThreadPool {
          * </p>
          */
         void shutdown() {
+            version(HUNT_DEBUG) infof("Shutting down %s...", this.name);
             _run = false;
         }
 
@@ -579,34 +590,25 @@ class SimpleThreadPool : ThreadPool {
             bool ran = false;
             
             while (_run) {
-                trace("ddddddddddd");
                 try {
                     lock.lock(); 
                     while (runnable is null && _run) {
-                trace("ddddddddddd");
                         lockCondition.wait(msecs(500));
                     }
 
                     if (runnable !is null) {
+                        version(HUNT_DEBUG) infof("start to run a job: %s", this.name);
                         ran = true;
-                trace("666666666666666");
                         runnable.run();
+                        version(HUNT_DEBUG) infof("finished to run a job: %s", this.name);
                     }
                     lock.unlock();
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called
-                    try {
-                        error("Worker thread was interrupt()'ed.", unblock);
-                    } catch(Exception e) {
-                        // ignore to help with a tomcat glitch
-                    }
+                    error("Worker thread was interrupt()'ed.", unblock.msg);
                 } catch (Throwable exceptionInRunnable) {
-                    try {
-                        error("Error while executing the Runnable: ",
-                            exceptionInRunnable);
-                    } catch(Exception e) {
-                        // ignore to help with a tomcat glitch
-                    }
+                    error("Error while executing the Runnable: ",
+                            exceptionInRunnable.msg);
                 } finally {
                     synchronized(lock) {
                         runnable = null;
@@ -616,19 +618,20 @@ class SimpleThreadPool : ThreadPool {
                         this.priority = tp.getThreadPriority();
                     }
 
+                    // trace("runOnce=%s, ran=%s, thread: %s", runOnce, ran, this.name);
+
                     if (runOnce) {
                         atomicStore(_run, false);
-                        clearFromBusyWorkersList(this);
+                        this.tp.clearFromBusyWorkersList(this);
                     } else if(ran) {
                         ran = false;
-                        makeAvailable(this);
+                        this.tp.makeAvailable(this);
                     }
 
                 }
             }
 
-            //version(HUNT_DEBUG)
-            trace("WorkerThread is shut down.");
+            version(HUNT_DEBUG)
+            tracef("WorkerThread [%s] is shut down.", this.name);
         }
     }
-}

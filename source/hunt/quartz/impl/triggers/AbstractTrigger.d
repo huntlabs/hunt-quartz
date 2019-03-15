@@ -865,21 +865,21 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     Object clone() {
         implementationMissing(false);
         return this;
-    //     AbstractTrigger<?> copy;
-    //     try {
-    //         copy = (AbstractTrigger<?>) super.clone();
+        // AbstractTrigger!T copy;
+        // try {
+        //     copy = (AbstractTrigger!T) super.clone();
 
-    //         // Shallow copy the jobDataMap.  Note that this means that if a user
-    //         // modifies a value object in this map from the cloned Trigger
-    //         // they will also be modifying this Trigger. 
-    //         if (jobDataMap !is null) {
-    //             copy.jobDataMap = cast(JobDataMap)jobDataMap.clone();
-    //         }
+        //     // Shallow copy the jobDataMap.  Note that this means that if a user
+        //     // modifies a value object in this map from the cloned Trigger
+        //     // they will also be modifying this Trigger. 
+        //     if (jobDataMap !is null) {
+        //         copy.jobDataMap = cast(JobDataMap)jobDataMap.clone();
+        //     }
 
-    //     } catch (CloneNotSupportedException ex) {
-    //         throw new IncompatibleClassChangeError("Not Cloneable.");
-    //     }
-    //     return copy;
+        // } catch (CloneNotSupportedException ex) {
+        //     throw new IncompatibleClassChangeError("Not Cloneable.");
+        // }
+        // return copy;
     }
     
     TriggerBuilder!(T) getTriggerBuilder() {

@@ -24,6 +24,7 @@ import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerKey;
 
+import hunt.logging.ConsoleLogger;
 import hunt.time.LocalDateTime;
 import hunt.util.Common;
 import hunt.util.Comparator;
@@ -300,7 +301,6 @@ enum CompletedExecutionInstruction { NOOP, RE_EXECUTE_JOB, SET_TRIGGER_COMPLETE,
  * by key.
  */
 class TriggerTimeComparator : Comparator!(Trigger) {
-  
     
     // This static method exists for comparator in TC clustered quartz
     static int compare(LocalDateTime nextFireTime1, int priority1, TriggerKey key1, 
@@ -334,9 +334,13 @@ class TriggerTimeComparator : Comparator!(Trigger) {
 
     int compare(Trigger t1, Trigger t2) nothrow { 
         try {
-            return compare(t1.getNextFireTime(), t1.getPriority(), t1.getKey(), 
+            
+            int r =  compare(t1.getNextFireTime(), t1.getPriority(), t1.getKey(), 
                 t2.getNextFireTime(), t2.getPriority(), t2.getKey());
-        } catch(Exception) {
+            info("xxxxxx=>", r);
+            return r;
+        } catch(Exception e) {
+            debug warning(e.toString());
             return 0;
         }
     }
