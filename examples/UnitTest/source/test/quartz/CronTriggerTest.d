@@ -15,7 +15,6 @@
  */
 module test.quartz.CronTriggerTest;
 
-
 import hunt.quartz.impl.triggers.CronTriggerImpl;
 import hunt.quartz.CronTrigger;
 import hunt.quartz.Trigger;
@@ -26,7 +25,6 @@ import hunt.time.LocalDateTime;
 import hunt.time.Month;
 import hunt.time.ZonedDateTime;
 import hunt.time.ZoneId;
-
 
 import hunt.Assert;
 import hunt.Exceptions;
@@ -44,7 +42,7 @@ alias fail = Assert.fail;
 /**
  * Unit test for CronTrigger.
  */
-public class CronTriggerTest {
+class CronTriggerTest {
 
     private enum string[] VERSIONS = ["2.0"];
 
@@ -56,7 +54,7 @@ public class CronTriggerTest {
     // protected String[] getVersions() {
     //     return VERSIONS;
     // }
-    
+
     /**
      * Get the object to serialize when generating serialized file for future
      * tests, and against which to validate deserialized object.
@@ -65,7 +63,7 @@ public class CronTriggerTest {
     // protected Object getTargetObject(){
     //     JobDataMap jobDataMap = new JobDataMap();
     //     jobDataMap.put("A", "B");
-        
+
     //     CronTriggerImpl t = new CronTriggerImpl();
     //     t.setName("test");
     //     t.setGroup("testGroup");
@@ -76,57 +74,56 @@ public class CronTriggerTest {
 
     //     return t;
     // }
-    
+
     /**
      * Verify that the target object and the object we just deserialized 
      * match.
      */
-//     override
-//     protected void verifyMatch(Object target, Object deserialized) {
-//         CronTriggerImpl targetCronTrigger = (CronTriggerImpl)target;
-//         CronTriggerImpl deserializedCronTrigger = (CronTriggerImpl)deserialized;
+    //     override
+    //     protected void verifyMatch(Object target, Object deserialized) {
+    //         CronTriggerImpl targetCronTrigger = (CronTriggerImpl)target;
+    //         CronTriggerImpl deserializedCronTrigger = (CronTriggerImpl)deserialized;
 
-//         assertNotNull(deserializedCronTrigger);
-//         assertEquals(targetCronTrigger.getName(), deserializedCronTrigger.getName());
-//         assertEquals(targetCronTrigger.getGroup(), deserializedCronTrigger.getGroup());
-//         assertEquals(targetCronTrigger.getJobName(), deserializedCronTrigger.getJobName());
-//         assertEquals(targetCronTrigger.getJobGroup(), deserializedCronTrigger.getJobGroup());
-// //        assertEquals(targetCronTrigger.getStartTime(), deserializedCronTrigger.getStartTime());
-//         assertEquals(targetCronTrigger.getEndTime(), deserializedCronTrigger.getEndTime());
-//         assertEquals(targetCronTrigger.getCalendarName(), deserializedCronTrigger.getCalendarName());
-//         assertEquals(targetCronTrigger.getDescription(), deserializedCronTrigger.getDescription());
-//         assertEquals(targetCronTrigger.getJobDataMap(), deserializedCronTrigger.getJobDataMap());
-//         assertEquals(targetCronTrigger.getCronExpression(), deserializedCronTrigger.getCronExpression());
-//     }
-        
-    
-    public void testClone(){
+    //         assertNotNull(deserializedCronTrigger);
+    //         assertEquals(targetCronTrigger.getName(), deserializedCronTrigger.getName());
+    //         assertEquals(targetCronTrigger.getGroup(), deserializedCronTrigger.getGroup());
+    //         assertEquals(targetCronTrigger.getJobName(), deserializedCronTrigger.getJobName());
+    //         assertEquals(targetCronTrigger.getJobGroup(), deserializedCronTrigger.getJobGroup());
+    // //        assertEquals(targetCronTrigger.getStartTime(), deserializedCronTrigger.getStartTime());
+    //         assertEquals(targetCronTrigger.getEndTime(), deserializedCronTrigger.getEndTime());
+    //         assertEquals(targetCronTrigger.getCalendarName(), deserializedCronTrigger.getCalendarName());
+    //         assertEquals(targetCronTrigger.getDescription(), deserializedCronTrigger.getDescription());
+    //         assertEquals(targetCronTrigger.getJobDataMap(), deserializedCronTrigger.getJobDataMap());
+    //         assertEquals(targetCronTrigger.getCronExpression(), deserializedCronTrigger.getCronExpression());
+    //     }
+
+    void testClone() {
         implementationMissing(false);
-        // CronTriggerImpl trigger = new CronTriggerImpl();
-        // trigger.setName("test");
-        // trigger.setGroup("testGroup");
-        // trigger.setCronExpression("0 0 12 * * ?");
-        // CronTrigger trigger2 = (CronTrigger) trigger.clone();
+        CronTriggerImpl trigger = new CronTriggerImpl();
+        trigger.setName("test");
+        trigger.setGroup("testGroup");
+        trigger.setCronExpression("0 0 12 * * ?");
+        CronTrigger trigger2 = cast(CronTrigger) trigger.clone();
 
-        // assertEquals( "Cloning failed", trigger, trigger2 );
+        assertEquals( "Cloning failed", trigger, trigger2 );
 
-        // // equals() doesn't test the cron expression
-        // assertEquals( "Cloning failed for the cron expression", 
-        //               "0 0 12 * * ?", trigger2.getCronExpression()
-        //             );
+        // equals() doesn't test the cron expression
+        assertEquals( "Cloning failed for the cron expression", 
+                      "0 0 12 * * ?", trigger2.getCronExpression()
+                    );
     }
 
     // http://jira.opensymphony.com/browse/QUARTZ-558
-    public void testQuartz558(){
+    void testQuartz558() {
         CronTriggerImpl trigger = new CronTriggerImpl();
         trigger.setName("test");
         trigger.setGroup("testGroup");
         CronTrigger trigger2 = cast(CronTrigger) trigger.clone();
 
-        assertEquals( "Cloning failed", trigger, trigger2 );
+        assertEquals("Cloning failed", trigger, trigger2);
     }
 
-    public void testMisfireInstructionValidity(){
+    void testMisfireInstructionValidity() {
         CronTriggerImpl trigger = new CronTriggerImpl();
 
         try {
@@ -134,22 +131,20 @@ public class CronTriggerTest {
             trigger.setMisfireInstruction(Trigger.MISFIRE_INSTRUCTION_SMART_POLICY);
             trigger.setMisfireInstruction(CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING);
             trigger.setMisfireInstruction(CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             fail("Unexpected exception while setting misfire instruction.");
         }
-        
+
         try {
             trigger.setMisfireInstruction(CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING + 1);
-            
+
             fail("Expected exception while setting invalid misfire instruction but did not get it.");
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
         }
     }
 
     // // execute with version number to generate a new version's serialized form
-    // public static void main(String[] args){
+    // static void main(String[] args){
     //     new CronTriggerTest().writeJobDataFile("2.0");
     // }
 

@@ -36,6 +36,7 @@ import hunt.quartz.spi.OperableTrigger;
 
 import hunt.Exceptions;
 import hunt.time.LocalDateTime;
+import hunt.util.Traits;
 
 import std.array;
 import std.conv;
@@ -864,22 +865,24 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     // override
     Object clone() {
         implementationMissing(false);
-        // AbstractTrigger!T copy;
-        // try {
-        //     // copy = (AbstractTrigger!T) super.clone();
-        //     // copy = (cast(TypeInfo_Class)typeid(this)).create();
-        //     copy = cast(AbstractTrigger!T)typeid(this).create();
+        AbstractTrigger!T copy;
+        try {
+            // copy = (AbstractTrigger!T) super.clone();
+            // copy = (cast(TypeInfo_Class)typeid(this)).create();
+            copy = cast(AbstractTrigger!T)typeid(this).create();
+            enum string s = generateObjectClone!(AbstractTrigger!T, this.stringof, copy.stringof);
+            mixin(s);
 
-        //     // Shallow copy the jobDataMap.  Note that this means that if a user
-        //     // modifies a value object in this map from the cloned Trigger
-        //     // they will also be modifying this Trigger. 
-        //     if (jobDataMap !is null) {
-        //         copy.jobDataMap = cast(JobDataMap)jobDataMap.clone();
-        //     }
+            // Shallow copy the jobDataMap.  Note that this means that if a user
+            // modifies a value object in this map from the cloned Trigger
+            // they will also be modifying this Trigger. 
+            if (jobDataMap !is null) {
+                copy.jobDataMap = cast(JobDataMap)jobDataMap.clone();
+            }
 
-        // } catch (CloneNotSupportedException ex) {
-        //     throw new IncompatibleClassChangeError("Not Cloneable.");
-        // }
+        } catch (CloneNotSupportedException ex) {
+            throw new IncompatibleClassChangeError("Not Cloneable.");
+        }
         // return copy;
 
         return this;

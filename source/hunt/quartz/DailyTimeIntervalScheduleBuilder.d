@@ -112,7 +112,7 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder { // !(DailyTimeInterva
     
     shared static this() {
         Set!(int) t = new HashSet!(int)(7);
-        foreach(DayOfWeek we;  DayOfWeek.ENUMS())
+        foreach(DayOfWeek we;  DayOfWeek.values())
             t.add(we.getValue());
         ALL_DAYS_OF_THE_WEEK = t; // Collections.unmodifiableSet(t);
         

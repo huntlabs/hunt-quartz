@@ -28,6 +28,7 @@ import hunt.collection.Set;
 
 import hunt.Exceptions;
 import hunt.Object;
+import hunt.util.Traits;
 
 import std.range;
 
@@ -221,19 +222,23 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
     // suppress warnings on generic cast of super.clone() and map.clone() lines.
     Object clone() {
         implementationMissing(false);
-        return this;
-        // DirtyFlagMap!(K,V) copy;
-        // try {
-        //     copy = cast(DirtyFlagMap!(K,V)) super.clone();
-        //     HashMap!(K,V) hashMap = cast(HashMap!(K,V))map;
-        //     if (hashMap !is null) {
-        //         copy.map = cast(Map!(K,V))(hashMap.clone());
-        //     }
-        // } catch (CloneNotSupportedException ex) {
-        //     throw new IncompatibleClassChangeError("Not Cloneable.");
-        // }
+        // return this;
+        DirtyFlagMap!(K,V) copy;
+        try {
+            copy = cast(DirtyFlagMap!(K,V)) super.clone();
 
-        // return copy;
+            enum string s = generateObjectClone!(DirtyFlagMap!(K,V), this.stringof, copy.stringof);
+            mixin(s);
+
+            HashMap!(K,V) hashMap = cast(HashMap!(K,V))map;
+            if (hashMap !is null) {
+                copy.map = cast(Map!(K,V))(hashMap.clone());
+            }
+        } catch (CloneNotSupportedException ex) {
+            throw new IncompatibleClassChangeError("Not Cloneable.");
+        }
+
+        return copy;
     }
 
 }

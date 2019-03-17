@@ -109,62 +109,72 @@ class SimpleTriggerTest {
     //     assertEquals(targetSimpleTrigger.getMisfireInstruction(), deserializedSimpleTrigger.getMisfireInstruction());
     // }
     
-    void testUpdateAfterMisfire() {
+    // void testUpdateAfterMisfire() {
         
-        LocalDateTime startTime = LocalDateTime.of(2005, Month.JULY, 5, 9, 0, 0);
+    //     LocalDateTime startTime = LocalDateTime.of(2005, Month.JULY, 5, 9, 0, 0);
         
-        LocalDateTime endTime = LocalDateTime.of(2005, Month.JULY, 5, 10, 0, 0);
+    //     LocalDateTime endTime = LocalDateTime.of(2005, Month.JULY, 5, 10, 0, 0);
         
-        SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
-        simpleTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT);
-        simpleTrigger.setRepeatCount(5);
-        simpleTrigger.setStartTime(startTime);
-        simpleTrigger.setEndTime(endTime);
+    //     SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
+    //     simpleTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT);
+    //     simpleTrigger.setRepeatCount(5);
+    //     simpleTrigger.setStartTime(startTime);
+    //     simpleTrigger.setEndTime(endTime);
         
-        simpleTrigger.updateAfterMisfire(null);
-        assertEquals(startTime, simpleTrigger.getStartTime());
-        assertEquals(endTime, simpleTrigger.getEndTime());
-        assertNull(simpleTrigger.getNextFireTime());
-    }
+    //     simpleTrigger.updateAfterMisfire(null);
+    //     assertEquals(startTime, simpleTrigger.getStartTime());
+    //     assertEquals(endTime, simpleTrigger.getEndTime());
+    //     assertNull(simpleTrigger.getNextFireTime());
+    // }
     
-    void testGetFireTimeAfter() {
-        SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
-        LocalDateTime startTime = LocalDateTime.now();
+    // void testGetFireTimeAfter() {
+    //     SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
+    //     LocalDateTime startTime = LocalDateTime.now();
 
-        simpleTrigger.setStartTime(startTime);
-        simpleTrigger.setRepeatInterval(10);
-        simpleTrigger.setRepeatCount(4);
+    //     simpleTrigger.setStartTime(startTime);
+    //     simpleTrigger.setRepeatInterval(10);
+    //     simpleTrigger.setRepeatCount(4);
         
-        LocalDateTime fireTimeAfter = simpleTrigger.getFireTimeAfter(startTime.plusMilliseconds(34));
-        assert(fireTimeAfter !is null);
-        Duration dur = Duration.between(startTime, fireTimeAfter);
-        assertEquals(40, dur.toMillis());
-    }
+    //     LocalDateTime fireTimeAfter = simpleTrigger.getFireTimeAfter(startTime.plusMilliseconds(34));
+    //     assert(fireTimeAfter !is null);
+    //     Duration dur = Duration.between(startTime, fireTimeAfter);
+    //     assertEquals(40, dur.toMillis());
+    // }
     
     void testClone() {
-        implementationMissing(false);
-        // SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
+        SimpleTriggerImpl simpleTrigger = new SimpleTriggerImpl();
         
-        // // Make sure empty sub-objects are cloned okay
-        // Trigger clone = cast(Trigger)simpleTrigger.clone();
-        // assertEquals(0, clone.getJobDataMap().size());
+        // Make sure empty sub-objects are cloned okay
+        Trigger clone = cast(Trigger)simpleTrigger.clone();
+        assertEquals(0, clone.getJobDataMap().size());
         
-        // // Make sure non-empty sub-objects are cloned okay
-        // simpleTrigger.getJobDataMap().put("K1", "V1");
-        // simpleTrigger.getJobDataMap().put("K2", "V2");
-        // clone = cast(Trigger)simpleTrigger.clone();
-        // assertEquals(2, clone.getJobDataMap().size());
-        // assertEquals("V1", clone.getJobDataMap().get("K1"));
-        // assertEquals("V2", clone.getJobDataMap().get("K2"));
+        // Make sure non-empty sub-objects are cloned okay
+        simpleTrigger.getJobDataMap().put("K1", "V1");
+        simpleTrigger.getJobDataMap().put("K2", "V2");
+        clone = cast(Trigger)simpleTrigger.clone();
+        assertEquals(2, clone.getJobDataMap().size());
+        import hunt.String;
+        String v = cast(String)clone.getJobDataMap().get("K1");
+        assert(v !is null);
+        assertEquals("V1", v.value());
+        v = cast(String)clone.getJobDataMap().get("K2");
+        assert(v !is null);
+        assertEquals("V2", v.value());
         
-        // // Make sure sub-object collections have really been cloned by ensuring 
-        // // their modification does not change the source Trigger 
-        // clone.getJobDataMap().remove("K1");
-        // assertEquals(1, clone.getJobDataMap().size());
+        // Make sure sub-object collections have really been cloned by ensuring 
+        // their modification does not change the source Trigger 
+        clone.getJobDataMap().remove("K1");
+        assertEquals(1, clone.getJobDataMap().size());
         
-        // assertEquals(2, simpleTrigger.getJobDataMap().size());
-        // assertEquals("V1", simpleTrigger.getJobDataMap().get("K1"));
-        // assertEquals("V2", simpleTrigger.getJobDataMap().get("K2"));
+        assertEquals(2, simpleTrigger.getJobDataMap().size());
+
+
+        v = cast(String)simpleTrigger.getJobDataMap().get("K1");
+        assert(v !is null);
+        assertEquals("V1", v.value());
+        v = cast(String)simpleTrigger.getJobDataMap().get("K2");
+        assert(v !is null);
+        assertEquals("V2", v.value());
     }
     
     // NPE in equals()
@@ -196,11 +206,5 @@ class SimpleTriggerTest {
         catch(Exception e) {
         }
     }
-
-    
-    // execute with version number to generate a new version's serialized form
-    // static void main(string[] args){
-    //     new SimpleTriggerTest().writeJobDataFile("2.0");
-    // }
     
 }

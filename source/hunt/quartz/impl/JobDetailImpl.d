@@ -31,6 +31,7 @@ import hunt.quartz.StatefulJob;
 import hunt.quartz.Trigger;
 import hunt.quartz.utils.ClassUtils;
 
+import hunt.util.Traits;
 import hunt.Exceptions;
 
 import std.array;
@@ -452,18 +453,22 @@ class JobDetailImpl : JobDetail {
     
     Object clone() {
         implementationMissing(false);
-        return this;
-    //     JobDetailImpl copy;
-    //     try {
-    //         copy = (JobDetailImpl) super.clone();
-    //         if (jobDataMap !is null) {
-    //             copy.jobDataMap = (JobDataMap) jobDataMap.clone();
-    //         }
-    //     } catch (CloneNotSupportedException ex) {
-    //         throw new IncompatibleClassChangeError("Not Cloneable.");
-    //     }
+        // return this;
+        JobDetailImpl copy;
+        try {
+            copy = cast(JobDetailImpl)typeid(this).create();
+            // copy = cast(JobDetailImpl) super.clone();
+            assert(copy !is null);
+            enum string s = generateObjectClone!(JobDetailImpl, this.stringof, copy.stringof);
+            mixin(s);
+            if (jobDataMap !is null) {
+                copy.jobDataMap = cast(JobDataMap) jobDataMap.clone();
+            }
+        } catch (CloneNotSupportedException ex) {
+            throw new IncompatibleClassChangeError("Not Cloneable.");
+        }
 
-    //     return copy;
+        return copy;
     }
 
     JobBuilder getJobBuilder() {
