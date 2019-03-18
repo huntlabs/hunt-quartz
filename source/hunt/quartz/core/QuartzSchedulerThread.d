@@ -348,7 +348,13 @@ class QuartzSchedulerThread : ThreadEx {
                     if (triggers !is null && !triggers.isEmpty()) {
 
                         now = DateTimeHelper.currentTimeMillis();
-                        long triggerTime = triggers.get(0).getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli();
+                        LocalDateTime dt = triggers.get(0).getNextFireTime();
+                        if(dt is null) {
+                            warning("getNextFireTime is null");
+                            continue;
+                        }
+
+                        long triggerTime = dt.toInstant(ZoneOffset.UTC).toEpochMilli();
                         long timeUntilTrigger = triggerTime - now;
                         while(timeUntilTrigger > 2) {
                             sigLock.lock();

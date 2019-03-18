@@ -39,6 +39,7 @@ import hunt.time.Duration;
 import hunt.time.LocalTime;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;
+import hunt.util.Traits;
 
 import hunt.logging.ConsoleLogger;
 
@@ -596,12 +597,11 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             
             //avoid infinite loop
             if (nextFireTime.getYear() > YEAR_TO_GIVEUP_SCHEDULING_AT) {
-                trace("dddddddddddddddddddddd");
                 nextFireTime = null;
             }
         }
 
-        tracef("nextFireTime is null: %s", nextFireTime is null);
+        version(HUNT_DEBUG) tracef("nextFireTime is null: %s", nextFireTime is null);
     }
 
     /**
@@ -613,7 +613,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         nextFireTime = getFireTimeAfter(previousFireTime);
 
         if (nextFireTime is null || calendar is null) {
-        tracef("nextFireTime is null: %s", nextFireTime is null);
+            version(HUNT_DEBUG) tracef("nextFireTime is null: %s", nextFireTime is null);
             return;
         }
         
@@ -638,7 +638,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             }
         }
 
-        tracef("nextFireTime is null: %s", nextFireTime is null);
+        version(HUNT_DEBUG) tracef("nextFireTime is null: %s", nextFireTime is null);
     }
 
     /**
@@ -661,9 +661,11 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     override
     LocalDateTime computeFirstFireTime(Calendar calendar) {
         nextFireTime = getStartTime();
-
-        scope(exit) {
-            tracef("nextFireTime is null: %s", nextFireTime is null);
+        
+        version(HUNT_DEBUG) {
+            scope(exit) {
+                tracef("nextFireTime is null: %s", nextFireTime is null);
+            }
         }
 
         while (nextFireTime !is null && calendar !is null
@@ -724,8 +726,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * </p>
      */
     void setNextFireTime(LocalDateTime nextFireTime) {
-        this.nextFireTime = nextFireTime;
-        tracef("nextFireTime is null: %s", nextFireTime is null);
+        this.nextFireTime = nextFireTime;        
+        version(HUNT_DEBUG) tracef("nextFireTime is null: %s", nextFireTime is null);
         
     }
 
@@ -783,10 +785,12 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         // long afterMillis = afterTime.toInstant(ZoneOffset.UTC).toEpochMilli();
 
         // long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
-        Duration dur = Duration.between(getStartTime(), afterTime);
-        tracef("sec: %d, nano: %d , mi:%d", dur.getSeconds, dur.getNano, dur.toMillis());
+        Duration dur = Duration.between(getStartTime(), afterTime);        
         long numberOfTimesExecuted = (dur.toMillis() / repeatInterval) + 1;
-        tracef("numberOfTimesExecuted: %d, repeatCount: %d", numberOfTimesExecuted, repeatCount);
+        version(HUNT_DEBUG) {
+            tracef("sec: %d, nano: %d , mi:%d", dur.getSeconds, dur.getNano, dur.toMillis());
+            tracef("numberOfTimesExecuted: %d, repeatCount: %d", numberOfTimesExecuted, repeatCount);
+        }
 
         if ((numberOfTimesExecuted > repeatCount) && 
             (repeatCount != REPEAT_INDEFINITELY)) {
@@ -937,6 +941,13 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         }
         
         return sb;
+    }
+
+    override Object clone() { 
+        SimpleTriggerImpl copy = cast(SimpleTriggerImpl)super.clone();
+        enum string s = generateObjectClone!(SimpleTriggerImpl, this.stringof, copy.stringof);
+        mixin(s);
+        return copy;
     }
 
 }

@@ -864,11 +864,9 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
 
     // override
     Object clone() {
-        implementationMissing(false);
+        // implementationMissing(false);
         AbstractTrigger!T copy;
         try {
-            // copy = (AbstractTrigger!T) super.clone();
-            // copy = (cast(TypeInfo_Class)typeid(this)).create();
             copy = cast(AbstractTrigger!T)typeid(this).create();
             enum string s = generateObjectClone!(AbstractTrigger!T, this.stringof, copy.stringof);
             mixin(s);
@@ -883,9 +881,10 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
         } catch (CloneNotSupportedException ex) {
             throw new IncompatibleClassChangeError("Not Cloneable.");
         }
-        // return copy;
 
-        return this;
+        return copy;
+
+        // return this;
     }
     
     TriggerBuilder!(T) getTriggerBuilder() {

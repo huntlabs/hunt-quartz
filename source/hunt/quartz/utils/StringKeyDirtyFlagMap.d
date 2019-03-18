@@ -26,6 +26,7 @@ import hunt.Integer;
 import hunt.Long;
 import hunt.Number;
 import hunt.String;
+import hunt.util.Traits;
 
 /**
  * <p>
@@ -387,5 +388,12 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         } catch (Exception e) {
             throw new ClassCastException("Identified object is not a string.");
         }
+    }
+
+    override Object clone() { 
+        StringKeyDirtyFlagMap copy = cast(StringKeyDirtyFlagMap)super.clone();
+        enum string s = generateObjectClone!(StringKeyDirtyFlagMap, this.stringof, copy.stringof);
+        mixin(s);
+        return copy;
     }
 }

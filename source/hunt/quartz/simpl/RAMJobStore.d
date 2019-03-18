@@ -404,6 +404,7 @@ class RAMJobStore : JobStore {
      */
     void storeTrigger(OperableTrigger newTrigger, bool replaceExisting) {
         TriggerWrapper tw = new TriggerWrapper(cast(OperableTrigger)newTrigger.clone());
+        // TriggerWrapper tw = new TriggerWrapper(cast(OperableTrigger)newTrigger);
 
         synchronized (lock) 
         {
@@ -573,7 +574,7 @@ class RAMJobStore : JobStore {
     JobDetail retrieveJob(JobKey jobKey) {
         synchronized(lock) {
             JobWrapper jw = jobsByKey.get(jobKey);
-            return (jw !is null) ? cast(JobDetail)jw.jobDetail : null; // .clone()
+            return (jw !is null) ? cast(JobDetail)jw.jobDetail.clone() : null;
         }
     }
 
@@ -589,7 +590,7 @@ class RAMJobStore : JobStore {
         synchronized(lock) {
             TriggerWrapper tw = triggersByKey.get(triggerKey);
     
-            return (tw !is null) ? cast(OperableTrigger)tw.getTrigger() : null; // .clone()
+            return (tw !is null) ? cast(OperableTrigger)tw.getTrigger().clone() : null;
         }
     }
     
@@ -1388,6 +1389,7 @@ class RAMJobStore : JobStore {
         }
 
         signaler.notifyTriggerListenersMisfired(cast(OperableTrigger)tw.trigger.clone());
+        // signaler.notifyTriggerListenersMisfired(cast(OperableTrigger)tw.trigger);
 
         tw.trigger.updateAfterMisfire(cal);
 
@@ -1486,7 +1488,11 @@ class RAMJobStore : JobStore {
 
                 tw.state = TriggerWrapper.STATE_ACQUIRED;
                 tw.trigger.setFireInstanceId(getFiredTriggerRecordId());
+
+                version(HUNT_DEBUG) tracef("trigger: %s", typeid(cast(Object)tw.trigger));
                 OperableTrigger trig = cast(OperableTrigger) tw.trigger.clone();
+                // OperableTrigger trig = cast(OperableTrigger) tw.trigger;
+                assert(trig !is null);
                 if (result.isEmpty()) {
                     batchEnd = max(tw.trigger.getNextFireTime().toEpochMilli(), 
                         DateTimeHelper.currentTimeMillis()) + timeWindow;
@@ -1600,12 +1606,10 @@ class RAMJobStore : JobStore {
     void triggeredJobComplete(OperableTrigger trigger,
             JobDetail jobDetail, CompletedExecutionInstruction triggerInstCode) {
 
-// FIXME: Needing refactor or cleanup -@zxp at 3/14/2019, 2:04:23 PM
-// check reentrant
         version(HUNT_DEBUG) trace("try to trigger on job completed");
         synchronized (lock) 
         {
-        version(HUNT_DEBUG) trace("triggering on job completed");
+        // version(HUNT_DEBUG) trace("triggering on job completed");
 
             JobWrapper jw = jobsByKey.get(jobDetail.getKey());
             TriggerWrapper tw = triggersByKey.get(trigger.getKey());

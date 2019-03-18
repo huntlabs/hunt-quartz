@@ -70,6 +70,7 @@ class RAMSchedulerTest {
         return new StdSchedulerFactory(config).getScheduler();
     }
 
+
     @Test
     void testBasicStorageFunctions(){
         Scheduler sched = createScheduler("testBasicStorageFunctions", 2);

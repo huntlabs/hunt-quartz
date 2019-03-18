@@ -452,12 +452,9 @@ class JobDetailImpl : JobDetail {
     alias opCmp = Object.opCmp;
     
     Object clone() {
-        implementationMissing(false);
-        // return this;
         JobDetailImpl copy;
         try {
             copy = cast(JobDetailImpl)typeid(this).create();
-            // copy = cast(JobDetailImpl) super.clone();
             assert(copy !is null);
             enum string s = generateObjectClone!(JobDetailImpl, this.stringof, copy.stringof);
             mixin(s);
