@@ -25,6 +25,7 @@ import hunt.time.Constants;
 import hunt.time.LocalDateTime;
 import hunt.time.Month;
 import hunt.time.ZoneId;
+import hunt.time.ZoneRegion;
 
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
@@ -48,7 +49,7 @@ public class AnnualCalendarTest {
     private __gshared ZoneId EST_TIME_ZONE;
 
     shared static this() {
-        EST_TIME_ZONE = ZoneId.of("America/New_York");  
+        EST_TIME_ZONE = ZoneRegion.of("America/New_York");  
     }
 
 

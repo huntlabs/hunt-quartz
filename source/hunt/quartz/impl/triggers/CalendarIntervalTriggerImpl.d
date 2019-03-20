@@ -42,6 +42,7 @@ import hunt.time.LocalTime;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 import hunt.time.ZoneOffset;
+import hunt.time.ZoneRegion;
 // import std.datetime;
 
 import std.conv;
@@ -356,7 +357,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
     ZoneId getTimeZone() {
         
         if (timeZone is null) {
-            timeZone = ZoneId.systemDefault();
+            timeZone = ZoneRegion.systemDefault();
         }
         return timeZone;
     }

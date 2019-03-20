@@ -26,6 +26,7 @@ import hunt.time.util.Locale;
 import hunt.time.DayOfWeek;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
+import hunt.time.ZoneRegion;
 import hunt.time.ZoneOffset;
 import hunt.util.Common;
 // import std.datetime;
@@ -393,7 +394,7 @@ final class CronExpression : Cloneable { // Serializable,
      */
     ZoneId getTimeZone() {
         if (timeZone is null) {
-            timeZone = ZoneId.systemDefault();
+            timeZone = ZoneRegion.systemDefault();
         }
 
         return timeZone;

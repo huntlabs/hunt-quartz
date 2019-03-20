@@ -37,8 +37,8 @@ import hunt.Exceptions;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 import hunt.time.ZoneOffset;
+import hunt.time.ZoneRegion;
 
-// import std.datetime;
 
 /**
  * <p>
@@ -107,7 +107,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     this() {
         super();
         setStartTime(LocalDateTime.now());
-        setTimeZone(ZoneId.systemDefault());
+        setTimeZone(ZoneRegion.systemDefault());
     }
 
     // /**
@@ -485,7 +485,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         }
         
         if (timeZone is null) {
-            timeZone = ZoneId.systemDefault(); // ZoneId.getDefault();
+            timeZone = ZoneRegion.systemDefault(); // ZoneId.getDefault();
         }
         return timeZone;
     }

@@ -15,17 +15,12 @@
  */
 module test.quartz.CronExpressionTest;
 
-// import java.io.*;
-// import java.text.ParseException;
-// import java.util.Arrays;
-// import java.util.LocalDateTime;
-// import java.util.Date;
-// import java.util.ZoneId;
 
 import hunt.quartz.CronExpression;
 import hunt.time.LocalDateTime;
 import hunt.time.Month;
 import hunt.time.ZoneId;
+import hunt.time.ZoneRegion;
 
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
@@ -47,7 +42,7 @@ class CronExpressionTest  { // : SerializationTestSupport
     private __gshared ZoneId EST_TIME_ZONE;
 
     shared static this() {
-        EST_TIME_ZONE = ZoneId.of("US/Eastern");  
+        EST_TIME_ZONE = ZoneRegion.of("US/Eastern");  
     }
 
     /**

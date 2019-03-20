@@ -25,6 +25,7 @@ import hunt.time.LocalDateTime;
 import hunt.time.Month;
 import hunt.time.ZonedDateTime;
 import hunt.time.ZoneId;
+import hunt.time.ZoneRegion;
 
 
 import hunt.Assert;
@@ -51,7 +52,7 @@ class SimpleTriggerTest {
     
     shared static this()
     {
-        EST_TIME_ZONE = ZoneId.of("US/Eastern"); 
+        EST_TIME_ZONE = ZoneRegion.of("US/Eastern"); 
         START_TIME = ZonedDateTime.of(2006, Month.JUNE, 1, 10, 5, 15, 0, EST_TIME_ZONE);
         END_TIME = ZonedDateTime.of(2006, Month.JUNE, 1, 10, 5, 15, 0, EST_TIME_ZONE);
     }

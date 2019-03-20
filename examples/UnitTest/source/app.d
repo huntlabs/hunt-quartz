@@ -19,7 +19,7 @@ void main()
 	// testUnits!(AnnualCalendarTest);
 	// testUnits!(CronExpressionTest);
 	// testUnits!(CronTriggerTest);
-	// testUnits!(RAMSchedulerTest);
+	testUnits!(RAMSchedulerTest);
 	// testUnits!(SimpleTriggerTest);
 	// testUnits!(VersionTest);
 
