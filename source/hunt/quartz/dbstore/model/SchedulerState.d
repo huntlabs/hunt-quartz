@@ -7,9 +7,15 @@ import hunt.entity;
 class SchedulerState : Model {
     mixin MakeModel;
 
-    // @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
-    // string schedulerName;
+    @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
+    string schedulerName;
+    
+    @PrimaryKey @Column(TableConstants.COL_INSTANCE_NAME)
+    string instanceName;
 
-    // @PrimaryKey @Column(TableConstants.COL_LOCK_NAME)
-    // string lockName;
+    @Column(TableConstants.COL_LAST_CHECKIN_TIME)
+    long lastCheckinTime;
+
+    @Column(TableConstants.COL_CHECKIN_INTERVAL)
+    long checkinInterval;
 }

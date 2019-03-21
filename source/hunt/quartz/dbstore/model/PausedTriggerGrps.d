@@ -7,9 +7,9 @@ import hunt.entity;
 class PausedTriggerGrps : Model {
     mixin MakeModel;
 
-    // @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
-    // string schedulerName;
+    @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
+    string schedulerName;
 
-    // @PrimaryKey @Column(TableConstants.COL_LOCK_NAME)
-    // string lockName;
+    @PrimaryKey @Column(TableConstants.COL_TRIGGER_GROUP)
+    string triggerGroup;
 }

@@ -7,9 +7,21 @@ import hunt.entity;
 class CronTriggers : Model {
     mixin MakeModel;
 
-    // @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
-    // string schedulerName;
+    @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
+    string schedulerName;
 
-    // @PrimaryKey @Column(TableConstants.COL_LOCK_NAME)
-    // string lockName;
+    @PrimaryKey @Column(TableConstants.COL_TRIGGER_NAME)
+    string triggerName;
+
+    @PrimaryKey @Column(TableConstants.COL_TRIGGER_GROUP)
+    string triggerGroup;
+
+    @Column(TableConstants.COL_REPEAT_COUNT)
+    long repeatCount;
+
+    @Column(TableConstants.COL_REPEAT_INTERVAL)
+    long repeatInterval;
+
+    @Column(TableConstants.COL_TIMES_TRIGGERED)
+    long timesTriggered;
 }

@@ -114,6 +114,20 @@ struct TableConstants {
 
     enum string COL_TIMES_TRIGGERED = "TIMES_TRIGGERED";
 
+    // TABLE_SIMPROP_TRIGGERS columns names
+    enum string COL_STR_PROP_1 = "STR_PROP_1";
+    enum string COL_STR_PROP_2 = "STR_PROP_2";
+    enum string COL_STR_PROP_3 = "STR_PROP_3";
+    enum string COL_INT_PROP_1 = "STR_INT_1";
+    enum string COL_INT_PROP_2 = "STR_INT_2";
+    enum string COL_LONG_PROP_1 = "STR_LONG_1";
+    enum string COL_LONG_PROP_2 = "STR_LONG_2";
+    enum string COL_DEC_PROP_1 = "STR_DEC_1";
+    enum string COL_DEC_PROP_2 = "STR_DEC_2";
+    enum string COL_BOOL_PROP_1 = "STR_BOOL_1";
+    enum string COL_BOOL_PROP_2 = "STR_BOOL_2";
+
+
     // TABLE_CRON_TRIGGERS columns names
     enum string COL_CRON_EXPRESSION = "CRON_EXPRESSION";
 

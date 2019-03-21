@@ -7,9 +7,12 @@ import hunt.entity;
 class Calendars : Model {
     mixin MakeModel;
 
-    // @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
-    // string COL_SCHEDULER_NAME;
+    @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)
+    string schedulerName;
 
-    // @PrimaryKey @Column(TableConstants.COL_LOCK_NAME)
-    // string lockName;
+    @PrimaryKey @Column(TableConstants.COL_CALENDAR_NAME)
+    string calendarName;
+
+    @Column(TableConstants.COL_CALENDAR)
+    ubyte[] calendar;
 }
