@@ -58,6 +58,9 @@ class UnableToInterruptJobException : SchedulerException {
 }
 
 
+class LockException : SchedulerException {
+    mixin BasicExceptionCtors;
+}
 
 class JobExecutionException : SchedulerException {
 

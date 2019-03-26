@@ -132,163 +132,163 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     //     this(name, (string)null);
     // }
     
-    // /**
-    //  * <p>
-    //  * Create a <code>SimpleTrigger</code> that will occur immediately, and
-    //  * not repeat.
-    //  * </p>
-    //  * 
-    //  * @deprecated use a TriggerBuilder instead
-    //  */
-    // deprecated("")
-    // this(string name, string group) {
-    //     this(name, group, LocalDateTime.now(), null, 0, 0);
-    // }
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur immediately, and
+     * not repeat.
+     * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
+     */
+    deprecated("")
+    this(string name, string group) {
+        this(name, group, LocalDateTime.now(), null, 0, 0);
+    }
 
-    // /**
-    //  * <p>
-    //  * Create a <code>SimpleTrigger</code> that will occur immediately, and
-    //  * repeat at the the given interval the given number of times.
-    //  * </p>
-    //  * 
-    //  * @deprecated use a TriggerBuilder instead
-    //  */
-    // deprecated("")
-    // this(string name, int repeatCount, long repeatInterval) {
-    //     this(name, null, repeatCount, repeatInterval);
-    // }
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur immediately, and
+     * repeat at the the given interval the given number of times.
+     * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
+     */
+    deprecated("")
+    this(string name, int repeatCount, long repeatInterval) {
+        this(name, null, repeatCount, repeatInterval);
+    }
 
-    // /**
-    //  * <p>
-    //  * Create a <code>SimpleTrigger</code> that will occur immediately, and
-    //  * repeat at the the given interval the given number of times.
-    //  * </p>
-    //  * 
-    //  * @deprecated use a TriggerBuilder instead
-    //  */
-    // deprecated("")
-    // this(string name, string group, int repeatCount,
-    //         long repeatInterval) {
-    //     this(name, group, LocalDateTime.now(), null, repeatCount, repeatInterval);
-    // }
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur immediately, and
+     * repeat at the the given interval the given number of times.
+     * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
+     */
+    deprecated("")
+    this(string name, string group, int repeatCount,
+            long repeatInterval) {
+        this(name, group, LocalDateTime.now(), null, repeatCount, repeatInterval);
+    }
 
-    // /**
-    //  * <p>
-    //  * Create a <code>SimpleTrigger</code> that will occur at the given time,
-    //  * and not repeat.
-    //  * </p>
-    //  * 
-    //  * @deprecated use a TriggerBuilder instead
-    //  */
-    // deprecated("")
-    // this(string name, LocalDateTime startTime) {
-    //     this(name, null, startTime);
-    // }
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur at the given time,
+     * and not repeat.
+     * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
+     */
+    deprecated("")
+    this(string name, LocalDateTime startTime) {
+        this(name, null, startTime);
+    }
 
-    // /**
-    //  * <p>
-    //  * Create a <code>SimpleTrigger</code> that will occur at the given time,
-    //  * and not repeat.
-    //  * </p>
-    //  * 
-    //  * @deprecated use a TriggerBuilder instead
-    //  */
-    // deprecated("")
-    // this(string name, string group, LocalDateTime startTime) {
-    //     this(name, group, startTime, null, 0, 0);
-    // }
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur at the given time,
+     * and not repeat.
+     * </p>
+     * 
+     * @deprecated use a TriggerBuilder instead
+     */
+    deprecated("")
+    this(string name, string group, LocalDateTime startTime) {
+        this(name, group, startTime, null, 0, 0);
+    }
     
-    // /**
-    //  * <p>
-    //  * Create a <code>SimpleTrigger</code> that will occur at the given time,
-    //  * and repeat at the the given interval the given number of times, or until
-    //  * the given end time.
-    //  * </p>
-    //  * 
-    //  * @param startTime
-    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
-    //  *          to fire.
-    //  * @param endTime
-    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
-    //  *          to quit repeat firing.
-    //  * @param repeatCount
-    //  *          The number of times for the <code>Trigger</code> to repeat
-    //  *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
-    //  * @param repeatInterval
-    //  *          The number of milliseconds to pause between the repeat firing.
-    //  * 
-    //  * @deprecated use a TriggerBuilder instead
-    //  */
-    // deprecated("")
-    // this(string name, LocalDateTime startTime,
-    //         LocalDateTime endTime, int repeatCount, long repeatInterval) {
-    //     this(name, null, startTime, endTime, repeatCount, repeatInterval);
-    // }
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur at the given time,
+     * and repeat at the the given interval the given number of times, or until
+     * the given end time.
+     * </p>
+     * 
+     * @param startTime
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
+     *          to fire.
+     * @param endTime
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
+     *          to quit repeat firing.
+     * @param repeatCount
+     *          The number of times for the <code>Trigger</code> to repeat
+     *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
+     * @param repeatInterval
+     *          The number of milliseconds to pause between the repeat firing.
+     * 
+     * @deprecated use a TriggerBuilder instead
+     */
+    deprecated("")
+    this(string name, LocalDateTime startTime,
+            LocalDateTime endTime, int repeatCount, long repeatInterval) {
+        this(name, null, startTime, endTime, repeatCount, repeatInterval);
+    }
     
-    // /**
-    //  * <p>
-    //  * Create a <code>SimpleTrigger</code> that will occur at the given time,
-    //  * and repeat at the the given interval the given number of times, or until
-    //  * the given end time.
-    //  * </p>
-    //  * 
-    //  * @param startTime
-    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
-    //  *          to fire.
-    //  * @param endTime
-    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
-    //  *          to quit repeat firing.
-    //  * @param repeatCount
-    //  *          The number of times for the <code>Trigger</code> to repeat
-    //  *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
-    //  * @param repeatInterval
-    //  *          The number of milliseconds to pause between the repeat firing.
-    //  * 
-    //  * @deprecated use a TriggerBuilder instead
-    //  */
-    // deprecated("")
-    // this(string name, string group, LocalDateTime startTime,
-    //         LocalDateTime endTime, int repeatCount, long repeatInterval) {
-    //     super(name, group);
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur at the given time,
+     * and repeat at the the given interval the given number of times, or until
+     * the given end time.
+     * </p>
+     * 
+     * @param startTime
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
+     *          to fire.
+     * @param endTime
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
+     *          to quit repeat firing.
+     * @param repeatCount
+     *          The number of times for the <code>Trigger</code> to repeat
+     *          firing, use {@link #REPEAT_INDEFINITELY} for unlimited times.
+     * @param repeatInterval
+     *          The number of milliseconds to pause between the repeat firing.
+     * 
+     * @deprecated use a TriggerBuilder instead
+     */
+    deprecated("")
+    this(string name, string group, LocalDateTime startTime,
+            LocalDateTime endTime, int repeatCount, long repeatInterval) {
+        super(name, group);
 
-    //     setStartTime(startTime);
-    //     setEndTime(endTime);
-    //     setRepeatCount(repeatCount);
-    //     setRepeatInterval(repeatInterval);
-    // }
+        setStartTime(startTime);
+        setEndTime(endTime);
+        setRepeatCount(repeatCount);
+        setRepeatInterval(repeatInterval);
+    }
 
-    // /**
-    //  * <p>
-    //  * Create a <code>SimpleTrigger</code> that will occur at the given time,
-    //  * fire the identified <code>Job</code> and repeat at the the given
-    //  * interval the given number of times, or until the given end time.
-    //  * </p>
-    //  * 
-    //  * @param startTime
-    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
-    //  *          to fire.
-    //  * @param endTime
-    //  *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
-    //  *          to quit repeat firing.
-    //  * @param repeatCount
-    //  *          The number of times for the <code>Trigger</code> to repeat
-    //  *          firing, use {@link #REPEAT_INDEFINITELY}for unlimitted times.
-    //  * @param repeatInterval
-    //  *          The number of milliseconds to pause between the repeat firing.
-    //  * 
-    //  * @deprecated use a TriggerBuilder instead
-    //  */
-    // deprecated("")
-    // this(string name, string group, string jobName,
-    //         string jobGroup, LocalDateTime startTime, LocalDateTime endTime, int repeatCount,
-    //         long repeatInterval) {
-    //     super(name, group, jobName, jobGroup);
+    /**
+     * <p>
+     * Create a <code>SimpleTrigger</code> that will occur at the given time,
+     * fire the identified <code>Job</code> and repeat at the the given
+     * interval the given number of times, or until the given end time.
+     * </p>
+     * 
+     * @param startTime
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
+     *          to fire.
+     * @param endTime
+     *          A <code>LocalDateTime</code> set to the time for the <code>Trigger</code>
+     *          to quit repeat firing.
+     * @param repeatCount
+     *          The number of times for the <code>Trigger</code> to repeat
+     *          firing, use {@link #REPEAT_INDEFINITELY}for unlimitted times.
+     * @param repeatInterval
+     *          The number of milliseconds to pause between the repeat firing.
+     * 
+     * @deprecated use a TriggerBuilder instead
+     */
+    deprecated("")
+    this(string name, string group, string jobName,
+            string jobGroup, LocalDateTime startTime, LocalDateTime endTime, int repeatCount,
+            long repeatInterval) {
+        super(name, group, jobName, jobGroup);
 
-    //     setStartTime(startTime);
-    //     setEndTime(endTime);
-    //     setRepeatCount(repeatCount);
-    //     setRepeatInterval(repeatInterval);
-    // }
+        setStartTime(startTime);
+        setEndTime(endTime);
+        setRepeatCount(repeatCount);
+        setRepeatInterval(repeatInterval);
+    }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

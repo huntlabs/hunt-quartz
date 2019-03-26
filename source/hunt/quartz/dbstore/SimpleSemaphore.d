@@ -20,6 +20,7 @@ module hunt.quartz.dbstore.SimpleSemaphore;
 import hunt.quartz.dbstore.Semaphore;
 
 // import java.sql.Connection;
+import hunt.Exceptions;
 import hunt.collection.HashSet;
 import hunt.concurrency.thread;
 import hunt.logging.ConsoleLogger;

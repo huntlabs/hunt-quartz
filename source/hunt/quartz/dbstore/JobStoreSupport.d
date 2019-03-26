@@ -25,8 +25,10 @@ module hunt.quartz.dbstore.JobStoreSupport;
 
 import hunt.quartz.dbstore.DBConnectionManager;
 import hunt.quartz.dbstore.DriverDelegate;
+import hunt.quartz.dbstore.FiredTriggerRecord;
 import hunt.quartz.dbstore.SchedulerStateRecord;
 import hunt.quartz.dbstore.Semaphore;
+import hunt.quartz.dbstore.SimpleSemaphore;
 import hunt.quartz.dbstore.TableConstants;
 import hunt.quartz.dbstore.TriggerStatus;
 
@@ -64,9 +66,13 @@ import hunt.quartz.spi.TriggerFiredResult;
 import hunt.Exceptions;
 import hunt.concurrency.thread;
 import hunt.logging.ConsoleLogger;
+import hunt.time.LocalDateTime;
+import hunt.time.ZoneOffset;
 import hunt.util.DateTime;
 
 import core.atomic;
+import core.thread;
+import core.time;
 
 import std.algorithm;
 import std.conv;
@@ -89,7 +95,7 @@ abstract class JobStoreSupport : JobStore {
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
-     * Constants.
+     * TableConstants.
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
@@ -136,15 +142,15 @@ abstract class JobStoreSupport : JobStore {
     
     private bool lockOnInsert = true;
 
-    // private Semaphore lockHandler = null; // set in initialize() method...
+    private Semaphore lockHandler = null; // set in initialize() method...
 
     private string selectWithLockSQL = null;
 
     private long clusterCheckinInterval = 7500L;
 
-    // private ClusterManager clusterManagementThread = null;
+    private ClusterManager clusterManagementThread = null;
 
-    // private MisfireHandler misfireHandler = null;
+    private MisfireHandler misfireHandler = null;
 
     // private ClassLoadHelper classLoadHelper;
 
@@ -669,7 +675,7 @@ abstract class JobStoreSupport : JobStore {
 
         // classLoadHelper = loadHelper;
         if(isThreadsInheritInitializersClassLoadContext()) {
-            info("JDBCJobStore threads will inherit ContextClassLoader of thread: " ~ ThreadEx.getThis().name());
+            trace("JDBCJobStore threads will inherit ContextClassLoader of thread: " ~ ThreadEx.getThis().name());
             // initializersLoader = ThreadEx.getThis().getContextClassLoader();
         }
         
@@ -684,18 +690,19 @@ abstract class JobStoreSupport : JobStore {
             if (isClustered()) {
                 setUseDBLocks(true);
             }
-            
-            if (getUseDBLocks()) {
-                // if(getDriverDelegateClass() !is null && getDriverDelegateClass()== MSSQLDelegate.stringof) {
-                //     if(getSelectWithLockSQL() is null) {
-                //         string msSqlDflt = "SELECT * FROM {0}LOCKS WITH (UPDLOCK,ROWLOCK) WHERE " ~ COL_SCHEDULER_NAME ~ " = {1} AND LOCK_NAME = ?";
-                //         trace("Detected usage of MSSQLDelegate class - defaulting 'selectWithLockSQL' to '" ~ msSqlDflt ~ "'.");
-                //         setSelectWithLockSQL(msSqlDflt);
-                //     }
-                // }
-                trace("Using db table-based data access locking (synchronization).");
-                setLockHandler(new StdRowLockSemaphore(getTablePrefix(), getInstanceName(), getSelectWithLockSQL()));
-            } else {
+
+            // if (getUseDBLocks()) {
+            //     // if(getDriverDelegateClass() !is null && getDriverDelegateClass()== MSSQLDelegate.stringof) {
+            //     //     if(getSelectWithLockSQL() is null) {
+            //     //         string msSqlDflt = "SELECT * FROM {0}LOCKS WITH (UPDLOCK,ROWLOCK) WHERE " ~ COL_SCHEDULER_NAME ~ " = {1} AND LOCK_NAME = ?";
+            //     //         trace("Detected usage of MSSQLDelegate class - defaulting 'selectWithLockSQL' to '" ~ msSqlDflt ~ "'.");
+            //     //         setSelectWithLockSQL(msSqlDflt);
+            //     //     }
+            //     // }
+            //     trace("Using db table-based data access locking (synchronization).");
+            //     setLockHandler(new StdRowLockSemaphore(getTablePrefix(), getInstanceName(), getSelectWithLockSQL()));
+            // } else 
+            {
                 trace(
                     "Using thread monitor-based data access locking (synchronization).");
                 setLockHandler(new SimpleSemaphore());
@@ -710,9 +717,9 @@ abstract class JobStoreSupport : JobStore {
     void schedulerStarted() {
 
         if (isClustered()) {
-            clusterManagementThread = new ClusterManager();
-            if(initializersLoader !is null)
-                clusterManagementThread.setContextClassLoader(initializersLoader);
+            clusterManagementThread = new ClusterManager(this);
+            // if(initializersLoader !is null)
+            //     clusterManagementThread.setContextClassLoader(initializersLoader);
             clusterManagementThread.initialize();
         } else {
             try {
@@ -723,9 +730,9 @@ abstract class JobStoreSupport : JobStore {
             }
         }
 
-        misfireHandler = new MisfireHandler();
-        if(initializersLoader !is null)
-            misfireHandler.setContextClassLoader(initializersLoader);
+        misfireHandler = new MisfireHandler(this);
+        // if(initializersLoader !is null)
+        //     misfireHandler.setContextClassLoader(initializersLoader);
         misfireHandler.initialize();
         schedulerRunning = true;
         
@@ -805,17 +812,17 @@ abstract class JobStoreSupport : JobStore {
         } catch (SQLException sqle) {
             throw new JobPersistenceException(
                     "Failed to obtain DB connection from data source '"
-                    + getDataSource() ~ "': " ~ sqle.toString(), sqle);
+                    ~ getDataSource() ~ "': " ~ sqle.toString(), sqle);
         } catch (Throwable e) {
             throw new JobPersistenceException(
                     "Failed to obtain DB connection from data source '"
-                    + getDataSource() ~ "': " ~ e.toString(), e);
+                    ~ getDataSource() ~ "': " ~ e.toString(), e);
         }
 
         if (conn is null) { 
             throw new JobPersistenceException(
                 "Could not get connection from DataSource '"
-                + getDataSource() ~ "'"); 
+                ~ getDataSource() ~ "'"); 
         }
 
         // Protect connection attributes we might change.
@@ -823,13 +830,13 @@ abstract class JobStoreSupport : JobStore {
 
         // Set any connection connection attributes we are to override.
         try {
-            if (!isDontSetAutoCommitFalse()) {
-                conn.setAutoCommit(false);
-            }
+            // if (!isDontSetAutoCommitFalse()) {
+            //     conn.setAutoCommit(false);
+            // }
 
-            if(isTxIsolationLevelSerializable()) {
-                conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-            }
+            // if(isTxIsolationLevelSerializable()) {
+            //     conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            // }
         } catch (SQLException sqle) {
             warning("Failed to override connection auto commit/transaction isolation.", sqle);
         } catch (Throwable e) {
@@ -847,7 +854,7 @@ abstract class JobStoreSupport : JobStore {
             try {
                 getLockHandler().releaseLock(lockName);
             } catch (LockException le) {
-                error("Error returning lock: " ~ le.getMessage(), le);
+                error("Error returning lock: " ~ le.msg);
             }
         }
     }
@@ -862,10 +869,10 @@ abstract class JobStoreSupport : JobStore {
         executeInNonManagedTXLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     recoverJobs(conn);
                 }
-            }, null);
+            }, cast(TransactionValidator!(void))null);
     }
     
     /**
@@ -881,14 +888,12 @@ abstract class JobStoreSupport : JobStore {
         try {
             // update inconsistent job states
             int rows = getDelegate().updateTriggerStatesFromOtherStates(conn,
-                    STATE_WAITING, STATE_ACQUIRED, STATE_BLOCKED);
+                    TableConstants.STATE_WAITING, TableConstants.STATE_ACQUIRED, TableConstants.STATE_BLOCKED);
 
             rows += getDelegate().updateTriggerStatesFromOtherStates(conn,
-                        STATE_PAUSED, STATE_PAUSED_BLOCKED, STATE_PAUSED_BLOCKED);
+                        TableConstants.STATE_PAUSED, TableConstants.STATE_PAUSED_BLOCKED, TableConstants.STATE_PAUSED_BLOCKED);
             
-            info(
-                    "Freed " ~ rows
-                            ~ " triggers from 'acquired' / 'blocked' state.");
+            trace("Freed " ~ rows.to!string() ~ " triggers from 'acquired' / 'blocked' state.");
 
             // clean up misfired jobs
             recoverMisfiredJobs(conn, true);
@@ -896,29 +901,29 @@ abstract class JobStoreSupport : JobStore {
             // recover jobs marked for recovery that were not fully executed
             List!(OperableTrigger) recoveringJobTriggers = getDelegate()
                     .selectTriggersForRecoveringJobs(conn);
-            info("Recovering " ~ recoveringJobTriggers.size().to!string()
+            trace("Recovering " ~ recoveringJobTriggers.size().to!string()
                     ~ " jobs that were in-progress at the time of the last shut-down.");
 
             foreach(OperableTrigger recoveringJobTrigger; recoveringJobTriggers) {
                 if (jobExists(conn, recoveringJobTrigger.getJobKey())) {
                     recoveringJobTrigger.computeFirstFireTime(null);
                     storeTrigger(conn, recoveringJobTrigger, null, false,
-                            STATE_WAITING, false, true);
+                            TableConstants.STATE_WAITING, false, true);
                 }
             }
-            info("Recovery complete.");
+            trace("Recovery complete.");
 
             // remove lingering 'complete' triggers...
-            List!(TriggerKey) cts = getDelegate().selectTriggersInState(conn, STATE_COMPLETE);
+            List!(TriggerKey) cts = getDelegate().selectTriggersInState(conn, TableConstants.STATE_COMPLETE);
             foreach(TriggerKey ct; cts) {
                 removeTrigger(conn, ct);
             }
-            info(
-                "Removed " ~ cts.size() ~ " 'complete' triggers.");
+            trace(
+                "Removed " ~ cts.size().to!string() ~ " 'complete' triggers.");
             
             // clean up any fired trigger entries
             int n = getDelegate().deleteFiredTriggers(conn);
-            info("Removed " ~ n ~ " stale fired job entries.");
+            trace("Removed " ~ n.to!string() ~ " stale fired job entries.");
         } catch (JobPersistenceException e) {
             throw e;
         } catch (Exception e) {
@@ -945,26 +950,22 @@ abstract class JobStoreSupport : JobStore {
             (recovering) ? -1 : getMaxMisfiresToHandleAtATime();
         
         List!(TriggerKey) misfiredTriggers = new LinkedList!(TriggerKey)();
-        long earliestNewTime = Long.MAX_VALUE;
+        long earliestNewTime = long.max;
         // We must still look for the MISFIRED state in case triggers were left 
         // in this state when upgrading to this version that does not support it. 
-        bool hasMoreMisfiredTriggers =
-            getDelegate().hasMisfiredTriggersInState(
-                conn, STATE_WAITING, getMisfireTime(), 
+        bool hasMoreMisfiredTriggers = getDelegate().hasMisfiredTriggersInState(
+                conn, TableConstants.STATE_WAITING, getMisfireTime(), 
                 maxMisfiresToHandleAtATime, misfiredTriggers);
 
         if (hasMoreMisfiredTriggers) {
-            info(
-                "Handling the first " ~ misfiredTriggers.size() +
+            trace("Handling the first " ~ misfiredTriggers.size().to!string() ~
                 " triggers that missed their scheduled fire-time.  " ~
                 "More misfired triggers remain to be processed.");
         } else if (misfiredTriggers.size() > 0) { 
-            info(
-                "Handling " ~ misfiredTriggers.size() + 
+            trace("Handling " ~ misfiredTriggers.size().to!string() ~
                 " trigger(s) that missed their scheduled fire-time.");
         } else {
-            trace(
-                "Found 0 triggers that missed their scheduled fire-time.");
+            trace("Found 0 triggers that missed their scheduled fire-time.");
             return RecoverMisfiredJobsResult.NO_OP; 
         }
 
@@ -977,10 +978,10 @@ abstract class JobStoreSupport : JobStore {
                 continue;
             }
 
-            doUpdateOfMisfiredTrigger(conn, trig, false, STATE_WAITING, recovering);
+            doUpdateOfMisfiredTrigger(conn, trig, false, TableConstants.STATE_WAITING, recovering);
 
-            if(trig.getNextFireTime() !is null && trig.getNextFireTime().getTime() < earliestNewTime)
-                earliestNewTime = trig.getNextFireTime().getTime();
+            if(trig.getNextFireTime() !is null && trig.getNextFireTime().toEpochMilli() < earliestNewTime)
+                earliestNewTime = trig.getNextFireTime().toEpochMilli();
         }
 
         return new RecoverMisfiredJobsResult(
@@ -998,7 +999,7 @@ abstract class JobStoreSupport : JobStore {
                 misfireTime -= getMisfireThreshold();
             }
 
-            if (trig.getNextFireTime().getTime() > misfireTime) {
+            if (trig.getNextFireTime().toEpochMilli() > misfireTime) {
                 return false;
             }
 
@@ -1008,11 +1009,12 @@ abstract class JobStoreSupport : JobStore {
 
         } catch (Exception e) {
             throw new JobPersistenceException(
-                    "Couldn't update misfired trigger '" ~ triggerKey ~ "': " ~ e.msg, e);
+                    "Couldn't update misfired trigger '" ~ triggerKey.toString() ~ "': " ~ e.msg, e);
         }
     }
 
-    private void doUpdateOfMisfiredTrigger(Connection conn, OperableTrigger trig, bool forceState, string newStateIfNotComplete, bool recovering) {
+    private void doUpdateOfMisfiredTrigger(Connection conn, OperableTrigger trig, 
+        bool forceState, string newStateIfNotComplete, bool recovering) {
         Calendar cal = null;
         if (trig.getCalendarName() !is null) {
             cal = retrieveCalendar(conn, trig.getCalendarName());
@@ -1024,7 +1026,7 @@ abstract class JobStoreSupport : JobStore {
 
         if (trig.getNextFireTime() is null) {
             storeTrigger(conn, trig,
-                null, true, STATE_COMPLETE, forceState, recovering);
+                null, true, TableConstants.STATE_COMPLETE, forceState, recovering);
             schedSignaler.notifySchedulerListenersFinalized(trig);
         } else {
             storeTrigger(conn, trig, null, true, newStateIfNotComplete,
@@ -1050,10 +1052,10 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             (isLockOnInsert()) ? LOCK_TRIGGER_ACCESS : null,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     storeJob(conn, newJob, false);
                     storeTrigger(conn, newTrigger, newJob, false,
-                            Constants.STATE_WAITING, false, false);
+                            TableConstants.STATE_WAITING, false, false);
                 }
             });
     }
@@ -1073,12 +1075,11 @@ abstract class JobStoreSupport : JobStore {
      *           if a <code>Job</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
      */
-    void storeJob(JobDetail newJob,
-        bool replaceExisting) {
+    void storeJob(JobDetail newJob, bool replaceExisting) {
         executeInLock(
             (isLockOnInsert() || replaceExisting) ? LOCK_TRIGGER_ACCESS : null,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     storeJob(conn, newJob, replaceExisting);
                 }
             });
@@ -1121,7 +1122,7 @@ abstract class JobStoreSupport : JobStore {
             return getDelegate().jobExists(conn, jobKey);
         } catch (SQLException e) {
             throw new JobPersistenceException(
-                    "Couldn't determine job existence (" ~ jobKey ~ "): " ~ e.msg, e);
+                    "Couldn't determine job existence (" ~ jobKey.toString() ~ "): " ~ e.msg, e);
         }
     }
 
@@ -1146,9 +1147,9 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             (isLockOnInsert() || replaceExisting) ? LOCK_TRIGGER_ACCESS : null,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     storeTrigger(conn, newTrigger, null, replaceExisting,
-                        STATE_WAITING, false, false);
+                        TableConstants.STATE_WAITING, false, false);
                 }
             });
     }
@@ -1179,15 +1180,15 @@ abstract class JobStoreSupport : JobStore {
 
                 if(!shouldBepaused) {
                     shouldBepaused = getDelegate().isTriggerGroupPaused(conn,
-                            ALL_GROUPS_PAUSED);
+                            TableConstants.ALL_GROUPS_PAUSED);
 
                     if (shouldBepaused) {
                         getDelegate().insertPausedTriggerGroup(conn, newTrigger.getKey().getGroup());
                     }
                 }
 
-                if (shouldBepaused && (state== STATE_WAITING || state== STATE_ACQUIRED)) {
-                    state = STATE_PAUSED;
+                if (shouldBepaused && (state== TableConstants.STATE_WAITING || state== TableConstants.STATE_ACQUIRED)) {
+                    state = TableConstants.STATE_PAUSED;
                 }
             }
 
@@ -1196,7 +1197,7 @@ abstract class JobStoreSupport : JobStore {
             }
             if (job is null) {
                 throw new JobPersistenceException("The job ("
-                        + newTrigger.getJobKey()
+                        ~ newTrigger.getJobKey().toString()
                         ~ ") referenced by the trigger does not exist.");
             }
 
@@ -1210,8 +1211,8 @@ abstract class JobStoreSupport : JobStore {
                 getDelegate().insertTrigger(conn, newTrigger, state, job);
             }
         } catch (Exception e) {
-            throw new JobPersistenceException("Couldn't store trigger '" ~ newTrigger.getKey() ~ "' for '" 
-                    + newTrigger.getJobKey() ~ "' job:" ~ e.msg, e);
+            throw new JobPersistenceException("Couldn't store trigger '" ~ newTrigger.getKey().toString() ~ "' for '" 
+                    ~ newTrigger.getJobKey().toString() ~ "' job:" ~ e.msg, e);
         }
     }
 
@@ -1225,7 +1226,7 @@ abstract class JobStoreSupport : JobStore {
             return getDelegate().triggerExists(conn, key);
         } catch (SQLException e) {
             throw new JobPersistenceException(
-                    "Couldn't determine trigger existence (" ~ key ~ "): " ~ e.msg, e);
+                    "Couldn't determine trigger existence (" ~ key.toString() ~ "): " ~ e.msg, e);
         }
     }
 
@@ -1309,14 +1310,14 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
                 (isLockOnInsert() || replace) ? LOCK_TRIGGER_ACCESS : null,
                 new class VoidTransactionCallback {
-                    void executeVoid(Connection conn) {
+                    void execute(Connection conn) {
                         
                         // FUTURE_TODO: make this more efficient with a true bulk operation...
-                        foreach(JobDetail job; triggersAndJobs.keySet()) {
+                        foreach(JobDetail job; triggersAndJobs.byKey()) {
                             storeJob(conn, job, replace);
                             foreach(Trigger trigger ; triggersAndJobs.get(job)) {
                                 storeTrigger(conn, cast(OperableTrigger) trigger, job, replace,
-                                        Constants.STATE_WAITING, false, false);
+                                        TableConstants.STATE_WAITING, false, false);
                             }
                         }
                     }
@@ -1366,8 +1367,7 @@ abstract class JobStoreSupport : JobStore {
     protected JobDetail retrieveJob(Connection conn, JobKey key) {
         try {
 
-            return getDelegate().selectJobDetail(conn, key,
-                    getClassLoadHelper());
+            return getDelegate().selectJobDetail(conn, key);
         } catch (ClassNotFoundException e) {
             throw new JobPersistenceException(
                     "Couldn't retrieve job because a required class was not found: "
@@ -1417,13 +1417,12 @@ abstract class JobStoreSupport : JobStore {
         bool removedTrigger;
         try {
             // this must be called before we delete the trigger, obviously
-            JobDetail job = getDelegate().selectJobForTrigger(conn,
-                    getClassLoadHelper(), key, false);
+            JobDetail job = getDelegate().selectJobForTrigger(conn, key, false);
 
             removedTrigger = 
                 deleteTriggerAndChildren(conn, key);
 
-            if (null != job && !job.isDurable()) {
+            if (job !is null && !job.isDurable()) {
                 int numTriggers = getDelegate().selectNumTriggersForJob(conn,
                         job.getKey());
                 if (numTriggers == 0) {
@@ -1461,21 +1460,19 @@ abstract class JobStoreSupport : JobStore {
             TriggerKey key, OperableTrigger newTrigger) {
         try {
             // this must be called before we delete the trigger, obviously
-            JobDetail job = getDelegate().selectJobForTrigger(conn,
-                    getClassLoadHelper(), key);
+            JobDetail job = getDelegate().selectJobForTrigger(conn, key);
 
             if (job is null) {
                 return false;
             }
             
-            if (!newTrigger.getJobKey()== job.getKey()) {
+            if (newTrigger.getJobKey() != job.getKey()) {
                 throw new JobPersistenceException("New trigger is not related to the same job as the old trigger.");
             }
             
-            bool removedTrigger = 
-                deleteTriggerAndChildren(conn, key);
+            bool removedTrigger = deleteTriggerAndChildren(conn, key);
             
-            storeTrigger(conn, newTrigger, job, false, STATE_WAITING, false, false);
+            storeTrigger(conn, newTrigger, job, false, TableConstants.STATE_WAITING, false, false);
 
             return removedTrigger;
         } catch (ClassNotFoundException e) {
@@ -1526,9 +1523,9 @@ abstract class JobStoreSupport : JobStore {
      * @see TriggerState#NONE
      */
     TriggerState getTriggerState(TriggerKey triggerKey) {
-        return cast(TriggerState)executeWithoutLock( // no locks necessary for read...
-                new class TransactionCallback {
-                    Object execute(Connection conn) {
+        return executeWithoutLock( // no locks necessary for read...
+                new class TransactionCallback!(TriggerState) {
+                    TriggerState execute(Connection conn) {
                         return getTriggerState(conn, triggerKey);
                     }
                 });
@@ -1542,27 +1539,27 @@ abstract class JobStoreSupport : JobStore {
                 return TriggerState.NONE;
             }
 
-            if (ts== STATE_DELETED) {
+            if (ts== TableConstants.STATE_DELETED) {
                 return TriggerState.NONE;
             }
 
-            if (ts== STATE_COMPLETE) {
+            if (ts== TableConstants.STATE_COMPLETE) {
                 return TriggerState.COMPLETE;
             }
 
-            if (ts== STATE_PAUSED) {
+            if (ts== TableConstants.STATE_PAUSED) {
                 return TriggerState.PAUSED;
             }
 
-            if (ts== STATE_PAUSED_BLOCKED) {
+            if (ts== TableConstants.STATE_PAUSED_BLOCKED) {
                 return TriggerState.PAUSED;
             }
 
-            if (ts== STATE_ERROR) {
+            if (ts== TableConstants.STATE_ERROR) {
                 return TriggerState.ERROR;
             }
 
-            if (ts== STATE_BLOCKED) {
+            if (ts== TableConstants.STATE_BLOCKED) {
                 return TriggerState.BLOCKED;
             }
 
@@ -1570,7 +1567,7 @@ abstract class JobStoreSupport : JobStore {
 
         } catch (SQLException e) {
             throw new JobPersistenceException(
-                    "Couldn't determine state of trigger (" ~ key ~ "): " ~ e.msg, e);
+                    "Couldn't determine state of trigger (" ~ key.toString() ~ "): " ~ e.msg, e);
         }
     }
 
@@ -1590,7 +1587,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new class VoidTransactionCallback {
-                    void executeVoid(Connection conn) {
+                    void execute(Connection conn) {
                         resetTriggerFromErrorState(conn, triggerKey);
                     }
                 });
@@ -1599,15 +1596,15 @@ abstract class JobStoreSupport : JobStore {
     void resetTriggerFromErrorState(Connection conn, TriggerKey triggerKey) {
 
         try {
-            string newState = STATE_WAITING;
+            string newState = TableConstants.STATE_WAITING;
 
             if(getDelegate().isTriggerGroupPaused(conn, triggerKey.getGroup())) {
-                newState = STATE_PAUSED;
+                newState = TableConstants.STATE_PAUSED;
             }
 
-            getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, newState, STATE_ERROR);
+            getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, newState, TableConstants.STATE_ERROR);
 
-            info("Trigger " ~ triggerKey.toString() ~ " reset from ERROR state to: " ~ newState);
+            trace("Trigger " ~ triggerKey.toString() ~ " reset from ERROR state to: " ~ newState);
         } catch (SQLException e) {
             throw new JobPersistenceException(
                     "Couldn't reset from error state of trigger (" ~ triggerKey.toString() ~ "): " ~ e.msg, e);
@@ -1636,7 +1633,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             (isLockOnInsert() || updateTriggers) ? LOCK_TRIGGER_ACCESS : null,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     storeCalendar(conn, calName, calendar, replaceExisting, updateTriggers);
                 }
             });
@@ -1662,7 +1659,7 @@ abstract class JobStoreSupport : JobStore {
                     
                     foreach(OperableTrigger trigger; trigs) {
                         trigger.updateWithNewCalendar(calendar, getMisfireThreshold());
-                        storeTrigger(conn, trigger, null, true, STATE_WAITING, false, false);
+                        storeTrigger(conn, trigger, null, true, TableConstants.STATE_WAITING, false, false);
                     }
                 }
             } else {
@@ -1960,7 +1957,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
                 LOCK_TRIGGER_ACCESS,
                 new class VoidTransactionCallback {
-                    void executeVoid(Connection conn) {
+                    void execute(Connection conn) {
                         clearAllSchedulingData(conn);
                     }
                 });
@@ -1989,7 +1986,7 @@ abstract class JobStoreSupport : JobStore {
     Set!(TriggerKey) getTriggerKeys(GroupMatcher!(TriggerKey) matcher) {
         return executeWithoutLock( // no locks necessary for read...
             new class TransactionCallback!(Set!(TriggerKey)) {
-                Object execute(Connection conn) {
+                Set!(TriggerKey) execute(Connection conn) {
                     return getTriggerNames(conn, matcher);
                 }
             });
@@ -2026,7 +2023,7 @@ abstract class JobStoreSupport : JobStore {
     List!(string) getJobGroupNames() {
         return executeWithoutLock( // no locks necessary for read...
             new class TransactionCallback!(List!(string)) {
-                Object execute(Connection conn) {
+                List!(string) execute(Connection conn) {
                     return getJobGroupNames(conn);
                 }
             });
@@ -2156,7 +2153,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     pauseTrigger(conn, triggerKey);
                 }
             });
@@ -2176,18 +2173,18 @@ abstract class JobStoreSupport : JobStore {
             string oldState = getDelegate().selectTriggerState(conn,
                     triggerKey);
 
-            if (oldState== STATE_WAITING
-                    || oldState== STATE_ACQUIRED) {
+            if (oldState== TableConstants.STATE_WAITING
+                    || oldState== TableConstants.STATE_ACQUIRED) {
 
                 getDelegate().updateTriggerState(conn, triggerKey,
-                        STATE_PAUSED);
-            } else if (oldState== STATE_BLOCKED) {
+                        TableConstants.STATE_PAUSED);
+            } else if (oldState== TableConstants.STATE_BLOCKED) {
                 getDelegate().updateTriggerState(conn, triggerKey,
-                        STATE_PAUSED_BLOCKED);
+                        TableConstants.STATE_PAUSED_BLOCKED);
             }
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't pause trigger '"
-                    + triggerKey ~ "': " ~ e.msg, e);
+                    ~ triggerKey.toString() ~ "': " ~ e.msg, e);
         }
     }
 
@@ -2203,7 +2200,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     List!(OperableTrigger) triggers = getTriggersForJob(conn, jobKey);
                     foreach(OperableTrigger trigger; triggers) {
                         pauseTrigger(conn, trigger.getKey());
@@ -2245,17 +2242,17 @@ abstract class JobStoreSupport : JobStore {
     
     /**
      * Determines if a Trigger for the given job should be blocked.  
-     * State can only transition to STATE_PAUSED_BLOCKED/BLOCKED from 
+     * State can only transition to TableConstants.STATE_PAUSED_BLOCKED/BLOCKED from 
      * PAUSED/STATE_WAITING respectively.
      * 
-     * @return STATE_PAUSED_BLOCKED, BLOCKED, or the currentState. 
+     * @return TableConstants.STATE_PAUSED_BLOCKED, BLOCKED, or the currentState. 
      */
     protected string checkBlockedState(
             Connection conn, JobKey jobKey, string currentState) {
 
         // State can only transition to BLOCKED from PAUSED or WAITING.
-        if ((!currentState== STATE_WAITING) &&
-            (!currentState== STATE_PAUSED)) {
+        if ((currentState != TableConstants.STATE_WAITING) &&
+            (currentState != TableConstants.STATE_PAUSED)) {
             return currentState;
         }
         
@@ -2266,7 +2263,9 @@ abstract class JobStoreSupport : JobStore {
             if (lst.size() > 0) {
                 FiredTriggerRecord rec = lst.get(0);
                 if (rec.isJobDisallowsConcurrentExecution()) { // OLD_TODO: worry about failed/recovering/job  states?
-                    return (STATE_PAUSED== currentState) ? STATE_PAUSED_BLOCKED : STATE_BLOCKED;
+                    return (TableConstants.STATE_PAUSED == currentState) ? 
+                        TableConstants.STATE_PAUSED_BLOCKED : 
+                        TableConstants.STATE_BLOCKED;
                 }
             }
 
@@ -2274,7 +2273,7 @@ abstract class JobStoreSupport : JobStore {
         } catch (SQLException e) {
             throw new JobPersistenceException(
                 "Couldn't determine if trigger should be in a blocked state '"
-                    + jobKey ~ "': "
+                    ~ jobKey.toString() ~ "': "
                     ~ e.msg, e);
         }
 
@@ -2297,7 +2296,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     resumeTrigger(conn, triggerKey);
                 }
             });
@@ -2327,15 +2326,15 @@ abstract class JobStoreSupport : JobStore {
             }
 
             bool blocked = false;
-            if(STATE_PAUSED_BLOCKED== status.getStatus()) {
+            if(TableConstants.STATE_PAUSED_BLOCKED == status.getStatus()) {
                 blocked = true;
             }
 
-            string newState = checkBlockedState(conn, status.getJobKey(), STATE_WAITING);
+            string newState = checkBlockedState(conn, status.getJobKey(), TableConstants.STATE_WAITING);
 
             bool misfired = false;
 
-            if (schedulerRunning && status.getNextFireTime().before(new Date())) {
+            if (schedulerRunning && status.getNextFireTime().isBefore(LocalDateTime.now())) {
                 misfired = updateMisfiredTrigger(conn, key,
                     newState, true);
             }
@@ -2343,10 +2342,10 @@ abstract class JobStoreSupport : JobStore {
             if(!misfired) {
                 if(blocked) {
                     getDelegate().updateTriggerStateFromOtherState(conn,
-                            key, newState, STATE_PAUSED_BLOCKED);
+                            key, newState, TableConstants.STATE_PAUSED_BLOCKED);
                 } else {
                     getDelegate().updateTriggerStateFromOtherState(conn,
-                            key, newState, STATE_PAUSED);
+                            key, newState, TableConstants.STATE_PAUSED);
                 }
             } 
 
@@ -2374,7 +2373,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     List!(OperableTrigger) triggers = getTriggersForJob(conn, jobKey);
                     foreach(OperableTrigger trigger; triggers) {
                         resumeTrigger(conn, trigger.getKey());
@@ -2401,7 +2400,7 @@ abstract class JobStoreSupport : JobStore {
     Set!(string) resumeJobs(GroupMatcher!(JobKey) matcher) {
         return cast(Set!(string)) executeInLock(
             LOCK_TRIGGER_ACCESS,
-            new class TransactionCallback!() {
+            new class TransactionCallback!(Set!(string)) {
                 Set!(string) execute(Connection conn) {
                     Set!(JobKey) jobKeys = getJobNames(conn, matcher);
                     Set!(string) groupNames = new HashSet!(string)();
@@ -2451,17 +2450,17 @@ abstract class JobStoreSupport : JobStore {
         try {
 
             getDelegate().updateTriggerGroupStateFromOtherStates(
-                    conn, matcher, STATE_PAUSED, STATE_ACQUIRED,
-                    STATE_WAITING, STATE_WAITING);
+                    conn, matcher, TableConstants.STATE_PAUSED, TableConstants.STATE_ACQUIRED,
+                    TableConstants.STATE_WAITING, TableConstants.STATE_WAITING);
 
             getDelegate().updateTriggerGroupStateFromOtherState(
-                    conn, matcher, STATE_PAUSED_BLOCKED, STATE_BLOCKED);
+                    conn, matcher, TableConstants.STATE_PAUSED_BLOCKED, TableConstants.STATE_BLOCKED);
 
             List!(string) groups = getDelegate().selectTriggerGroups(conn, matcher);
             
             // make sure to account for an exact group match for a group that doesn't yet exist
-            StringMatcher.StringOperatorName operator = matcher.getCompareWithOperator();
-            if (operator== StringOperatorName.EQUALS && !groups.contains(matcher.getCompareToValue())) {
+            StringOperatorName operator = matcher.getCompareWithOperator();
+            if (operator == StringOperatorName.EQUALS && !groups.contains(matcher.getCompareToValue())) {
               groups.add(matcher.getCompareToValue());
             }
 
@@ -2569,7 +2568,7 @@ abstract class JobStoreSupport : JobStore {
             /*
              * int res =
              * getDelegate().updateTriggerGroupStateFromOtherState(conn,
-             * groupName, STATE_WAITING, PAUSED);
+             * groupName, TableConstants.STATE_WAITING, PAUSED);
              * 
              * if(res > 0) {
              * 
@@ -2579,7 +2578,7 @@ abstract class JobStoreSupport : JobStore {
              * 
              * Key[] misfires =
              * getDelegate().selectMisfiredTriggersInGroupInState(conn,
-             * groupName, STATE_WAITING, misfireTime);
+             * groupName, TableConstants.STATE_WAITING, misfireTime);
              * 
              * List blockedTriggers = findTriggersToBeBlocked(conn,
              * groupName);
@@ -2590,7 +2589,7 @@ abstract class JobStoreSupport : JobStore {
              * key.getGroup(), BLOCKED); }
              * 
              * for(int i=0; i < misfires.length; i++) {               string
-             * newState = STATE_WAITING;
+             * newState = TableConstants.STATE_WAITING;
              * if(blockedTriggers.contains(misfires[i])) newState =
              * BLOCKED; updateMisfiredTrigger(conn,
              * misfires[i].getName(), misfires[i].getGroup(), newState, true); } }
@@ -2598,7 +2597,7 @@ abstract class JobStoreSupport : JobStore {
 
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't pause trigger group '"
-                    + matcher ~ "': " ~ e.msg, e);
+                    ~ matcher.toString() ~ "': " ~ e.msg, e);
         }
     }
 
@@ -2620,7 +2619,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     pauseAll(conn);
                 }
             });
@@ -2645,12 +2644,12 @@ abstract class JobStoreSupport : JobStore {
         List!(string) names = getTriggerGroupNames(conn);
 
         foreach(string name; names) {
-            pauseTriggerGroup(conn, GroupMatcher.triggerGroupEquals(name));
+            pauseTriggerGroup(conn, GroupMatcherHelper.triggerGroupEquals(name));
         }
 
         try {
-            if (!getDelegate().isTriggerGroupPaused(conn, ALL_GROUPS_PAUSED)) {
-                getDelegate().insertPausedTriggerGroup(conn, ALL_GROUPS_PAUSED);
+            if (!getDelegate().isTriggerGroupPaused(conn, TableConstants.ALL_GROUPS_PAUSED)) {
+                getDelegate().insertPausedTriggerGroup(conn, TableConstants.ALL_GROUPS_PAUSED);
             }
 
         } catch (SQLException e) {
@@ -2677,7 +2676,7 @@ abstract class JobStoreSupport : JobStore {
         executeInLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     resumeAll(conn);
                 }
             });
@@ -2702,11 +2701,11 @@ abstract class JobStoreSupport : JobStore {
         List!(string) names = getTriggerGroupNames(conn);
 
         foreach(string name; names) {
-            resumeTriggerGroup(conn, GroupMatcher.triggerGroupEquals(name));
+            resumeTriggerGroup(conn, GroupMatcherHelper.triggerGroupEquals(name));
         }
 
         try {
-            getDelegate().deletePausedTriggerGroup(conn, ALL_GROUPS_PAUSED);
+            getDelegate().deletePausedTriggerGroup(conn, TableConstants.ALL_GROUPS_PAUSED);
         } catch (SQLException e) {
             throw new JobPersistenceException(
                     "Couldn't resume all trigger groups: " ~ e.msg, e);
@@ -2771,7 +2770,8 @@ abstract class JobStoreSupport : JobStore {
         do {
             currentLoopCount ++;
             try {
-                List!(TriggerKey) keys = getDelegate().selectTriggerToAcquire(conn, noLaterThan + timeWindow, getMisfireTime(), maxCount);
+                List!(TriggerKey) keys = getDelegate().selectTriggerToAcquire(conn, 
+                    noLaterThan + timeWindow, getMisfireTime(), maxCount);
                 
                 // No trigger is ready to fire yet.
                 if (keys is null || keys.size() == 0)
@@ -2795,7 +2795,7 @@ abstract class JobStoreSupport : JobStore {
                     } catch (JobPersistenceException jpe) {
                         try {
                             error("Error retrieving job, setting trigger state to ERROR.", jpe);
-                            getDelegate().updateTriggerState(conn, triggerKey, STATE_ERROR);
+                            getDelegate().updateTriggerState(conn, triggerKey, TableConstants.STATE_ERROR);
                         } catch (SQLException sqle) {
                             error("Unable to set trigger state to ERROR.", sqle);
                         }
@@ -2810,20 +2810,21 @@ abstract class JobStoreSupport : JobStore {
                         }
                     }
                     
-                    if (nextTrigger.getNextFireTime().getTime() > batchEnd) {
+                    if (nextTrigger.getNextFireTime().toEpochMilli() > batchEnd) {
                       break;
                     }
                     // We now have a acquired trigger, let's add to return list.
                     // If our trigger was no longer in the expected state, try a new one.
-                    int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, STATE_ACQUIRED, STATE_WAITING);
+                    int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, TableConstants.STATE_ACQUIRED, TableConstants.STATE_WAITING);
                     if (rowsUpdated <= 0) {
                         continue; // next trigger
                     }
                     nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
-                    getDelegate().insertFiredTrigger(conn, nextTrigger, STATE_ACQUIRED, null);
+                    getDelegate().insertFiredTrigger(conn, nextTrigger, TableConstants.STATE_ACQUIRED, null);
 
                     if(acquiredTriggers.isEmpty()) {
-                        batchEnd = Math.max(nextTrigger.getNextFireTime().getTime(), DateTimeHelper.currentTimeMillis()) + timeWindow;
+                        batchEnd = max(nextTrigger.getNextFireTime().toEpochMilli(), 
+                            DateTimeHelper.currentTimeMillis()) + timeWindow;
                     }
                     acquiredTriggers.add(nextTrigger);
                 }
@@ -2857,7 +2858,7 @@ abstract class JobStoreSupport : JobStore {
         retryExecuteInNonManagedTXLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     releaseAcquiredTrigger(conn, trigger);
                 }
             });
@@ -2867,7 +2868,7 @@ abstract class JobStoreSupport : JobStore {
             OperableTrigger trigger) {
         try {
             getDelegate().updateTriggerStateFromOtherState(conn,
-                    trigger.getKey(), STATE_WAITING, STATE_ACQUIRED);
+                    trigger.getKey(), TableConstants.STATE_WAITING, TableConstants.STATE_ACQUIRED);
             getDelegate().deleteFiredTrigger(conn, trigger.getFireInstanceId());
         } catch (SQLException e) {
             throw new JobPersistenceException(
@@ -2916,12 +2917,13 @@ abstract class JobStoreSupport : JobStore {
                             List!(FiredTriggerRecord) acquired = getDelegate().selectInstancesFiredTriggerRecords(conn, getInstanceId());
                             Set!(string) executingTriggers = new HashSet!(string)();
                             foreach(FiredTriggerRecord ft ; acquired) {
-                                if (STATE_EXECUTING== ft.getFireInstanceState()) {
+                                if (TableConstants.STATE_EXECUTING == ft.getFireInstanceState()) {
                                     executingTriggers.add(ft.getFireInstanceId());
                                 }
                             }
                             foreach(TriggerFiredResult tr ; result) {
-                                if (tr.getTriggerFiredBundle() !is null && executingTriggers.contains(tr.getTriggerFiredBundle().getTrigger().getFireInstanceId())) {
+                                if (tr.getTriggerFiredBundle() !is null && 
+                                    executingTriggers.contains(tr.getTriggerFiredBundle().getTrigger().getFireInstanceId())) {
                                     return true;
                                 }
                             }
@@ -2939,10 +2941,10 @@ abstract class JobStoreSupport : JobStore {
         Calendar cal = null;
 
         // Make sure trigger wasn't deleted, paused, or completed...
-        try { // if trigger was deleted, state will be STATE_DELETED
+        try { // if trigger was deleted, state will be TableConstants.STATE_DELETED
             string state = getDelegate().selectTriggerState(conn,
                     trigger.getKey());
-            if (!state== STATE_ACQUIRED) {
+            if (state != TableConstants.STATE_ACQUIRED) {
                 return null;
             }
         } catch (SQLException e) {
@@ -2957,7 +2959,7 @@ abstract class JobStoreSupport : JobStore {
             try {
                 error("Error retrieving job, setting trigger state to ERROR.", jpe);
                 getDelegate().updateTriggerState(conn, trigger.getKey(),
-                        STATE_ERROR);
+                        TableConstants.STATE_ERROR);
             } catch (SQLException sqle) {
                 error("Unable to set trigger state to ERROR.", sqle);
             }
@@ -2970,30 +2972,30 @@ abstract class JobStoreSupport : JobStore {
         }
 
         try {
-            getDelegate().updateFiredTrigger(conn, trigger, STATE_EXECUTING, job);
+            getDelegate().updateFiredTrigger(conn, trigger, TableConstants.STATE_EXECUTING, job);
         } catch (SQLException e) {
             throw new JobPersistenceException("Couldn't insert fired trigger: "
                     ~ e.msg, e);
         }
 
-        Date prevFireTime = trigger.getPreviousFireTime();
+        LocalDateTime prevFireTime = trigger.getPreviousFireTime();
 
         // call triggered - to update the trigger's next-fire-time state...
         trigger.triggered(cal);
 
-        string state = STATE_WAITING;
+        string state = TableConstants.STATE_WAITING;
         bool force = true;
         
         if (job.isConcurrentExectionDisallowed()) {
-            state = STATE_BLOCKED;
+            state = TableConstants.STATE_BLOCKED;
             force = false;
             try {
                 getDelegate().updateTriggerStatesForJobFromOtherState(conn, job.getKey(),
-                        STATE_BLOCKED, STATE_WAITING);
+                        TableConstants.STATE_BLOCKED, TableConstants.STATE_WAITING);
                 getDelegate().updateTriggerStatesForJobFromOtherState(conn, job.getKey(),
-                        STATE_BLOCKED, STATE_ACQUIRED);
+                        TableConstants.STATE_BLOCKED, TableConstants.STATE_ACQUIRED);
                 getDelegate().updateTriggerStatesForJobFromOtherState(conn, job.getKey(),
-                        STATE_PAUSED_BLOCKED, STATE_PAUSED);
+                        TableConstants.STATE_PAUSED_BLOCKED, TableConstants.STATE_PAUSED);
             } catch (SQLException e) {
                 throw new JobPersistenceException(
                         "Couldn't update states of blocked triggers: "
@@ -3002,7 +3004,7 @@ abstract class JobStoreSupport : JobStore {
         } 
             
         if (trigger.getNextFireTime() is null) {
-            state = STATE_COMPLETE;
+            state = TableConstants.STATE_COMPLETE;
             force = true;
         }
 
@@ -3011,7 +3013,7 @@ abstract class JobStoreSupport : JobStore {
         job.getJobDataMap().clearDirtyFlag();
 
         return new TriggerFiredBundle(job, trigger, cal, trigger.getKey().getGroup()
-                == Scheduler.DEFAULT_RECOVERY_GROUP, new Date(), trigger
+                == Scheduler.DEFAULT_RECOVERY_GROUP, LocalDateTime.now(), trigger
                 .getPreviousFireTime(), prevFireTime, trigger.getNextFireTime());
     }
 
@@ -3029,7 +3031,7 @@ abstract class JobStoreSupport : JobStore {
         retryExecuteInNonManagedTXLock(
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
-                void executeVoid(Connection conn) {
+                void execute(Connection conn) {
                     triggeredJobComplete(conn, trigger, jobDetail,triggerInstCode);
                 }
             });    
@@ -3054,33 +3056,33 @@ abstract class JobStoreSupport : JobStore {
                 }
             } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_COMPLETE) {
                 getDelegate().updateTriggerState(conn, trigger.getKey(),
-                        STATE_COMPLETE);
+                        TableConstants.STATE_COMPLETE);
                 signalSchedulingChangeOnTxCompletion(0L);
             } else if (triggerInstCode == CompletedExecutionInstruction.SET_TRIGGER_ERROR) {
-                info("Trigger " ~ trigger.getKey() ~ " set to ERROR state.");
+                trace("Trigger " ~ trigger.getKey().toString() ~ " set to ERROR state.");
                 getDelegate().updateTriggerState(conn, trigger.getKey(),
-                        STATE_ERROR);
+                        TableConstants.STATE_ERROR);
                 signalSchedulingChangeOnTxCompletion(0L);
             } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_COMPLETE) {
                 getDelegate().updateTriggerStatesForJob(conn,
-                        trigger.getJobKey(), STATE_COMPLETE);
+                        trigger.getJobKey(), TableConstants.STATE_COMPLETE);
                 signalSchedulingChangeOnTxCompletion(0L);
             } else if (triggerInstCode == CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR) {
-                info("All triggers of Job " ~ 
-                        trigger.getKey() ~ " set to ERROR state.");
+                trace("All triggers of Job " ~ 
+                        trigger.getKey().toString() ~ " set to ERROR state.");
                 getDelegate().updateTriggerStatesForJob(conn,
-                        trigger.getJobKey(), STATE_ERROR);
+                        trigger.getJobKey(), TableConstants.STATE_ERROR);
                 signalSchedulingChangeOnTxCompletion(0L);
             }
 
             if (jobDetail.isConcurrentExectionDisallowed()) {
                 getDelegate().updateTriggerStatesForJobFromOtherState(conn,
-                        jobDetail.getKey(), STATE_WAITING,
-                        STATE_BLOCKED);
+                        jobDetail.getKey(), TableConstants.STATE_WAITING,
+                        TableConstants.STATE_BLOCKED);
 
                 getDelegate().updateTriggerStatesForJobFromOtherState(conn,
-                        jobDetail.getKey(), STATE_PAUSED,
-                        STATE_PAUSED_BLOCKED);
+                        jobDetail.getKey(), TableConstants.STATE_PAUSED,
+                        TableConstants.STATE_PAUSED_BLOCKED);
 
                 signalSchedulingChangeOnTxCompletion(0L);
             }
@@ -3144,13 +3146,13 @@ abstract class JobStoreSupport : JobStore {
         // }
     }
 
-    // protected Semaphore getLockHandler() {
-    //     return lockHandler;
-    // }
+    protected Semaphore getLockHandler() {
+        return lockHandler;
+    }
 
-    // void setLockHandler(Semaphore lockHandler) {
-    //     this.lockHandler = lockHandler;
-    // }
+    void setLockHandler(Semaphore lockHandler) {
+        this.lockHandler = lockHandler;
+    }
 
     //---------------------------------------------------------------------------
     // Management methods
@@ -3167,12 +3169,10 @@ abstract class JobStoreSupport : JobStore {
             // misfired triggers requiring recovery.
             int misfireCount = (getDoubleCheckLockMisfireHandler()) ?
                 getDelegate().countMisfiredTriggersInState(
-                    conn, STATE_WAITING, getMisfireTime()) : 
-                Integer.MAX_VALUE;
+                    conn, TableConstants.STATE_WAITING, getMisfireTime()) : int.max;
             
             if (misfireCount == 0) {
-                trace(
-                    "Found 0 triggers that missed their scheduled fire-time.");
+                trace("Found 0 triggers that missed their scheduled fire-time.");
             } else {
                 transOwner = getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
                 
@@ -3201,7 +3201,7 @@ abstract class JobStoreSupport : JobStore {
     }
 
     // protected ThreadLocal!(Long) sigChangeForTxCompletion = new ThreadLocal!(Long)();
-    protected static bool sigChangeForTxCompletion;
+    protected static long sigChangeForTxCompletion;
     protected void signalSchedulingChangeOnTxCompletion(long candidateNewNextFireTime) {
         long sigTime = sigChangeForTxCompletion;
         if(candidateNewNextFireTime >= 0L)
@@ -3374,8 +3374,7 @@ abstract class JobStoreSupport : JobStore {
     protected long calcFailedIfAfter(SchedulerStateRecord rec) {
         return rec.getCheckinTimestamp() +
             max(rec.getCheckinInterval(), 
-                    (DateTimeHelper.currentTimeMillis() - lastCheckin)) +
-            7500L;
+                    (DateTimeHelper.currentTimeMillis() - lastCheckin)) + 7500L;
     }
     
     protected List!(SchedulerStateRecord) clusterCheckIn(Connection conn) {
@@ -3408,12 +3407,11 @@ abstract class JobStoreSupport : JobStore {
             long recoverIds = DateTimeHelper.currentTimeMillis();
 
             logWarnIfNonZero(failedInstances.size(),
-                    "ClusterManager: detected " ~ failedInstances.size()
+                    "ClusterManager: detected " ~ failedInstances.size().to!string()
                             ~ " failed or restarted instances.");
             try {
                 foreach(SchedulerStateRecord rec ; failedInstances) {
-                    info(
-                            "ClusterManager: Scanning for instance \""
+                    trace("ClusterManager: Scanning for instance \""
                                     ~ rec.getSchedulerInstanceId()
                                     ~ "\"'s failed in-progress jobs.");
 
@@ -3435,36 +3433,35 @@ abstract class JobStoreSupport : JobStore {
                         triggerKeys.add(tKey);
 
                         // release blocked triggers..
-                        if (ftRec.getFireInstanceState()== STATE_BLOCKED) {
+                        if (ftRec.getFireInstanceState()== TableConstants.STATE_BLOCKED) {
                             getDelegate()
                                     .updateTriggerStatesForJobFromOtherState(
                                             conn, jKey,
-                                            STATE_WAITING, STATE_BLOCKED);
-                        } else if (ftRec.getFireInstanceState()== STATE_PAUSED_BLOCKED) {
+                                            TableConstants.STATE_WAITING, TableConstants.STATE_BLOCKED);
+                        } else if (ftRec.getFireInstanceState()== TableConstants.STATE_PAUSED_BLOCKED) {
                             getDelegate()
                                     .updateTriggerStatesForJobFromOtherState(
                                             conn, jKey,
-                                            STATE_PAUSED, STATE_PAUSED_BLOCKED);
+                                            TableConstants.STATE_PAUSED, TableConstants.STATE_PAUSED_BLOCKED);
                         }
 
                         // release acquired triggers..
-                        if (ftRec.getFireInstanceState()== STATE_ACQUIRED) {
+                        if (ftRec.getFireInstanceState()== TableConstants.STATE_ACQUIRED) {
                             getDelegate().updateTriggerStateFromOtherState(
-                                    conn, tKey, STATE_WAITING,
-                                    STATE_ACQUIRED);
+                                    conn, tKey, TableConstants.STATE_WAITING,
+                                    TableConstants.STATE_ACQUIRED);
                             acquiredCount++;
                         } else if (ftRec.isJobRequestsRecovery()) {
                             // handle jobs marked for recovery that were not fully
                             // executed..
                             if (jobExists(conn, jKey)) {
-                                
                                 SimpleTriggerImpl rcvryTrig = new SimpleTriggerImpl(
                                         "recover_"
-                                                + rec.getSchedulerInstanceId()
+                                                ~ rec.getSchedulerInstanceId()
                                                 ~ "_"
-                                                + string.valueOf(recoverIds++),
+                                                ~ to!string(recoverIds++),
                                         Scheduler.DEFAULT_RECOVERY_GROUP,
-                                        new Date(ftRec.getScheduleTimestamp()));
+                                        LocalDateTime.ofEpochSecond(ftRec.getScheduleTimestamp(), 0, ZoneOffset.UTC));
                                 rcvryTrig.setJobName(jKey.getName());
                                 rcvryTrig.setJobGroup(jKey.getGroup());
                                 rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY);
@@ -3472,13 +3469,13 @@ abstract class JobStoreSupport : JobStore {
                                 JobDataMap jd = getDelegate().selectTriggerJobDataMap(conn, tKey.getName(), tKey.getGroup());
                                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, tKey.getName());
                                 jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, tKey.getGroup());
-                                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, string.valueOf(ftRec.getFireTimestamp()));
-                                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS, string.valueOf(ftRec.getScheduleTimestamp()));
+                                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, to!string(ftRec.getFireTimestamp()));
+                                jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS, to!string(ftRec.getScheduleTimestamp()));
                                 rcvryTrig.setJobDataMap(jd);
 
                                 rcvryTrig.computeFirstFireTime(null);
                                 storeTrigger(conn, rcvryTrig, null, false,
-                                        STATE_WAITING, false, true);
+                                        TableConstants.STATE_WAITING, false, true);
                                 recoveredCount++;
                             } else {
                                 warning("ClusterManager: failed job '"
@@ -3495,11 +3492,11 @@ abstract class JobStoreSupport : JobStore {
                             getDelegate()
                                     .updateTriggerStatesForJobFromOtherState(
                                             conn, jKey,
-                                            STATE_WAITING, STATE_BLOCKED);
+                                            TableConstants.STATE_WAITING, TableConstants.STATE_BLOCKED);
                             getDelegate()
                                     .updateTriggerStatesForJobFromOtherState(
                                             conn, jKey,
-                                            STATE_PAUSED, STATE_PAUSED_BLOCKED);
+                                            TableConstants.STATE_PAUSED, TableConstants.STATE_PAUSED_BLOCKED);
                         }
                     }
 
@@ -3510,13 +3507,10 @@ abstract class JobStoreSupport : JobStore {
                     // records of a COMPLETE trigger.
                     int completeCount = 0;
                     foreach(TriggerKey triggerKey ; triggerKeys) {
-
-                        if (getDelegate().selectTriggerState(conn, triggerKey).
-                                equals(STATE_COMPLETE)) {
+                        if (getDelegate().selectTriggerState(conn, triggerKey) == (TableConstants.STATE_COMPLETE)) {
                             List!(FiredTriggerRecord) firedTriggers =
                                     getDelegate().selectFiredTriggerRecords(conn, triggerKey.getName(), triggerKey.getGroup());
                             if (firedTriggers.isEmpty()) {
-
                                 if (removeTrigger(conn, triggerKey)) {
                                     completeCount++;
                                 }
@@ -3525,19 +3519,19 @@ abstract class JobStoreSupport : JobStore {
                     }
 
                     logWarnIfNonZero(acquiredCount,
-                            "ClusterManager: ......Freed " ~ acquiredCount
+                            "ClusterManager: ......Freed " ~ acquiredCount.to!string()
                                     ~ " acquired trigger(s).");
                     logWarnIfNonZero(completeCount,
-                            "ClusterManager: ......Deleted " ~ completeCount
+                            "ClusterManager: ......Deleted " ~ completeCount.to!string()
                                     ~ " complete triggers(s).");
                     logWarnIfNonZero(recoveredCount,
-                            "ClusterManager: ......Scheduled " ~ recoveredCount
+                            "ClusterManager: ......Scheduled " ~ recoveredCount.to!string()
                                     ~ " recoverable job(s) for recovery.");
                     logWarnIfNonZero(otherCount,
-                            "ClusterManager: ......Cleaned-up " ~ otherCount
+                            "ClusterManager: ......Cleaned-up " ~ otherCount.to!string()
                                     ~ " other failed job(s).");
 
-                    if (!rec.getSchedulerInstanceId()== getInstanceId()) {
+                    if (rec.getSchedulerInstanceId() != getInstanceId()) {
                         getDelegate().deleteSchedulerState(conn,
                                 rec.getSchedulerInstanceId());
                     }
@@ -3549,11 +3543,11 @@ abstract class JobStoreSupport : JobStore {
         }
     }
 
-    protected void logWarnIfNonZero(int val, string warning) {
+    protected void logWarnIfNonZero(int val, string message) {
         if (val > 0) {
-            info(warning);
+            warning(message);
         } else {
-            trace(warning);
+            trace(message);
         }
     }
 
@@ -3633,7 +3627,8 @@ abstract class JobStoreSupport : JobStore {
     protected void rollbackConnection(Connection conn) {
         if (conn !is null) {
             try {
-                conn.rollback();
+                // conn.rollback();
+                conn.getSession().rollback();
             } catch (SQLException e) {
                 error("Couldn't rollback jdbc connection. "~ e.msg, e);
             }
@@ -3651,7 +3646,8 @@ abstract class JobStoreSupport : JobStore {
 
         if (conn !is null) {
             try {
-                conn.commit();
+                // conn.commit();
+                conn.getSession().commit();
             } catch (SQLException e) {
                 throw new JobPersistenceException(
                     "Couldn't commit jdbc connection. "~ e.msg, e);
@@ -3691,22 +3687,24 @@ abstract class JobStoreSupport : JobStore {
     T executeInLock(T)(
             string lockName, 
             TransactionCallback!(T) txCallback) {
-        return executeInNonManagedTXLock(lockName, txCallback, null);
+        return executeInNonManagedTXLock(lockName, txCallback, cast(TransactionValidator!(T))null);
     }
     
     protected T retryExecuteInNonManagedTXLock(T)(string lockName, TransactionCallback!(T) txCallback) {
-        for (int retry = 1; !shutdown; retry++) {
+        for (int retry = 1; !isShutdown; retry++) {
             try {
-                return executeInNonManagedTXLock(lockName, txCallback, null);
+                return executeInNonManagedTXLock(lockName, txCallback, cast(TransactionValidator!(T))null);
             } catch (JobPersistenceException jpe) {
                 if(retry % 4 == 0) {
-                    schedSignaler.notifySchedulerListenersError("An error occurred while " ~ txCallback, jpe);
+                    schedSignaler.notifySchedulerListenersError("An error occurred while " ~ 
+                        (cast(Object)txCallback).toString(), jpe);
                 }
             } catch (RuntimeException e) {
                 error("retryExecuteInNonManagedTXLock: RuntimeException " ~ e.msg, e);
             }
             try {
-                Thread.sleep(getDbRetryInterval()); // retry every N seconds (the db connection must be failed)
+                Duration dr = dur!(TimeUnit.Millisecond)(getDbRetryInterval());
+                Thread.sleep(dr); // retry every N seconds (the db connection must be failed)
             } catch (InterruptedException e) {
                 throw new IllegalStateException("Received interrupted exception", e);
             }
@@ -3722,9 +3720,10 @@ abstract class JobStoreSupport : JobStore {
      * "TRIGGER_ACCESS".  If null, then no lock is acquired, but the
      * lockCallback is still executed in a non-managed transaction. 
      */
-    protected T executeInNonManagedTXLock(T)(
-            string lockName, 
-            TransactionCallback!(T) txCallback, TransactionValidator!(T) txValidator) {
+    protected T executeInNonManagedTXLock(T)(string lockName,  
+        TransactionCallback!(T) txCallback, 
+        TransactionValidator!(T) txValidator) {
+
         bool transOwner = false;
         Connection conn = null;
         try {
@@ -3741,28 +3740,45 @@ abstract class JobStoreSupport : JobStore {
             if (conn is null) {
                 conn = getNonManagedTXConnection();
             }
-            
-            T result = txCallback.execute(conn);
-            try {
-                commitConnection(conn);
-            } catch (JobPersistenceException e) {
-                rollbackConnection(conn);
-                if (txValidator is null || !retryExecuteInNonManagedTXLock(lockName, new class TransactionCallback!(bool) {
-                    override
-                    bool execute(Connection conn) {
-                        return txValidator.validate(conn, result);
-                    }
-                })) {
-                    throw e;
-                }
-            }
 
-            Long sigTime = clearAndGetSignalSchedulingChangeOnTxCompletion();
-            if(sigTime !is null && sigTime >= 0) {
-                signalSchedulingChangeImmediately(sigTime);
-            }
+            static if(is(T == void)) {
+                    txCallback.execute(conn);
+                try {
+                    commitConnection(conn);
+                } catch (JobPersistenceException e) {
+                    rollbackConnection(conn);
+                }
+
+                long sigTime = clearAndGetSignalSchedulingChangeOnTxCompletion();
+                if(sigTime >= 0) {
+                    signalSchedulingChangeImmediately(sigTime);
+                }
+            } else {
             
-            return result;
+                T result = txCallback.execute(conn);
+                try {
+                    commitConnection(conn);
+                } catch (JobPersistenceException e) {
+                    rollbackConnection(conn);
+                    if (txValidator is null || !retryExecuteInNonManagedTXLock(lockName, 
+                        new class TransactionCallback!(bool) {
+                            override
+                            bool execute(Connection conn) {
+                                return txValidator.validate(conn, result);
+                            }
+                    })) {
+                        throw e;
+                    }
+                }
+
+                long sigTime = clearAndGetSignalSchedulingChangeOnTxCompletion();
+                if(sigTime >= 0) {
+                    signalSchedulingChangeImmediately(sigTime);
+                }
+                
+                return result;
+
+            }
         } catch (JobPersistenceException e) {
             rollbackConnection(conn);
             throw e;
@@ -3796,7 +3812,11 @@ interface TransactionCallback(T) {
 }
 
 interface TransactionValidator(T) {
-    bool validate(Connection conn, T result);
+    static if(is(T == void)) {
+        bool validate(Connection conn);
+    } else {
+        bool validate(Connection conn, T result);
+    }
 }
 
 /**
@@ -3805,14 +3825,16 @@ interface TransactionValidator(T) {
  * 
  * @see JobStoreSupport#executeInNonManagedTXLock(string, TransactionCallback, TransactionValidator)
  */
-abstract class VoidTransactionCallback : TransactionCallback!(void) {
-    final void execute(Connection conn) {
-        executeVoid(conn);
-        // return null;
-    }
+// abstract class VoidTransactionCallback : TransactionCallback!(void) {
+//     // void execute(Connection conn) {
+//     //     executeVoid(conn);
+//     //     // return null;
+//     // }
     
-    abstract void executeVoid(Connection conn);
-}
+//     abstract void execute(Connection conn);
+// }
+
+alias VoidTransactionCallback = TransactionCallback!(void);
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -3825,17 +3847,19 @@ class ClusterManager : ThreadEx {
     private bool isShutdown= false;
 
     private int numFails = 0;
+    private JobStoreSupport jobStoreSupport;
     
-    this() {
-        this.setPriority(Thread.NORM_PRIORITY + 2);
-        this.setName("QuartzScheduler_" ~ instanceName ~ "-" ~ instanceId ~ "_ClusterManager");
-        this.setDaemon(getMakeThreadsDaemons());
+    this(JobStoreSupport jobStoreSupport) {
+        this.jobStoreSupport = jobStoreSupport;
+        this.priority = (Thread.PRIORITY_DEFAULT + 2);
+        this.name = "QuartzScheduler_" ~ jobStoreSupport.instanceName ~ "-" ~ jobStoreSupport.instanceId ~ "_ClusterManager";
+        this.isDaemon = jobStoreSupport.getMakeThreadsDaemons();
     }
 
     void initialize() {
         this.manage();
 
-        ThreadExecutor executor = getThreadExecutor();
+        ThreadExecutor executor = jobStoreSupport.getThreadExecutor();
         executor.execute(this);
     }
 
@@ -3848,7 +3872,7 @@ class ClusterManager : ThreadEx {
         bool res = false;
         try {
 
-            res = doCheckin();
+            res = jobStoreSupport.doCheckin();
 
             numFails = 0;
             trace("ClusterManager: Check-in complete.");
@@ -3864,28 +3888,30 @@ class ClusterManager : ThreadEx {
 
     override
     void run() {
-        while (!shutdown) {
+        while (!isShutdown) {
 
-            if (!shutdown) {
-                long timeToSleep = getClusterCheckinInterval();
-                long transpiredTime = (DateTimeHelper.currentTimeMillis() - lastCheckin);
+            if (!isShutdown) {
+                long timeToSleep = jobStoreSupport.getClusterCheckinInterval();
+                long transpiredTime = (DateTimeHelper.currentTimeMillis() - jobStoreSupport.lastCheckin);
                 timeToSleep = timeToSleep - transpiredTime;
                 if (timeToSleep <= 0) {
                     timeToSleep = 100L;
                 }
 
                 if(numFails > 0) {
-                    timeToSleep = Math.max(getDbRetryInterval(), timeToSleep);
+                    timeToSleep = max(jobStoreSupport.getDbRetryInterval(), timeToSleep);
                 }
                 
                 try {
-                    Thread.sleep(timeToSleep);
+                    Duration dr = dur!(TimeUnit.Millisecond)(timeToSleep);
+                    Thread.sleep(dr);
                 } catch (Exception ignore) {
+                    warning(ignore.msg);
                 }
             }
 
             if (!isShutdown&& this.manage()) {
-                signalSchedulingChangeImmediately(0L);
+                jobStoreSupport.signalSchedulingChangeImmediately(0L);
             }
 
         }//while !shutdown
@@ -3904,15 +3930,18 @@ class MisfireHandler : ThreadEx {
     private bool isShutdown= false;
 
     private int numFails = 0;
+    private JobStoreSupport jobStoreSupport;
     
 
-    this() {
-        this.setName("QuartzScheduler_" ~ instanceName ~ "-" ~ instanceId ~ "_MisfireHandler");
-        this.setDaemon(getMakeThreadsDaemons());
+    this(JobStoreSupport jobStoreSupport) {
+        this.jobStoreSupport = jobStoreSupport;
+        this.name = "QuartzScheduler_" ~ jobStoreSupport.instanceName ~ 
+            "-" ~ jobStoreSupport.instanceId ~ "_MisfireHandler";
+        this.isDaemon = jobStoreSupport.getMakeThreadsDaemons();
     }
 
     void initialize() {
-        ThreadExecutor executor = getThreadExecutor();
+        ThreadExecutor executor = jobStoreSupport.getThreadExecutor();
         executor.execute(this);
     }
 
@@ -3925,7 +3954,7 @@ class MisfireHandler : ThreadEx {
         try {
             trace("MisfireHandler: scanning for misfires...");
 
-            RecoverMisfiredJobsResult res = doRecoverMisfires();
+            RecoverMisfiredJobsResult res = jobStoreSupport.doRecoverMisfires();
             numFails = 0;
             return res;
         } catch (Exception e) {
@@ -3934,39 +3963,41 @@ class MisfireHandler : ThreadEx {
                             ~ e.msg, e);
             }
             numFails++;
+            return RecoverMisfiredJobsResult.NO_OP;
         }
-        return RecoverMisfiredJobsResult.NO_OP;
     }
 
     override
     void run() {
         
-        while (!shutdown) {
+        while (!isShutdown) {
 
             long sTime = DateTimeHelper.currentTimeMillis();
 
             RecoverMisfiredJobsResult recoverMisfiredJobsResult = manage();
 
             if (recoverMisfiredJobsResult.getProcessedMisfiredTriggerCount() > 0) {
-                signalSchedulingChangeImmediately(recoverMisfiredJobsResult.getEarliestNewTime());
+                jobStoreSupport.signalSchedulingChangeImmediately(recoverMisfiredJobsResult.getEarliestNewTime());
             }
 
-            if (!shutdown) {
+            if (!isShutdown) {
                 long timeToSleep = 50;  // At least a short pause to help balance threads
                 if (!recoverMisfiredJobsResult.hasMoreMisfiredTriggers()) {
-                    timeToSleep = getMisfireThreshold() - (DateTimeHelper.currentTimeMillis() - sTime);
+                    timeToSleep = jobStoreSupport.getMisfireThreshold() - (DateTimeHelper.currentTimeMillis() - sTime);
                     if (timeToSleep <= 0) {
                         timeToSleep = 50;
                     }
 
                     if(numFails > 0) {
-                        timeToSleep = Math.max(getDbRetryInterval(), timeToSleep);
+                        timeToSleep = max(jobStoreSupport.getDbRetryInterval(), timeToSleep);
                     }
                 }
                 
                 try {
-                    Thread.sleep(timeToSleep);
+                    Duration dr = dur!(TimeUnit.Millisecond)(timeToSleep);
+                    Thread.sleep(dr);
                 } catch (Exception ignore) {
+                    warning(ignore.msg);
                 }
             }//while !shutdown
         }
