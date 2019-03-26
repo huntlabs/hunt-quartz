@@ -20,8 +20,8 @@ void main()
 	// testUnits!(AnnualCalendarTest);
 	// testUnits!(CronExpressionTest);
 	// testUnits!(CronTriggerTest);
-	// testUnits!(DbSchedulerTest);
-	testUnits!(RAMSchedulerTest);
+	testUnits!(DbSchedulerTest);
+	// testUnits!(RAMSchedulerTest);
 	// testUnits!(SimpleTriggerTest);
 	// testUnits!(VersionTest);
 

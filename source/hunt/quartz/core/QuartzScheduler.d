@@ -123,41 +123,41 @@ class QuartzScheduler : RemotableQuartzScheduler {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private __gshared immutable string VERSION_MAJOR; // = "UNKNOWN";
-    private __gshared immutable string VERSION_MINOR; // = "UNKNOWN";
-    private __gshared immutable string VERSION_ITERATION; // = "UNKNOWN";
+    private __gshared string VERSION_MAJOR = "2"; // = "UNKNOWN";
+    private __gshared string VERSION_MINOR = "3"; // = "UNKNOWN";
+    private __gshared string VERSION_ITERATION = "0"; // = "UNKNOWN";
 
-    shared static this() {
-        VERSION_MAJOR = "2";
-        VERSION_MINOR = "3";
-        VERSION_ITERATION = "0";
-        // Properties props = new Properties();
-        // InputStream is = null;
-        // try {
-        //     is = QuartzScheduler.class.getResourceAsStream("quartz-build.properties");
-        //     if(is !is null) {
-        //         props.load(is);
-        //         string version = props.getProperty("version");
-        //         if (version !is null) {
-        //             string[] versionComponents = version.split("\\.");
-        //             VERSION_MAJOR = versionComponents[0];
-        //             VERSION_MINOR = versionComponents[1];
-        //             if(versionComponents.length > 2)
-        //                 VERSION_ITERATION = versionComponents[2];
-        //             else
-        //                 VERSION_ITERATION = "0";
-        //         } else {
-        //           error("Can't parse Quartz version from quartz-build.properties");
-        //         }
-        //     }
-        // } catch (Exception e) {
-        //     error("Error loading version info from quartz-build.properties.", e.msg);
-        // } finally {
-        //     if(is !is null) {
-        //         try { is.close(); } catch(Exception ignore) {}
-        //     }
-        // }
-    }
+    // shared static this() {
+    //     VERSION_MAJOR = "2";
+    //     VERSION_MINOR = "3";
+    //     VERSION_ITERATION = "0";
+    //     // Properties props = new Properties();
+    //     // InputStream is = null;
+    //     // try {
+    //     //     is = QuartzScheduler.class.getResourceAsStream("quartz-build.properties");
+    //     //     if(is !is null) {
+    //     //         props.load(is);
+    //     //         string version = props.getProperty("version");
+    //     //         if (version !is null) {
+    //     //             string[] versionComponents = version.split("\\.");
+    //     //             VERSION_MAJOR = versionComponents[0];
+    //     //             VERSION_MINOR = versionComponents[1];
+    //     //             if(versionComponents.length > 2)
+    //     //                 VERSION_ITERATION = versionComponents[2];
+    //     //             else
+    //     //                 VERSION_ITERATION = "0";
+    //     //         } else {
+    //     //           error("Can't parse Quartz version from quartz-build.properties");
+    //     //         }
+    //     //     }
+    //     // } catch (Exception e) {
+    //     //     error("Error loading version info from quartz-build.properties.", e.msg);
+    //     // } finally {
+    //     //     if(is !is null) {
+    //     //         try { is.close(); } catch(Exception ignore) {}
+    //     //     }
+    //     // }
+    // }
     
 
     /*
