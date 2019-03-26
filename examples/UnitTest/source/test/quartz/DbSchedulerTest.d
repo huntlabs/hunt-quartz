@@ -17,7 +17,7 @@ class DbSchedulerTest : SchedulerTestBase{
         // } catch (SQLException e) {
         //     throw new AssertionError(e);
         // }
-        JobStoreTX jobStore = new JobStoreTX();
+        // JobStoreTX jobStore = new JobStoreTX();
         // jobStore.setDataSource(name + "Database");
         // jobStore.setTablePrefix("QRTZ_");
         // jobStore.setInstanceId("AUTO");

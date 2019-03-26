@@ -139,7 +139,7 @@ interface RemotableQuartzScheduler { // : Remote
 
     Set!(JobKey) getJobKeys(GroupMatcher!(JobKey) matcher);
 
-    List!(Trigger) getTriggersOfJob(JobKey jobKey);
+    List!(OperableTrigger) getTriggersOfJob(JobKey jobKey);
 
     List!(string) getTriggerGroupNames();
 

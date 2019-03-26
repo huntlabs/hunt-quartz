@@ -445,7 +445,7 @@ class StdScheduler : Scheduler {
      * Calls the equivalent method on the 'proxied' <code>QuartzScheduler</code>.
      * </p>
      */
-    List!(Trigger) getTriggersOfJob(JobKey jobKey) {
+    List!(OperableTrigger) getTriggersOfJob(JobKey jobKey) {
         return sched.getTriggersOfJob(jobKey);
     }
 

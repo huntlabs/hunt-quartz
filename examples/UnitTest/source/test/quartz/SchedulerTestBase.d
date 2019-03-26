@@ -17,6 +17,7 @@ import hunt.quartz.StatefulJob;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerKey;
+import hunt.quartz.spi.OperableTrigger;
 
 import hunt.Assert;
 import hunt.collection.ArrayList;
@@ -259,10 +260,10 @@ class SchedulerTestBase {
 		Scheduler sched = createScheduler("testScheduleMultipleTriggersForAJob", 5);
 		sched.scheduleJob(job,triggersForJob, true);
 		
-		List!(Trigger) triggersOfJob = sched.getTriggersOfJob(job.getKey());
+		List!(OperableTrigger) triggersOfJob = sched.getTriggersOfJob(job.getKey());
 		assertEquals(2,triggersOfJob.size());
-		assertTrue(triggersOfJob.contains(trigger1));
-		assertTrue(triggersOfJob.contains(trigger2));
+		assertTrue(triggersOfJob.contains(cast(OperableTrigger)trigger1));
+		assertTrue(triggersOfJob.contains(cast(OperableTrigger)trigger2));
 		
 		sched.shutdown(true);
 	}

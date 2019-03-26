@@ -399,7 +399,8 @@ interface JobStore {
      * If there are no matches, a zero-length array should be returned.
      * </p>
      */
-    List!(Trigger) getTriggersForJob(JobKey jobKey);
+    // List!(Trigger) getTriggersForJob(JobKey jobKey);
+    List!(OperableTrigger) getTriggersForJob(JobKey jobKey);
 
     /**
      * Get the current state of the identified <code>{@link Trigger}</code>.

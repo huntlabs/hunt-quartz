@@ -36,6 +36,7 @@ import hunt.quartz.Trigger;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.spi.JobFactory;
+import hunt.quartz.spi.OperableTrigger;
 import hunt.quartz.utils.Key;
 
 /**
@@ -766,7 +767,7 @@ interface Scheduler {
      * </p>
      * 
      */
-    List!(Trigger) getTriggersOfJob(JobKey jobKey);
+    List!(OperableTrigger) getTriggersOfJob(JobKey jobKey);
 
     /**
      * Get the names of all known <code>{@link Trigger}</code> groups.
