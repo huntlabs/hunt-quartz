@@ -15,7 +15,7 @@
  * 
  */
 
-module hunt.quartz.utils.ConnectionProvider;
+module hunt.quartz.dbstore.ConnectionProvider;
 
 import hunt.database.driver.Connection;
 

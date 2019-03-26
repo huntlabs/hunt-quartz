@@ -11,6 +11,7 @@ import test.quartz.RAMSchedulerTest;
 import test.quartz.SimpleTriggerTest;
 import test.quartz.VersionTest;
 
+import test.quartz.DbSchedulerTest;
 
 import test.quartz.utils.PropertiesParserTest;
 
@@ -19,7 +20,8 @@ void main()
 	// testUnits!(AnnualCalendarTest);
 	// testUnits!(CronExpressionTest);
 	// testUnits!(CronTriggerTest);
-	testUnits!(RAMSchedulerTest);
+	testUnits!(DbSchedulerTest);
+	// testUnits!(RAMSchedulerTest);
 	// testUnits!(SimpleTriggerTest);
 	// testUnits!(VersionTest);
 

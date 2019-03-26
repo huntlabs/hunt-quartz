@@ -26,6 +26,7 @@ module hunt.quartz.spi.ClassLoadHelper;
  * @author jhouse
  * @author pl47ypus
  */
+deprecated("To be removed")
 interface ClassLoadHelper {
 
     /**

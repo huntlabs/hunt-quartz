@@ -48,10 +48,10 @@ import hunt.quartz.spi.JobStore;
 import hunt.quartz.spi.SchedulerPlugin;
 import hunt.quartz.spi.ThreadExecutor;
 import hunt.quartz.spi.ThreadPool;
-import hunt.quartz.utils.ConnectionProvider;
-import hunt.quartz.utils.DBConnectionManager;
-import hunt.quartz.utils.JNDIConnectionProvider;
-import hunt.quartz.utils.PoolingConnectionProvider;
+// import hunt.quartz.utils.ConnectionProvider;
+import hunt.quartz.dbstore.DBConnectionManager;
+// import hunt.quartz.utils.JNDIConnectionProvider;
+// import hunt.quartz.utils.PoolingConnectionProvider;
 import hunt.quartz.utils.PropertiesParser;
 
 import hunt.collection.Collection;

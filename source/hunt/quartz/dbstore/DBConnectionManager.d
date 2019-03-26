@@ -15,13 +15,16 @@
  * 
  */
 
-module hunt.quartz.utils.DBConnectionManager;
+module hunt.quartz.dbstore.DBConnectionManager;
 
-import hunt.quartz.utils.ConnectionProvider;
+// import hunt.quartz.dbstore.ConnectionProvider;
 
-import hunt.database.driver.Connection;
 import hunt.Exceptions;
 import hunt.collection.HashMap;
+
+import hunt.entity;
+
+alias Connection = EntityManager;
 
 /**
  * <p>
@@ -60,11 +63,11 @@ class DBConnectionManager {
 
     private __gshared DBConnectionManager instance;
 
-    shared static this(){
+    shared static this() {
         instance = new DBConnectionManager();
     }
 
-    private HashMap!(string, ConnectionProvider) providers;
+    // private HashMap!(string, ConnectionProvider) providers;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,7 +84,19 @@ class DBConnectionManager {
      *  
      */
     private this() {
-        providers = new HashMap!(string, ConnectionProvider)();
+        // providers = new HashMap!(string, ConnectionProvider)();
+
+    }
+
+    EntityOption getOption() {
+        EntityOption option = new EntityOption();
+        option.database.driver = "postgresql";
+        option.database.host = "10.1.11.34";
+        option.database.port = 5432;
+        option.database.database = "exampledb";
+        option.database.username = "quartz_test";
+        option.database.password = "123456";
+        return option;
     }
 
     /*
@@ -92,10 +107,10 @@ class DBConnectionManager {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    void addConnectionProvider(string dataSourceName,
-            ConnectionProvider provider) {
-        this.providers.put(dataSourceName, provider);
-    }
+    // void addConnectionProvider(string dataSourceName,
+    //         ConnectionProvider provider) {
+    //     this.providers.put(dataSourceName, provider);
+    // }
 
     /**
      * Get a database connection from the DataSource with the given name.
@@ -106,14 +121,22 @@ class DBConnectionManager {
      *              given name.
      */
     Connection getConnection(string dsName) {
-        ConnectionProvider provider = providers.get(dsName);
-        if (provider is null) {
-            throw new SQLException("There is no DataSource named '"
-                    ~ dsName ~ "'");
-        }
+        // ConnectionProvider provider = providers.get(dsName);
+        // if (provider is null) {
+        //     throw new SQLException("There is no DataSource named '"
+        //             ~ dsName ~ "'");
+        // }
 
-        return provider.getConnection();
+        // return provider.getConnection();
+        if (em is null) {
+            EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("postgresql",
+                    getOption());
+            em = entityManagerFactory.createEntityManager();
+        }
+        return em;
     }
+
+    private EntityManager em;
 
     /**
      * Get the class instance.
@@ -136,16 +159,16 @@ class DBConnectionManager {
      */
     void shutdown(string dsName) {
 
-        ConnectionProvider provider = providers.get(dsName);
-        if (provider is null) {
-            throw new SQLException("There is no DataSource named '"
-                    ~ dsName ~ "'");
-        }
+        // ConnectionProvider provider = providers.get(dsName);
+        // if (provider is null) {
+        //     throw new SQLException("There is no DataSource named '"
+        //             ~ dsName ~ "'");
+        // }
 
-        provider.shutdown();
+        // provider.shutdown();
     }
 
-    ConnectionProvider getConnectionProvider(string key) {
-        return providers.get(key);
-    }
+    // ConnectionProvider getConnectionProvider(string key) {
+    //     return providers.get(key);
+    // }
 }
