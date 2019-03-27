@@ -88,16 +88,6 @@ class DBConnectionManager {
 
     }
 
-    EntityOption getOption() {
-        EntityOption option = new EntityOption();
-        option.database.driver = "postgresql";
-        option.database.host = "10.1.11.34";
-        option.database.port = 5432;
-        option.database.database = "exampledb";
-        option.database.username = "quartz_test";
-        option.database.password = "123456";
-        return option;
-    }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +110,7 @@ class DBConnectionManager {
      *              if an error occurs, or there is no DataSource with the
      *              given name.
      */
-    Connection getConnection(string dsName) {
+    Connection getConnection(string dsName, EntityOption option) {
         // ConnectionProvider provider = providers.get(dsName);
         // if (provider is null) {
         //     throw new SQLException("There is no DataSource named '"
@@ -130,7 +120,7 @@ class DBConnectionManager {
         // return provider.getConnection();
         if (em is null) {
             EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("postgresql",
-                    getOption());
+                    option);
             em = entityManagerFactory.createEntityManager();
         }
         return em;

@@ -29,6 +29,7 @@ import hunt.quartz.dbstore.FiredTriggerRecord;
 import hunt.quartz.dbstore.SchedulerStateRecord;
 import hunt.quartz.dbstore.Semaphore;
 import hunt.quartz.dbstore.SimpleSemaphore;
+import hunt.quartz.dbstore.StdDbDelegate;
 import hunt.quartz.dbstore.TableConstants;
 import hunt.quartz.dbstore.TriggerStatus;
 
@@ -63,6 +64,7 @@ import hunt.quartz.spi.ThreadExecutor;
 import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.spi.TriggerFiredResult;
 
+import hunt.database.DatabaseException;
 import hunt.Exceptions;
 import hunt.concurrency.thread;
 import hunt.logging.ConsoleLogger;
@@ -79,6 +81,7 @@ import std.conv;
 import std.datetime;
 
 import hunt.entity.EntityManager;
+import hunt.entity.EntityOption;
 
 alias Connection = EntityManager;
 
@@ -111,7 +114,7 @@ abstract class JobStoreSupport : JobStore {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
+    protected EntityOption entityOption;
     protected string dsName;
 
     protected string tablePrefix = TableConstants.DEFAULT_TABLE_PREFIX;
@@ -130,7 +133,7 @@ abstract class JobStoreSupport : JobStore {
 
     protected HashMap!(string, Calendar) calendarCache;
 
-    // private DriverDelegate delegate;
+    private DriverDelegate dbDriverDelegate;
 
     private long misfireThreshold = 60000L; // one minute
 
@@ -222,6 +225,14 @@ abstract class JobStoreSupport : JobStore {
      */
     string getDataSource() {
         return dsName;
+    }
+
+    void setEntityOption(EntityOption option) {
+        entityOption = option;
+    }
+
+    EntityOption getEntityOption() {
+        return entityOption;
     }
 
     /**
@@ -808,15 +819,16 @@ abstract class JobStoreSupport : JobStore {
         Connection conn;
         try {
             conn = DBConnectionManager.getInstance().getConnection(
-                    getDataSource());
-        } catch (SQLException sqle) {
-            throw new JobPersistenceException(
-                    "Failed to obtain DB connection from data source '"
-                    ~ getDataSource() ~ "': " ~ sqle.toString(), sqle);
+                    getDataSource(), getEntityOption());
+        } catch (DatabaseException sqle) {
+            string msg = "Failed to obtain DB connection from data source '"
+                    ~ getDataSource() ~ "': " ~ sqle.msg;
+            warning(msg);
+            throw new JobPersistenceException(msg, sqle);
         } catch (Throwable e) {
-            throw new JobPersistenceException(
-                    "Failed to obtain DB connection from data source '"
-                    ~ getDataSource() ~ "': " ~ e.toString(), e);
+            string msg = "Failed to obtain DB connection from data source '"
+                    ~ getDataSource() ~ "': " ~ e.msg;
+            throw new JobPersistenceException(msg, e);
         }
 
         if (conn is null) { 
@@ -3118,32 +3130,21 @@ abstract class JobStoreSupport : JobStore {
      * </p>
      */
     protected DriverDelegate getDelegate() {
-        implementationMissing(false);
-        return null;
-        // synchronized(this) {
-        //     if(null == delegate) {
-        //         try {
-        //             if(delegateClassName !is null) {
-        //                 delegateClass = getClassLoadHelper().loadClass(delegateClassName, DriverDelegate.class);
-        //             }
-
-        //             delegate = delegateClass.newInstance();
+        synchronized(this) {
+            if(dbDriverDelegate is null) {
+                try {
+                    dbDriverDelegate = new StdDbDelegate();
                     
-        //             delegate.initialize(tablePrefix, instanceName, instanceId, getClassLoadHelper(), canUseProperties(), getDriverDelegateInitString());
-                    
-        //         } catch (InstantiationException e) {
-        //             throw new NoSuchDelegateException("Couldn't create delegate: "
-        //                     ~ e.msg, e);
-        //         } catch (IllegalAccessException e) {
-        //             throw new NoSuchDelegateException("Couldn't create delegate: "
-        //                     ~ e.msg, e);
-        //         } catch (ClassNotFoundException e) {
-        //             throw new NoSuchDelegateException("Couldn't load delegate class: "
-        //                     ~ e.msg, e);
-        //         }
-        //     }
-        //     return delegate;
-        // }
+                    dbDriverDelegate.initialize(tablePrefix, instanceName, instanceId, 
+                        canUseProperties(), getDriverDelegateInitString());
+                } catch (Exception e) {
+                    string msg = "Couldn't create DB driver delegate: " ~ e.msg;
+                    warning(msg);
+                    throw new NoSuchDelegateException(msg, e);
+                }
+            }
+            return dbDriverDelegate;
+        }
     }
 
     protected Semaphore getLockHandler() {
