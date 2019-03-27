@@ -43,10 +43,10 @@ struct StdSqlConstants {
      */
 
     // table prefix substitution string
-//     enum string TABLE_PREFIX_SUBST = "{0}";
+    enum string TABLE_PREFIX_SUBST = "{0}";
 
-//     // table prefix substitution string
-//     enum string SCHED_NAME_SUBST = "{1}";
+    // table prefix substitution string
+    enum string SCHED_NAME_SUBST = "%s";
 
 //     // QUERIES
 //     enum string UPDATE_TRIGGER_STATES_FROM_OTHER_STATES = "UPDATE "
@@ -622,9 +622,9 @@ struct StdSqlConstants {
 //             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
 //             ~ " AND " ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
-//     enum string SELECT_PAUSED_TRIGGER_GROUPS = "SELECT "
-//         ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " FROM " ~ ModelConstants.MODEL_PAUSED_TRIGGERS
-//         ~ " WHERE " ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
+    enum string SELECT_PAUSED_TRIGGER_GROUPS = "SELECT t."
+        ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " FROM " ~ ModelConstants.MODEL_PAUSED_TRIGGERS
+        ~ " t WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
 //     enum string DELETE_PAUSED_TRIGGER_GROUP = "DELETE FROM "
 //             ~ ModelConstants.MODEL_PAUSED_TRIGGERS ~ " WHERE "
