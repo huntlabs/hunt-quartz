@@ -62,6 +62,178 @@ class SchedulerTestBase {
 
     protected abstract Scheduler createScheduler(string name, int threadPoolSize);
 
+    @Test
+    void testBasicStorageFunctions(){
+        Scheduler sched = createScheduler("testBasicStorageFunctions", 2);
+
+        // test basic storage functions of scheduler...
+        
+        JobDetail job = JobBuilder.newJob()
+            .ofType(typeid(TestJob))
+            .withIdentity("j1")
+            .storeDurably()
+            .build();
+
+        assertFalse("Unexpected existence of job named 'j1'.", 
+            sched.checkExists(jobKey("j1")));
+
+        sched.addJob(job, false); 
+
+        assertTrue("Expected existence of job named 'j1' but checkExists return false.", 
+            sched.checkExists(jobKey("j1")));
+
+        job = sched.getJobDetail(jobKey("j1"));
+
+        assertNotNull("Stored job not found!", job);
+        
+        sched.deleteJob(jobKey("j1"));
+        
+        Trigger trigger = TriggerBuilderHelper.newTrigger!Trigger()
+            .withIdentity("t1")
+            .forJob(job)
+            .startNow()
+            .withSchedule(simpleSchedule()
+                    .repeatForever()
+                    .withIntervalInSeconds(5))
+             .build();
+
+        assertFalse("Unexpected existence of trigger named '11'.", sched.checkExists(triggerKey("t1")));
+
+        sched.scheduleJob(job, trigger);
+        
+        assertTrue("Expected existence of trigger named 't1' but checkExists return false.", sched.checkExists(triggerKey("t1")));
+
+        job = sched.getJobDetail(jobKey("j1"));
+
+        assertNotNull("Stored job not found!", job);
+        
+        trigger = sched.getTrigger(triggerKey("t1"));
+
+        assertNotNull("Stored trigger not found!", trigger);
+
+        job = JobBuilder.newJob()
+            .ofType(typeid(TestJob))
+            .withIdentity("j2", "g1")
+            .build();
+    
+        trigger = TriggerBuilderHelper.newTrigger!Trigger()
+            .withIdentity("t2", "g1")
+            .forJob(job)
+            .startNow()
+            .withSchedule(simpleSchedule()
+                    .repeatForever()
+                    .withIntervalInSeconds(5))
+             .build();
+
+        sched.scheduleJob(job, trigger);
+        
+        job = JobBuilder.newJob()
+            .ofType(typeid(TestJob))
+            .withIdentity("j3", "g1")
+            .build();
+    
+        trigger = TriggerBuilderHelper.newTrigger!Trigger()
+            .withIdentity("t3", "g1")
+            .forJob(job)
+            .startNow()
+            .withSchedule(simpleSchedule()
+                    .repeatForever()
+                    .withIntervalInSeconds(5))
+             .build();
+    
+        sched.scheduleJob(job, trigger);
+        
+                
+        List!(string) jobGroups = sched.getJobGroupNames();
+        List!(string) triggerGroups = sched.getTriggerGroupNames();
+        
+        assertTrue("Job group list size expected to be = 2 ", jobGroups.size() == 2);
+        assertTrue("Trigger group list size expected to be = 2 ", triggerGroups.size() == 2);
+        
+        Set!(JobKey) jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals(JobKey.DEFAULT_GROUP));
+        Set!(TriggerKey) triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
+
+        assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1);
+        assertTrue("Number of triggers expected in default group was 1 ", triggerKeys.size() == 1);
+
+        jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals("g1"));
+        triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals("g1"));
+
+        assertTrue("Number of jobs expected in 'g1' group was 2 ", jobKeys.size() == 2);
+        assertTrue("Number of triggers expected in 'g1' group was 2 ", triggerKeys.size() == 2);
+
+        
+        TriggerState s = sched.getTriggerState(triggerKey("t2", "g1"));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s == TriggerState.NORMAL);
+        
+        sched.pauseTrigger(triggerKey("t2", "g1"));
+        s = sched.getTriggerState(triggerKey("t2", "g1"));
+        assertTrue("State of trigger t2 expected to be PAUSED ", s == TriggerState.PAUSED);
+
+        sched.resumeTrigger(triggerKey("t2", "g1"));
+        s = sched.getTriggerState(triggerKey("t2", "g1"));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s == TriggerState.NORMAL);
+
+        Set!(string) pausedGroups = sched.getPausedTriggerGroups();
+        assertTrue("Size of paused trigger groups list expected to be 0 ", pausedGroups.size() == 0);
+        
+        sched.pauseTriggers(GroupMatcherHelper.triggerGroupEquals("g1"));
+        
+        // test that adding a trigger to a paused group causes the new trigger to be paused also... 
+        job = JobBuilder.newJob()
+            .ofType(typeid(TestJob))
+            .withIdentity("j4", "g1")
+            .build();
+    
+        trigger = TriggerBuilderHelper.newTrigger!Trigger()
+            .withIdentity("t4", "g1")
+            .forJob(job)
+            .startNow()
+            .withSchedule(simpleSchedule()
+                    .repeatForever()
+                    .withIntervalInSeconds(5))
+             .build();
+    
+        sched.scheduleJob(job, trigger);
+
+        pausedGroups = sched.getPausedTriggerGroups();
+        assertTrue("Size of paused trigger groups list expected to be 1 ", pausedGroups.size() == 1);
+
+        s = sched.getTriggerState(triggerKey("t2", "g1"));
+        assertTrue("State of trigger t2 expected to be PAUSED ", s == TriggerState.PAUSED);
+
+        s = sched.getTriggerState(triggerKey("t4", "g1"));
+        assertTrue("State of trigger t4 expected to be PAUSED ", s == TriggerState.PAUSED);
+        
+        sched.resumeTriggers(GroupMatcherHelper.triggerGroupEquals("g1"));
+        s = sched.getTriggerState(triggerKey("t2", "g1"));
+        assertTrue("State of trigger t2 expected to be NORMAL ", s == TriggerState.NORMAL);
+        s = sched.getTriggerState(triggerKey("t4", "g1"));
+        assertTrue("State of trigger t4 expected to be NORMAL ", s == TriggerState.NORMAL);
+        pausedGroups = sched.getPausedTriggerGroups();
+        assertTrue("Size of paused trigger groups list expected to be 0 ", pausedGroups.size() == 0);
+
+        
+        assertFalse("Scheduler should have returned 'false' from attempt to unschedule non-existing trigger. ", sched.unscheduleJob(triggerKey("foasldfksajdflk")));
+
+        assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", sched.unscheduleJob(triggerKey("t3", "g1")));
+        
+        jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals("g1"));
+        triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals("g1"));
+
+        assertTrue("Number of jobs expected in 'g1' group was 1 ", jobKeys.size() == 2); // job should have been deleted also, because it is non-durable
+        assertTrue("Number of triggers expected in 'g1' group was 1 ", triggerKeys.size() == 2);
+
+        assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", sched.unscheduleJob(triggerKey("t1")));
+        
+        jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals(JobKey.DEFAULT_GROUP));
+        triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
+
+        assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1); // job should have been left in place, because it is non-durable
+        assertTrue("Number of triggers expected in default group was 0 ", triggerKeys.size() == 0);
+
+        sched.shutdown(true);
+    }
     
     @Test
     void testDurableStorageFunctions(){
