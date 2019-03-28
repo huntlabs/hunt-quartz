@@ -500,7 +500,7 @@ class StdDbDelegate : DriverDelegate {
         //     ps = conn
         //             .prepareStatement(rtp(SELECT_INSTANCES_RECOVERABLE_FIRED_TRIGGERS));
         //     query.setParameter(1, instanceId);
-        //     setBoolean(ps, 2, true);
+        //     query.setParameter(2, true);
         //     rs = ps.executeQuery();
 
         //     long dumId = DateTimeHelper.currentTimeMillis();
@@ -621,33 +621,26 @@ class StdDbDelegate : DriverDelegate {
      *           if there were problems serializing the JobDataMap
      */
     int insertJobDetail(Connection conn, JobDetail job) {
-        
-        implementationMissing(false);
-        return 0;
         // ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
 
-        // PreparedStatement ps = null;
-
-        // int insertResult = 0;
-
-        // try {
-        //     ps = conn.prepareStatement(rtp(INSERT_JOB_DETAIL));
-        //     query.setParameter(1, job.getKey().getName());
-        //     query.setParameter(2, job.getKey().getGroup());
-        //     query.setParameter(3, job.getDescription());
-        //     query.setParameter(4, job.getJobClass().getName());
-        //     setBoolean(ps, 5, job.isDurable());
-        //     setBoolean(ps, 6, job.isConcurrentExectionDisallowed());
-        //     setBoolean(ps, 7, job.isPersistJobDataAfterExecution());
-        //     setBoolean(ps, 8, job.requestsRecovery());
+        int insertResult = 0;
+        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.INSERT_JOB_DETAIL));
+        query.setParameter(1, job.getKey().getName());
+        query.setParameter(2, job.getKey().getGroup());
+        query.setParameter(3, job.getDescription());
+        query.setParameter(4, job.getJobClass().name);
+        query.setParameter(5, job.isDurable());
+        query.setParameter(6, job.isConcurrentExectionDisallowed());
+        query.setParameter(7, job.isPersistJobDataAfterExecution());
+        query.setParameter(8, job.requestsRecovery());
+        // FIXME: Needing refactor or cleanup -@zhangxueping at 3/28/2019, 1:55:07 PM
+        // 
+        query.setParameter(9, cast(ubyte[])[1,2,3]);
         //     setBytes(ps, 9, baos);
 
-        //     insertResult = ps.executeUpdate();
-        // } finally {
-        //     closeStatement(ps);
-        // }
+        insertResult = query.exec();
 
-        // return insertResult;
+        return insertResult;
     }
 
     /**
@@ -674,10 +667,10 @@ class StdDbDelegate : DriverDelegate {
         //     ps = conn.prepareStatement(rtp(UPDATE_JOB_DETAIL));
         //     query.setParameter(1, job.getDescription());
         //     query.setParameter(2, job.getJobClass().getName());
-        //     setBoolean(ps, 3, job.isDurable());
-        //     setBoolean(ps, 4, job.isConcurrentExectionDisallowed());
-        //     setBoolean(ps, 5, job.isPersistJobDataAfterExecution());
-        //     setBoolean(ps, 6, job.requestsRecovery());
+        //     query.setParameter(3, job.isDurable());
+        //     query.setParameter(4, job.isConcurrentExectionDisallowed());
+        //     query.setParameter(5, job.isPersistJobDataAfterExecution());
+        //     query.setParameter(6, job.requestsRecovery());
         //     setBytes(ps, 7, baos);
         //     query.setParameter(8, job.getKey().getName());
         //     query.setParameter(9, job.getKey().getGroup());
@@ -788,27 +781,11 @@ class StdDbDelegate : DriverDelegate {
      * @return true if the job exists, false otherwise
      */
     bool jobExists(Connection conn, JobKey jobKey) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
-
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_JOB_EXISTENCE));
-        //     query.setParameter(1, jobKey.getName());
-        //     query.setParameter(2, jobKey.getGroup());
-        //     rs = ps.executeQuery();
-        //     if (rs.next()) {
-        //         return true;
-        //     } else {
-        //         return false;
-        //     }
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return false;
-
+        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_EXISTENCE));
+        query.setParameter(1, jobKey.getName());
+        query.setParameter(2, jobKey.getGroup());
+        JobDetails r = query.getSingleResult();
+        return r !is null;
     }
 
     /**
@@ -2789,13 +2766,13 @@ class StdDbDelegate : DriverDelegate {
         //     if (job !is null) {
         //         query.setParameter(8, trigger.getJobKey().getName());
         //         query.setParameter(9, trigger.getJobKey().getGroup());
-        //         setBoolean(ps, 10, job.isConcurrentExectionDisallowed());
-        //         setBoolean(ps, 11, job.requestsRecovery());
+        //         query.setParameter(10, job.isConcurrentExectionDisallowed());
+        //         query.setParameter(11, job.requestsRecovery());
         //     } else {
         //         query.setParameter(8, null);
         //         query.setParameter(9, null);
-        //         setBoolean(ps, 10, false);
-        //         setBoolean(ps, 11, false);
+        //         query.setParameter(10, false);
+        //         query.setParameter(11, false);
         //     }
         //     ps.setInt(12, trigger.getPriority());
 
@@ -2836,13 +2813,13 @@ class StdDbDelegate : DriverDelegate {
         //     if (job !is null) {
         //         query.setParameter(5, trigger.getJobKey().getName());
         //         query.setParameter(6, trigger.getJobKey().getGroup());
-        //         setBoolean(ps, 7, job.isConcurrentExectionDisallowed());
-        //         setBoolean(ps, 8, job.requestsRecovery());
+        //         query.setParameter(7, job.isConcurrentExectionDisallowed());
+        //         query.setParameter(8, job.requestsRecovery());
         //     } else {
         //         query.setParameter(5, null);
         //         query.setParameter(6, null);
-        //         setBoolean(ps, 7, false);
-        //         setBoolean(ps, 8, false);
+        //         query.setParameter(7, false);
+        //         query.setParameter(8, false);
         //     }
 
         //     query.setParameter(9, trigger.getFireInstanceId());

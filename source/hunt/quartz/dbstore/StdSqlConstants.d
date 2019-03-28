@@ -120,12 +120,12 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
     enum string INSERT_JOB_DETAIL = "INSERT INTO "
-            ~ ModelConstants.MODEL_JOB_DETAILS ~ " (" 
-            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ ", " ~ ModelConstants.FIELD_JOB_NAME
-            ~ ", " ~ ModelConstants.FIELD_JOB_GROUP ~ ", " ~ ModelConstants.FIELD_DESCRIPTION ~ ", "
-            ~ ModelConstants.FIELD_JOB_CLASS ~ ", " ~ ModelConstants.FIELD_IS_DURABLE ~ ", " 
-            ~ ModelConstants.FIELD_IS_NONCONCURRENT ~  ", " ~ ModelConstants.FIELD_IS_UPDATE_DATA ~ ", " 
-            ~ ModelConstants.FIELD_REQUESTS_RECOVERY ~ ", "
+            ~ ModelConstants.MODEL_JOB_DETAILS ~ " t (t." 
+            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ ", t." ~ ModelConstants.FIELD_JOB_NAME
+            ~ ", t." ~ ModelConstants.FIELD_JOB_GROUP ~ ", t." ~ ModelConstants.FIELD_DESCRIPTION ~ ", t."
+            ~ ModelConstants.FIELD_JOB_CLASS ~ ", t." ~ ModelConstants.FIELD_IS_DURABLE ~ ", t." 
+            ~ ModelConstants.FIELD_IS_NONCONCURRENT ~  ", t." ~ ModelConstants.FIELD_IS_UPDATE_DATA ~ ", t." 
+            ~ ModelConstants.FIELD_REQUESTS_RECOVERY ~ ", t."
             ~ ModelConstants.FIELD_JOB_DATAMAP ~ ") " ~ " VALUES(" ~ SCHED_NAME_SUBST ~ ", ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     enum string UPDATE_JOB_DETAIL = "UPDATE "
@@ -165,7 +165,7 @@ struct StdSqlConstants {
             ~ " AND t." ~ ModelConstants.FIELD_JOB_NAME
             ~ " = ? AND t." ~ ModelConstants.FIELD_JOB_GROUP ~ " = ?";
 
-    enum string SELECT_JOB_EXISTENCE = "SELECT " ~ ModelConstants.FIELD_JOB_NAME
+    enum string SELECT_JOB_EXISTENCE = "SELECT t." ~ ModelConstants.FIELD_JOB_NAME
             ~ " FROM " ~ ModelConstants.MODEL_JOB_DETAILS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST 
             ~ " AND t." ~ ModelConstants.FIELD_JOB_NAME

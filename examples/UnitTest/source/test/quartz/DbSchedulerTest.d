@@ -44,6 +44,7 @@ class DbSchedulerTest : SchedulerTestBase {
         option.database.database = "quartz_test";
         option.database.username = "postgres";
         option.database.password = "123456";
+        option.database.prefix = "qrtz_";
         return option;
     }
 }
