@@ -9,7 +9,7 @@ public import hunt.quartz.dbstore.model.Locks;
 public import hunt.quartz.dbstore.model.PausedTriggerGrps;
 public import hunt.quartz.dbstore.model.SchedulerState;
 public import hunt.quartz.dbstore.model.SimpleTriggers;
-public import hunt.quartz.dbstore.model.SimpropTriggers;
+public import hunt.quartz.dbstore.model.SimpPropertiesTrigger;
 public import hunt.quartz.dbstore.model.Triggers;
 
 

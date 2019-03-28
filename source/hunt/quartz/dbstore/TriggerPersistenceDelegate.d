@@ -15,10 +15,6 @@
  */
 module hunt.quartz.dbstore.TriggerPersistenceDelegate;
 
-// import java.io.IOException;
-// import java.sql.Connection;
-// import java.sql.SQLException;
-
 import hunt.quartz.JobDetail;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.TriggerKey;

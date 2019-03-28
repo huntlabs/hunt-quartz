@@ -17,11 +17,20 @@
 
 module hunt.quartz.dbstore.StdDbDelegate;
 
+import hunt.quartz.dbstore.CalendarIntervalTriggerPersistenceDelegate;
+import hunt.quartz.dbstore.CronTriggerPersistenceDelegate;
+import hunt.quartz.dbstore.DailyTimeIntervalTriggerPersistenceDelegate;
 import hunt.quartz.dbstore.DriverDelegate;
+import hunt.quartz.dbstore.FiredTriggerRecord;
 import hunt.quartz.dbstore.model;
+import hunt.quartz.dbstore.SchedulerStateRecord;
 import hunt.quartz.dbstore.SimpleTriggerPersistenceDelegate;
 import hunt.quartz.dbstore.StdSqlConstants;
+import hunt.quartz.dbstore.TriggerStatus;
 import hunt.quartz.dbstore.TriggerPersistenceDelegate;
+
+import hunt.io.ByteArrayOutputStream;
+
 
 // import static hunt.quartz.JobKey.jobKey;
 // import static hunt.quartz.TriggerBuilder.newTrigger;
@@ -72,7 +81,9 @@ import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 import hunt.quartz.spi.OperableTrigger;
 
 import hunt.Exceptions;
-import hunt.entity;
+// import hunt.entity;
+
+import hunt.entity.EntityManager;
 import hunt.entity.eql.EqlQuery;
 import hunt.logging;
 
@@ -110,7 +121,7 @@ class StdDbDelegate : DriverDelegate {
     
     // protected ClassLoadHelper classLoadHelper;
 
-    // protected List!(TriggerPersistenceDelegate) triggerPersistenceDelegates;
+    protected List!(TriggerPersistenceDelegate) triggerPersistenceDelegates;
 
     
     /*
@@ -127,7 +138,7 @@ class StdDbDelegate : DriverDelegate {
      * </p>
      */
     this() {
-        // triggerPersistenceDelegates = new LinkedList!(TriggerPersistenceDelegate)();
+        triggerPersistenceDelegates = new LinkedList!(TriggerPersistenceDelegate)();
     }
 
     /*
@@ -241,19 +252,7 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, newState);
         query.setParameter(2, oldState1);
         query.setParameter(3, oldState2);
-        query.exec();
-
-        // PreparedStatement ps = null;
-
-        // try {
-        //     ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATES_FROM_OTHER_STATES));
-        //     query.setParameter(1, newState);
-        //     query.setParameter(2, oldState1);
-        //     query.setParameter(3, oldState2);
-        //     return ps.executeUpdate();
-        // } finally {
-        //     closeStatement(ps);
-        // }
+        return query.exec();
     }
 
     /**
@@ -931,6 +930,7 @@ class StdDbDelegate : DriverDelegate {
      * @return the total number of jobs stored
      */
     int selectNumJobs(Connection conn) {
+
         // PreparedStatement ps = null;
         // ResultSet rs = null;
 
@@ -963,23 +963,26 @@ class StdDbDelegate : DriverDelegate {
      * @return an array of <code>string</code> group names
      */
     List!(string) selectJobGroups(Connection conn) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_JOB_GROUPS));
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_JOB_GROUPS));
+        //     rs = ps.executeQuery();
 
-            LinkedList!(string) list = new LinkedList!(string)();
-            while (rs.next()) {
-                list.add(rs.getString(1));
-            }
+        //     LinkedList!(string) list = new LinkedList!(string)();
+        //     while (rs.next()) {
+        //         list.add(rs.getString(1));
+        //     }
 
-            return list;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return list;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -994,30 +997,33 @@ class StdDbDelegate : DriverDelegate {
      * @return an array of <code>string</code> job names
      */
     Set!(JobKey) selectJobsInGroup(Connection conn, GroupMatcher!(JobKey) matcher) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            if(isMatcherEquals(matcher)) {
-                ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP));
-                query.setParameter(1, toSqlEqualsClause(matcher));
-            }
-            else {
-                ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP_LIKE));
-                query.setParameter(1, toSqlLikeClause(matcher));
-            }
-            rs = ps.executeQuery();
+        // try {
+        //     if(isMatcherEquals(matcher)) {
+        //         ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP));
+        //         query.setParameter(1, toSqlEqualsClause(matcher));
+        //     }
+        //     else {
+        //         ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP_LIKE));
+        //         query.setParameter(1, toSqlLikeClause(matcher));
+        //     }
+        //     rs = ps.executeQuery();
 
-            LinkedList!(JobKey) list = new LinkedList!(JobKey)();
-            while (rs.next()) {
-                list.add(jobKey(rs.getString(1), rs.getString(2)));
-            }
+        //     LinkedList!(JobKey) list = new LinkedList!(JobKey)();
+        //     while (rs.next()) {
+        //         list.add(jobKey(rs.getString(1), rs.getString(2)));
+        //     }
 
-            return new HashSet!(JobKey)(list);
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return new HashSet!(JobKey)(list);
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     protected bool isMatcherEquals(T)(GroupMatcher!T matcher) {
@@ -1047,7 +1053,8 @@ class StdDbDelegate : DriverDelegate {
                 groupName = "%";
                 break;
             default:
-                throw new UnsupportedOperationException("Don't know how to translate " ~ matcher.getCompareWithOperator() ~ " into SQL");
+                throw new UnsupportedOperationException("Don't know how to translate " ~ 
+                    matcher.getCompareWithOperator() ~ " into SQL");
         }
         return groupName;
     }
@@ -1072,65 +1079,68 @@ class StdDbDelegate : DriverDelegate {
     int insertTrigger(Connection conn, OperableTrigger trigger, string state,
             JobDetail jobDetail) {
 
-        ByteArrayOutputStream baos = null;
-        if(trigger.getJobDataMap().size() > 0) {
-            baos = serializeJobData(trigger.getJobDataMap());
-        }
+        // ByteArrayOutputStream baos = null;
+        // if(trigger.getJobDataMap().size() > 0) {
+        //     baos = serializeJobData(trigger.getJobDataMap());
+        // }
         
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        int insertResult = 0;
+        // int insertResult = 0;
 
-        try {
-            ps = conn.prepareStatement(rtp(INSERT_TRIGGER));
-            query.setParameter(1, trigger.getKey().getName());
-            query.setParameter(2, trigger.getKey().getGroup());
-            query.setParameter(3, trigger.getJobKey().getName());
-            query.setParameter(4, trigger.getJobKey().getGroup());
-            query.setParameter(5, trigger.getDescription());
-            if(trigger.getNextFireTime() !is null)
-                ps.setBigDecimal(6, new BigDecimal(string.valueOf(trigger
-                        .getNextFireTime().getTime())));
-            else
-                ps.setBigDecimal(6, null);
-            long prevFireTime = -1;
-            if (trigger.getPreviousFireTime() !is null) {
-                prevFireTime = trigger.getPreviousFireTime().getTime();
-            }
-            ps.setBigDecimal(7, new BigDecimal(string.valueOf(prevFireTime)));
-            query.setParameter(8, state);
+        // try {
+        //     ps = conn.prepareStatement(rtp(INSERT_TRIGGER));
+        //     query.setParameter(1, trigger.getKey().getName());
+        //     query.setParameter(2, trigger.getKey().getGroup());
+        //     query.setParameter(3, trigger.getJobKey().getName());
+        //     query.setParameter(4, trigger.getJobKey().getGroup());
+        //     query.setParameter(5, trigger.getDescription());
+        //     if(trigger.getNextFireTime() !is null)
+        //         ps.setBigDecimal(6, new BigDecimal(string.valueOf(trigger
+        //                 .getNextFireTime().getTime())));
+        //     else
+        //         ps.setBigDecimal(6, null);
+        //     long prevFireTime = -1;
+        //     if (trigger.getPreviousFireTime() !is null) {
+        //         prevFireTime = trigger.getPreviousFireTime().getTime();
+        //     }
+        //     ps.setBigDecimal(7, new BigDecimal(string.valueOf(prevFireTime)));
+        //     query.setParameter(8, state);
             
-            TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
+        //     TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
             
-            string type = TTYPE_BLOB;
-            if(tDel !is null)
-                type = tDel.getHandledTriggerTypeDiscriminator();
-            query.setParameter(9, type);
+        //     string type = TTYPE_BLOB;
+        //     if(tDel !is null)
+        //         type = tDel.getHandledTriggerTypeDiscriminator();
+        //     query.setParameter(9, type);
             
-            ps.setBigDecimal(10, new BigDecimal(string.valueOf(trigger
-                    .getStartTime().getTime())));
-            long endTime = 0;
-            if (trigger.getEndTime() !is null) {
-                endTime = trigger.getEndTime().getTime();
-            }
-            ps.setBigDecimal(11, new BigDecimal(string.valueOf(endTime)));
-            query.setParameter(12, trigger.getCalendarName());
-            ps.setInt(13, trigger.getMisfireInstruction());
-            setBytes(ps, 14, baos);
-            ps.setInt(15, trigger.getPriority());
+        //     ps.setBigDecimal(10, new BigDecimal(string.valueOf(trigger
+        //             .getStartTime().getTime())));
+        //     long endTime = 0;
+        //     if (trigger.getEndTime() !is null) {
+        //         endTime = trigger.getEndTime().getTime();
+        //     }
+        //     ps.setBigDecimal(11, new BigDecimal(string.valueOf(endTime)));
+        //     query.setParameter(12, trigger.getCalendarName());
+        //     ps.setInt(13, trigger.getMisfireInstruction());
+        //     setBytes(ps, 14, baos);
+        //     ps.setInt(15, trigger.getPriority());
             
-            insertResult = ps.executeUpdate();
+        //     insertResult = ps.executeUpdate();
             
-            if(tDel is null)
-                insertBlobTrigger(conn, trigger);
-            else
-                tDel.insertExtendedTriggerProperties(conn, trigger, state, jobDetail);
+        //     if(tDel is null)
+        //         insertBlobTrigger(conn, trigger);
+        //     else
+        //         tDel.insertExtendedTriggerProperties(conn, trigger, state, jobDetail);
             
-        } finally {
-            closeStatement(ps);
-        }
+        // } finally {
+        //     closeStatement(ps);
+        // }
 
-        return insertResult;
+        // return insertResult;
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1189,79 +1199,82 @@ class StdDbDelegate : DriverDelegate {
             JobDetail jobDetail) {
 
         // save some clock cycles by unnecessarily writing job data blob ...
-        bool updateJobData = trigger.getJobDataMap().isDirty();
-        ByteArrayOutputStream baos = null;
-        if(updateJobData) {
-            baos = serializeJobData(trigger.getJobDataMap());
-        }
+        // bool updateJobData = trigger.getJobDataMap().isDirty();
+        // ByteArrayOutputStream baos = null;
+        // if(updateJobData) {
+        //     baos = serializeJobData(trigger.getJobDataMap());
+        // }
                 
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        int insertResult = 0;
+        // int insertResult = 0;
 
 
-        try {
-            if(updateJobData) {
-                ps = conn.prepareStatement(rtp(UPDATE_TRIGGER));
-            } else {
-                ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_SKIP_DATA));
-            }
+        // try {
+        //     if(updateJobData) {
+        //         ps = conn.prepareStatement(rtp(UPDATE_TRIGGER));
+        //     } else {
+        //         ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_SKIP_DATA));
+        //     }
                 
-            query.setParameter(1, trigger.getJobKey().getName());
-            query.setParameter(2, trigger.getJobKey().getGroup());
-            query.setParameter(3, trigger.getDescription());
-            long nextFireTime = -1;
-            if (trigger.getNextFireTime() !is null) {
-                nextFireTime = trigger.getNextFireTime().getTime();
-            }
-            ps.setBigDecimal(4, new BigDecimal(string.valueOf(nextFireTime)));
-            long prevFireTime = -1;
-            if (trigger.getPreviousFireTime() !is null) {
-                prevFireTime = trigger.getPreviousFireTime().getTime();
-            }
-            ps.setBigDecimal(5, new BigDecimal(string.valueOf(prevFireTime)));
-            query.setParameter(6, state);
+        //     query.setParameter(1, trigger.getJobKey().getName());
+        //     query.setParameter(2, trigger.getJobKey().getGroup());
+        //     query.setParameter(3, trigger.getDescription());
+        //     long nextFireTime = -1;
+        //     if (trigger.getNextFireTime() !is null) {
+        //         nextFireTime = trigger.getNextFireTime().getTime();
+        //     }
+        //     ps.setBigDecimal(4, new BigDecimal(string.valueOf(nextFireTime)));
+        //     long prevFireTime = -1;
+        //     if (trigger.getPreviousFireTime() !is null) {
+        //         prevFireTime = trigger.getPreviousFireTime().getTime();
+        //     }
+        //     ps.setBigDecimal(5, new BigDecimal(string.valueOf(prevFireTime)));
+        //     query.setParameter(6, state);
             
-            TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
+        //     TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
             
-            string type = TTYPE_BLOB;
-            if(tDel !is null)
-                type = tDel.getHandledTriggerTypeDiscriminator();
+        //     string type = TTYPE_BLOB;
+        //     if(tDel !is null)
+        //         type = tDel.getHandledTriggerTypeDiscriminator();
 
-            query.setParameter(7, type);
+        //     query.setParameter(7, type);
             
-            ps.setBigDecimal(8, new BigDecimal(string.valueOf(trigger
-                    .getStartTime().getTime())));
-            long endTime = 0;
-            if (trigger.getEndTime() !is null) {
-                endTime = trigger.getEndTime().getTime();
-            }
-            ps.setBigDecimal(9, new BigDecimal(string.valueOf(endTime)));
-            query.setParameter(10, trigger.getCalendarName());
-            ps.setInt(11, trigger.getMisfireInstruction());
-            ps.setInt(12, trigger.getPriority());
+        //     ps.setBigDecimal(8, new BigDecimal(string.valueOf(trigger
+        //             .getStartTime().getTime())));
+        //     long endTime = 0;
+        //     if (trigger.getEndTime() !is null) {
+        //         endTime = trigger.getEndTime().getTime();
+        //     }
+        //     ps.setBigDecimal(9, new BigDecimal(string.valueOf(endTime)));
+        //     query.setParameter(10, trigger.getCalendarName());
+        //     ps.setInt(11, trigger.getMisfireInstruction());
+        //     ps.setInt(12, trigger.getPriority());
 
-            if(updateJobData) {
-                setBytes(ps, 13, baos);
-                query.setParameter(14, trigger.getKey().getName());
-                query.setParameter(15, trigger.getKey().getGroup());
-            } else {
-                query.setParameter(13, trigger.getKey().getName());
-                query.setParameter(14, trigger.getKey().getGroup());
-            }
+        //     if(updateJobData) {
+        //         setBytes(ps, 13, baos);
+        //         query.setParameter(14, trigger.getKey().getName());
+        //         query.setParameter(15, trigger.getKey().getGroup());
+        //     } else {
+        //         query.setParameter(13, trigger.getKey().getName());
+        //         query.setParameter(14, trigger.getKey().getGroup());
+        //     }
 
-            insertResult = ps.executeUpdate();
+        //     insertResult = ps.executeUpdate();
             
-            if(tDel is null)
-                updateBlobTrigger(conn, trigger);
-            else
-                tDel.updateExtendedTriggerProperties(conn, trigger, state, jobDetail);
+        //     if(tDel is null)
+        //         updateBlobTrigger(conn, trigger);
+        //     else
+        //         tDel.updateExtendedTriggerProperties(conn, trigger, state, jobDetail);
             
-        } finally {
-            closeStatement(ps);
-        }
+        // } finally {
+        //     closeStatement(ps);
+        // }
 
-        return insertResult;
+        // return insertResult;
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1276,8 +1289,8 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows updated
      */
     int updateBlobTrigger(Connection conn, OperableTrigger trigger) {
-        PreparedStatement ps = null;
-        ByteArrayOutputStream os = null;
+        // PreparedStatement ps = null;
+        // ByteArrayOutputStream os = null;
 
         // try {
         //     // update the blob
@@ -1315,24 +1328,27 @@ class StdDbDelegate : DriverDelegate {
      * @return true if the trigger exists, false otherwise
      */
     bool triggerExists(Connection conn, TriggerKey triggerKey) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGER_EXISTENCE));
-            query.setParameter(1, triggerKey.getName());
-            query.setParameter(2, triggerKey.getGroup());
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER_EXISTENCE));
+        //     query.setParameter(1, triggerKey.getName());
+        //     query.setParameter(2, triggerKey.getGroup());
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return true;
-            } else {
-                return false;
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     if (rs.next()) {
+        //         return true;
+        //     } else {
+        //         return false;
+        //     }
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return false;
     }
 
     /**
@@ -1348,17 +1364,20 @@ class StdDbDelegate : DriverDelegate {
      */
     int updateTriggerState(Connection conn, TriggerKey triggerKey,
             string state) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE));
-            query.setParameter(1, state);
-            query.setParameter(2, triggerKey.getName());
-            query.setParameter(3, triggerKey.getGroup());
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        // try {
+        //     ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE));
+        //     query.setParameter(1, state);
+        //     query.setParameter(2, triggerKey.getName());
+        //     query.setParameter(3, triggerKey.getGroup());
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1383,21 +1402,24 @@ class StdDbDelegate : DriverDelegate {
     int updateTriggerStateFromOtherStates(Connection conn,
             TriggerKey triggerKey, string newState, string oldState1,
             string oldState2, string oldState3) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE_FROM_STATES));
-            query.setParameter(1, newState);
-            query.setParameter(2, triggerKey.getName());
-            query.setParameter(3, triggerKey.getGroup());
-            query.setParameter(4, oldState1);
-            query.setParameter(5, oldState2);
-            query.setParameter(6, oldState3);
+        // try {
+        //     ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE_FROM_STATES));
+        //     query.setParameter(1, newState);
+        //     query.setParameter(2, triggerKey.getName());
+        //     query.setParameter(3, triggerKey.getGroup());
+        //     query.setParameter(4, oldState1);
+        //     query.setParameter(5, oldState2);
+        //     query.setParameter(6, oldState3);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1424,21 +1446,24 @@ class StdDbDelegate : DriverDelegate {
     int updateTriggerGroupStateFromOtherStates(Connection conn,
             GroupMatcher!(TriggerKey) matcher, string newState, string oldState1,
             string oldState2, string oldState3) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn
-                    .prepareStatement(rtp(UPDATE_TRIGGER_GROUP_STATE_FROM_STATES));
-            query.setParameter(1, newState);
-            query.setParameter(2, toSqlLikeClause(matcher));
-            query.setParameter(3, oldState1);
-            query.setParameter(4, oldState2);
-            query.setParameter(5, oldState3);
+        // try {
+        //     ps = conn
+        //             .prepareStatement(rtp(UPDATE_TRIGGER_GROUP_STATE_FROM_STATES));
+        //     query.setParameter(1, newState);
+        //     query.setParameter(2, toSqlLikeClause(matcher));
+        //     query.setParameter(3, oldState1);
+        //     query.setParameter(4, oldState2);
+        //     query.setParameter(5, oldState3);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1458,19 +1483,22 @@ class StdDbDelegate : DriverDelegate {
      */
     int updateTriggerStateFromOtherState(Connection conn,
             TriggerKey triggerKey, string newState, string oldState) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE_FROM_STATE));
-            query.setParameter(1, newState);
-            query.setParameter(2, triggerKey.getName());
-            query.setParameter(3, triggerKey.getGroup());
-            query.setParameter(4, oldState);
+        // try {
+        //     ps = conn.prepareStatement(rtp(UPDATE_TRIGGER_STATE_FROM_STATE));
+        //     query.setParameter(1, newState);
+        //     query.setParameter(2, triggerKey.getName());
+        //     query.setParameter(3, triggerKey.getGroup());
+        //     query.setParameter(4, oldState);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1492,19 +1520,22 @@ class StdDbDelegate : DriverDelegate {
      */
     int updateTriggerGroupStateFromOtherState(Connection conn,
             GroupMatcher!(TriggerKey) matcher, string newState, string oldState) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn
-                    .prepareStatement(rtp(UPDATE_TRIGGER_GROUP_STATE_FROM_STATE));
-            query.setParameter(1, newState);
-            query.setParameter(2, toSqlLikeClause(matcher));
-            query.setParameter(3, oldState);
+        // try {
+        //     ps = conn
+        //             .prepareStatement(rtp(UPDATE_TRIGGER_GROUP_STATE_FROM_STATE));
+        //     query.setParameter(1, newState);
+        //     query.setParameter(2, toSqlLikeClause(matcher));
+        //     query.setParameter(3, oldState);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1520,36 +1551,42 @@ class StdDbDelegate : DriverDelegate {
      */
     int updateTriggerStatesForJob(Connection conn, JobKey jobKey,
             string state) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(UPDATE_JOB_TRIGGER_STATES));
-            query.setParameter(1, state);
-            query.setParameter(2, jobKey.getName());
-            query.setParameter(3, jobKey.getGroup());
+        // try {
+        //     ps = conn.prepareStatement(rtp(UPDATE_JOB_TRIGGER_STATES));
+        //     query.setParameter(1, state);
+        //     query.setParameter(2, jobKey.getName());
+        //     query.setParameter(3, jobKey.getGroup());
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     int updateTriggerStatesForJobFromOtherState(Connection conn,
             JobKey jobKey, string state, string oldState) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn
-                    .prepareStatement(rtp(UPDATE_JOB_TRIGGER_STATES_FROM_OTHER_STATE));
-            query.setParameter(1, state);
-            query.setParameter(2, jobKey.getName());
-            query.setParameter(3, jobKey.getGroup());
-            query.setParameter(4, oldState);
+        // try {
+        //     ps = conn
+        //             .prepareStatement(rtp(UPDATE_JOB_TRIGGER_STATES_FROM_OTHER_STATE));
+        //     query.setParameter(1, state);
+        //     query.setParameter(2, jobKey.getName());
+        //     query.setParameter(3, jobKey.getGroup());
+        //     query.setParameter(4, oldState);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1562,17 +1599,20 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteBlobTrigger(Connection conn, TriggerKey triggerKey) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(DELETE_BLOB_TRIGGER));
-            query.setParameter(1, triggerKey.getName());
-            query.setParameter(2, triggerKey.getGroup());
+        // try {
+        //     ps = conn.prepareStatement(rtp(DELETE_BLOB_TRIGGER));
+        //     query.setParameter(1, triggerKey.getName());
+        //     query.setParameter(2, triggerKey.getGroup());
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1585,19 +1625,22 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteTrigger(Connection conn, TriggerKey triggerKey) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        deleteTriggerExtension(conn, triggerKey);
+        // deleteTriggerExtension(conn, triggerKey);
         
-        try {
-            ps = conn.prepareStatement(rtp(DELETE_TRIGGER));
-            query.setParameter(1, triggerKey.getName());
-            query.setParameter(2, triggerKey.getGroup());
+        // try {
+        //     ps = conn.prepareStatement(rtp(DELETE_TRIGGER));
+        //     query.setParameter(1, triggerKey.getName());
+        //     query.setParameter(2, triggerKey.getGroup());
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
     
     protected void deleteTriggerExtension(Connection conn, TriggerKey triggerKey) {
@@ -1620,24 +1663,27 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of triggers for the given job
      */
     int selectNumTriggersForJob(Connection conn, JobKey jobKey) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS_FOR_JOB));
-            query.setParameter(1, jobKey.getName());
-            query.setParameter(2, jobKey.getGroup());
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS_FOR_JOB));
+        //     query.setParameter(1, jobKey.getName());
+        //     query.setParameter(2, jobKey.getGroup());
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return rs.getInt(1);
-            } else {
-                return 0;
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     if (rs.next()) {
+        //         return rs.getInt(1);
+        //     } else {
+        //         return 0;
+        //     }
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -1652,9 +1698,8 @@ class StdDbDelegate : DriverDelegate {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    JobDetail selectJobForTrigger(Connection conn, ClassLoadHelper loadHelper,
-        TriggerKey triggerKey) {
-        return selectJobForTrigger(conn, loadHelper, triggerKey, true);
+    JobDetail selectJobForTrigger(Connection conn, TriggerKey triggerKey) {
+        return selectJobForTrigger(conn, triggerKey, true);
     }
 
     /**
@@ -1673,37 +1718,40 @@ class StdDbDelegate : DriverDelegate {
      */
     JobDetail selectJobForTrigger(Connection conn, 
             TriggerKey triggerKey, bool loadJobClass) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_JOB_FOR_TRIGGER));
-            query.setParameter(1, triggerKey.getName());
-            query.setParameter(2, triggerKey.getGroup());
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_JOB_FOR_TRIGGER));
+        //     query.setParameter(1, triggerKey.getName());
+        //     query.setParameter(2, triggerKey.getGroup());
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                JobDetailImpl job = new JobDetailImpl();
-                job.setName(rs.getString(1));
-                job.setGroup(rs.getString(2));
-                job.setDurability(getBoolean(rs, 3));
-                if (loadJobClass) {
-                    implementationMissing(false);
-                    // job.setJobClass(loadHelper.loadClass(rs.getString(4), Job.class));
-                }
-                job.setRequestsRecovery(getBoolean(rs, 5));
+        //     if (rs.next()) {
+        //         JobDetailImpl job = new JobDetailImpl();
+        //         job.setName(rs.getString(1));
+        //         job.setGroup(rs.getString(2));
+        //         job.setDurability(getBoolean(rs, 3));
+        //         if (loadJobClass) {
+        //             implementationMissing(false);
+        //             // job.setJobClass(loadHelper.loadClass(rs.getString(4), Job.class));
+        //         }
+        //         job.setRequestsRecovery(getBoolean(rs, 5));
                 
-                return job;
-            } else {
-                version(HUNT_DEBUG) {
-                    trace("No job for trigger '" ~ triggerKey ~ "'.");
-                }
-                return null;
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //         return job;
+        //     } else {
+        //         version(HUNT_DEBUG) {
+        //             trace("No job for trigger '" ~ triggerKey ~ "'.");
+        //         }
+        //         return null;
+        //     }
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -1720,50 +1768,56 @@ class StdDbDelegate : DriverDelegate {
      */
     List!(OperableTrigger) selectTriggersForJob(Connection conn, JobKey jobKey) {
 
-        LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_FOR_JOB));
-            query.setParameter(1, jobKey.getName());
-            query.setParameter(2, jobKey.getGroup());
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_FOR_JOB));
+        //     query.setParameter(1, jobKey.getName());
+        //     query.setParameter(2, jobKey.getGroup());
+        //     rs = ps.executeQuery();
 
-            while (rs.next()) {
-                OperableTrigger t = selectTrigger(conn, triggerKey(rs.getString(COL_TRIGGER_NAME), rs.getString(COL_TRIGGER_GROUP)));
-                if(t !is null) {
-                    trigList.add(t);
-                }
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     while (rs.next()) {
+        //         OperableTrigger t = selectTrigger(conn, triggerKey(rs.getString(COL_TRIGGER_NAME), rs.getString(COL_TRIGGER_GROUP)));
+        //         if(t !is null) {
+        //             trigList.add(t);
+        //         }
+        //     }
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
 
-        return trigList;
+        // return trigList;
+
+        implementationMissing(false);
+        return null;
     }
 
     List!(OperableTrigger) selectTriggersForCalendar(Connection conn, string calName) {
 
-        LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_FOR_CALENDAR));
-            query.setParameter(1, calName);
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_FOR_CALENDAR));
+        //     query.setParameter(1, calName);
+        //     rs = ps.executeQuery();
 
-            while (rs.next()) {
-                trigList.add(selectTrigger(conn, triggerKey(rs.getString(COL_TRIGGER_NAME), rs.getString(COL_TRIGGER_GROUP))));
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     while (rs.next()) {
+        //         trigList.add(selectTrigger(conn, triggerKey(rs.getString(COL_TRIGGER_NAME), rs.getString(COL_TRIGGER_GROUP))));
+        //     }
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
 
-        return trigList;
+        // return trigList;
+
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -1777,11 +1831,11 @@ class StdDbDelegate : DriverDelegate {
      * @throws JobPersistenceException 
      */
     OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         implementationMissing(false);
         return null;
 
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
         // try {
         //     OperableTrigger trigger = null;
 
@@ -1888,22 +1942,24 @@ class StdDbDelegate : DriverDelegate {
         // }
     }
 
-    private bool isTriggerStillPresent(PreparedStatement ps) {
-        ResultSet rs = null;
-        try {
-            rs = ps.executeQuery();
-            return rs.next();
-        } finally {
-            closeResultSet(rs);
-        }
-    }
+    // private bool isTriggerStillPresent(PreparedStatement ps) {
+    //     ResultSet rs = null;
+    //     try {
+    //         rs = ps.executeQuery();
+    //         return rs.next();
+    //     } finally {
+    //         closeResultSet(rs);
+    //     }
+    // }
 
     private void setTriggerStateProperties(OperableTrigger trigger, TriggerPropertyBundle props) {
         
-        if(props.getStatePropertyNames() is null)
-            return;
+        // if(props.getStatePropertyNames() is null)
+        //     return;
         
-        Util.setBeanProps(trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
+        // Util.setBeanProps(trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
+
+        implementationMissing(false);
     }
 
     /**
@@ -1922,12 +1978,13 @@ class StdDbDelegate : DriverDelegate {
      */
     JobDataMap selectTriggerJobDataMap(Connection conn, string triggerName,
             string groupName) {
-        
-        PreparedStatement ps = null;
-        ResultSet rs = null;
 
         implementationMissing(false);
+        return null;
 
+        
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
         // try {
         //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER_DATA));
         //     query.setParameter(1, triggerName);
@@ -1955,7 +2012,7 @@ class StdDbDelegate : DriverDelegate {
         //     closeStatement(ps);
         // }
         
-        return new JobDataMap();
+        // return new JobDataMap();
     }
             
 
@@ -1969,28 +2026,31 @@ class StdDbDelegate : DriverDelegate {
      * @return the <code>{@link hunt.quartz.Trigger}</code> object
      */
     string selectTriggerState(Connection conn, TriggerKey triggerKey) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            string state = null;
+        // try {
+        //     string state = null;
 
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGER_STATE));
-            query.setParameter(1, triggerKey.getName());
-            query.setParameter(2, triggerKey.getGroup());
-            rs = ps.executeQuery();
+        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER_STATE));
+        //     query.setParameter(1, triggerKey.getName());
+        //     query.setParameter(2, triggerKey.getGroup());
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                state = rs.getString(COL_TRIGGER_STATE);
-            } else {
-                state = STATE_DELETED;
-            }
+        //     if (rs.next()) {
+        //         state = rs.getString(COL_TRIGGER_STATE);
+        //     } else {
+        //         state = STATE_DELETED;
+        //     }
 
-            return state.intern();
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return state.intern();
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
 
     }
 
@@ -2005,39 +2065,41 @@ class StdDbDelegate : DriverDelegate {
      */
     TriggerStatus selectTriggerStatus(Connection conn,
             TriggerKey triggerKey) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            TriggerStatus status = null;
+        // try {
+        //     TriggerStatus status = null;
 
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGER_STATUS));
-            query.setParameter(1, triggerKey.getName());
-            query.setParameter(2, triggerKey.getGroup());
-            rs = ps.executeQuery();
+        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER_STATUS));
+        //     query.setParameter(1, triggerKey.getName());
+        //     query.setParameter(2, triggerKey.getGroup());
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                string state = rs.getString(COL_TRIGGER_STATE);
-                long nextFireTime = rs.getLong(COL_NEXT_FIRE_TIME);
-                string jobName = rs.getString(COL_JOB_NAME);
-                string jobGroup = rs.getString(COL_JOB_GROUP);
+        //     if (rs.next()) {
+        //         string state = rs.getString(COL_TRIGGER_STATE);
+        //         long nextFireTime = rs.getLong(COL_NEXT_FIRE_TIME);
+        //         string jobName = rs.getString(COL_JOB_NAME);
+        //         string jobGroup = rs.getString(COL_JOB_GROUP);
 
-                Date nft = null;
-                if (nextFireTime > 0) {
-                    nft = new Date(nextFireTime);
-                }
+        //         Date nft = null;
+        //         if (nextFireTime > 0) {
+        //             nft = new Date(nextFireTime);
+        //         }
 
-                status = new TriggerStatus(state, nft);
-                status.setKey(triggerKey);
-                status.setJobKey(jobKey(jobName, jobGroup));
-            }
+        //         status = new TriggerStatus(state, nft);
+        //         status.setKey(triggerKey);
+        //         status.setJobKey(jobKey(jobName, jobGroup));
+        //     }
 
-            return status;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return status;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
 
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -2050,23 +2112,26 @@ class StdDbDelegate : DriverDelegate {
      * @return the total number of triggers stored
      */
     int selectNumTriggers(Connection conn) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            int count = 0;
-            ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS));
-            rs = ps.executeQuery();
+        // try {
+        //     int count = 0;
+        //     ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS));
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                count = rs.getInt(1);
-            }
+        //     if (rs.next()) {
+        //         count = rs.getInt(1);
+        //     }
 
-            return count;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return count;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -2079,44 +2144,49 @@ class StdDbDelegate : DriverDelegate {
      * @return an array of <code>string</code> group names
      */
     List!(string) selectTriggerGroups(Connection conn) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGER_GROUPS));
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER_GROUPS));
+        //     rs = ps.executeQuery();
 
-            LinkedList!(string) list = new LinkedList!(string)();
-            while (rs.next()) {
-                list.add(rs.getString(1));
-            }
+        //     LinkedList!(string) list = new LinkedList!(string)();
+        //     while (rs.next()) {
+        //         list.add(rs.getString(1));
+        //     }
 
-            return list;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return list;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+        implementationMissing(false);
+        return null;
     }
 
     List!(string) selectTriggerGroups(Connection conn, GroupMatcher!(TriggerKey) matcher) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGER_GROUPS_FILTERED));
-            query.setParameter(1, toSqlLikeClause(matcher));
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER_GROUPS_FILTERED));
+        //     query.setParameter(1, toSqlLikeClause(matcher));
+        //     rs = ps.executeQuery();
 
-            LinkedList!(string) list = new LinkedList!(string)();
-            while (rs.next()) {
-                list.add(rs.getString(1));
-            }
+        //     LinkedList!(string) list = new LinkedList!(string)();
+        //     while (rs.next()) {
+        //         list.add(rs.getString(1));
+        //     }
 
-            return list;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return list;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -2131,121 +2201,140 @@ class StdDbDelegate : DriverDelegate {
      * @return a Set of <code>TriggerKey</code>s
      */
     Set!(TriggerKey) selectTriggersInGroup(Connection conn, GroupMatcher!(TriggerKey) matcher) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            if(isMatcherEquals(matcher)) {
-                ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_GROUP));
-                query.setParameter(1, toSqlEqualsClause(matcher));
-            }
-            else {
-                ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_GROUP_LIKE));
-                query.setParameter(1, toSqlLikeClause(matcher));
-            }
-            rs = ps.executeQuery();
+        // try {
+        //     if(isMatcherEquals(matcher)) {
+        //         ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_GROUP));
+        //         query.setParameter(1, toSqlEqualsClause(matcher));
+        //     }
+        //     else {
+        //         ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_GROUP_LIKE));
+        //         query.setParameter(1, toSqlLikeClause(matcher));
+        //     }
+        //     rs = ps.executeQuery();
 
-            Set!(TriggerKey) keys = new HashSet!(TriggerKey)();
-            while (rs.next()) {
-                keys.add(triggerKey(rs.getString(1), rs.getString(2)));
-            }
+        //     Set!(TriggerKey) keys = new HashSet!(TriggerKey)();
+        //     while (rs.next()) {
+        //         keys.add(triggerKey(rs.getString(1), rs.getString(2)));
+        //     }
 
-            return keys;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return keys;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     int insertPausedTriggerGroup(Connection conn, string groupName) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(INSERT_PAUSED_TRIGGER_GROUP));
-            query.setParameter(1, groupName);
-            int rows = ps.executeUpdate();
+        // try {
+        //     ps = conn.prepareStatement(rtp(INSERT_PAUSED_TRIGGER_GROUP));
+        //     query.setParameter(1, groupName);
+        //     int rows = ps.executeUpdate();
 
-            return rows;
-        } finally {
-            closeStatement(ps);
-        }
+        //     return rows;
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     int deletePausedTriggerGroup(Connection conn, string groupName) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(DELETE_PAUSED_TRIGGER_GROUP));
-            query.setParameter(1, groupName);
-            int rows = ps.executeUpdate();
+        // try {
+        //     ps = conn.prepareStatement(rtp(DELETE_PAUSED_TRIGGER_GROUP));
+        //     query.setParameter(1, groupName);
+        //     int rows = ps.executeUpdate();
 
-            return rows;
-        } finally {
-            closeStatement(ps);
-        }
+        //     return rows;
+        // } finally {
+        //     closeStatement(ps);
+        // }
+        implementationMissing(false);
+        return 0;
     }
 
     int deletePausedTriggerGroup(Connection conn, GroupMatcher!(TriggerKey) matcher) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(DELETE_PAUSED_TRIGGER_GROUP));
-            query.setParameter(1, toSqlLikeClause(matcher));
-            int rows = ps.executeUpdate();
+        // try {
+        //     ps = conn.prepareStatement(rtp(DELETE_PAUSED_TRIGGER_GROUP));
+        //     query.setParameter(1, toSqlLikeClause(matcher));
+        //     int rows = ps.executeUpdate();
 
-            return rows;
-        } finally {
-            closeStatement(ps);
-        }
+        //     return rows;
+        // } finally {
+        //     closeStatement(ps);
+        // }
+        implementationMissing(false);
+        return 0;
     }
 
     int deleteAllPausedTriggerGroups(Connection conn) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(DELETE_PAUSED_TRIGGER_GROUPS));
-            int rows = ps.executeUpdate();
+        // try {
+        //     ps = conn.prepareStatement(rtp(DELETE_PAUSED_TRIGGER_GROUPS));
+        //     int rows = ps.executeUpdate();
 
-            return rows;
-        } finally {
-            closeStatement(ps);
-        }
+        //     return rows;
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     bool isTriggerGroupPaused(Connection conn, string groupName) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_PAUSED_TRIGGER_GROUP));
-            query.setParameter(1, groupName);
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_PAUSED_TRIGGER_GROUP));
+        //     query.setParameter(1, groupName);
+        //     rs = ps.executeQuery();
 
-            return rs.next();
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return rs.next();
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     bool isExistingTriggerGroup(Connection conn, string groupName) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS_IN_GROUP));
-            query.setParameter(1, groupName);
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_NUM_TRIGGERS_IN_GROUP));
+        //     query.setParameter(1, groupName);
+        //     rs = ps.executeQuery();
 
-            if (!rs.next()) {
-                return false;
-            }
+        //     if (!rs.next()) {
+        //         return false;
+        //     }
 
-            return (rs.getInt(1) > 0);
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return (rs.getInt(1) > 0);
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     //---------------------------------------------------------------------------
@@ -2269,19 +2358,22 @@ class StdDbDelegate : DriverDelegate {
      */
     int insertCalendar(Connection conn, string calendarName,
             Calendar calendar) {
-        ByteArrayOutputStream baos = serializeObject(calendar);
+        // ByteArrayOutputStream baos = serializeObject(calendar);
 
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(INSERT_CALENDAR));
-            query.setParameter(1, calendarName);
-            setBytes(ps, 2, baos);
+        // try {
+        //     ps = conn.prepareStatement(rtp(INSERT_CALENDAR));
+        //     query.setParameter(1, calendarName);
+        //     setBytes(ps, 2, baos);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -2301,19 +2393,22 @@ class StdDbDelegate : DriverDelegate {
      */
     int updateCalendar(Connection conn, string calendarName,
             Calendar calendar) {
-        ByteArrayOutputStream baos = serializeObject(calendar);
+        // ByteArrayOutputStream baos = serializeObject(calendar);
 
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(UPDATE_CALENDAR));
-            setBytes(ps, 1, baos);
-            query.setParameter(2, calendarName);
+        // try {
+        //     ps = conn.prepareStatement(rtp(UPDATE_CALENDAR));
+        //     setBytes(ps, 1, baos);
+        //     query.setParameter(2, calendarName);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -2328,23 +2423,26 @@ class StdDbDelegate : DriverDelegate {
      * @return true if the trigger exists, false otherwise
      */
     bool calendarExists(Connection conn, string calendarName) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_CALENDAR_EXISTENCE));
-            query.setParameter(1, calendarName);
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_CALENDAR_EXISTENCE));
+        //     query.setParameter(1, calendarName);
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return true;
-            } else {
-                return false;
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     if (rs.next()) {
+        //         return true;
+        //     } else {
+        //         return false;
+        //     }
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -2364,10 +2462,12 @@ class StdDbDelegate : DriverDelegate {
      *           if there were problems deserializing the calendar
      */
     Calendar selectCalendar(Connection conn, string calendarName) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         implementationMissing(false);
         return null;
+        
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
         // try {
         //     string selCal = rtp(SELECT_CALENDAR);
         //     ps = conn.prepareStatement(selCal);
@@ -2401,8 +2501,8 @@ class StdDbDelegate : DriverDelegate {
      * @return true if any triggers reference the calendar, false otherwise
      */
     bool calendarIsReferenced(Connection conn, string calendarName) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
         implementationMissing(false);
         return false;
         // try {
@@ -2433,7 +2533,7 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteCalendar(Connection conn, string calendarName) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
         implementationMissing(false);
         return 0;
         // try {
@@ -2456,8 +2556,8 @@ class StdDbDelegate : DriverDelegate {
      * @return the total number of calendars stored
      */
     int selectNumCalendars(Connection conn) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
         implementationMissing(false);
         return 0;
@@ -2488,11 +2588,11 @@ class StdDbDelegate : DriverDelegate {
      * @return an array of <code>string</code> calendar names
      */
     List!(string) selectCalendars(Connection conn) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
         implementationMissing(false);
-        return 0;
+        return null;
         // try {
         //     ps = conn.prepareStatement(rtp(SELECT_CALENDARS));
         //     rs = ps.executeQuery();
@@ -2525,22 +2625,25 @@ class StdDbDelegate : DriverDelegate {
      * @deprecated Does not account for misfires.
      */
     long selectNextFireTime(Connection conn) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_NEXT_FIRE_TIME));
-            query.setParameter(1, STATE_WAITING);
-            rs = ps.executeQuery();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_NEXT_FIRE_TIME));
+        //     query.setParameter(1, STATE_WAITING);
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return rs.getLong(ALIAS_COL_NEXT_FIRE_TIME);
-            } else {
-                return 0l;
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     if (rs.next()) {
+        //         return rs.getLong(ALIAS_COL_NEXT_FIRE_TIME);
+        //     } else {
+        //         return 0l;
+        //     }
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return false;
     }
 
     /**
@@ -2557,24 +2660,27 @@ class StdDbDelegate : DriverDelegate {
      *         trigger will be fired at that time
      */
     TriggerKey selectTriggerForFireTime(Connection conn, long fireTime) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_TRIGGER_FOR_FIRE_TIME));
-            query.setParameter(1, STATE_WAITING);
-            ps.setBigDecimal(2, new BigDecimal(string.valueOf(fireTime)));
-            rs = ps.executeQuery();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER_FOR_FIRE_TIME));
+        //     query.setParameter(1, STATE_WAITING);
+        //     ps.setBigDecimal(2, new BigDecimal(string.valueOf(fireTime)));
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return new TriggerKey(rs.getString(COL_TRIGGER_NAME), rs
-                        .getString(COL_TRIGGER_GROUP));
-            } else {
-                return null;
-            }
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     if (rs.next()) {
+        //         return new TriggerKey(rs.getString(COL_TRIGGER_NAME), rs
+        //                 .getString(COL_TRIGGER_GROUP));
+        //     } else {
+        //         return null;
+        //     }
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
 
@@ -2619,37 +2725,40 @@ class StdDbDelegate : DriverDelegate {
      * @return A (never null, possibly empty) list of the identifiers (Key objects) of the next triggers to be fired.
      */
     List!(TriggerKey) selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan, int maxCount) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        List!(TriggerKey) nextTriggers = new LinkedList!(TriggerKey)();
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_NEXT_TRIGGER_TO_ACQUIRE));
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
+        // List!(TriggerKey) nextTriggers = new LinkedList!(TriggerKey)();
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_NEXT_TRIGGER_TO_ACQUIRE));
             
-            // Set max rows to retrieve
-            if (maxCount < 1)
-                maxCount = 1; // we want at least one trigger back.
-            ps.setMaxRows(maxCount);
+        //     // Set max rows to retrieve
+        //     if (maxCount < 1)
+        //         maxCount = 1; // we want at least one trigger back.
+        //     ps.setMaxRows(maxCount);
             
-            // Try to give jdbc driver a hint to hopefully not pull over more than the few rows we actually need.
-            // Note: in some jdbc drivers, such as MySQL, you must set maxRows before fetchSize, or you get exception!
-            ps.setFetchSize(maxCount);
+        //     // Try to give jdbc driver a hint to hopefully not pull over more than the few rows we actually need.
+        //     // Note: in some jdbc drivers, such as MySQL, you must set maxRows before fetchSize, or you get exception!
+        //     ps.setFetchSize(maxCount);
             
-            query.setParameter(1, STATE_WAITING);
-            ps.setBigDecimal(2, new BigDecimal(string.valueOf(noLaterThan)));
-            ps.setBigDecimal(3, new BigDecimal(string.valueOf(noEarlierThan)));
-            rs = ps.executeQuery();
+        //     query.setParameter(1, STATE_WAITING);
+        //     ps.setBigDecimal(2, new BigDecimal(string.valueOf(noLaterThan)));
+        //     ps.setBigDecimal(3, new BigDecimal(string.valueOf(noEarlierThan)));
+        //     rs = ps.executeQuery();
             
-            while (rs.next() && nextTriggers.size() <= maxCount) {
-                nextTriggers.add(triggerKey(
-                        rs.getString(COL_TRIGGER_NAME),
-                        rs.getString(COL_TRIGGER_GROUP)));
-            }
+        //     while (rs.next() && nextTriggers.size() <= maxCount) {
+        //         nextTriggers.add(triggerKey(
+        //                 rs.getString(COL_TRIGGER_NAME),
+        //                 rs.getString(COL_TRIGGER_GROUP)));
+        //     }
             
-            return nextTriggers;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }      
+        //     return nextTriggers;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }    
+        
+        implementationMissing(false);
+        return null;  
     }
 
     /**
@@ -2667,33 +2776,36 @@ class StdDbDelegate : DriverDelegate {
      */
     int insertFiredTrigger(Connection conn, OperableTrigger trigger,
             string state, JobDetail job) {
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(rtp(INSERT_FIRED_TRIGGER));
-            query.setParameter(1, trigger.getFireInstanceId());
-            query.setParameter(2, trigger.getKey().getName());
-            query.setParameter(3, trigger.getKey().getGroup());
-            query.setParameter(4, instanceId);
-            ps.setBigDecimal(5, new BigDecimal(string.valueOf(DateTimeHelper.currentTimeMillis())));
-            ps.setBigDecimal(6, new BigDecimal(string.valueOf(trigger.getNextFireTime().getTime())));
-            query.setParameter(7, state);
-            if (job !is null) {
-                query.setParameter(8, trigger.getJobKey().getName());
-                query.setParameter(9, trigger.getJobKey().getGroup());
-                setBoolean(ps, 10, job.isConcurrentExectionDisallowed());
-                setBoolean(ps, 11, job.requestsRecovery());
-            } else {
-                query.setParameter(8, null);
-                query.setParameter(9, null);
-                setBoolean(ps, 10, false);
-                setBoolean(ps, 11, false);
-            }
-            ps.setInt(12, trigger.getPriority());
+        // PreparedStatement ps = null;
+        // try {
+        //     ps = conn.prepareStatement(rtp(INSERT_FIRED_TRIGGER));
+        //     query.setParameter(1, trigger.getFireInstanceId());
+        //     query.setParameter(2, trigger.getKey().getName());
+        //     query.setParameter(3, trigger.getKey().getGroup());
+        //     query.setParameter(4, instanceId);
+        //     ps.setBigDecimal(5, new BigDecimal(string.valueOf(DateTimeHelper.currentTimeMillis())));
+        //     ps.setBigDecimal(6, new BigDecimal(string.valueOf(trigger.getNextFireTime().getTime())));
+        //     query.setParameter(7, state);
+        //     if (job !is null) {
+        //         query.setParameter(8, trigger.getJobKey().getName());
+        //         query.setParameter(9, trigger.getJobKey().getGroup());
+        //         setBoolean(ps, 10, job.isConcurrentExectionDisallowed());
+        //         setBoolean(ps, 11, job.requestsRecovery());
+        //     } else {
+        //         query.setParameter(8, null);
+        //         query.setParameter(9, null);
+        //         setBoolean(ps, 10, false);
+        //         setBoolean(ps, 11, false);
+        //     }
+        //     ps.setInt(12, trigger.getPriority());
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     /**
@@ -2711,35 +2823,38 @@ class StdDbDelegate : DriverDelegate {
      */
     int updateFiredTrigger(Connection conn, OperableTrigger trigger,
             string state, JobDetail job) {
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(rtp(UPDATE_FIRED_TRIGGER));
+        // PreparedStatement ps = null;
+        // try {
+        //     ps = conn.prepareStatement(rtp(UPDATE_FIRED_TRIGGER));
             
-            query.setParameter(1, instanceId);
+        //     query.setParameter(1, instanceId);
 
-            ps.setBigDecimal(2, new BigDecimal(string.valueOf(DateTimeHelper.currentTimeMillis())));
-            ps.setBigDecimal(3, new BigDecimal(string.valueOf(trigger.getNextFireTime().getTime())));
-            query.setParameter(4, state);
+        //     ps.setBigDecimal(2, new BigDecimal(string.valueOf(DateTimeHelper.currentTimeMillis())));
+        //     ps.setBigDecimal(3, new BigDecimal(string.valueOf(trigger.getNextFireTime().getTime())));
+        //     query.setParameter(4, state);
 
-            if (job !is null) {
-                query.setParameter(5, trigger.getJobKey().getName());
-                query.setParameter(6, trigger.getJobKey().getGroup());
-                setBoolean(ps, 7, job.isConcurrentExectionDisallowed());
-                setBoolean(ps, 8, job.requestsRecovery());
-            } else {
-                query.setParameter(5, null);
-                query.setParameter(6, null);
-                setBoolean(ps, 7, false);
-                setBoolean(ps, 8, false);
-            }
+        //     if (job !is null) {
+        //         query.setParameter(5, trigger.getJobKey().getName());
+        //         query.setParameter(6, trigger.getJobKey().getGroup());
+        //         setBoolean(ps, 7, job.isConcurrentExectionDisallowed());
+        //         setBoolean(ps, 8, job.requestsRecovery());
+        //     } else {
+        //         query.setParameter(5, null);
+        //         query.setParameter(6, null);
+        //         setBoolean(ps, 7, false);
+        //         setBoolean(ps, 8, false);
+        //     }
 
-            query.setParameter(9, trigger.getFireInstanceId());
+        //     query.setParameter(9, trigger.getFireInstanceId());
 
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
     
     /**
@@ -2751,47 +2866,50 @@ class StdDbDelegate : DriverDelegate {
      * @return a List of FiredTriggerRecord objects.
      */
     List!(FiredTriggerRecord) selectFiredTriggerRecords(Connection conn, string triggerName, string groupName) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            List!(FiredTriggerRecord) lst = new LinkedList!(FiredTriggerRecord)();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
+        // try {
+        //     List!(FiredTriggerRecord) lst = new LinkedList!(FiredTriggerRecord)();
 
-            if (triggerName !is null) {
-                ps = conn.prepareStatement(rtp(SELECT_FIRED_TRIGGER));
-                query.setParameter(1, triggerName);
-                query.setParameter(2, groupName);
-            } else {
-                ps = conn.prepareStatement(rtp(SELECT_FIRED_TRIGGER_GROUP));
-                query.setParameter(1, groupName);
-            }
-            rs = ps.executeQuery();
+        //     if (triggerName !is null) {
+        //         ps = conn.prepareStatement(rtp(SELECT_FIRED_TRIGGER));
+        //         query.setParameter(1, triggerName);
+        //         query.setParameter(2, groupName);
+        //     } else {
+        //         ps = conn.prepareStatement(rtp(SELECT_FIRED_TRIGGER_GROUP));
+        //         query.setParameter(1, groupName);
+        //     }
+        //     rs = ps.executeQuery();
 
-            while (rs.next()) {
-                FiredTriggerRecord rec = new FiredTriggerRecord();
+        //     while (rs.next()) {
+        //         FiredTriggerRecord rec = new FiredTriggerRecord();
 
-                rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
-                rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
-                rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
-                rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
-                rec.setPriority(rs.getInt(COL_PRIORITY));
-                rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
-                rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
-                        .getString(COL_TRIGGER_GROUP)));
-                if (!rec.getFireInstanceState()== STATE_ACQUIRED) {
-                    rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
-                    rec.setJobRequestsRecovery(rs
-                            .getBoolean(COL_REQUESTS_RECOVERY));
-                    rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
-                            .getString(COL_JOB_GROUP)));
-                }
-                lst.add(rec);
-            }
+        //         rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
+        //         rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
+        //         rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
+        //         rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
+        //         rec.setPriority(rs.getInt(COL_PRIORITY));
+        //         rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
+        //         rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
+        //                 .getString(COL_TRIGGER_GROUP)));
+        //         if (!rec.getFireInstanceState()== STATE_ACQUIRED) {
+        //             rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
+        //             rec.setJobRequestsRecovery(rs
+        //                     .getBoolean(COL_REQUESTS_RECOVERY));
+        //             rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
+        //                     .getString(COL_JOB_GROUP)));
+        //         }
+        //         lst.add(rec);
+        //     }
 
-            return lst;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return lst;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -2803,88 +2921,94 @@ class StdDbDelegate : DriverDelegate {
      * @return a List of FiredTriggerRecord objects.
      */
     List!(FiredTriggerRecord) selectFiredTriggerRecordsByJob(Connection conn, string jobName, string groupName) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            List!(FiredTriggerRecord) lst = new LinkedList!(FiredTriggerRecord)();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
+        // try {
+        //     List!(FiredTriggerRecord) lst = new LinkedList!(FiredTriggerRecord)();
 
-            if (jobName !is null) {
-                ps = conn.prepareStatement(rtp(SELECT_FIRED_TRIGGERS_OF_JOB));
-                query.setParameter(1, jobName);
-                query.setParameter(2, groupName);
-            } else {
-                ps = conn
-                        .prepareStatement(rtp(SELECT_FIRED_TRIGGERS_OF_JOB_GROUP));
-                query.setParameter(1, groupName);
-            }
-            rs = ps.executeQuery();
+        //     if (jobName !is null) {
+        //         ps = conn.prepareStatement(rtp(SELECT_FIRED_TRIGGERS_OF_JOB));
+        //         query.setParameter(1, jobName);
+        //         query.setParameter(2, groupName);
+        //     } else {
+        //         ps = conn
+        //                 .prepareStatement(rtp(SELECT_FIRED_TRIGGERS_OF_JOB_GROUP));
+        //         query.setParameter(1, groupName);
+        //     }
+        //     rs = ps.executeQuery();
 
-            while (rs.next()) {
-                FiredTriggerRecord rec = new FiredTriggerRecord();
+        //     while (rs.next()) {
+        //         FiredTriggerRecord rec = new FiredTriggerRecord();
 
-                rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
-                rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
-                rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
-                rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
-                rec.setPriority(rs.getInt(COL_PRIORITY));
-                rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
-                rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
-                        .getString(COL_TRIGGER_GROUP)));
-                if (!rec.getFireInstanceState()== STATE_ACQUIRED) {
-                    rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
-                    rec.setJobRequestsRecovery(rs
-                            .getBoolean(COL_REQUESTS_RECOVERY));
-                    rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
-                            .getString(COL_JOB_GROUP)));
-                }
-                lst.add(rec);
-            }
+        //         rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
+        //         rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
+        //         rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
+        //         rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
+        //         rec.setPriority(rs.getInt(COL_PRIORITY));
+        //         rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
+        //         rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
+        //                 .getString(COL_TRIGGER_GROUP)));
+        //         if (!rec.getFireInstanceState()== STATE_ACQUIRED) {
+        //             rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
+        //             rec.setJobRequestsRecovery(rs
+        //                     .getBoolean(COL_REQUESTS_RECOVERY));
+        //             rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
+        //                     .getString(COL_JOB_GROUP)));
+        //         }
+        //         lst.add(rec);
+        //     }
 
-            return lst;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return lst;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
 
     }
 
     List!(FiredTriggerRecord) selectInstancesFiredTriggerRecords(Connection conn,
             string instanceName) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            List!(FiredTriggerRecord) lst = new LinkedList!(FiredTriggerRecord)();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
+        // try {
+        //     List!(FiredTriggerRecord) lst = new LinkedList!(FiredTriggerRecord)();
 
-            ps = conn.prepareStatement(rtp(SELECT_INSTANCES_FIRED_TRIGGERS));
-            query.setParameter(1, instanceName);
-            rs = ps.executeQuery();
+        //     ps = conn.prepareStatement(rtp(SELECT_INSTANCES_FIRED_TRIGGERS));
+        //     query.setParameter(1, instanceName);
+        //     rs = ps.executeQuery();
 
-            while (rs.next()) {
-                FiredTriggerRecord rec = new FiredTriggerRecord();
+        //     while (rs.next()) {
+        //         FiredTriggerRecord rec = new FiredTriggerRecord();
 
-                rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
-                rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
-                rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
-                rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
-                rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
-                rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
-                        .getString(COL_TRIGGER_GROUP)));
-                if (!rec.getFireInstanceState()== STATE_ACQUIRED) {
-                    rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
-                    rec.setJobRequestsRecovery(rs
-                            .getBoolean(COL_REQUESTS_RECOVERY));
-                    rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
-                            .getString(COL_JOB_GROUP)));
-                }
-                rec.setPriority(rs.getInt(COL_PRIORITY));
-                lst.add(rec);
-            }
+        //         rec.setFireInstanceId(rs.getString(COL_ENTRY_ID));
+        //         rec.setFireInstanceState(rs.getString(COL_ENTRY_STATE));
+        //         rec.setFireTimestamp(rs.getLong(COL_FIRED_TIME));
+        //         rec.setScheduleTimestamp(rs.getLong(COL_SCHED_TIME));
+        //         rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
+        //         rec.setTriggerKey(triggerKey(rs.getString(COL_TRIGGER_NAME), rs
+        //                 .getString(COL_TRIGGER_GROUP)));
+        //         if (!rec.getFireInstanceState()== STATE_ACQUIRED) {
+        //             rec.setJobDisallowsConcurrentExecution(getBoolean(rs, COL_IS_NONCONCURRENT));
+        //             rec.setJobRequestsRecovery(rs
+        //                     .getBoolean(COL_REQUESTS_RECOVERY));
+        //             rec.setJobKey(jobKey(rs.getString(COL_JOB_NAME), rs
+        //                     .getString(COL_JOB_GROUP)));
+        //         }
+        //         rec.setPriority(rs.getInt(COL_PRIORITY));
+        //         lst.add(rec);
+        //     }
 
-            return lst;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return lst;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -2900,23 +3024,26 @@ class StdDbDelegate : DriverDelegate {
      * @return a Set of string objects.
      */
     Set!(string) selectFiredTriggerInstanceNames(Connection conn) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            Set!(string) instanceNames = new HashSet!(string)();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
+        // try {
+        //     Set!(string) instanceNames = new HashSet!(string)();
 
-            ps = conn.prepareStatement(rtp(SELECT_FIRED_TRIGGER_INSTANCE_NAMES));
-            rs = ps.executeQuery();
+        //     ps = conn.prepareStatement(rtp(SELECT_FIRED_TRIGGER_INSTANCE_NAMES));
+        //     rs = ps.executeQuery();
 
-            while (rs.next()) {
-                instanceNames.add(rs.getString(COL_INSTANCE_NAME));
-            }
+        //     while (rs.next()) {
+        //         instanceNames.add(rs.getString(COL_INSTANCE_NAME));
+        //     }
 
-            return instanceNames;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return instanceNames;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
     
     /**
@@ -2931,104 +3058,121 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteFiredTrigger(Connection conn, string entryId) {
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(rtp(DELETE_FIRED_TRIGGER));
-            query.setParameter(1, entryId);
+        // PreparedStatement ps = null;
+        // try {
+        //     ps = conn.prepareStatement(rtp(DELETE_FIRED_TRIGGER));
+        //     query.setParameter(1, entryId);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     int selectJobExecutionCount(Connection conn, JobKey jobKey) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
 
-        try {
-            ps = conn.prepareStatement(rtp(SELECT_JOB_EXECUTION_COUNT));
-            query.setParameter(1, jobKey.getName());
-            query.setParameter(2, jobKey.getGroup());
+        // try {
+        //     ps = conn.prepareStatement(rtp(SELECT_JOB_EXECUTION_COUNT));
+        //     query.setParameter(1, jobKey.getName());
+        //     query.setParameter(2, jobKey.getGroup());
 
-            rs = ps.executeQuery();
+        //     rs = ps.executeQuery();
 
-            return (rs.next()) ? rs.getInt(1) : 0;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return (rs.next()) ? rs.getInt(1) : 0;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
     
     int insertSchedulerState(Connection conn, string theInstanceId,
             long checkInTime, long interval) {
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(rtp(INSERT_SCHEDULER_STATE));
-            query.setParameter(1, theInstanceId);
-            ps.setLong(2, checkInTime);
-            ps.setLong(3, interval);
+        // PreparedStatement ps = null;
+        // try {
+        //     ps = conn.prepareStatement(rtp(INSERT_SCHEDULER_STATE));
+        //     query.setParameter(1, theInstanceId);
+        //     ps.setLong(2, checkInTime);
+        //     ps.setLong(3, interval);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     int deleteSchedulerState(Connection conn, string theInstanceId) {
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(rtp(DELETE_SCHEDULER_STATE));
-            query.setParameter(1, theInstanceId);
+        // PreparedStatement ps = null;
+        // try {
+        //     ps = conn.prepareStatement(rtp(DELETE_SCHEDULER_STATE));
+        //     query.setParameter(1, theInstanceId);
 
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     int updateSchedulerState(Connection conn, string theInstanceId, long checkInTime) {
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(rtp(UPDATE_SCHEDULER_STATE));
-            ps.setLong(1, checkInTime);
-            query.setParameter(2, theInstanceId);
+        // PreparedStatement ps = null;
+        // try {
+        //     ps = conn.prepareStatement(rtp(UPDATE_SCHEDULER_STATE));
+        //     ps.setLong(1, checkInTime);
+        //     query.setParameter(2, theInstanceId);
         
-            return ps.executeUpdate();
-        } finally {
-            closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
         
     List!(SchedulerStateRecord) selectSchedulerStateRecords(Connection conn, string theInstanceId) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            List!(SchedulerStateRecord) lst = new LinkedList!(SchedulerStateRecord)();
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
+        // try {
+        //     List!(SchedulerStateRecord) lst = new LinkedList!(SchedulerStateRecord)();
 
-            if (theInstanceId !is null) {
-                ps = conn.prepareStatement(rtp(SELECT_SCHEDULER_STATE));
-                query.setParameter(1, theInstanceId);
-            } else {
-                ps = conn.prepareStatement(rtp(SELECT_SCHEDULER_STATES));
-            }
-            rs = ps.executeQuery();
+        //     if (theInstanceId !is null) {
+        //         ps = conn.prepareStatement(rtp(SELECT_SCHEDULER_STATE));
+        //         query.setParameter(1, theInstanceId);
+        //     } else {
+        //         ps = conn.prepareStatement(rtp(SELECT_SCHEDULER_STATES));
+        //     }
+        //     rs = ps.executeQuery();
 
-            while (rs.next()) {
-                SchedulerStateRecord rec = new SchedulerStateRecord();
+        //     while (rs.next()) {
+        //         SchedulerStateRecord rec = new SchedulerStateRecord();
 
-                rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
-                rec.setCheckinTimestamp(rs.getLong(COL_LAST_CHECKIN_TIME));
-                rec.setCheckinInterval(rs.getLong(COL_CHECKIN_INTERVAL));
+        //         rec.setSchedulerInstanceId(rs.getString(COL_INSTANCE_NAME));
+        //         rec.setCheckinTimestamp(rs.getLong(COL_LAST_CHECKIN_TIME));
+        //         rec.setCheckinInterval(rs.getLong(COL_CHECKIN_INTERVAL));
 
-                lst.add(rec);
-            }
+        //         lst.add(rec);
+        //     }
 
-            return lst;
-        } finally {
-            closeResultSet(rs);
-            closeStatement(ps);
-        }
+        //     return lst;
+        // } finally {
+        //     closeResultSet(rs);
+        //     closeStatement(ps);
+        // }
+        implementationMissing(false);
+        return null;
 
     }
 
@@ -3071,13 +3215,16 @@ class StdDbDelegate : DriverDelegate {
      *           if serialization causes an error
      */
     protected ByteArrayOutputStream serializeObject(Object obj) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if (null != obj) {
-            ObjectOutputStream out = new ObjectOutputStream(baos);
-            out.writeObject(obj);
-            out.flush();
-        }
-        return baos;
+        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // if (null != obj) {
+        //     ObjectOutputStream out = new ObjectOutputStream(baos);
+        //     out.writeObject(obj);
+        //     out.flush();
+        // }
+        // return baos;
+
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -3093,19 +3240,22 @@ class StdDbDelegate : DriverDelegate {
      *           if serialization causes an error
      */
     protected ByteArrayOutputStream serializeJobData(JobDataMap data) {
-        if (canUseProperties()) {
-            return serializeProperties(data);
-        }
+        // if (canUseProperties()) {
+        //     return serializeProperties(data);
+        // }
 
-        try {
-            return serializeObject(data);
-        } catch (NotSerializableException e) {
-            throw new NotSerializableException(
-                "Unable to serialize JobDataMap for insertion into " ~ 
-                "database because the value of property '" ~ 
-                getKeyOfNonSerializableValue(data) + 
-                "' is not serializable: " ~ e.getMessage());
-        }
+        // try {
+        //     return serializeObject(data);
+        // } catch (NotSerializableException e) {
+        //     throw new NotSerializableException(
+        //         "Unable to serialize JobDataMap for insertion into " ~ 
+        //         "database because the value of property '" ~ 
+        //         getKeyOfNonSerializableValue(data) + 
+        //         "' is not serializable: " ~ e.getMessage());
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     /**
@@ -3114,76 +3264,76 @@ class StdDbDelegate : DriverDelegate {
      * @return The key of the first non-serializable value in the given Map or 
      * null if all values are serializable.
      */
-    protected Object getKeyOfNonSerializableValue(Map<?, ?> data) {
-        for (Iterator<?> entryIter = data.entrySet().iterator(); entryIter.hasNext();) {
-            Map.Entry<?, ?> entry = (Map.Entry<?, ?>)entryIter.next();
+    // protected Object getKeyOfNonSerializableValue(Map<?, ?> data) {
+    //     for (Iterator<?> entryIter = data.entrySet().iterator(); entryIter.hasNext();) {
+    //         Map.Entry<?, ?> entry = (Map.Entry<?, ?>)entryIter.next();
             
-            ByteArrayOutputStream baos = null;
-            try {
-                baos = serializeObject(entry.getValue());
-            } catch (IOException e) {
-                return entry.getKey();
-            } finally {
-                if (baos !is null) {
-                    try { baos.close(); } catch (IOException ignore) {}
-                }
-            }
-        }
+    //         ByteArrayOutputStream baos = null;
+    //         try {
+    //             baos = serializeObject(entry.getValue());
+    //         } catch (IOException e) {
+    //             return entry.getKey();
+    //         } finally {
+    //             if (baos !is null) {
+    //                 try { baos.close(); } catch (IOException ignore) {}
+    //             }
+    //         }
+    //     }
         
-        // As long as it is true that the Map was not serializable, we should
-        // not hit this case.
-        return null;   
-    }
+    //     // As long as it is true that the Map was not serializable, we should
+    //     // not hit this case.
+    //     return null;   
+    // }
     
     /**
      * serialize the java.util.Properties
      */
-    private ByteArrayOutputStream serializeProperties(JobDataMap data) {
-        ByteArrayOutputStream ba = new ByteArrayOutputStream();
-        if (null != data) {
-            Properties properties = convertToProperty(data.getWrappedMap());
-            properties.store(ba, "");
-        }
+    // private ByteArrayOutputStream serializeProperties(JobDataMap data) {
+    //     ByteArrayOutputStream ba = new ByteArrayOutputStream();
+    //     if (null != data) {
+    //         Properties properties = convertToProperty(data.getWrappedMap());
+    //         properties.store(ba, "");
+    //     }
 
-        return ba;
-    }
-
-    /**
-     * convert the JobDataMap into a list of properties
-     */
-    protected Map<?, ?> convertFromProperty(Properties properties) {
-        return new HashMap!(Object, Object)(properties);
-    }
+    //     return ba;
+    // }
 
     /**
      * convert the JobDataMap into a list of properties
      */
-    protected Properties convertToProperty(Map<?, ?> data) {
-        Properties properties = new Properties();
+    // protected Map<?, ?> convertFromProperty(Properties properties) {
+    //     return new HashMap!(Object, Object)(properties);
+    // }
+
+    /**
+     * convert the JobDataMap into a list of properties
+     */
+    // protected Properties convertToProperty(Map<?, ?> data) {
+    //     Properties properties = new Properties();
         
-        for (Iterator<?> entryIter = data.entrySet().iterator(); entryIter.hasNext();) {
-            Map.Entry<?, ?> entry = (Map.Entry<?, ?>)entryIter.next();
+    //     for (Iterator<?> entryIter = data.entrySet().iterator(); entryIter.hasNext();) {
+    //         Map.Entry<?, ?> entry = (Map.Entry<?, ?>)entryIter.next();
             
-            Object key = entry.getKey();
-            Object val = (entry.getValue() is null) ? "" : entry.getValue();
+    //         Object key = entry.getKey();
+    //         Object val = (entry.getValue() is null) ? "" : entry.getValue();
             
-            if(!(key instanceof string)) {
-                throw new IOException("JobDataMap keys/values must be Strings " 
-                        ~ "when the 'useProperties' property is set. " 
-                        ~ " offending Key: " ~ key);
-            }
+    //         if(!(key instanceof string)) {
+    //             throw new IOException("JobDataMap keys/values must be Strings " 
+    //                     ~ "when the 'useProperties' property is set. " 
+    //                     ~ " offending Key: " ~ key);
+    //         }
             
-            if(!(val instanceof string)) {
-                throw new IOException("JobDataMap values must be Strings " 
-                        ~ "when the 'useProperties' property is set. " 
-                        ~ " Key of offending value: " ~ key);
-            }
+    //         if(!(val instanceof string)) {
+    //             throw new IOException("JobDataMap values must be Strings " 
+    //                     ~ "when the 'useProperties' property is set. " 
+    //                     ~ " Key of offending value: " ~ key);
+    //         }
             
-            properties.put(key, val);
-        }
+    //         properties.put(key, val);
+    //     }
         
-        return properties;
-    }
+    //     return properties;
+    // }
 
     /**
      * <p>
@@ -3202,30 +3352,33 @@ class StdDbDelegate : DriverDelegate {
      * @throws IOException
      *           if deserialization causes an error
      */
-    protected Object getObjectFromBlob(ResultSet rs, string colName) {
-        Object obj = null;
+    // protected Object getObjectFromBlob(ResultSet rs, string colName) {
+    //     // Object obj = null;
 
-        Blob blobLocator = rs.getBlob(colName);
-        if (blobLocator !is null && blobLocator.length() != 0) {
-            InputStream binaryInput = blobLocator.getBinaryStream();
+    //     // Blob blobLocator = rs.getBlob(colName);
+    //     // if (blobLocator !is null && blobLocator.length() != 0) {
+    //     //     InputStream binaryInput = blobLocator.getBinaryStream();
 
-            if (null != binaryInput) {
-                if (binaryInput instanceof ByteArrayInputStream
-                    && ((ByteArrayInputStream) binaryInput).available() == 0 ) {
-                    //do nothing
-                } else {
-                    ObjectInputStream in = new ObjectInputStream(binaryInput);
-                    try {
-                        obj = in.readObject();
-                    } finally {
-                        in.close();
-                    }
-                }
-            }
+    //     //     if (null != binaryInput) {
+    //     //         if (binaryInput instanceof ByteArrayInputStream
+    //     //             && ((ByteArrayInputStream) binaryInput).available() == 0 ) {
+    //     //             //do nothing
+    //     //         } else {
+    //     //             ObjectInputStream in = new ObjectInputStream(binaryInput);
+    //     //             try {
+    //     //                 obj = in.readObject();
+    //     //             } finally {
+    //     //                 in.close();
+    //     //             }
+    //     //         }
+    //     //     }
 
-        }
-        return obj;
-    }
+    //     // }
+    //     // return obj;
+
+    //     implementationMissing(false);
+    //     return null;
+    // }
 
     /**
      * <p>

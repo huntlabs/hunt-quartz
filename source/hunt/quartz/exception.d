@@ -58,6 +58,11 @@ class UnableToInterruptJobException : SchedulerException {
 }
 
 
+class NoSuchDelegateException : JobPersistenceException {
+    mixin BasicExceptionCtors;
+}
+
+
 class LockException : SchedulerException {
     mixin BasicExceptionCtors;
 }

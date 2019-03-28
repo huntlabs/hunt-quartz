@@ -16,14 +16,8 @@
 module hunt.quartz.dbstore.CronTriggerPersistenceDelegate;
 
 import hunt.quartz.dbstore.StdSqlConstants;
+import hunt.quartz.dbstore.TableConstants;
 import hunt.quartz.dbstore.TriggerPersistenceDelegate;
-
-// import java.io.IOException;
-// import java.sql.Connection;
-// import java.sql.PreparedStatement;
-// import java.sql.ResultSet;
-// import java.sql.SQLException;
-// import std.datetime : TimeZone;
 
 import hunt.quartz.CronScheduleBuilder;
 import hunt.quartz.CronTrigger;
@@ -31,6 +25,8 @@ import hunt.quartz.JobDetail;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.impl.triggers.CronTriggerImpl;
 import hunt.quartz.spi.OperableTrigger;
+
+import hunt.Exceptions;
 
 class CronTriggerPersistenceDelegate : TriggerPersistenceDelegate {
 
@@ -43,7 +39,7 @@ class CronTriggerPersistenceDelegate : TriggerPersistenceDelegate {
     }
 
     string getHandledTriggerTypeDiscriminator() {
-        return TTYPE_CRON;
+        return TableConstants.TTYPE_CRON;
     }
 
     bool canHandleTriggerType(OperableTrigger trigger) {
@@ -56,85 +52,96 @@ class CronTriggerPersistenceDelegate : TriggerPersistenceDelegate {
 
     int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
 
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(Util.rtp(DELETE_CRON_TRIGGER, tablePrefix, schedNameLiteral));
-            ps.setString(1, triggerKey.getName());
-            ps.setString(2, triggerKey.getGroup());
+        // try {
+        //     ps = conn.prepareStatement(Util.rtp(DELETE_CRON_TRIGGER, tablePrefix, schedNameLiteral));
+        //     ps.setString(1, triggerKey.getName());
+        //     ps.setString(2, triggerKey.getGroup());
 
-            return ps.executeUpdate();
-        } finally {
-            Util.closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     Util.closeStatement(ps);
+        // }
+        
+        implementationMissing(false);
+        return 0;
     }
 
     int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
-        CronTrigger cronTrigger = cast(CronTrigger)trigger;
+        // CronTrigger cronTrigger = cast(CronTrigger)trigger;
         
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
         
-        try {
-            ps = conn.prepareStatement(Util.rtp(INSERT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
-            ps.setString(1, trigger.getKey().getName());
-            ps.setString(2, trigger.getKey().getGroup());
-            ps.setString(3, cronTrigger.getCronExpression());
-            ps.setString(4, cronTrigger.getTimeZone().getID());
+        // try {
+        //     ps = conn.prepareStatement(Util.rtp(INSERT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
+        //     ps.setString(1, trigger.getKey().getName());
+        //     ps.setString(2, trigger.getKey().getGroup());
+        //     ps.setString(3, cronTrigger.getCronExpression());
+        //     ps.setString(4, cronTrigger.getTimeZone().getID());
 
-            return ps.executeUpdate();
-        } finally {
-            Util.closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     Util.closeStatement(ps);
+        // }
+        implementationMissing(false);
+        return 0;
     }
 
     TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
 
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
         
-        try {
-            ps = conn.prepareStatement(Util.rtp(SELECT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
-            ps.setString(1, triggerKey.getName());
-            ps.setString(2, triggerKey.getGroup());
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(Util.rtp(SELECT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
+        //     ps.setString(1, triggerKey.getName());
+        //     ps.setString(2, triggerKey.getGroup());
+        //     rs = ps.executeQuery();
 
-            if (rs.next()) {
-                string cronExpr = rs.getString(COL_CRON_EXPRESSION);
-                string timeZoneId = rs.getString(COL_TIME_ZONE_ID);
+        //     if (rs.next()) {
+        //         string cronExpr = rs.getString(COL_CRON_EXPRESSION);
+        //         string timeZoneId = rs.getString(COL_TIME_ZONE_ID);
 
-                CronScheduleBuilder cb = CronScheduleBuilder.cronSchedule(cronExpr);
+        //         CronScheduleBuilder cb = CronScheduleBuilder.cronSchedule(cronExpr);
               
-                if (timeZoneId !is null) 
-                    cb.inTimeZone(TimeZone.getTimeZone(timeZoneId));
+        //         if (timeZoneId !is null) 
+        //             cb.inTimeZone(TimeZone.getTimeZone(timeZoneId));
                 
-                return new TriggerPropertyBundle(cb, null, null);
-            }
+        //         return new TriggerPropertyBundle(cb, null, null);
+        //     }
             
-            throw new IllegalStateException("No record found for selection of Trigger with key: '" ~ triggerKey ~ "' and statement: " ~ Util.rtp(SELECT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
-        } finally {
-            Util.closeResultSet(rs);
-            Util.closeStatement(ps);
-        }
+        //     throw new IllegalStateException("No record found for selection of Trigger with key: '" ~ triggerKey ~ "' and statement: " ~ Util.rtp(SELECT_CRON_TRIGGER, tablePrefix, schedNameLiteral));
+        // } finally {
+        //     Util.closeResultSet(rs);
+        //     Util.closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return null;
     }
 
     int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
-        CronTrigger cronTrigger = cast(CronTrigger)trigger;
+        // CronTrigger cronTrigger = cast(CronTrigger)trigger;
         
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(Util.rtp(UPDATE_CRON_TRIGGER, tablePrefix, schedNameLiteral));
-            ps.setString(1, cronTrigger.getCronExpression());
-            ps.setString(2, cronTrigger.getTimeZone().getID());
-            ps.setString(3, trigger.getKey().getName());
-            ps.setString(4, trigger.getKey().getGroup());
+        // try {
+        //     ps = conn.prepareStatement(Util.rtp(UPDATE_CRON_TRIGGER, tablePrefix, schedNameLiteral));
+        //     ps.setString(1, cronTrigger.getCronExpression());
+        //     ps.setString(2, cronTrigger.getTimeZone().getID());
+        //     ps.setString(3, trigger.getKey().getName());
+        //     ps.setString(4, trigger.getKey().getGroup());
             
-            return ps.executeUpdate();
-        } finally {
-            Util.closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     Util.closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
 }

@@ -17,7 +17,7 @@
 
 module hunt.quartz.dbstore.StdSqlConstants;
 
-// import hunt.quartz.dbstore.TableConstants;
+import hunt.quartz.dbstore.TableConstants;
 import hunt.quartz.dbstore.model;
 import hunt.quartz.Trigger;
 
@@ -476,7 +476,7 @@ struct StdSqlConstants {
             ~ " t WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
     enum string SELECT_NEXT_FIRE_TIME = "SELECT MIN("
-            ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ ") AS " ~ ALIAS_ModelConstants.FIELD_NEXT_FIRE_TIME
+            ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ ") AS " ~ TableConstants.ALIAS_COL_NEXT_FIRE_TIME
             ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? AND t." ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " >= 0";

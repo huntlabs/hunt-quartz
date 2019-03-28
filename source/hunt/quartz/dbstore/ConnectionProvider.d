@@ -17,7 +17,11 @@
 
 module hunt.quartz.dbstore.ConnectionProvider;
 
-import hunt.database.driver.Connection;
+// import hunt.database.driver.Connection;
+
+import hunt.entity.EntityManager;
+
+alias Connection = EntityManager;
 
 /**
  * Implementations of this interface used by <code>DBConnectionManager</code>

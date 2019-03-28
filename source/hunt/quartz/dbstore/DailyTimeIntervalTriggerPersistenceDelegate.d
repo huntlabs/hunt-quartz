@@ -16,16 +16,27 @@
  */
 module hunt.quartz.dbstore.DailyTimeIntervalTriggerPersistenceDelegate;
 
-import hunt.collection.HashSet;
-import hunt.collection.Iterator;
-import hunt.comtainer.Set;
+import hunt.quartz.dbstore.SimplePropertiesTriggerPersistenceDelegateSupport;
+import hunt.quartz.dbstore.SimplePropertiesTriggerProperties;
+import hunt.quartz.dbstore.TableConstants;
+import hunt.quartz.dbstore.TriggerPersistenceDelegate;
 
 import hunt.quartz.DailyTimeIntervalScheduleBuilder;
 import hunt.quartz.DailyTimeIntervalTrigger;
 import hunt.quartz.TimeOfDay;
-import hunt.quartz.DateBuilder.IntervalUnit;
+import hunt.quartz.DateBuilder;
 import hunt.quartz.impl.triggers.DailyTimeIntervalTriggerImpl;
 import hunt.quartz.spi.OperableTrigger;
+
+import hunt.collection.HashSet;
+import hunt.collection.Iterator;
+import hunt.collection.Set;
+import hunt.Integer;
+
+import hunt.text.StringBuilder;
+
+import std.conv;
+import std.string;
 
 /**
  * Persist a DailyTimeIntervalTrigger by converting internal fields to and from
@@ -49,7 +60,7 @@ class DailyTimeIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersi
     }
 
     string getHandledTriggerTypeDiscriminator() {
-        return TTYPE_DAILY_TIME_INT;
+        return TableConstants.TTYPE_DAILY_TIME_INT;
     }
 
     override
@@ -58,10 +69,10 @@ class DailyTimeIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersi
         SimplePropertiesTriggerProperties props = new SimplePropertiesTriggerProperties();
         
         props.setInt1(dailyTrigger.getRepeatInterval());
-        props.setString1(dailyTrigger.getRepeatIntervalUnit().name());
+        props.setString1(dailyTrigger.getRepeatIntervalUnit().to!string());
         props.setInt2(dailyTrigger.getTimesTriggered());
         
-        Set!(Integer) days = dailyTrigger.getDaysOfWeek();
+        Set!(int) days = dailyTrigger.getDaysOfWeek();
         string daysStr = join(days, ",");
         props.setString2(daysStr);
 
@@ -89,15 +100,18 @@ class DailyTimeIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersi
         return props;
     }
 
-    private string join(Set!(Integer) days, string sep) {
+    private string join(Set!(int) days, string sep) {
         StringBuilder sb = new StringBuilder();
         if (days is null || days.size() <= 0)
             return "";
         
-        Iterator!(Integer) itr = days.iterator();
-        sb.append(itr.next());
-        while(itr.hasNext()) {
-            sb.append(sep).append(itr.next());
+        // Iterator!(Integer) itr = days.iterator();
+        // sb.append(itr.next());
+        // while(itr.hasNext()) {
+        //     sb.append(sep).append(itr.next());
+        // }
+        foreach(int v; days) {
+            sb.append(sep).append(v);
         }
         return sb.toString();
     }
@@ -110,14 +124,14 @@ class DailyTimeIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersi
         string daysOfWeekStr = props.getString2();
         string timeOfDayStr = props.getString3();
 
-        IntervalUnit intervalUnit = IntervalUnit.valueOf(intervalUnitStr);
+        IntervalUnit intervalUnit = to!IntervalUnit(intervalUnitStr);
         DailyTimeIntervalScheduleBuilder scheduleBuilder = DailyTimeIntervalScheduleBuilder
                 .dailyTimeIntervalSchedule()
                 .withInterval(interval, intervalUnit)
                 .withRepeatCount(repeatCount);
                 
         if (daysOfWeekStr !is null) {
-            Set!(Integer) daysOfWeek = new HashSet!(Integer)();
+            Set!(int) daysOfWeek = new HashSet!(int)();
             string[] nums = daysOfWeekStr.split(",");
             if (nums.length > 0) {
                 foreach(string num ; nums) {
@@ -157,9 +171,11 @@ class DailyTimeIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersi
             scheduleBuilder.endingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59));
         }
         
+        import hunt.Exceptions;
         int timesTriggered = props.getInt2();
-        string[] statePropertyNames = { "timesTriggered" };
-        Object[] statePropertyValues = { timesTriggered };
+        string[] statePropertyNames = ["timesTriggered"];
+        implementationMissing(false);
+        Object[] statePropertyValues = []; // [timesTriggered];
 
         return new TriggerPropertyBundle(scheduleBuilder, statePropertyNames, statePropertyValues);
     }

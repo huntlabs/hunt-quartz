@@ -15,15 +15,9 @@
  */
 module hunt.quartz.dbstore.SimpleTriggerPersistenceDelegate;
 
-import hunt.quartz.dbstore.TriggerPersistenceDelegate;
 import hunt.quartz.dbstore.StdSqlConstants;
-
-// import java.io.IOException;
-// import java.math.BigDecimal;
-// import java.sql.Connection;
-// import java.sql.PreparedStatement;
-// import java.sql.ResultSet;
-// import java.sql.SQLException;
+import hunt.quartz.dbstore.TableConstants;
+import hunt.quartz.dbstore.TriggerPersistenceDelegate;
 
 import hunt.quartz.JobDetail;
 import hunt.quartz.SimpleScheduleBuilder;
@@ -31,6 +25,8 @@ import hunt.quartz.SimpleTrigger;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 import hunt.quartz.spi.OperableTrigger;
+
+import hunt.Exceptions;
 
 /**
 */
@@ -45,7 +41,7 @@ class SimpleTriggerPersistenceDelegate : TriggerPersistenceDelegate {
     }
 
     string getHandledTriggerTypeDiscriminator() {
-        return TTYPE_SIMPLE;
+        return TableConstants.TTYPE_SIMPLE;
     }
 
     bool canHandleTriggerType(OperableTrigger trigger) {
@@ -57,91 +53,102 @@ class SimpleTriggerPersistenceDelegate : TriggerPersistenceDelegate {
     }
 
     int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(Util.rtp(DELETE_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-            ps.setString(1, triggerKey.getName());
-            ps.setString(2, triggerKey.getGroup());
+        // try {
+        //     ps = conn.prepareStatement(Util.rtp(DELETE_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
+        //     ps.setString(1, triggerKey.getName());
+        //     ps.setString(2, triggerKey.getGroup());
 
-            return ps.executeUpdate();
-        } finally {
-            Util.closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     Util.closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
-        SimpleTrigger simpleTrigger = cast(SimpleTrigger)trigger;
+        // SimpleTrigger simpleTrigger = cast(SimpleTrigger)trigger;
         
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
         
-        try {
-            ps = conn.prepareStatement(Util.rtp(INSERT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-            ps.setString(1, trigger.getKey().getName());
-            ps.setString(2, trigger.getKey().getGroup());
-            ps.setInt(3, simpleTrigger.getRepeatCount());
-            ps.setBigDecimal(4, new BigDecimal(string.valueOf(simpleTrigger.getRepeatInterval())));
-            ps.setInt(5, simpleTrigger.getTimesTriggered());
+        // try {
+        //     ps = conn.prepareStatement(Util.rtp(INSERT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
+        //     ps.setString(1, trigger.getKey().getName());
+        //     ps.setString(2, trigger.getKey().getGroup());
+        //     ps.setInt(3, simpleTrigger.getRepeatCount());
+        //     ps.setBigDecimal(4, new BigDecimal(string.valueOf(simpleTrigger.getRepeatInterval())));
+        //     ps.setInt(5, simpleTrigger.getTimesTriggered());
 
-            return ps.executeUpdate();
-        } finally {
-            Util.closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     Util.closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
     TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
 
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // PreparedStatement ps = null;
+        // ResultSet rs = null;
         
-        try {
-            ps = conn.prepareStatement(Util.rtp(SELECT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-            ps.setString(1, triggerKey.getName());
-            ps.setString(2, triggerKey.getGroup());
-            rs = ps.executeQuery();
+        // try {
+        //     ps = conn.prepareStatement(Util.rtp(SELECT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
+        //     ps.setString(1, triggerKey.getName());
+        //     ps.setString(2, triggerKey.getGroup());
+        //     rs = ps.executeQuery();
     
-            if (rs.next()) {
-                int repeatCount = rs.getInt(COL_REPEAT_COUNT);
-                long repeatInterval = rs.getLong(COL_REPEAT_INTERVAL);
-                int timesTriggered = rs.getInt(COL_TIMES_TRIGGERED);
+        //     if (rs.next()) {
+        //         int repeatCount = rs.getInt(COL_REPEAT_COUNT);
+        //         long repeatInterval = rs.getLong(COL_REPEAT_INTERVAL);
+        //         int timesTriggered = rs.getInt(COL_TIMES_TRIGGERED);
 
-                SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()
-                    .withRepeatCount(repeatCount)
-                    .withIntervalInMilliseconds(repeatInterval);
+        //         SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()
+        //             .withRepeatCount(repeatCount)
+        //             .withIntervalInMilliseconds(repeatInterval);
                 
-                string[] statePropertyNames = { "timesTriggered" };
-                Object[] statePropertyValues = { timesTriggered };
+        //         string[] statePropertyNames = { "timesTriggered" };
+        //         Object[] statePropertyValues = { timesTriggered };
                 
-                return new TriggerPropertyBundle(sb, statePropertyNames, statePropertyValues);
-            }
+        //         return new TriggerPropertyBundle(sb, statePropertyNames, statePropertyValues);
+        //     }
             
-            throw new IllegalStateException("No record found for selection of Trigger with key: '" ~ triggerKey ~ "' and statement: " ~ Util.rtp(SELECT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-        } finally {
-            Util.closeResultSet(rs);
-            Util.closeStatement(ps);
-        }
+        //     throw new IllegalStateException("No record found for selection of Trigger with key: '" ~ triggerKey ~ "' and statement: " ~ Util.rtp(SELECT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
+        // } finally {
+        //     Util.closeResultSet(rs);
+        //     Util.closeStatement(ps);
+        // }
+        implementationMissing(false);
+        return null;
     }
 
     int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
 
-        SimpleTrigger simpleTrigger = cast(SimpleTrigger)trigger;
+        // SimpleTrigger simpleTrigger = cast(SimpleTrigger)trigger;
         
-        PreparedStatement ps = null;
+        // PreparedStatement ps = null;
 
-        try {
-            ps = conn.prepareStatement(Util.rtp(UPDATE_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
+        // try {
+        //     ps = conn.prepareStatement(Util.rtp(UPDATE_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
 
-            ps.setInt(1, simpleTrigger.getRepeatCount());
-            ps.setBigDecimal(2, new BigDecimal(string.valueOf(simpleTrigger.getRepeatInterval())));
-            ps.setInt(3, simpleTrigger.getTimesTriggered());
-            ps.setString(4, simpleTrigger.getKey().getName());
-            ps.setString(5, simpleTrigger.getKey().getGroup());
+        //     ps.setInt(1, simpleTrigger.getRepeatCount());
+        //     ps.setBigDecimal(2, new BigDecimal(string.valueOf(simpleTrigger.getRepeatInterval())));
+        //     ps.setInt(3, simpleTrigger.getTimesTriggered());
+        //     ps.setString(4, simpleTrigger.getKey().getName());
+        //     ps.setString(5, simpleTrigger.getKey().getGroup());
 
-            return ps.executeUpdate();
-        } finally {
-            Util.closeStatement(ps);
-        }
+        //     return ps.executeUpdate();
+        // } finally {
+        //     Util.closeStatement(ps);
+        // }
+
+        implementationMissing(false);
+        return 0;
     }
 
 }

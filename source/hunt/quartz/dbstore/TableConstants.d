@@ -44,7 +44,7 @@ struct TableConstants {
 
     enum string TABLE_SIMPLE_TRIGGERS = "SIMPLE_TRIGGERS";
 
-    enum string TABLE_SIMPROP_TRIGGERS = "SIMPROP_TRIGGERS";
+    enum string TABLE_SIMPLE_PROPERTIES_TRIGGERS = "SIMPROP_TRIGGERS";
 
     enum string TABLE_CRON_TRIGGERS = "CRON_TRIGGERS";
 
@@ -114,7 +114,7 @@ struct TableConstants {
 
     enum string COL_TIMES_TRIGGERED = "TIMES_TRIGGERED";
 
-    // TABLE_SIMPROP_TRIGGERS columns names
+    // TABLE_SIMPLE_PROPERTIES_TRIGGERS columns names
     enum string COL_STR_PROP_1 = "STR_PROP_1";
     enum string COL_STR_PROP_2 = "STR_PROP_2";
     enum string COL_STR_PROP_3 = "STR_PROP_3";
