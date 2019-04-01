@@ -16,12 +16,9 @@ class CronTriggers : Model {
     @PrimaryKey @Column(TableConstants.COL_TRIGGER_GROUP)
     string triggerGroup;
 
-    @Column(TableConstants.COL_REPEAT_COUNT)
-    long repeatCount;
+    @Column(TableConstants.COL_CRON_EXPRESSION)
+    string cronExpression;
 
-    @Column(TableConstants.COL_REPEAT_INTERVAL)
-    long repeatInterval;
-
-    @Column(TableConstants.COL_TIMES_TRIGGERED)
-    long timesTriggered;
+    @Column(TableConstants.COL_TIME_ZONE_ID)
+    string timeZoneId;
 }

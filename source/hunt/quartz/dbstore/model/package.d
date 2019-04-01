@@ -75,66 +75,66 @@ struct ModelConstants {
     enum string FIELD_DESCRIPTION = JobDetails.description.stringof; // "DESCRIPTION";
 
     // MODEL_TRIGGERS columns names
-    enum string FIELD_TRIGGER_NAME = "TRIGGER_NAME";
+    enum string FIELD_TRIGGER_NAME =  Triggers.triggerName.stringof; // "TRIGGER_NAME";
 
-    enum string FIELD_TRIGGER_GROUP = "TRIGGER_GROUP";
+    enum string FIELD_TRIGGER_GROUP = Triggers.jobGroup.stringof; // "TRIGGER_GROUP";
 
-    enum string FIELD_NEXT_FIRE_TIME = "NEXT_FIRE_TIME";
+    enum string FIELD_NEXT_FIRE_TIME = Triggers.nextFireTime.stringof; // "NEXT_FIRE_TIME";
 
-    enum string FIELD_PREV_FIRE_TIME = "PREV_FIRE_TIME";
+    enum string FIELD_PREV_FIRE_TIME = Triggers.prevFireTime.stringof; // "PREV_FIRE_TIME";
 
-    enum string FIELD_TRIGGER_STATE = "TRIGGER_STATE";
+    enum string FIELD_TRIGGER_STATE = Triggers.triggerState.stringof; // "TRIGGER_STATE";
 
-    enum string FIELD_TRIGGER_TYPE = "TRIGGER_TYPE";
+    enum string FIELD_TRIGGER_TYPE = Triggers.triggerType.stringof; // "TRIGGER_TYPE";
 
-    enum string FIELD_START_TIME = "START_TIME";
+    enum string FIELD_START_TIME = Triggers.startTime.stringof; // "START_TIME";
 
-    enum string FIELD_END_TIME = "END_TIME";
+    enum string FIELD_END_TIME = Triggers.endTime.stringof; // "END_TIME";
 
-    enum string FIELD_PRIORITY = "PRIORITY";
+    enum string FIELD_PRIORITY = Triggers.priority.stringof; // "PRIORITY";
 
-    enum string FIELD_MISFIRE_INSTRUCTION = "MISFIRE_INSTR";
+    enum string FIELD_MISFIRE_INSTRUCTION = Triggers.misfireInstruction.stringof; // "MISFIRE_INSTR";
 
-    enum string ALIAS_FIELD_NEXT_FIRE_TIME = "ALIAS_NXT_FR_TM";
+    // enum string ALIAS_FIELD_NEXT_FIRE_TIME = "ALIAS_NXT_FR_TM";
 
     // MODEL_SIMPLE_TRIGGERS columns names
-    enum string FIELD_REPEAT_COUNT = "REPEAT_COUNT";
+    enum string FIELD_REPEAT_COUNT = SimpleTriggers.repeatCount.stringof; // "REPEAT_COUNT";
 
-    enum string FIELD_REPEAT_INTERVAL = "REPEAT_INTERVAL";
+    enum string FIELD_REPEAT_INTERVAL = SimpleTriggers.repeatInterval.stringof; // "REPEAT_INTERVAL";
 
-    enum string FIELD_TIMES_TRIGGERED = "TIMES_TRIGGERED";
+    enum string FIELD_TIMES_TRIGGERED = SimpleTriggers.timesTriggered.stringof; // "TIMES_TRIGGERED";
 
     // MODEL_CRON_TRIGGERS columns names
-    enum string FIELD_CRON_EXPRESSION = "CRON_EXPRESSION";
+    enum string FIELD_CRON_EXPRESSION = CronTriggers.cronExpression.stringof; // "CRON_EXPRESSION";
+
+    enum string FIELD_TIME_ZONE_ID = CronTriggers.timeZoneId.stringof; // "TIME_ZONE_ID";
 
     // MODEL_BLOB_TRIGGERS columns names
-    enum string FIELD_BLOB = "BLOB_DATA";
-
-    enum string FIELD_TIME_ZONE_ID = "TIME_ZONE_ID";
+    enum string FIELD_BLOB = BlobTriggers.blogData.stringof; // "BLOB_DATA";
 
     // MODEL_FIRED_TRIGGERS columns names
-    enum string FIELD_INSTANCE_NAME = "INSTANCE_NAME";
+    enum string FIELD_INSTANCE_NAME = FiredTriggers.instanceName.stringof; // "INSTANCE_NAME";
 
-    enum string FIELD_FIRED_TIME = "FIRED_TIME";
+    enum string FIELD_FIRED_TIME = FiredTriggers.firedTime.stringof; // "FIRED_TIME";
 
-    enum string FIELD_SCHED_TIME = "SCHED_TIME";
+    enum string FIELD_SCHED_TIME = FiredTriggers.schedTime.stringof; // "SCHED_TIME";
     
-    enum string FIELD_ENTRY_ID = "ENTRY_ID";
+    enum string FIELD_ENTRY_ID = FiredTriggers.entryId.stringof; // "ENTRY_ID";
 
-    enum string FIELD_ENTRY_STATE = "STATE";
+    enum string FIELD_ENTRY_STATE = FiredTriggers.state.stringof; // "STATE";
 
     // MODEL_CALENDARS columns names
-    enum string FIELD_CALENDAR_NAME = "CALENDAR_NAME";
+    enum string FIELD_CALENDAR_NAME = Calendars.calendarName.stringof; // "CALENDAR_NAME";
 
-    enum string FIELD_CALENDAR = "CALENDAR";
-
-    // MODEL_LOCKS columns names
-    enum string FIELD_LOCK_NAME = "LOCK_NAME";
+    enum string FIELD_CALENDAR = Calendars.calendar.stringof; // "CALENDAR";
 
     // MODEL_LOCKS columns names
-    enum string FIELD_LAST_CHECKIN_TIME = "LAST_CHECKIN_TIME";
+    enum string FIELD_LOCK_NAME = Locks.lockName.stringof; // "LOCK_NAME";
 
-    enum string FIELD_CHECKIN_INTERVAL = "CHECKIN_INTERVAL";
+    // MODEL_SCHEDULER_STATE columns names
+    enum string FIELD_LAST_CHECKIN_TIME = SchedulerState.lastCheckinTime.stringof; // "LAST_CHECKIN_TIME";
+
+    enum string FIELD_CHECKIN_INTERVAL = SchedulerState.checkinInterval.stringof; // "CHECKIN_INTERVAL";
 
     // MISC CONSTANTS
     enum string DEFAULT_MODEL_PREFIX = "QRTZ_";

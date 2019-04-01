@@ -155,7 +155,7 @@ struct TableConstants {
     // TABLE_LOCKS columns names
     enum string COL_LOCK_NAME = "lock_name";
 
-    // TABLE_LOCKS columns names
+    // TABLE_SCHEDULER_STATE columns names
     enum string COL_LAST_CHECKIN_TIME = "last_checkin_time";
 
     enum string COL_CHECKIN_INTERVAL = "checkin_interval";
