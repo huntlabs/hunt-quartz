@@ -26,40 +26,10 @@ import hunt.quartz.dbstore.model;
 import hunt.quartz.dbstore.SchedulerStateRecord;
 import hunt.quartz.dbstore.SimpleTriggerPersistenceDelegate;
 import hunt.quartz.dbstore.StdSqlConstants;
+import hunt.quartz.dbstore.TableConstants;
 import hunt.quartz.dbstore.TriggerStatus;
 import hunt.quartz.dbstore.TriggerPersistenceDelegate;
 
-import hunt.io.ByteArrayOutputStream;
-
-
-// import static hunt.quartz.JobKey.jobKey;
-// import static hunt.quartz.TriggerBuilder.newTrigger;
-
-// import java.io.ByteArrayInputStream;
-// import java.io.ByteArrayOutputStream;
-// import java.io.IOException;
-// import hunt.io.common;
-// import java.io.NotSerializableException;
-// import java.io.ObjectInputStream;
-// import java.io.ObjectOutputStream;
-// import java.math.BigDecimal;
-// import java.sql.Blob;
-// import java.sql.Connection;
-// import java.sql.PreparedStatement;
-// import java.sql.ResultSet;
-// import java.sql.SQLException;
-// import java.sql.Statement;
-// import std.datetime;
-
-import hunt.collection.HashMap;
-import hunt.collection.HashSet;
-import hunt.collection.Iterator;
-import hunt.collection.LinkedList;
-import hunt.collection.List;
-import hunt.collection.Map;
-import hunt.collection.Set;
-
-import hunt.quartz.dbstore.TableConstants;
 import hunt.quartz.Calendar;
 import hunt.quartz.exception;
 import hunt.quartz.Job;
@@ -79,17 +49,46 @@ import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 // import hunt.quartz.spi.ClassLoadHelper;
 import hunt.quartz.spi.OperableTrigger;
 
-import hunt.Exceptions;
-// import hunt.entity;
+import hunt.collection.HashMap;
+import hunt.collection.HashSet;
+import hunt.collection.Iterator;
+import hunt.collection.LinkedList;
+import hunt.collection.List;
+import hunt.collection.Map;
+import hunt.collection.Set;
 
+import hunt.Exceptions;
 import hunt.entity.EntityManager;
 import hunt.entity.eql.EqlQuery;
+import hunt.io.ByteArrayOutputStream;
 import hunt.logging;
+import hunt.time.LocalDateTime;
+import hunt.time.ZoneOffset;
 
 import std.conv;
 import std.format;
 
 alias triggerKey = TriggerKey.triggerKey;
+alias jobKey = JobKey.jobKey;
+
+
+// import static hunt.quartz.TriggerBuilder.newTrigger;
+
+// import java.io.ByteArrayInputStream;
+// import java.io.ByteArrayOutputStream;
+// import java.io.IOException;
+// import hunt.io.common;
+// import java.io.NotSerializableException;
+// import java.io.ObjectInputStream;
+// import java.io.ObjectOutputStream;
+// import java.math.BigDecimal;
+// import java.sql.Blob;
+// import java.sql.Connection;
+// import java.sql.PreparedStatement;
+// import java.sql.ResultSet;
+// import java.sql.SQLException;
+// import java.sql.Statement;
+// import std.datetime;
 
 /**
  * <p>
@@ -1748,31 +1747,11 @@ class StdDbDelegate : DriverDelegate {
         Triggers[] triggers = query.getResultList();
 
         foreach(Triggers t; triggers) {
-            OperableTrigger t = selectTrigger(conn, triggerKey(t.triggerName, t.triggerGroup()));
-            if(t !is null) {
-                trigList.add(t);
+            OperableTrigger ot = selectTrigger(conn, triggerKey(t.triggerName, t.triggerGroup));
+            if(ot !is null) {
+                trigList.add(ot);
             }
         }
-
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
-
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_FOR_JOB));
-        //     query.setParameter(1, jobKey.getName());
-        //     query.setParameter(2, jobKey.getGroup());
-        //     rs = ps.executeQuery();
-
-        //     while (rs.next()) {
-        //         OperableTrigger t = selectTrigger(conn, triggerKey(rs.getString(COL_TRIGGER_NAME), rs.getString(COL_TRIGGER_GROUP)));
-        //         if(t !is null) {
-        //             trigList.add(t);
-        //         }
-        //     }
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
 
         return trigList;
 
@@ -1815,115 +1794,114 @@ class StdDbDelegate : DriverDelegate {
      */
     OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) {
 
-        
+        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER));
+        query.setParameter(1, triggerKey.getName());
+        query.setParameter(2, triggerKey.getGroup());
+        Triggers t = query.getSingleResult();
 
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
-        // try {
-        //     OperableTrigger trigger = null;
+        if(t is null) {
+            return null;
+        }
 
-        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER));
-        //     query.setParameter(1, triggerKey.getName());
-        //     query.setParameter(2, triggerKey.getGroup());
-        //     rs = ps.executeQuery();
-
-        //     if (rs.next()) {
-        //         string jobName = rs.getString(COL_JOB_NAME);
-        //         string jobGroup = rs.getString(COL_JOB_GROUP);
-        //         string description = rs.getString(COL_DESCRIPTION);
-        //         long nextFireTime = rs.getLong(COL_NEXT_FIRE_TIME);
-        //         long prevFireTime = rs.getLong(COL_PREV_FIRE_TIME);
-        //         string triggerType = rs.getString(COL_TRIGGER_TYPE);
-        //         long startTime = rs.getLong(COL_START_TIME);
-        //         long endTime = rs.getLong(COL_END_TIME);
-        //         string calendarName = rs.getString(COL_CALENDAR_NAME);
-        //         int misFireInstr = rs.getInt(COL_MISFIRE_INSTRUCTION);
-        //         int priority = rs.getInt(COL_PRIORITY);
-
-        //         // Map<?, ?> map = null;
-        //         // if (canUseProperties()) {
-        //         //     map = getMapFromProperties(rs);
-        //         // } else {
-        //         //     map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
-        //         // }
-        //         implementationMissing(false);
-                
-        //         Date nft = null;
-        //         if (nextFireTime > 0) {
-        //             nft = new Date(nextFireTime);
-        //         }
-
-        //         Date pft = null;
-        //         if (prevFireTime > 0) {
-        //             pft = new Date(prevFireTime);
-        //         }
-        //         Date startTimeD = new Date(startTime);
-        //         Date endTimeD = null;
-        //         if (endTime > 0) {
-        //             endTimeD = new Date(endTime);
-        //         }
-
-        //         if (triggerType== TTYPE_BLOB) {
-        //             rs.close(); rs = null;
-        //             ps.close(); ps = null;
-
-        //             ps = conn.prepareStatement(rtp(SELECT_BLOB_TRIGGER));
-        //             query.setParameter(1, triggerKey.getName());
-        //             query.setParameter(2, triggerKey.getGroup());
-        //             rs = ps.executeQuery();
-
-        //             if (rs.next()) {
-        //                 trigger = cast(OperableTrigger) getObjectFromBlob(rs, COL_BLOB);
-        //             }
-        //         }
-        //         else {
-        //             TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(triggerType);
-                    
-        //             if(tDel is null)
-        //                 throw new JobPersistenceException("No TriggerPersistenceDelegate for trigger discriminator type: " ~ triggerType);
-
-        //             TriggerPropertyBundle triggerProps = null;
-        //             try {
-        //                 triggerProps = tDel.loadExtendedTriggerProperties(conn, triggerKey);
-        //             } catch (IllegalStateException isex) {
-        //                 if (isTriggerStillPresent(ps)) {
-        //                     throw isex;
-        //                 } else {
-        //                     // QTZ-386 Trigger has been deleted
-        //                     return null;
-        //                 }
-        //             }
-
-        //             TriggerBuilder!Trigger tb = TriggerBuilderHelper.newTrigger!Trigger()
-        //                 .withDescription(description)
-        //                 .withPriority(priority)
-        //                 .startAt(startTimeD)
-        //                 .endAt(endTimeD)
-        //                 .withIdentity(triggerKey)
-        //                 .modifiedByCalendar(calendarName)
-        //                 .withSchedule(triggerProps.getScheduleBuilder())
-        //                 .forJob(jobKey(jobName, jobGroup));
-    
-        //             if (null != map) {
-        //                 tb.usingJobData(new JobDataMap(map));
-        //             }
-    
-        //             trigger = cast(OperableTrigger) tb.build();
-                    
-        //             trigger.setMisfireInstruction(misFireInstr);
-        //             trigger.setNextFireTime(nft);
-        //             trigger.setPreviousFireTime(pft);
-                    
-        //             setTriggerStateProperties(trigger, triggerProps);
-        //         }                
-        //     }
-
-        //     return trigger;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
+        string jobName =  t.jobName;
+        string jobGroup = t.jobGroup;
+        string description = t.description;
+        long nextFireTime = t.nextFireTime;
+        long prevFireTime = t.prevFireTime;
+        string triggerType = t.triggerType;
+        long startTime = t.startTime;
+        long endTime = t.endTime;
+        string calendarName = t.calendarName;
+        int misFireInstr = t.misfireInstruction;
+        int priority = t.priority;
+// TODO: Tasks pending completion -@zhangxueping at 4/1/2019, 5:18:17 PM
+// 
+        // Map<?, ?> map = null;
+        // if (canUseProperties()) {
+        //     map = getMapFromProperties(rs);
+        // } else {
+        //     map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
         // }
+                
+
+        LocalDateTime nft = null;
+        if (nextFireTime > 0) {
+            nft = LocalDateTime.ofEpochSecond(nextFireTime, 0, ZoneOffset.UTC);
+        }
+
+        LocalDateTime pft = null;
+        if (prevFireTime > 0) {
+            pft = LocalDateTime.ofEpochSecond(prevFireTime, 0, ZoneOffset.UTC);
+        }
+        LocalDateTime startTimeD = LocalDateTime.ofEpochSecond(startTime, 0, ZoneOffset.UTC);
+        LocalDateTime endTimeD = null;
+        if (endTime > 0) {
+            endTimeD = LocalDateTime.ofEpochSecond(endTime, 0, ZoneOffset.UTC);
+        }
+
+        OperableTrigger trigger = null;
+
+        if (triggerType == TableConstants.TTYPE_BLOB) {
+            EqlQuery!(BlobTriggers)  blobTriggersQuery = 
+                conn.createQuery!(BlobTriggers)(rtp(StdSqlConstants.SELECT_BLOB_TRIGGER));
+            blobTriggersQuery.setParameter(1, triggerKey.getName());
+            blobTriggersQuery.setParameter(2, triggerKey.getGroup());
+            BlobTriggers r = blobTriggersQuery.getSingleResult();
+
+            if (r !is null) {
+                // TODO: Tasks pending completion -@zhangxueping at 4/1/2019, 5:38:10 PM
+                // 
+                implementationMissing(false);
+                // trigger = cast(OperableTrigger) getObjectFromBlob(rs, COL_BLOB);
+            } else {
+                version(HUNT_DEBUG) trace("There are no blob triggers");
+            }
+        } else {
+            TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(triggerType);
+            
+            if(tDel is null)
+                throw new JobPersistenceException("No TriggerPersistenceDelegate for trigger discriminator type: " ~ triggerType);
+
+            TriggerPropertyBundle triggerProps = null;
+            try {
+                triggerProps = tDel.loadExtendedTriggerProperties(conn, triggerKey);
+            } catch (IllegalStateException isex) {
+                warning(isex.msg);
+                return null;
+                // if (isTriggerStillPresent(ps)) {
+                //     throw isex;
+                // } else {
+                //     // QTZ-386 Trigger has been deleted
+                //     return null;
+                // }
+            }
+
+            TriggerBuilder!Trigger tb = TriggerBuilderHelper.newTrigger!Trigger()
+                .withDescription(description)
+                .withPriority(priority)
+                .startAt(startTimeD)
+                .endAt(endTimeD)
+                .withIdentity(triggerKey)
+                .modifiedByCalendar(calendarName)
+                .withSchedule(triggerProps.getScheduleBuilder())
+                .forJob(jobKey(jobName, jobGroup));
+
+            // if (map !is null) {
+            //     tb.usingJobData(new JobDataMap(map));
+            // }
+
+            trigger = cast(OperableTrigger) tb.build();
+            
+            trigger.setMisfireInstruction(misFireInstr);
+            trigger.setNextFireTime(nft);
+            trigger.setPreviousFireTime(pft);
+            
+            setTriggerStateProperties(trigger, triggerProps);
+        }   
+
+        return trigger;          
     }
+
 
     // private bool isTriggerStillPresent(PreparedStatement ps) {
     //     ResultSet rs = null;
