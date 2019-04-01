@@ -1,10 +1,10 @@
-module hunt.quartz.dbstore.model.SimpPropertiesTrigger;
+module hunt.quartz.dbstore.model.SimpPropertiesTriggers;
 
 import hunt.quartz.dbstore.TableConstants;
 import hunt.entity;
 
 @Table(TableConstants.TABLE_SIMPLE_PROPERTIES_TRIGGERS)
-class SimpPropertiesTrigger : Model {
+class SimpPropertiesTriggers : Model {
     mixin MakeModel;
 
     @PrimaryKey @Column(TableConstants.COL_SCHEDULER_NAME)

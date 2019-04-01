@@ -118,7 +118,7 @@ struct StdSqlConstants {
             ~ ModelConstants.MODEL_FIRED_TRIGGERS
             ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
-
+            
     enum string INSERT_JOB_DETAIL = "INSERT INTO "
             ~ ModelConstants.MODEL_JOB_DETAILS ~ " t (t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ ", t." ~ ModelConstants.FIELD_JOB_NAME

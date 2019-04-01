@@ -34,7 +34,6 @@ import hunt.io.ByteArrayOutputStream;
 
 // import static hunt.quartz.JobKey.jobKey;
 // import static hunt.quartz.TriggerBuilder.newTrigger;
-// import static hunt.quartz.TriggerKey.triggerKey;
 
 // import java.io.ByteArrayInputStream;
 // import java.io.ByteArrayOutputStream;
@@ -89,6 +88,8 @@ import hunt.logging;
 
 import std.conv;
 import std.format;
+
+alias triggerKey = TriggerKey.triggerKey;
 
 /**
  * <p>
@@ -625,6 +626,8 @@ class StdDbDelegate : DriverDelegate {
 
         int insertResult = 0;
         EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.INSERT_JOB_DETAIL));
+        // import hunt.entity.NativeQuery;
+        // NativeQuery  query = conn.createNativeQuery(rtp(StdSqlConstants.INSERT_JOB_DETAIL));
         query.setParameter(1, job.getKey().getName());
         query.setParameter(2, job.getKey().getGroup());
         query.setParameter(3, job.getDescription());
@@ -785,6 +788,7 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         JobDetails r = query.getSingleResult();
+        version(HUNT_DEBUG) trace("The result is ", r !is null);
         return r !is null;
     }
 
@@ -834,46 +838,36 @@ class StdDbDelegate : DriverDelegate {
      *           if deserialization causes an error
      */
     JobDetail selectJobDetail(Connection conn, JobKey jobKey) {
-        implementationMissing(false);
-        return null;
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_DETAIL));
+        query.setParameter(1, jobKey.getName());
+        query.setParameter(2, jobKey.getGroup());
+        JobDetails j = query.getSingleResult();
+        if(j is null)
+            return null;
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_JOB_DETAIL));
-        //     query.setParameter(1, jobKey.getName());
-        //     query.setParameter(2, jobKey.getGroup());
-        //     rs = ps.executeQuery();
+        JobDetailImpl job = new JobDetailImpl();
+        job.setName(j.jobName);
+        job.setGroup(j.jobGroup);
+        job.setDescription(j.description);
+        
+        job.setJobClass(cast(TypeInfo_Class)TypeInfo_Class.find(j.jobClassName));
 
-        //     JobDetailImpl job = null;
+        job.setDurability(j.isDurable.to!bool());
+        job.setRequestsRecovery(j.requestsRecovery.to!bool());
+        // TODO: Tasks pending completion -@zhangxueping at 4/1/2019, 4:48:23 PM
+        // 
 
-        //     if (rs.next()) {
-        //         job = new JobDetailImpl();
-
-        //         job.setName(rs.getString(COL_JOB_NAME));
-        //         job.setGroup(rs.getString(COL_JOB_GROUP));
-        //         job.setDescription(rs.getString(COL_DESCRIPTION));
-        //         job.setJobClass( loadHelper.loadClass(rs.getString(COL_JOB_CLASS), Job.class));
-        //         job.setDurability(getBoolean(rs, COL_IS_DURABLE));
-        //         job.setRequestsRecovery(getBoolean(rs, COL_REQUESTS_RECOVERY));
-
-        //         Map<?, ?> map = null;
-        //         if (canUseProperties()) {
-        //             map = getMapFromProperties(rs);
-        //         } else {
-        //             map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
-        //         }
-
-        //         if (null != map) {
-        //             job.setJobDataMap(new JobDataMap(map));
-        //         }
-        //     }
-
-        //     return job;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
+        // Map<?, ?> map = null;
+        // if (canUseProperties()) {
+        //     map = getMapFromProperties(rs);
+        // } else {
+        //     map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
         // }
+
+        // if (null != map) {
+            // job.setJobDataMap(new JobDataMap(map));
+        // }
+        return job;
     }
 
     /**
@@ -1745,7 +1739,21 @@ class StdDbDelegate : DriverDelegate {
      */
     List!(OperableTrigger) selectTriggersForJob(Connection conn, JobKey jobKey) {
 
-        // LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
+        LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
+
+        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_JOB));
+        query.setParameter(1, jobKey.getName());
+        query.setParameter(2, jobKey.getGroup());
+
+        Triggers[] triggers = query.getResultList();
+
+        foreach(Triggers t; triggers) {
+            OperableTrigger t = selectTrigger(conn, triggerKey(t.triggerName, t.triggerGroup()));
+            if(t !is null) {
+                trigList.add(t);
+            }
+        }
+
         // PreparedStatement ps = null;
         // ResultSet rs = null;
 
@@ -1766,10 +1774,8 @@ class StdDbDelegate : DriverDelegate {
         //     closeStatement(ps);
         // }
 
-        // return trigList;
+        return trigList;
 
-        implementationMissing(false);
-        return null;
     }
 
     List!(OperableTrigger) selectTriggersForCalendar(Connection conn, string calName) {
@@ -1808,8 +1814,8 @@ class StdDbDelegate : DriverDelegate {
      * @throws JobPersistenceException 
      */
     OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) {
-        implementationMissing(false);
-        return null;
+
+        
 
         // PreparedStatement ps = null;
         // ResultSet rs = null;

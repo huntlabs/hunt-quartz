@@ -38,127 +38,127 @@ struct TableConstants {
      */
 
     // Table names
-    enum string TABLE_JOB_DETAILS = "JOB_DETAILS";
+    enum string TABLE_JOB_DETAILS = "job_details";
 
-    enum string TABLE_TRIGGERS = "TRIGGERS";
+    enum string TABLE_TRIGGERS = "triggers";
 
-    enum string TABLE_SIMPLE_TRIGGERS = "SIMPLE_TRIGGERS";
+    enum string TABLE_SIMPLE_TRIGGERS = "simple_triggers";
 
-    enum string TABLE_SIMPLE_PROPERTIES_TRIGGERS = "SIMPROP_TRIGGERS";
+    enum string TABLE_SIMPLE_PROPERTIES_TRIGGERS = "simprop_triggers";
 
-    enum string TABLE_CRON_TRIGGERS = "CRON_TRIGGERS";
+    enum string TABLE_CRON_TRIGGERS = "cron_triggers";
 
-    enum string TABLE_BLOB_TRIGGERS = "BLOB_TRIGGERS";
+    enum string TABLE_BLOB_TRIGGERS = "blob_triggers";
 
-    enum string TABLE_FIRED_TRIGGERS = "FIRED_TRIGGERS";
+    enum string TABLE_FIRED_TRIGGERS = "fired_triggers";
 
-    enum string TABLE_CALENDARS = "CALENDARS";
+    enum string TABLE_CALENDARS = "calendars";
 
-    enum string TABLE_PAUSED_TRIGGERS = "PAUSED_TRIGGER_GRPS";
+    enum string TABLE_PAUSED_TRIGGERS = "paused_trigger_grps";
 
-    enum string TABLE_LOCKS = "LOCKS";
+    enum string TABLE_LOCKS = "locks";
 
-    enum string TABLE_SCHEDULER_STATE = "SCHEDULER_STATE";
+    enum string TABLE_SCHEDULER_STATE = "scheduler_state";
 
     // TABLE_JOB_DETAILS columns names
     
-    enum string COL_SCHEDULER_NAME = "SCHED_NAME";
+    enum string COL_SCHEDULER_NAME = "sched_name";
     
-    enum string COL_JOB_NAME = "JOB_NAME";
+    enum string COL_JOB_NAME = "job_name";
 
-    enum string COL_JOB_GROUP = "JOB_GROUP";
+    enum string COL_JOB_GROUP = "job_group";
 
-    enum string COL_IS_DURABLE = "IS_DURABLE";
+    enum string COL_IS_DURABLE = "is_durable";
 
-    enum string COL_IS_VOLATILE = "IS_VOLATILE";
+    enum string COL_IS_VOLATILE = "is_volatile";
 
-    enum string COL_IS_NONCONCURRENT = "IS_NONCONCURRENT";
+    enum string COL_IS_NONCONCURRENT = "is_nonconcurrent";
 
-    enum string COL_IS_UPDATE_DATA = "IS_UPDATE_DATA";
+    enum string COL_IS_UPDATE_DATA = "is_update_data";
 
-    enum string COL_REQUESTS_RECOVERY = "REQUESTS_RECOVERY";
+    enum string COL_REQUESTS_RECOVERY = "requests_recovery";
 
-    enum string COL_JOB_DATAMAP = "JOB_DATA";
+    enum string COL_JOB_DATAMAP = "job_data";
 
-    enum string COL_JOB_CLASS = "JOB_CLASS_NAME";
+    enum string COL_JOB_CLASS = "job_class_name";
 
-    enum string COL_DESCRIPTION = "DESCRIPTION";
+    enum string COL_DESCRIPTION = "description";
 
     // TABLE_TRIGGERS columns names
-    enum string COL_TRIGGER_NAME = "TRIGGER_NAME";
+    enum string COL_TRIGGER_NAME = "trigger_name";
 
-    enum string COL_TRIGGER_GROUP = "TRIGGER_GROUP";
+    enum string COL_TRIGGER_GROUP = "trigger_group";
 
-    enum string COL_NEXT_FIRE_TIME = "NEXT_FIRE_TIME";
+    enum string COL_NEXT_FIRE_TIME = "next_fire_time";
 
-    enum string COL_PREV_FIRE_TIME = "PREV_FIRE_TIME";
+    enum string COL_PREV_FIRE_TIME = "prev_fire_time";
 
-    enum string COL_TRIGGER_STATE = "TRIGGER_STATE";
+    enum string COL_TRIGGER_STATE = "trigger_state";
 
-    enum string COL_TRIGGER_TYPE = "TRIGGER_TYPE";
+    enum string COL_TRIGGER_TYPE = "trigger_type";
 
-    enum string COL_START_TIME = "START_TIME";
+    enum string COL_START_TIME = "start_time";
 
-    enum string COL_END_TIME = "END_TIME";
+    enum string COL_END_TIME = "end_time";
 
-    enum string COL_PRIORITY = "PRIORITY";
+    enum string COL_PRIORITY = "priority";
 
-    enum string COL_MISFIRE_INSTRUCTION = "MISFIRE_INSTR";
+    enum string COL_MISFIRE_INSTRUCTION = "misfire_instr";
 
-    enum string ALIAS_COL_NEXT_FIRE_TIME = "ALIAS_NXT_FR_TM";
+    enum string ALIAS_COL_NEXT_FIRE_TIME = "alias_nxt_fr_tm";
 
     // TABLE_SIMPLE_TRIGGERS columns names
-    enum string COL_REPEAT_COUNT = "REPEAT_COUNT";
+    enum string COL_REPEAT_COUNT = "repeat_count";
 
-    enum string COL_REPEAT_INTERVAL = "REPEAT_INTERVAL";
+    enum string COL_REPEAT_INTERVAL = "repeat_interval";
 
-    enum string COL_TIMES_TRIGGERED = "TIMES_TRIGGERED";
+    enum string COL_TIMES_TRIGGERED = "times_triggered";
 
     // TABLE_SIMPLE_PROPERTIES_TRIGGERS columns names
-    enum string COL_STR_PROP_1 = "STR_PROP_1";
-    enum string COL_STR_PROP_2 = "STR_PROP_2";
-    enum string COL_STR_PROP_3 = "STR_PROP_3";
-    enum string COL_INT_PROP_1 = "STR_INT_1";
-    enum string COL_INT_PROP_2 = "STR_INT_2";
-    enum string COL_LONG_PROP_1 = "STR_LONG_1";
-    enum string COL_LONG_PROP_2 = "STR_LONG_2";
-    enum string COL_DEC_PROP_1 = "STR_DEC_1";
-    enum string COL_DEC_PROP_2 = "STR_DEC_2";
-    enum string COL_BOOL_PROP_1 = "STR_BOOL_1";
-    enum string COL_BOOL_PROP_2 = "STR_BOOL_2";
+    enum string COL_STR_PROP_1 = "str_prop_1";
+    enum string COL_STR_PROP_2 = "str_prop_2";
+    enum string COL_STR_PROP_3 = "str_prop_3";
+    enum string COL_INT_PROP_1 = "str_int_1";
+    enum string COL_INT_PROP_2 = "str_int_2";
+    enum string COL_LONG_PROP_1 = "str_long_1";
+    enum string COL_LONG_PROP_2 = "str_long_2";
+    enum string COL_DEC_PROP_1 = "str_dec_1";
+    enum string COL_DEC_PROP_2 = "str_dec_2";
+    enum string COL_BOOL_PROP_1 = "str_bool_1";
+    enum string COL_BOOL_PROP_2 = "str_bool_2";
 
 
     // TABLE_CRON_TRIGGERS columns names
-    enum string COL_CRON_EXPRESSION = "CRON_EXPRESSION";
+    enum string COL_CRON_EXPRESSION = "cron_expression";
 
     // TABLE_BLOB_TRIGGERS columns names
-    enum string COL_BLOB = "BLOB_DATA";
+    enum string COL_BLOB = "blob_data";
 
-    enum string COL_TIME_ZONE_ID = "TIME_ZONE_ID";
+    enum string COL_TIME_ZONE_ID = "time_zone_id";
 
     // TABLE_FIRED_TRIGGERS columns names
-    enum string COL_INSTANCE_NAME = "INSTANCE_NAME";
+    enum string COL_INSTANCE_NAME = "instance_name";
 
-    enum string COL_FIRED_TIME = "FIRED_TIME";
+    enum string COL_FIRED_TIME = "fired_time";
 
-    enum string COL_SCHED_TIME = "SCHED_TIME";
+    enum string COL_SCHED_TIME = "sched_time";
     
-    enum string COL_ENTRY_ID = "ENTRY_ID";
+    enum string COL_ENTRY_ID = "entry_id";
 
-    enum string COL_ENTRY_STATE = "STATE";
+    enum string COL_ENTRY_STATE = "state";
 
     // TABLE_CALENDARS columns names
-    enum string COL_CALENDAR_NAME = "CALENDAR_NAME";
+    enum string COL_CALENDAR_NAME = "calendar_name";
 
-    enum string COL_CALENDAR = "CALENDAR";
-
-    // TABLE_LOCKS columns names
-    enum string COL_LOCK_NAME = "LOCK_NAME";
+    enum string COL_CALENDAR = "calendar";
 
     // TABLE_LOCKS columns names
-    enum string COL_LAST_CHECKIN_TIME = "LAST_CHECKIN_TIME";
+    enum string COL_LOCK_NAME = "lock_name";
 
-    enum string COL_CHECKIN_INTERVAL = "CHECKIN_INTERVAL";
+    // TABLE_LOCKS columns names
+    enum string COL_LAST_CHECKIN_TIME = "last_checkin_time";
+
+    enum string COL_CHECKIN_INTERVAL = "checkin_interval";
 
     // MISC CONSTANTS
     enum string DEFAULT_TABLE_PREFIX = "QRTZ_";

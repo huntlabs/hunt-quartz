@@ -9,7 +9,7 @@ public import hunt.quartz.dbstore.model.Locks;
 public import hunt.quartz.dbstore.model.PausedTriggerGrps;
 public import hunt.quartz.dbstore.model.SchedulerState;
 public import hunt.quartz.dbstore.model.SimpleTriggers;
-public import hunt.quartz.dbstore.model.SimpPropertiesTrigger;
+public import hunt.quartz.dbstore.model.SimpPropertiesTriggers;
 public import hunt.quartz.dbstore.model.Triggers;
 
 
@@ -33,6 +33,8 @@ struct ModelConstants {
 
     enum string MODEL_SIMPLE_TRIGGERS = SimpleTriggers.stringof;
 
+    enum string MODEL_SIMPLE_PROPERTIES_TRIGGERS = SimpPropertiesTriggers.stringof;
+
     enum string MODEL_CRON_TRIGGERS = CronTriggers.stringof;
 
     enum string MODEL_BLOB_TRIGGERS = BlobTriggers.stringof;
@@ -47,32 +49,30 @@ struct ModelConstants {
 
     enum string MODEL_SCHEDULER_STATE = SchedulerState.stringof;
 
-    // FIXME: Needing refactor or cleanup -@zxp at 3/11/2019, 5:54:11 PM
-    // 
 
     // MODEL_JOB_DETAILS columns names
    
-    enum string FIELD_SCHEDULER_NAME = "SCHED_NAME";
+    enum string FIELD_SCHEDULER_NAME = JobDetails.schedulerName.stringof; // "SCHED_NAME";
     
-    enum string FIELD_JOB_NAME = "JOB_NAME";
+    enum string FIELD_JOB_NAME = JobDetails.jobName.stringof; // "JOB_NAME";
 
-    enum string FIELD_JOB_GROUP = "JOB_GROUP";
+    enum string FIELD_JOB_GROUP = JobDetails.jobGroup.stringof; // "JOB_GROUP";
 
-    enum string FIELD_IS_DURABLE = "IS_DURABLE";
+    enum string FIELD_IS_DURABLE = JobDetails.isDurable.stringof; // "IS_DURABLE";
 
-    enum string FIELD_IS_VOLATILE = "IS_VOLATILE";
+    enum string FIELD_IS_VOLATILE =  "IS_VOLATILE";
 
-    enum string FIELD_IS_NONCONCURRENT = "IS_NONCONCURRENT";
+    enum string FIELD_IS_NONCONCURRENT = JobDetails.isNonconcurrent.stringof; // "IS_NONCONCURRENT";
 
-    enum string FIELD_IS_UPDATE_DATA = "IS_UPDATE_DATA";
+    enum string FIELD_IS_UPDATE_DATA = JobDetails.isUpdateData.stringof; // "IS_UPDATE_DATA";
 
-    enum string FIELD_REQUESTS_RECOVERY = "REQUESTS_RECOVERY";
+    enum string FIELD_REQUESTS_RECOVERY = JobDetails.requestsRecovery.stringof; // "REQUESTS_RECOVERY";
 
-    enum string FIELD_JOB_DATAMAP = "JOB_DATA";
+    enum string FIELD_JOB_DATAMAP = JobDetails.jobData.stringof; // "JOB_DATA";
 
-    enum string FIELD_JOB_CLASS = "JOB_CLASS_NAME";
+    enum string FIELD_JOB_CLASS = JobDetails.jobClassName.stringof; // "JOB_CLASS_NAME";
 
-    enum string FIELD_DESCRIPTION = "DESCRIPTION";
+    enum string FIELD_DESCRIPTION = JobDetails.description.stringof; // "DESCRIPTION";
 
     // MODEL_TRIGGERS columns names
     enum string FIELD_TRIGGER_NAME = "TRIGGER_NAME";
