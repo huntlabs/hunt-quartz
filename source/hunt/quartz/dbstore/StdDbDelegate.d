@@ -699,28 +699,16 @@ class StdDbDelegate : DriverDelegate {
      * hunt.quartz.utils.Key}</code> objects
      */
     List!(TriggerKey) selectTriggerKeysForJob(Connection conn, JobKey jobKey) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_JOB));
+        query.setParameter(1, jobKey.getName());
+        query.setParameter(2, jobKey.getGroup());
+        Triggers[] triggers = query.getResultList();
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_FOR_JOB));
-        //     query.setParameter(1, jobKey.getName());
-        //     query.setParameter(2, jobKey.getGroup());
-        //     rs = ps.executeQuery();
-
-        //     LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
-        //     while (rs.next()) {
-        //         string trigName = rs.getString(COL_TRIGGER_NAME);
-        //         string trigGroup = rs.getString(COL_TRIGGER_GROUP);
-        //         list.add(triggerKey(trigName, trigGroup));
-        //     }
-        //     return list;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-        implementationMissing(false);
-        return null;
+        LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
+        foreach(Triggers t; triggers) {
+                list.add(triggerKey(t.triggerName, t.triggerGroup));
+        }
+        return list;
     }
 
     /**
