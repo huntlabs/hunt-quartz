@@ -77,7 +77,7 @@ struct ModelConstants {
     // MODEL_TRIGGERS columns names
     enum string FIELD_TRIGGER_NAME =  Triggers.triggerName.stringof; // "TRIGGER_NAME";
 
-    enum string FIELD_TRIGGER_GROUP = Triggers.jobGroup.stringof; // "TRIGGER_GROUP";
+    enum string FIELD_TRIGGER_GROUP = Triggers.triggerGroup.stringof; // "TRIGGER_GROUP";
 
     enum string FIELD_NEXT_FIRE_TIME = Triggers.nextFireTime.stringof; // "NEXT_FIRE_TIME";
 
