@@ -15,6 +15,7 @@
  */
 module hunt.quartz.dbstore.SimpleTriggerPersistenceDelegate;
 
+import hunt.quartz.dbstore.model;
 import hunt.quartz.dbstore.StdSqlConstants;
 import hunt.quartz.dbstore.TableConstants;
 import hunt.quartz.dbstore.TriggerPersistenceDelegate;
@@ -26,7 +27,16 @@ import hunt.quartz.TriggerKey;
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 import hunt.quartz.spi.OperableTrigger;
 
+import hunt.entity.EntityManager;
+import hunt.entity.NativeQuery;
+import hunt.entity.eql.EqlQuery;
+import hunt.database.driver.ResultSet;
+import hunt.database.Row;
+
 import hunt.Exceptions;
+import hunt.Integer;
+
+import std.format;
 
 /**
 */
@@ -53,102 +63,75 @@ class SimpleTriggerPersistenceDelegate : TriggerPersistenceDelegate {
     }
 
     int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
-        // PreparedStatement ps = null;
-
-        // try {
-        //     ps = conn.prepareStatement(Util.rtp(DELETE_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-        //     ps.setString(1, triggerKey.getName());
-        //     ps.setString(2, triggerKey.getGroup());
-
-        //     return ps.executeUpdate();
-        // } finally {
-        //     Util.closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return 0;
+        EqlQuery!(SimpleTriggers)  query = conn.createQuery!(SimpleTriggers)(rtp(StdSqlConstants.DELETE_SIMPLE_TRIGGER));
+        query.setParameter(1, triggerKey.getName());
+        query.setParameter(2, triggerKey.getGroup());
+        return query.exec();
     }
 
-    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
+    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, 
+        string state, JobDetail jobDetail) {
 
-        // SimpleTrigger simpleTrigger = cast(SimpleTrigger)trigger;
-        
-        // PreparedStatement ps = null;
-        
-        // try {
-        //     ps = conn.prepareStatement(Util.rtp(INSERT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-        //     ps.setString(1, trigger.getKey().getName());
-        //     ps.setString(2, trigger.getKey().getGroup());
-        //     ps.setInt(3, simpleTrigger.getRepeatCount());
-        //     ps.setBigDecimal(4, new BigDecimal(string.valueOf(simpleTrigger.getRepeatInterval())));
-        //     ps.setInt(5, simpleTrigger.getTimesTriggered());
+        SimpleTrigger simpleTrigger = cast(SimpleTrigger)trigger;
+        assert(simpleTrigger !is null);
 
-        //     return ps.executeUpdate();
-        // } finally {
-        //     Util.closeStatement(ps);
-        // }
+        EqlQuery!(SimpleTriggers)  query = conn.createQuery!(SimpleTriggers)(rtp(StdSqlConstants.INSERT_SIMPLE_TRIGGER));
+        query.setParameter(1, trigger.getKey().getName());
+        query.setParameter(2, trigger.getKey().getGroup());
+        query.setParameter(3, simpleTrigger.getRepeatCount());
+        query.setParameter(4, simpleTrigger.getRepeatInterval());
+        query.setParameter(5, simpleTrigger.getTimesTriggered());
 
-        implementationMissing(false);
-        return 0;
+        int r = query.exec();
+        return r;
+    }
+
+    protected final string rtp(string query) {
+        return format(query, schedNameLiteral);
     }
 
     TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
+        EqlQuery!(SimpleTriggers)  query = conn.createQuery!(SimpleTriggers)(rtp(StdSqlConstants.SELECT_SIMPLE_TRIGGER));
+        query.setParameter(1, triggerKey.getName());
+        query.setParameter(2, triggerKey.getGroup());
+        SimpleTriggers rt = query.getSingleResult();
 
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
-        
-        // try {
-        //     ps = conn.prepareStatement(Util.rtp(SELECT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-        //     ps.setString(1, triggerKey.getName());
-        //     ps.setString(2, triggerKey.getGroup());
-        //     rs = ps.executeQuery();
     
-        //     if (rs.next()) {
-        //         int repeatCount = rs.getInt(COL_REPEAT_COUNT);
-        //         long repeatInterval = rs.getLong(COL_REPEAT_INTERVAL);
-        //         int timesTriggered = rs.getInt(COL_TIMES_TRIGGERED);
+        if (rt !is null) {
+            int repeatCount = cast(int)rt.repeatCount;
+            long repeatInterval = rt.repeatInterval;
+            int timesTriggered = cast(int)rt.timesTriggered;
 
-        //         SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()
-        //             .withRepeatCount(repeatCount)
-        //             .withIntervalInMilliseconds(repeatInterval);
-                
-        //         string[] statePropertyNames = { "timesTriggered" };
-        //         Object[] statePropertyValues = { timesTriggered };
-                
-        //         return new TriggerPropertyBundle(sb, statePropertyNames, statePropertyValues);
-        //     }
+            SimpleScheduleBuilder sb = SimpleScheduleBuilder.simpleSchedule()
+                .withRepeatCount(repeatCount)
+                .withIntervalInMilliseconds(repeatInterval);
             
-        //     throw new IllegalStateException("No record found for selection of Trigger with key: '" ~ triggerKey ~ "' and statement: " ~ Util.rtp(SELECT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-        // } finally {
-        //     Util.closeResultSet(rs);
-        //     Util.closeStatement(ps);
-        // }
-        implementationMissing(false);
-        return null;
+            string[] statePropertyNames = [ "timesTriggered" ];
+            Object[] statePropertyValues = [ new Integer(timesTriggered) ];
+            
+            return new TriggerPropertyBundle(sb, statePropertyNames, statePropertyValues);
+        }
+        
+        throw new IllegalStateException("No record found for selection of Trigger with key: '" ~ triggerKey.toString() 
+            ~ "' and statement: " ~ rtp(StdSqlConstants.SELECT_SIMPLE_TRIGGER));
+        
     }
 
-    int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
+    int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, 
+        string state, JobDetail jobDetail) {
 
-        // SimpleTrigger simpleTrigger = cast(SimpleTrigger)trigger;
-        
-        // PreparedStatement ps = null;
+        SimpleTrigger simpleTrigger = cast(SimpleTrigger)trigger;
+        assert(simpleTrigger !is null);
 
-        // try {
-        //     ps = conn.prepareStatement(Util.rtp(UPDATE_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
+        EqlQuery!(SimpleTriggers)  query = conn.createQuery!(SimpleTriggers)(rtp(StdSqlConstants.UPDATE_SIMPLE_TRIGGER));
+        query.setParameter(1, simpleTrigger.getRepeatCount());
+        query.setParameter(2, simpleTrigger.getRepeatInterval());
+        query.setParameter(3, simpleTrigger.getTimesTriggered());
+        query.setParameter(4, simpleTrigger.getKey().getName());
+        query.setParameter(5, simpleTrigger.getKey().getGroup());
 
-        //     ps.setInt(1, simpleTrigger.getRepeatCount());
-        //     ps.setBigDecimal(2, new BigDecimal(string.valueOf(simpleTrigger.getRepeatInterval())));
-        //     ps.setInt(3, simpleTrigger.getTimesTriggered());
-        //     ps.setString(4, simpleTrigger.getKey().getName());
-        //     ps.setString(5, simpleTrigger.getKey().getGroup());
-
-        //     return ps.executeUpdate();
-        // } finally {
-        //     Util.closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return 0;
+        int r = query.exec();
+        return r;
     }
 
 }

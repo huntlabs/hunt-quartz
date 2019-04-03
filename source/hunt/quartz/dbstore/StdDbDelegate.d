@@ -559,7 +559,6 @@ class StdDbDelegate : DriverDelegate {
     }
 
     int deleteFiredTriggers(Connection conn, string theInstanceId) {
-
         EqlQuery!(FiredTriggers)  query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_INSTANCES_FIRED_TRIGGERS));
         return query.exec();
     }
@@ -1570,22 +1569,10 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteTrigger(Connection conn, TriggerKey triggerKey) {
-        // PreparedStatement ps = null;
-
-        // deleteTriggerExtension(conn, triggerKey);
-        
-        // try {
-        //     ps = conn.prepareStatement(rtp(DELETE_TRIGGER));
-        //     query.setParameter(1, triggerKey.getName());
-        //     query.setParameter(2, triggerKey.getGroup());
-
-        //     return ps.executeUpdate();
-        // } finally {
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return 0;
+        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.DELETE_TRIGGER));
+        query.setParameter(1, triggerKey.getName());
+        query.setParameter(2, triggerKey.getGroup());
+        return query.exec();
     }
     
     protected void deleteTriggerExtension(Connection conn, TriggerKey triggerKey) {
