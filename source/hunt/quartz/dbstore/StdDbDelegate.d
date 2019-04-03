@@ -921,26 +921,16 @@ class StdDbDelegate : DriverDelegate {
      * @return an array of <code>string</code> group names
      */
     List!(string) selectJobGroups(Connection conn) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_GROUPS));
+        ResultSet rs = query.getNativeResult();
+        assert(rs !is null);
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_JOB_GROUPS));
-        //     rs = ps.executeQuery();
+        LinkedList!(string) list = new LinkedList!(string)();
+        foreach(Row r; rs) {
+            list.add(r[0]);
+        }
 
-        //     LinkedList!(string) list = new LinkedList!(string)();
-        //     while (rs.next()) {
-        //         list.add(rs.getString(1));
-        //     }
-
-        //     return list;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return null;
+        return list;
     }
 
     /**
@@ -994,26 +984,24 @@ class StdDbDelegate : DriverDelegate {
 
     protected string toSqlLikeClause(T)(GroupMatcher!T matcher) {
         string groupName;
-        switch(matcher.getCompareWithOperator()) {
-            case EQUALS:
-                groupName = matcher.getCompareToValue();
-                break;
-            case CONTAINS:
-                groupName = "%" ~ matcher.getCompareToValue() ~ "%";
-                break;
-            case ENDS_WITH:
-                groupName = "%" ~ matcher.getCompareToValue();
-                break;
-            case STARTS_WITH:
-                groupName = matcher.getCompareToValue() ~ "%";
-                break;
-            case ANYTHING:
-                groupName = "%";
-                break;
-            default:
-                throw new UnsupportedOperationException("Don't know how to translate " ~ 
-                    matcher.getCompareWithOperator() ~ " into SQL");
+        StringOperatorName operatorName = matcher.getCompareWithOperator();
+
+        if(operatorName is StringOperatorName.EQUALS) {
+            groupName = matcher.getCompareToValue();
+        } else if(operatorName is StringOperatorName.CONTAINS) {
+            groupName = "%" ~ matcher.getCompareToValue() ~ "%";
+        } else if(operatorName is StringOperatorName.ENDS_WITH) {
+            groupName = "%" ~ matcher.getCompareToValue();
+        } else if(operatorName is StringOperatorName.STARTS_WITH) {
+            groupName = matcher.getCompareToValue() ~ "%";
+        } else if(operatorName is StringOperatorName.ANYTHING) {
+            groupName = "%";
+            
+        } else {
+            throw new UnsupportedOperationException("Don't know how to translate " ~ 
+                operatorName.toString() ~ " into SQL");
         }
+        
         return groupName;
     }
 
@@ -1650,40 +1638,31 @@ class StdDbDelegate : DriverDelegate {
      */
     JobDetail selectJobForTrigger(Connection conn, 
             TriggerKey triggerKey, bool loadJobClass) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        
+        EqlQuery!(JobDetails, Triggers)  query = conn.createQuery!(JobDetails, Triggers)(rtp2(StdSqlConstants.SELECT_JOB_FOR_TRIGGER));
+        query.setParameter(1, triggerKey.getName());
+        query.setParameter(2, triggerKey.getGroup());
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_JOB_FOR_TRIGGER));
-        //     query.setParameter(1, triggerKey.getName());
-        //     query.setParameter(2, triggerKey.getGroup());
-        //     rs = ps.executeQuery();
+        ResultSet rs = query.getNativeResult();
+        if(rs is null) {
+           version(HUNT_DEBUG) {
+                trace("No job for trigger '" ~ triggerKey.toString() ~ "'.");
+            }
+            return null;
+        } 
+        
+        JobDetailImpl job = new JobDetailImpl();
+        Row r = rs.front();
 
-        //     if (rs.next()) {
-        //         JobDetailImpl job = new JobDetailImpl();
-        //         job.setName(rs.getString(1));
-        //         job.setGroup(rs.getString(2));
-        //         job.setDurability(getBoolean(rs, 3));
-        //         if (loadJobClass) {
-        //             implementationMissing(false);
-        //             // job.setJobClass(loadHelper.loadClass(rs.getString(4), Job.class));
-        //         }
-        //         job.setRequestsRecovery(getBoolean(rs, 5));
-                
-        //         return job;
-        //     } else {
-        //         version(HUNT_DEBUG) {
-        //             trace("No job for trigger '" ~ triggerKey ~ "'.");
-        //         }
-        //         return null;
-        //     }
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return null;
+        job.setName(r[0]);
+        job.setGroup(r[1]);
+        job.setDurability(r.getAs!bool(2));
+        if (loadJobClass) {
+            job.setJobClass(cast(TypeInfo_Class)TypeInfo_Class.find(r[3]));
+        }
+        job.setRequestsRecovery(r.getAs!bool(4));
+        
+        return job;
     }
 
     /**
@@ -1877,8 +1856,8 @@ class StdDbDelegate : DriverDelegate {
 
     private void setTriggerStateProperties(OperableTrigger trigger, TriggerPropertyBundle props) {
         
-        // if(props.getStatePropertyNames() is null)
-        //     return;
+        if(props.getStatePropertyNames() is null)
+            return;
         
         // Util.setBeanProps(trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
 
@@ -2089,27 +2068,19 @@ class StdDbDelegate : DriverDelegate {
     }
 
     List!(string) selectTriggerGroups(Connection conn, GroupMatcher!(TriggerKey) matcher) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGER_GROUPS_FILTERED));
-        //     query.setParameter(1, toSqlLikeClause(matcher));
-        //     rs = ps.executeQuery();
+        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_GROUPS_FILTERED));
+        query.setParameter(1, toSqlLikeClause(matcher));
 
-        //     LinkedList!(string) list = new LinkedList!(string)();
-        //     while (rs.next()) {
-        //         list.add(rs.getString(1));
-        //     }
+        ResultSet rs = query.getNativeResult();
+        assert(rs !is null);
 
-        //     return list;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
+        LinkedList!(string) list = new LinkedList!(string)();
+        foreach(Row r; rs) {
+            list.add(r[0]);
+        }
 
-        implementationMissing(false);
-        return null;
+        return list;
     }
 
     /**
@@ -2231,7 +2202,7 @@ class StdDbDelegate : DriverDelegate {
     bool isExistingTriggerGroup(Connection conn, string groupName) {
         trace("xxxxxxxxxxxxx");
         EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS_IN_GROUP));
-        // NativeQuery  query = conn.createNativeQuery(rtp2(StdSqlConstants.SELECT_NUM_TRIGGERS_IN_GROUP));
+        // NativeQuery  query = conn.createNativeQuery(rtpWithTablePrefix(StdSqlConstants.SELECT_NUM_TRIGGERS_IN_GROUP));
         query.setParameter(1, groupName);
         // Triggers r = query.getSingleResult();
         // info("r is null: ", r is null);
@@ -2245,7 +2216,6 @@ class StdDbDelegate : DriverDelegate {
             info(r.toStringArray());
 
             infof("xxxx=>%s", r[0]);
-
         }
 
         return !rs.empty();
@@ -3108,8 +3078,13 @@ class StdDbDelegate : DriverDelegate {
         return format(query, getSchedulerNameLiteral());
     }
 
-    // ditto
     protected final string rtp2(string query) {
+        string s = getSchedulerNameLiteral();
+        return format(query, s, s);
+    }
+
+    // ditto
+    protected final string rtpWithTablePrefix(string query) {
         return format(query, tablePrefix, getSchedulerNameLiteral());
     }
 

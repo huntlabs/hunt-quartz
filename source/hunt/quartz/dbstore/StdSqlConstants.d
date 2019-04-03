@@ -188,7 +188,7 @@ struct StdSqlConstants {
             ~ ") " ~ " FROM " ~ ModelConstants.MODEL_JOB_DETAILS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
-    enum string SELECT_JOB_GROUPS = "SELECT DISTINCT("
+    enum string SELECT_JOB_GROUPS = "SELECT DISTINCT( t."
             ~ ModelConstants.FIELD_JOB_GROUP ~ ") FROM " ~ ModelConstants.MODEL_JOB_DETAILS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
@@ -377,14 +377,15 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_JOB_GROUP ~ " = ?";
 
     enum string SELECT_JOB_FOR_TRIGGER = "SELECT J."
-            ~ ModelConstants.FIELD_JOB_NAME ~ ", J." ~ ModelConstants.FIELD_JOB_GROUP ~ ", J." ~ ModelConstants.FIELD_IS_DURABLE
-            ~ ", J." ~ ModelConstants.FIELD_JOB_CLASS ~ ", J." ~ ModelConstants.FIELD_REQUESTS_RECOVERY ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " T, " ~ ModelConstants.MODEL_JOB_DETAILS
+            ~ ModelConstants.FIELD_JOB_NAME ~ ", J." ~ ModelConstants.FIELD_JOB_GROUP 
+            ~ ", J." ~ ModelConstants.FIELD_IS_DURABLE
+            ~ ", J." ~ ModelConstants.FIELD_JOB_CLASS ~ ", J." ~ ModelConstants.FIELD_REQUESTS_RECOVERY 
+            ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " T, " ~ ModelConstants.MODEL_JOB_DETAILS
             ~ " J WHERE T." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST 
             ~ " AND J." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST 
-            ~ " AND T." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND T."
-            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ? AND T." ~ ModelConstants.FIELD_JOB_NAME ~ " = J."
-            ~ ModelConstants.FIELD_JOB_NAME ~ " AND T." ~ ModelConstants.FIELD_JOB_GROUP ~ " = J."
-            ~ ModelConstants.FIELD_JOB_GROUP;
+            ~ " AND T." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND T." ~ ModelConstants.FIELD_TRIGGER_GROUP 
+            ~ " = ? AND T." ~ ModelConstants.FIELD_JOB_NAME ~ " = J." ~ ModelConstants.FIELD_JOB_NAME 
+            ~ " AND T." ~ ModelConstants.FIELD_JOB_GROUP ~ " = J." ~ ModelConstants.FIELD_JOB_GROUP;
 
     enum string SELECT_TRIGGER = "SELECT * FROM "
             ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
@@ -424,11 +425,11 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
-    enum string SELECT_NUM_TRIGGERS = "SELECT COUNT("
+    enum string SELECT_NUM_TRIGGERS = "SELECT COUNT(t."
             ~ ModelConstants.FIELD_TRIGGER_NAME ~ ") " ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
-    enum string SELECT_NUM_TRIGGERS_IN_GROUP = "SELECT COUNT("
+    enum string SELECT_NUM_TRIGGERS_IN_GROUP = "SELECT COUNT(t."
             ~ ModelConstants.FIELD_TRIGGER_NAME ~ ") " ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
@@ -439,11 +440,11 @@ struct StdSqlConstants {
 //             ~ " AND " ~ TableConstants.COL_TRIGGER_GROUP ~ " = ?";
            
 
-    enum string SELECT_TRIGGER_GROUPS = "SELECT DISTINCT("
+    enum string SELECT_TRIGGER_GROUPS = "SELECT DISTINCT(t."
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ ") FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
-    enum string SELECT_TRIGGER_GROUPS_FILTERED = "SELECT DISTINCT("
+    enum string SELECT_TRIGGER_GROUPS_FILTERED = "SELECT DISTINCT(t."
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ ") FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST ~ " AND t." 
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " LIKE ?";
