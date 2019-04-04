@@ -129,7 +129,7 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_JOB_DATAMAP ~ ") " ~ " VALUES(" ~ SCHED_NAME_SUBST ~ ", ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     enum string UPDATE_JOB_DETAIL = "UPDATE "
-            ~ ModelConstants.MODEL_JOB_DETAILS ~ " SET "
+            ~ ModelConstants.MODEL_JOB_DETAILS ~ " t SET t."
             ~ ModelConstants.FIELD_DESCRIPTION ~ " = ?, t." ~ ModelConstants.FIELD_JOB_CLASS ~ " = ?, t."
             ~ ModelConstants.FIELD_IS_DURABLE ~ " = ?, t." 
             ~ ModelConstants.FIELD_IS_NONCONCURRENT ~ " = ?, t." ~ ModelConstants.FIELD_IS_UPDATE_DATA ~ " = ?, t." 
@@ -171,7 +171,7 @@ struct StdSqlConstants {
             ~ " AND t." ~ ModelConstants.FIELD_JOB_NAME
             ~ " = ? AND t." ~ ModelConstants.FIELD_JOB_GROUP ~ " = ?";
 
-    enum string UPDATE_JOB_DATA = "UPDATE " ~ ModelConstants.MODEL_JOB_DETAILS ~ " SET " ~ ModelConstants.FIELD_JOB_DATAMAP ~ " = ? "
+    enum string UPDATE_JOB_DATA = "UPDATE " ~ ModelConstants.MODEL_JOB_DETAILS ~ " t SET t." ~ ModelConstants.FIELD_JOB_DATAMAP ~ " = ? "
             ~ " t WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST 
             ~ " AND t." ~ ModelConstants.FIELD_JOB_NAME
@@ -236,7 +236,8 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ ", t." ~ ModelConstants.FIELD_BLOB
             ~ ") " ~ " VALUES(" ~ SCHED_NAME_SUBST ~ ", ?, ?, ?)";
 
-    enum string UPDATE_TRIGGER_SKIP_DATA = "UPDATE " ~ ModelConstants.MODEL_TRIGGERS ~ " SET " ~ ModelConstants.FIELD_JOB_NAME ~ " = ?, t."
+    enum string UPDATE_TRIGGER_SKIP_DATA = "UPDATE " ~ ModelConstants.MODEL_TRIGGERS ~ " t SET t." 
+            ~ ModelConstants.FIELD_JOB_NAME ~ " = ?, t."
             ~ ModelConstants.FIELD_JOB_GROUP ~ " = ?, t." 
             ~ ModelConstants.FIELD_DESCRIPTION ~ " = ?, t." ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " = ?, t."
             ~ ModelConstants.FIELD_PREV_FIRE_TIME ~ " = ?, t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?, t."
@@ -248,7 +249,8 @@ struct StdSqlConstants {
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME
             ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
-    enum string UPDATE_TRIGGER = "UPDATE " ~ ModelConstants.MODEL_TRIGGERS ~ " SET " ~ ModelConstants.FIELD_JOB_NAME ~ " = ?, t."
+    enum string UPDATE_TRIGGER = "UPDATE " ~ ModelConstants.MODEL_TRIGGERS ~ " t SET t." 
+        ~ ModelConstants.FIELD_JOB_NAME ~ " = ?, t."
         ~ ModelConstants.FIELD_JOB_GROUP ~ " = ?, t."
         ~ ModelConstants.FIELD_DESCRIPTION ~ " = ?, t." ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " = ?, t."
         ~ ModelConstants.FIELD_PREV_FIRE_TIME ~ " = ?, t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?, t."
@@ -268,7 +270,7 @@ struct StdSqlConstants {
             ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string UPDATE_CRON_TRIGGER = "UPDATE "
-            ~ ModelConstants.MODEL_CRON_TRIGGERS ~ " SET "
+            ~ ModelConstants.MODEL_CRON_TRIGGERS ~ " t SET t."
             ~ ModelConstants.FIELD_CRON_EXPRESSION ~ " = ?, t." ~ ModelConstants.FIELD_TIME_ZONE_ID  
             ~ " = ? WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
@@ -276,7 +278,7 @@ struct StdSqlConstants {
             ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string UPDATE_BLOB_TRIGGER = "UPDATE "
-            ~ ModelConstants.MODEL_BLOB_TRIGGERS ~ " SET " ~ ModelConstants.FIELD_BLOB
+            ~ ModelConstants.MODEL_BLOB_TRIGGERS ~ " t SET t." ~ ModelConstants.FIELD_BLOB
             ~ " = ? WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t."
@@ -289,20 +291,20 @@ struct StdSqlConstants {
             ~ " = ?";
 
     enum string UPDATE_TRIGGER_STATE = "UPDATE "
-            ~ ModelConstants.MODEL_TRIGGERS ~ " SET " ~ ModelConstants.FIELD_TRIGGER_STATE
+            ~ ModelConstants.MODEL_TRIGGERS ~ " t SET t." ~ ModelConstants.FIELD_TRIGGER_STATE
             ~ " = ?" ~ " t WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t."
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string UPDATE_TRIGGER_STATE_FROM_STATE = "UPDATE "
-            ~ ModelConstants.MODEL_TRIGGERS ~ " SET " ~ ModelConstants.FIELD_TRIGGER_STATE
+            ~ ModelConstants.MODEL_TRIGGERS ~ " t SET t." ~ ModelConstants.FIELD_TRIGGER_STATE
             ~ " = ?" ~ " t WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t."
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?";
 
     enum string UPDATE_TRIGGER_GROUP_STATE_FROM_STATE = "UPDATE "
             ~ ModelConstants.MODEL_TRIGGERS
-            ~ " SET "
+            ~ " t SET t."
             ~ ModelConstants.FIELD_TRIGGER_STATE
             ~ " = ?"
             ~ " t WHERE t."
@@ -312,66 +314,67 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?";
 
     enum string UPDATE_TRIGGER_STATE_FROM_STATES = "UPDATE "
-            ~ ModelConstants.MODEL_TRIGGERS ~ " SET " ~ ModelConstants.FIELD_TRIGGER_STATE
+            ~ ModelConstants.MODEL_TRIGGERS ~ " t SET t." ~ ModelConstants.FIELD_TRIGGER_STATE
             ~ " = ?" ~ " t WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t."
-            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ? AND (" ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? OR "
-            ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? OR " ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?)";
+            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ? AND (t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? OR t."
+            ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? OR t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?)";
 
     enum string UPDATE_TRIGGER_GROUP_STATE_FROM_STATES = "UPDATE "
             ~ ModelConstants.MODEL_TRIGGERS
-            ~ " SET "
+            ~ " t SET t."
             ~ ModelConstants.FIELD_TRIGGER_STATE
             ~ " = ?"
             ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP
-            ~ " LIKE ? AND ("
+            ~ " LIKE ? AND ( t."
             ~ ModelConstants.FIELD_TRIGGER_STATE
-            ~ " = ? OR "
+            ~ " = ? OR t."
             ~ ModelConstants.FIELD_TRIGGER_STATE
-            ~ " = ? OR "
+            ~ " = ? OR t."
             ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?)";
 
     enum string UPDATE_JOB_TRIGGER_STATES = "UPDATE "
-            ~ ModelConstants.MODEL_TRIGGERS ~ " SET " ~ ModelConstants.FIELD_TRIGGER_STATE
+            ~ ModelConstants.MODEL_TRIGGERS ~ " t SET t." ~ ModelConstants.FIELD_TRIGGER_STATE
             ~ " = ? WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_JOB_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_JOB_GROUP
             ~ " = ?";
 
-    enum string UPDATE_JOB_TRIGGER_STATES_FROM_OTHER_STATE = "UPDATE "
-            ~ ModelConstants.MODEL_TRIGGERS
-            ~ " SET "
-            ~ ModelConstants.FIELD_TRIGGER_STATE
-            ~ " = ? WHERE t."
-            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
+    enum string UPDATE_JOB_TRIGGER_STATES_FROM_OTHER_STATE = "UPDATE " ~ ModelConstants.MODEL_TRIGGERS
+            ~ " t SET t." ~ ModelConstants.FIELD_TRIGGER_STATE
+            ~ " = ? WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_JOB_NAME
-            ~ " = ? AND t."
-            ~ ModelConstants.FIELD_JOB_GROUP
+            ~ " = ? AND t." ~ ModelConstants.FIELD_JOB_GROUP
             ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?";
 
     enum string DELETE_SIMPLE_TRIGGER = "DELETE FROM "
             ~ ModelConstants.MODEL_SIMPLE_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME 
+            ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string DELETE_CRON_TRIGGER = "DELETE FROM "
             ~ ModelConstants.MODEL_CRON_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME 
+            ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string DELETE_BLOB_TRIGGER = "DELETE FROM "
             ~ ModelConstants.MODEL_BLOB_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME 
+            ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string DELETE_TRIGGER = "DELETE FROM "
             ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME 
+            ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
-    enum string SELECT_NUM_TRIGGERS_FOR_JOB = "SELECT COUNT("
-            ~ ModelConstants.FIELD_TRIGGER_NAME ~ ") FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
+    enum string SELECT_NUM_TRIGGERS_FOR_JOB = "SELECT COUNT(t."
+            ~ ModelConstants.FIELD_TRIGGER_NAME ~ ") FROM " 
+            ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST ~ " AND t." 
             ~ ModelConstants.FIELD_JOB_NAME ~ " = ? AND t."
             ~ ModelConstants.FIELD_JOB_GROUP ~ " = ?";
@@ -389,17 +392,20 @@ struct StdSqlConstants {
 
     enum string SELECT_TRIGGER = "SELECT * FROM "
             ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
-            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST ~ " AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string SELECT_TRIGGER_DATA = "SELECT t." ~ 
             ModelConstants.FIELD_JOB_DATAMAP ~ " FROM "
             ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
-            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST ~ " AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
         
     enum string SELECT_TRIGGER_STATE = "SELECT t."
-            ~ ModelConstants.FIELD_TRIGGER_STATE ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
+            ~ ModelConstants.FIELD_TRIGGER_STATE ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
+            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t."
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
@@ -426,7 +432,8 @@ struct StdSqlConstants {
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string SELECT_NUM_TRIGGERS = "SELECT COUNT(t."
-            ~ ModelConstants.FIELD_TRIGGER_NAME ~ ") " ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
+            ~ ModelConstants.FIELD_TRIGGER_NAME ~ ") " ~ " FROM " 
+            ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
     enum string SELECT_NUM_TRIGGERS_IN_GROUP = "SELECT COUNT(t."
@@ -499,27 +506,32 @@ struct StdSqlConstants {
             ~ " FROM " ~ ModelConstants.MODEL_CALENDARS
             ~ " t WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
 
-    enum string SELECT_NEXT_FIRE_TIME = "SELECT MIN("
+    enum string SELECT_NEXT_FIRE_TIME = "SELECT MIN(t."
             ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ ") AS " ~ TableConstants.ALIAS_COL_NEXT_FIRE_TIME
             ~ " FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
-            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? AND t." ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " >= 0";
+            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST ~ " AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? AND t." 
+            ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " >= 0";
 
     enum string SELECT_TRIGGER_FOR_FIRE_TIME = "SELECT t."
             ~ ModelConstants.FIELD_TRIGGER_NAME ~ ", t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " FROM "
             ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
-            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? AND t." ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " = ?";
+            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST ~ " AND t."
+            ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? AND t." 
+            ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " = ?";
 
     enum string SELECT_NEXT_TRIGGER_TO_ACQUIRE = "SELECT t."
         ~ ModelConstants.FIELD_TRIGGER_NAME ~ ", t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ ", t."
         ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ ", t." ~ ModelConstants.FIELD_PRIORITY ~ " FROM "
         ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
-        ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-        ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? AND t." ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " <= ? " 
-        ~ "AND (" ~ ModelConstants.FIELD_MISFIRE_INSTRUCTION ~ " = -1 OR (" ~ ModelConstants.FIELD_MISFIRE_INSTRUCTION 
-        ~ " != -1 AND t."~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " >= ?)) "
-        ~ "ORDER BY "~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " ASC, " ~ ModelConstants.FIELD_PRIORITY ~ " DESC";
+        ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST ~ " AND t." 
+        ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ? AND t." 
+        ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " <= ? " ~ "AND (t." 
+        ~ ModelConstants.FIELD_MISFIRE_INSTRUCTION ~ " = -1 OR (t." 
+        ~ ModelConstants.FIELD_MISFIRE_INSTRUCTION  ~ " != -1 AND t." 
+        ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " >= ?)) " ~ "ORDER BY t."
+        ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " ASC, t." 
+        ~ ModelConstants.FIELD_PRIORITY ~ " DESC";
     
     
     enum string INSERT_FIRED_TRIGGER = "INSERT INTO "
