@@ -75,24 +75,6 @@ alias triggerKey = TriggerKey.triggerKey;
 alias jobKey = JobKey.jobKey;
 
 
-// import static hunt.quartz.TriggerBuilder.newTrigger;
-
-// import java.io.ByteArrayInputStream;
-// import java.io.ByteArrayOutputStream;
-// import java.io.IOException;
-// import hunt.io.common;
-// import java.io.NotSerializableException;
-// import java.io.ObjectInputStream;
-// import java.io.ObjectOutputStream;
-// import java.math.BigDecimal;
-// import java.sql.Blob;
-// import java.sql.Connection;
-// import java.sql.PreparedStatement;
-// import java.sql.ResultSet;
-// import java.sql.SQLException;
-// import java.sql.Statement;
-// import std.datetime;
-
 /**
  * <p>
  * This is meant to be an abstract base class for most, if not all, <code>{@link hunt.quartz.impl.jdbcjobstore.DriverDelegate}</code>
@@ -122,8 +104,6 @@ class StdDbDelegate : DriverDelegate {
 
     protected bool useProperties;
     
-    // protected ClassLoadHelper classLoadHelper;
-
     protected List!(TriggerPersistenceDelegate) triggerPersistenceDelegates;
 
     
@@ -251,7 +231,8 @@ class StdDbDelegate : DriverDelegate {
      */
     int updateTriggerStatesFromOtherStates(Connection conn,
             string newState, string oldState1, string oldState2) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.UPDATE_TRIGGER_STATES_FROM_OTHER_STATES));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(
+            rtp(StdSqlConstants.UPDATE_TRIGGER_STATES_FROM_OTHER_STATES));
         query.setParameter(1, newState);
         query.setParameter(2, oldState1);
         query.setParameter(3, oldState2);
@@ -270,27 +251,19 @@ class StdDbDelegate : DriverDelegate {
      */
     List!(TriggerKey) selectMisfiredTriggers(Connection conn, long ts) {
         
-        implementationMissing(false);
-        return null;
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(
+            rtp(StdSqlConstants.SELECT_MISFIRED_TRIGGERS));
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_MISFIRED_TRIGGERS));
-        //     query.setParameter(1, new BigDecimal(string.valueOf(ts)));
-        //     rs = ps.executeQuery();
+        query.setParameter(1, ts);
+        Triggers[] triggers = query.getResultList();
 
-        //     LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
-        //     while (rs.next()) {
-        //         string triggerName = rs.getString(COL_TRIGGER_NAME);
-        //         string groupName = rs.getString(COL_TRIGGER_GROUP);
-        //         list.add(triggerKey(triggerName, groupName));
-        //     }
-        //     return list;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
+        LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
+        foreach(Triggerst t; triggers) {
+            string triggerName = t.trigName;
+            string groupName = t.triggerGroup;
+            list.add(triggerKey(triggerName, groupName));
+        }
+        return list;
     }
 
     /**
@@ -306,53 +279,36 @@ class StdDbDelegate : DriverDelegate {
      */
     List!(TriggerKey) selectTriggersInState(Connection conn, string state) {
 
-        implementationMissing(false);
-        return null;
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(
+            rtp(StdSqlConstants.SELECT_TRIGGERS_IN_STATE));
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_TRIGGERS_IN_STATE));
-        //     query.setParameter(1, state);
-        //     rs = ps.executeQuery();
+        query.setParameter(1, state);
+        ResultSet rs = query.getNativeResult();
+        
+        LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
+        foreach(Row r; rs) {
+            list.add(triggerKey(r[0], r[1]));
+        }
 
-        //     LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
-        //     while (rs.next()) {
-        //         list.add(triggerKey(rs.getString(1), rs.getString(2)));
-        //     }
-
-        //     return list;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
+        return list;
     }
 
-    List!(TriggerKey) selectMisfiredTriggersInState(Connection conn, string state,
-            long ts) {
+    List!(TriggerKey) selectMisfiredTriggersInState(Connection conn, string state, long ts) {
 
-        implementationMissing(false);
-        return null;
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(
+            rtp(StdSqlConstants.SELECT_MISFIRED_TRIGGERS_IN_STATE));
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_MISFIRED_TRIGGERS_IN_STATE));
-        //     query.setParameter(1, new BigDecimal(string.valueOf(ts)));
-        //     query.setParameter(2, state);
-        //     rs = ps.executeQuery();
+        query.setParameter(1, ts);
+        query.setParameter(2, state);
 
-        //     LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
-        //     while (rs.next()) {
-        //         string triggerName = rs.getString(COL_TRIGGER_NAME);
-        //         string groupName = rs.getString(COL_TRIGGER_GROUP);
-        //         list.add(triggerKey(triggerName, groupName));
-        //     }
-        //     return list;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
+        LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
+        ResultSet rs = query.getNativeResult();
+        foreach(Row r; rs) {
+            string triggerName = r[0];
+            string groupName = r[1];
+            list.add(triggerKey(triggerName, groupName));
+        }
+        return list;
     }
 
     /**
@@ -372,34 +328,28 @@ class StdDbDelegate : DriverDelegate {
      */
     bool hasMisfiredTriggersInState(Connection conn, string state1, 
         long ts, int count, List!(TriggerKey) resultList) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_HAS_MISFIRED_TRIGGERS_IN_STATE));
-        //     query.setParameter(1, new BigDecimal(string.valueOf(ts)));
-        //     query.setParameter(2, state1);
-        //     rs = ps.executeQuery();
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(
+            rtp(StdSqlConstants.SELECT_HAS_MISFIRED_TRIGGERS_IN_STATE));
 
-        //     bool hasReachedLimit = false;
-        //     while (rs.next() && (hasReachedLimit == false)) {
-        //         if (resultList.size() == count) {
-        //             hasReachedLimit = true;
-        //         } else {
-        //             string triggerName = rs.getString(COL_TRIGGER_NAME);
-        //             string groupName = rs.getString(COL_TRIGGER_GROUP);
-        //             resultList.add(triggerKey(triggerName, groupName));
-        //         }
-        //     }
-            
-        //     return hasReachedLimit;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
+        query.setParameter(1, ts);
+        query.setParameter(2, state1);
+        
+        ResultSet rs = query.getNativeResult();
 
-        implementationMissing(false);
-        return true;
+        bool hasReachedLimit = false;
+        foreach(Row r; rs) {
+            if (resultList.size() == count) {
+                hasReachedLimit = true;
+                break;
+            } else {
+                string triggerName = r[0];
+                string groupName = r[1];
+                resultList.add(triggerKey(triggerName, groupName));
+            }
+        }
+        
+        return hasReachedLimit;
     }
     
     /**
@@ -410,29 +360,21 @@ class StdDbDelegate : DriverDelegate {
      * 
      * @param conn the DB Connection
      */
-    int countMisfiredTriggersInState(
-            Connection conn, string state1, long ts) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+    int countMisfiredTriggersInState(Connection conn, string state1, long ts) {
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(
+            rtp(StdSqlConstants.COUNT_MISFIRED_TRIGGERS_IN_STATE));
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(COUNT_MISFIRED_TRIGGERS_IN_STATE));
-        //     query.setParameter(1, new BigDecimal(string.valueOf(ts)));
-        //     query.setParameter(2, state1);
-        //     rs = ps.executeQuery();
+        query.setParameter(1, ts);
+        query.setParameter(2, state1);
+        
+        ResultSet rs = query.getNativeResult();
 
-        //     if (rs.next()) {
-        //         return rs.getInt(1);
-        //     }
+        if (!rs.empty()) {
+            Row r = rs.front;
+            return rs.getAs!int(0);
+        }
 
-        //     throw new SQLException("No misfired trigger count returned.");
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return 0;
+        throw new SQLException("No misfired trigger count returned.");
     }
 
     /**
@@ -448,30 +390,21 @@ class StdDbDelegate : DriverDelegate {
      */
     List!(TriggerKey) selectMisfiredTriggersInGroupInState(Connection conn,
             string groupName, string state, long ts) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(
+            rtp(StdSqlConstants.SELECT_MISFIRED_TRIGGERS_IN_GROUP_IN_STATE));
+            
+        query.setParameter(1, ts);
+        query.setParameter(2, groupName);
+        query.setParameter(3, state);
+        
+        ResultSet rs = query.getNativeResult();
 
-        // try {
-        //     ps = conn
-        //             .prepareStatement(rtp(SELECT_MISFIRED_TRIGGERS_IN_GROUP_IN_STATE));
-        //     query.setParameter(1, new BigDecimal(string.valueOf(ts)));
-        //     query.setParameter(2, groupName);
-        //     query.setParameter(3, state);
-        //     rs = ps.executeQuery();
-
-        //     LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
-        //     while (rs.next()) {
-        //         string triggerName = rs.getString(COL_TRIGGER_NAME);
-        //         list.add(triggerKey(triggerName, groupName));
-        //     }
-        //     return list;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return null;
+        LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
+        foreach(Row r; rs) {
+            list.add(triggerKey(r[0], groupName));
+        }
+        return list;
     }
 
     /**
@@ -496,52 +429,43 @@ class StdDbDelegate : DriverDelegate {
      * @return an array of <code>{@link hunt.quartz.Trigger}</code> objects
      */
     List!(OperableTrigger) selectTriggersForRecoveringJobs(Connection conn) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(
+            rtp(StdSqlConstants.SELECT_INSTANCES_RECOVERABLE_FIRED_TRIGGERS));
 
-        // try {
-        //     ps = conn
-        //             .prepareStatement(rtp(SELECT_INSTANCES_RECOVERABLE_FIRED_TRIGGERS));
-        //     query.setParameter(1, instanceId);
-        //     query.setParameter(2, true);
-        //     rs = ps.executeQuery();
+        query.setParameter(1, instanceId);
+        query.setParameter(2, true);
+        
+        FiredTriggers[] triggers = query.getResultList();
 
-        //     long dumId = DateTimeHelper.currentTimeMillis();
-        //     LinkedList!(OperableTrigger) list = new LinkedList!(OperableTrigger)();
-        //     while (rs.next()) {
-        //         string jobName = rs.getString(COL_JOB_NAME);
-        //         string jobGroup = rs.getString(COL_JOB_GROUP);
-        //         string trigName = rs.getString(COL_TRIGGER_NAME);
-        //         string trigGroup = rs.getString(COL_TRIGGER_GROUP);
-        //         long firedTime = rs.getLong(COL_FIRED_TIME);
-        //         long scheduledTime = rs.getLong(COL_SCHED_TIME);
-        //         int priority = rs.getInt(COL_PRIORITY);
-                
-        //         SimpleTriggerImpl rcvryTrig = new SimpleTriggerImpl("recover_"
-        //                 + instanceId ~ "_" ~ string.valueOf(dumId++),
-        //                 Scheduler.DEFAULT_RECOVERY_GROUP, new Date(scheduledTime));
-        //         rcvryTrig.setJobName(jobName);
-        //         rcvryTrig.setJobGroup(jobGroup);
-        //         rcvryTrig.setPriority(priority);
-        //         rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY);
+        long dumId = DateTimeHelper.currentTimeMillis();
+        LinkedList!(OperableTrigger) list = new LinkedList!(OperableTrigger)();
+        foreach(FiredTriggers t; triggers) {
+            string jobName = t.jobName;
+            string jobGroup = t.jobGroup;
+            string trigName = t.triggerName;
+            string trigGroup = t.triggerGroup;
+            long firedTime = t.firedTime;
+            long scheduledTime = t.schedTime;
+            int priority = t.priority;
+            
+            SimpleTriggerImpl rcvryTrig = new SimpleTriggerImpl("recover_"
+                    ~ instanceId ~ "_" ~ to!string(dumId++),
+                    Scheduler.DEFAULT_RECOVERY_GROUP, LocalDateTime.ofEpochSecond(scheduledTime, 0, ZoneOffset.UTC));
+            rcvryTrig.setJobName(jobName);
+            rcvryTrig.setJobGroup(jobGroup);
+            rcvryTrig.setPriority(priority);
+            rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY);
 
-        //         JobDataMap jd = selectTriggerJobDataMap(conn, trigName, trigGroup);
-        //         jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, trigName);
-        //         jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, trigGroup);
-        //         jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, string.valueOf(firedTime));
-        //         jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS, string.valueOf(scheduledTime));
-        //         rcvryTrig.setJobDataMap(jd);
-                
-        //         list.add(rcvryTrig);
-        //     }
-        //     return list;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return null;
+            JobDataMap jd = selectTriggerJobDataMap(conn, trigName, trigGroup);
+            jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_NAME, trigName);
+            jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_GROUP, trigGroup);
+            jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_FIRETIME_IN_MILLISECONDS, to!string(firedTime));
+            jd.put(Scheduler.FAILED_JOB_ORIGINAL_TRIGGER_SCHEDULED_FIRETIME_IN_MILLISECONDS, to!string(scheduledTime));
+            rcvryTrig.setJobDataMap(jd);
+            
+            list.add(rcvryTrig);
+        }
+        return list;
     }
 
     /**
@@ -554,12 +478,13 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteFiredTriggers(Connection conn) {
-        EqlQuery!(FiredTriggers)  query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_FIRED_TRIGGERS));
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_FIRED_TRIGGERS));
         return query.exec();
     }
 
     int deleteFiredTriggers(Connection conn, string theInstanceId) {
-        EqlQuery!(FiredTriggers)  query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_INSTANCES_FIRED_TRIGGERS));
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_INSTANCES_FIRED_TRIGGERS));
+        query.setParameter(1, theInstanceId);
         return query.exec();
     }
 
@@ -571,37 +496,48 @@ class StdDbDelegate : DriverDelegate {
      * @throws JobPersistenceException
      */
     void clearData(Connection conn) {
-        implementationMissing(false);
-        
-        // PreparedStatement ps = null;
+        int count;
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(DELETE_ALL_SIMPLE_TRIGGERS));
-        //     ps.executeUpdate();
-        //     ps.close();
-        //     ps = conn.prepareStatement(rtp(DELETE_ALL_SIMPROP_TRIGGERS));
-        //     ps.executeUpdate();
-        //     ps.close();
-        //     ps = conn.prepareStatement(rtp(DELETE_ALL_CRON_TRIGGERS));
-        //     ps.executeUpdate();
-        //     ps.close();
-        //     ps = conn.prepareStatement(rtp(DELETE_ALL_BLOB_TRIGGERS));
-        //     ps.executeUpdate();
-        //     ps.close();
-        //     ps = conn.prepareStatement(rtp(DELETE_ALL_TRIGGERS));
-        //     ps.executeUpdate();
-        //     ps.close();
-        //     ps = conn.prepareStatement(rtp(DELETE_ALL_JOB_DETAILS));
-        //     ps.executeUpdate();
-        //     ps.close();
-        //     ps = conn.prepareStatement(rtp(DELETE_ALL_CALENDARS));
-        //     ps.executeUpdate();
-        //     ps.close();
-        //     ps = conn.prepareStatement(rtp(DELETE_ALL_PAUSED_TRIGGER_GRPS));
-        //     ps.executeUpdate();
-        // } finally {
-        //     closeStatement(ps);
-        // }
+        {
+            EqlQuery!(SimpleTriggers) query = conn.createQuery!(SimpleTriggers)(rtp(StdSqlConstants.DELETE_ALL_SIMPLE_TRIGGERS));
+            count = query.exec();
+        }
+
+        {
+            EqlQuery!(SimpPropertiesTriggers) query = conn.createQuery!(SimpPropertiesTriggers)(rtp(StdSqlConstants.DELETE_ALL_SIMPROP_TRIGGERS));
+            count = query.exec();
+        }
+
+
+        {
+            EqlQuery!(CronTriggers) query = conn.createQuery!(CronTriggers)(rtp(StdSqlConstants.DELETE_ALL_CRON_TRIGGERS));
+            count = query.exec();
+        }
+
+        {
+            EqlQuery!(BlobTriggers) query = conn.createQuery!(BlobTriggers)(rtp(StdSqlConstants.DELETE_ALL_BLOB_TRIGGERS));
+            count = query.exec();
+        }
+
+        {
+            EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.DELETE_ALL_TRIGGERS));
+            count = query.exec();
+        }
+
+        {
+            EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.DELETE_ALL_JOB_DETAILS));
+            count = query.exec();
+        }
+
+        {
+            EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.DELETE_ALL_CALENDARS));
+            count = query.exec();
+        }
+
+        {
+            EqlQuery!(PausedTriggerGrps) query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.DELETE_ALL_PAUSED_TRIGGER_GRPS));
+            count = query.exec();
+        }
     }
  
     
@@ -626,7 +562,7 @@ class StdDbDelegate : DriverDelegate {
         // ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
 
         int insertResult = 0;
-        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.INSERT_JOB_DETAIL));
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.INSERT_JOB_DETAIL));
         query.setParameter(1, job.getKey().getName());
         query.setParameter(2, job.getKey().getGroup());
         query.setParameter(3, job.getDescription());
@@ -639,7 +575,7 @@ class StdDbDelegate : DriverDelegate {
         // 
         query.setParameter(9, cast(ubyte[])[1,2,3]);
         //     setBytes(ps, 9, baos);
-
+implementationMissing(false);
         insertResult = query.exec();
 
         return insertResult;
@@ -659,33 +595,30 @@ class StdDbDelegate : DriverDelegate {
      *           if there were problems serializing the JobDataMap
      */
     int updateJobDetail(Connection conn, JobDetail job) {
+
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.UPDATE_JOB_DETAIL));
         // ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
 
-        // PreparedStatement ps = null;
+        int insertResult = 0;
 
-        // int insertResult = 0;
+        query.setParameter(1, job.getDescription());
+        query.setParameter(2, job.getJobClass().getName());
+        query.setParameter(3, job.isDurable());
+        query.setParameter(4, job.isConcurrentExectionDisallowed());
+        query.setParameter(5, job.isPersistJobDataAfterExecution());
+        query.setParameter(6, job.requestsRecovery());
+        // FIXME: Needing refactor or cleanup -@zhangxueping at 4/7/2019, 4:11:43 PM
+        // 
+        // setBytes(ps, 7, baos);
+        query.setParameter(7, cast(ubyte[])([0x1, 0x2]));
+        query.setParameter(8, job.getKey().getName());
+        query.setParameter(9, job.getKey().getGroup());
 
-        // try {
-        //     ps = conn.prepareStatement(rtp(UPDATE_JOB_DETAIL));
-        //     query.setParameter(1, job.getDescription());
-        //     query.setParameter(2, job.getJobClass().getName());
-        //     query.setParameter(3, job.isDurable());
-        //     query.setParameter(4, job.isConcurrentExectionDisallowed());
-        //     query.setParameter(5, job.isPersistJobDataAfterExecution());
-        //     query.setParameter(6, job.requestsRecovery());
-        //     setBytes(ps, 7, baos);
-        //     query.setParameter(8, job.getKey().getName());
-        //     query.setParameter(9, job.getKey().getGroup());
-
-        //     insertResult = ps.executeUpdate();
-        // } finally {
-        //     closeStatement(ps);
-        // }
-
-        // return insertResult;
-        
+        insertResult = query.exec();
         implementationMissing(false);
-        return 0;
+
+        return insertResult;
+        
     }
 
     /**
@@ -699,7 +632,7 @@ class StdDbDelegate : DriverDelegate {
      * hunt.quartz.utils.Key}</code> objects
      */
     List!(TriggerKey) selectTriggerKeysForJob(Connection conn, JobKey jobKey) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_JOB));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_JOB));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         Triggers[] triggers = query.getResultList();
@@ -725,7 +658,7 @@ class StdDbDelegate : DriverDelegate {
             trace("Deleting job: " ~ jobKey.toString());
         }
 
-        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.DELETE_JOB_DETAIL));
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.DELETE_JOB_DETAIL));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         return query.exec();
@@ -741,24 +674,17 @@ class StdDbDelegate : DriverDelegate {
      * @return true if the job exists and is stateful, false otherwise
      */
     bool isJobNonConcurrent(Connection conn, JobKey jobKey) {
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_NONCONCURRENT));
+        query.setParameter(1, jobKey.getName());
+        query.setParameter(2, jobKey.getGroup());
 
-        implementationMissing(false);
-        return false;
-
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
-
-        // try {
-        //     ps = conn.prepareStatement(rtp(SELECT_JOB_NONCONCURRENT));
-        //     query.setParameter(1, jobKey.getName());
-        //     query.setParameter(2, jobKey.getGroup());
-        //     rs = ps.executeQuery();
-        //     if (!rs.next()) { return false; }
-        //     return getBoolean(rs, COL_IS_NONCONCURRENT);
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
+        ResultSet rs = query.getNativeResult();
+        if (!rs.empty) { 
+            Row r = rs.front;
+            return r.getAs!bool(0);
+        }
+        
+        return false; 
     }
 
     /**
@@ -771,7 +697,7 @@ class StdDbDelegate : DriverDelegate {
      * @return true if the job exists, false otherwise
      */
     bool jobExists(Connection conn, JobKey jobKey) {
-        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_EXISTENCE));
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_EXISTENCE));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         JobDetails r = query.getSingleResult();
@@ -792,22 +718,17 @@ class StdDbDelegate : DriverDelegate {
      */
     int updateJobData(Connection conn, JobDetail job) {
         // ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
+// FIXME: Needing refactor or cleanup -@zhangxueping at 4/7/2019, 4:02:53 PM
+// 
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.UPDATE_JOB_DATA));
 
-        // PreparedStatement ps = null;
-
-        // try {
-        //     ps = conn.prepareStatement(rtp(UPDATE_JOB_DATA));
-        //     setBytes(ps, 1, baos);
-        //     query.setParameter(2, job.getKey().getName());
-        //     query.setParameter(3, job.getKey().getGroup());
-
-        //     return ps.executeUpdate();
-        // } finally {
-        //     closeStatement(ps);
-        // }
+        // setBytes(ps, 1, baos);
+        query.setParameter(1, cast(ubyte[])[0x1, 0x2]);
+        query.setParameter(2, job.getKey().getName());
+        query.setParameter(3, job.getKey().getGroup());
 
         implementationMissing(false);
-        return false;
+        return query.exec();
     }
 
     /**
@@ -825,7 +746,7 @@ class StdDbDelegate : DriverDelegate {
      *           if deserialization causes an error
      */
     JobDetail selectJobDetail(Connection conn, JobKey jobKey) {
-        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_DETAIL));
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_DETAIL));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         JobDetails j = query.getSingleResult();
@@ -843,7 +764,7 @@ class StdDbDelegate : DriverDelegate {
         job.setRequestsRecovery(j.requestsRecovery.to!bool());
         // TODO: Tasks pending completion -@zhangxueping at 4/1/2019, 4:48:23 PM
         // 
-
+        implementationMissing(false);
         // Map<?, ?> map = null;
         // if (canUseProperties()) {
         //     map = getMapFromProperties(rs);
@@ -888,27 +809,16 @@ class StdDbDelegate : DriverDelegate {
      * @return the total number of jobs stored
      */
     int selectNumJobs(Connection conn) {
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_NUM_JOBS));
+        ResultSet rs = query.getNativeResult();
 
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        int count = 0;
+        if(!rs.empty){
+            Row r = rs.front;
+            count = r.getAs!int(0);
+        }
 
-        // try {
-        //     int count = 0;
-        //     ps = conn.prepareStatement(rtp(SELECT_NUM_JOBS));
-        //     rs = ps.executeQuery();
-
-        //     if (rs.next()) {
-        //         count = rs.getInt(1);
-        //     }
-
-        //     return count;
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return false;
+        return count;
     }
 
     /**
@@ -921,7 +831,7 @@ class StdDbDelegate : DriverDelegate {
      * @return an array of <code>string</code> group names
      */
     List!(string) selectJobGroups(Connection conn) {
-        EqlQuery!(JobDetails)  query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_GROUPS));
+        EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_GROUPS));
         ResultSet rs = query.getNativeResult();
         assert(rs !is null);
 
@@ -945,33 +855,23 @@ class StdDbDelegate : DriverDelegate {
      * @return an array of <code>string</code> job names
      */
     Set!(JobKey) selectJobsInGroup(Connection conn, GroupMatcher!(JobKey) matcher) {
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(JobDetails) query;
 
-        // try {
-        //     if(isMatcherEquals(matcher)) {
-        //         ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP));
-        //         query.setParameter(1, toSqlEqualsClause(matcher));
-        //     }
-        //     else {
-        //         ps = conn.prepareStatement(rtp(SELECT_JOBS_IN_GROUP_LIKE));
-        //         query.setParameter(1, toSqlLikeClause(matcher));
-        //     }
-        //     rs = ps.executeQuery();
+        if(isMatcherEquals(matcher)) {
+            query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOBS_IN_GROUP));
+            query.setParameter(1, toSqlEqualsClause(matcher));
+        } else {
+            query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOBS_IN_GROUP_LIKE));
+            query.setParameter(1, toSqlLikeClause(matcher));
+        }
+        ResultSet rs = query.getNativeResult();
 
-        //     LinkedList!(JobKey) list = new LinkedList!(JobKey)();
-        //     while (rs.next()) {
-        //         list.add(jobKey(rs.getString(1), rs.getString(2)));
-        //     }
+        LinkedList!(JobKey) list = new LinkedList!(JobKey)();
+        foreach(Row r; rs) {
+            list.add(jobKey(r[0], r[1]));
+        }
 
-        //     return new HashSet!(JobKey)(list);
-        // } finally {
-        //     closeResultSet(rs);
-        //     closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return null;
+        return new HashSet!(JobKey)(list);
     }
 
     protected bool isMatcherEquals(T)(GroupMatcher!T matcher) {
@@ -1031,7 +931,7 @@ class StdDbDelegate : DriverDelegate {
         // }
         
         int insertResult = 0;
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.INSERT_TRIGGER));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.INSERT_TRIGGER));
 
         query.setParameter(1, trigger.getKey().getName());
         query.setParameter(2, trigger.getKey().getGroup());
@@ -1098,7 +998,7 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows inserted
      */
     int insertBlobTrigger(Connection conn, OperableTrigger trigger) {
-        EqlQuery!(BlobTriggers)  query = conn.createQuery!(BlobTriggers)(rtp(StdSqlConstants.INSERT_BLOB_TRIGGER));
+        EqlQuery!(BlobTriggers) query = conn.createQuery!(BlobTriggers)(rtp(StdSqlConstants.INSERT_BLOB_TRIGGER));
         query.setParameter(1, trigger.getKey().getName());
         query.setParameter(2, trigger.getKey().getGroup());
         query.setParameter(3, cast(ubyte[])[0x11, 0xA1]);
@@ -1177,13 +1077,13 @@ implementationMissing(false);
 
         query.setParameter(7, type);
         
-        query.setParameter(8, new BigDecimal(string.valueOf(trigger
+        query.setParameter(8, new BigDecimal(to!string(trigger
                 .getStartTime().getTime())));
         long endTime = 0;
         if (trigger.getEndTime() !is null) {
             endTime = trigger.getEndTime().getTime();
         }
-        query.setParameter(9, new BigDecimal(string.valueOf(endTime)));
+        query.setParameter(9, new BigDecimal(to!string(endTime)));
         query.setParameter(10, trigger.getCalendarName());
         ps.setInt(11, trigger.getMisfireInstruction());
         ps.setInt(12, trigger.getPriority());
@@ -1257,7 +1157,7 @@ implementationMissing(false);
      * @return true if the trigger exists, false otherwise
      */
     bool triggerExists(Connection conn, TriggerKey triggerKey) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_EXISTENCE));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_EXISTENCE));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
         Triggers r = query.getSingleResult();
@@ -1441,7 +1341,7 @@ implementationMissing(false);
 
     int updateTriggerStatesForJobFromOtherState(Connection conn,
             JobKey jobKey, string state, string oldState) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(
                 rtp(StdSqlConstants.UPDATE_JOB_TRIGGER_STATES_FROM_OTHER_STATE));
         query.setParameter(1, state);
         query.setParameter(2, jobKey.getName());
@@ -1461,7 +1361,7 @@ implementationMissing(false);
      * @return the number of rows deleted
      */
     int deleteBlobTrigger(Connection conn, TriggerKey triggerKey) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.DELETE_BLOB_TRIGGER));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.DELETE_BLOB_TRIGGER));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
         return query.exec();
@@ -1477,7 +1377,7 @@ implementationMissing(false);
      * @return the number of rows deleted
      */
     int deleteTrigger(Connection conn, TriggerKey triggerKey) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.DELETE_TRIGGER));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.DELETE_TRIGGER));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
         return query.exec();
@@ -1503,7 +1403,7 @@ implementationMissing(false);
      * @return the number of triggers for the given job
      */
     int selectNumTriggersForJob(Connection conn, JobKey jobKey) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS_FOR_JOB));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS_FOR_JOB));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         ResultSet rs = query.getNativeResult();
@@ -1549,7 +1449,7 @@ implementationMissing(false);
     JobDetail selectJobForTrigger(Connection conn, 
             TriggerKey triggerKey, bool loadJobClass) {
         
-        EqlQuery!(JobDetails, Triggers)  query = conn.createQuery!(JobDetails, Triggers)(rtp2(StdSqlConstants.SELECT_JOB_FOR_TRIGGER));
+        EqlQuery!(JobDetails, Triggers) query = conn.createQuery!(JobDetails, Triggers)(rtp2(StdSqlConstants.SELECT_JOB_FOR_TRIGGER));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
 
@@ -1591,7 +1491,7 @@ implementationMissing(false);
 
         LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
 
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_JOB));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_JOB));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
 
@@ -1611,7 +1511,7 @@ implementationMissing(false);
     List!(OperableTrigger) selectTriggersForCalendar(Connection conn, string calName) {
 
         LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_CALENDAR));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_CALENDAR));
         query.setParameter(1, calName);
         ResultSet rs = query.getNativeResult();
 
@@ -1634,7 +1534,7 @@ implementationMissing(false);
      */
     OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) {
 
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
         Triggers t = query.getSingleResult();
@@ -1779,7 +1679,7 @@ implementationMissing(false);
      */
     JobDataMap selectTriggerJobDataMap(Connection conn, string triggerName, string groupName) {
 
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_DATA));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_DATA));
         query.setParameter(1, triggerName);
         query.setParameter(2, groupName);
         
@@ -1813,7 +1713,7 @@ implementationMissing(false);
      * @return the <code>{@link hunt.quartz.Trigger}</code> object
      */
     string selectTriggerState(Connection conn, TriggerKey triggerKey) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_STATE));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_STATE));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
 
@@ -1841,7 +1741,7 @@ implementationMissing(false);
      */
     TriggerStatus selectTriggerStatus(Connection conn, TriggerKey triggerKey) {
 
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_STATUS));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_STATUS));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
         Triggers trigger = query.getSingleResult();
@@ -1876,7 +1776,7 @@ implementationMissing(false);
      * @return the total number of triggers stored
      */
     int selectNumTriggers(Connection conn) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS));
         ResultSet rs = query.getNativeResult();
 
         int count = 0;
@@ -1897,7 +1797,7 @@ implementationMissing(false);
      * @return an array of <code>string</code> group names
      */
     List!(string) selectTriggerGroups(Connection conn) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_GROUPS));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_GROUPS));
 
         ResultSet rs = query.getNativeResult();
 
@@ -1910,7 +1810,7 @@ implementationMissing(false);
 
     List!(string) selectTriggerGroups(Connection conn, GroupMatcher!(TriggerKey) matcher) {
 
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_GROUPS_FILTERED));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_GROUPS_FILTERED));
         query.setParameter(1, toSqlLikeClause(matcher));
 
         ResultSet rs = query.getNativeResult();
@@ -1958,34 +1858,34 @@ implementationMissing(false);
     }
 
     int insertPausedTriggerGroup(Connection conn, string groupName) {
-        EqlQuery!(PausedTriggerGrps)  query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.INSERT_PAUSED_TRIGGER_GROUP));
+        EqlQuery!(PausedTriggerGrps) query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.INSERT_PAUSED_TRIGGER_GROUP));
         query.setParameter(1, groupName);
         int rows = query.exec();
         return rows;
     }
 
     int deletePausedTriggerGroup(Connection conn, string groupName) {
-        EqlQuery!(PausedTriggerGrps)  query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.DELETE_PAUSED_TRIGGER_GROUP));
+        EqlQuery!(PausedTriggerGrps) query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.DELETE_PAUSED_TRIGGER_GROUP));
         query.setParameter(1, groupName);
         int rows = query.exec();
         return rows;
     }
 
     int deletePausedTriggerGroup(Connection conn, GroupMatcher!(TriggerKey) matcher) {
-        EqlQuery!(PausedTriggerGrps)  query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.DELETE_PAUSED_TRIGGER_GROUP));
+        EqlQuery!(PausedTriggerGrps) query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.DELETE_PAUSED_TRIGGER_GROUP));
         query.setParameter(1, toSqlLikeClause(matcher));
         int rows = query.exec();
         return rows;
     }
 
     int deleteAllPausedTriggerGroups(Connection conn) {
-        EqlQuery!(PausedTriggerGrps)  query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.DELETE_PAUSED_TRIGGER_GROUPS));
+        EqlQuery!(PausedTriggerGrps) query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.DELETE_PAUSED_TRIGGER_GROUPS));
         int rows = query.exec();
         return rows;
     }
 
     bool isTriggerGroupPaused(Connection conn, string groupName) {
-        EqlQuery!(PausedTriggerGrps)  query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.SELECT_PAUSED_TRIGGER_GROUP));
+        EqlQuery!(PausedTriggerGrps) query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.SELECT_PAUSED_TRIGGER_GROUP));
         query.setParameter(1, groupName);
 
         ResultSet rs = query.getNativeResult();
@@ -1994,7 +1894,7 @@ implementationMissing(false);
     }
 
     bool isExistingTriggerGroup(Connection conn, string groupName) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS_IN_GROUP));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS_IN_GROUP));
         query.setParameter(1, groupName);
         ResultSet rs = query.getNativeResult();
 
@@ -2023,7 +1923,7 @@ implementationMissing(false);
      *           if there were problems serializing the calendar
      */
     int insertCalendar(Connection conn, string calendarName, Calendar calendar) {
-        EqlQuery!(Calendars)  query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.INSERT_CALENDAR));
+        EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.INSERT_CALENDAR));
         query.setParameter(1, calendarName);
         // TODO: Tasks pending completion -@zhangxueping at 4/3/2019, 6:18:30 PM
         // 
@@ -2052,7 +1952,7 @@ implementationMissing(false);
      *           if there were problems serializing the calendar
      */
     int updateCalendar(Connection conn, string calendarName, Calendar calendar) {
-        EqlQuery!(Calendars)  query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.UPDATE_CALENDAR));
+        EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.UPDATE_CALENDAR));
         // TODO: Tasks pending completion -@zhangxueping at 4/3/2019, 6:18:30 PM
         // 
         implementationMissing(false);
@@ -2074,7 +1974,7 @@ implementationMissing(false);
      * @return true if the trigger exists, false otherwise
      */
     bool calendarExists(Connection conn, string calendarName) {
-        EqlQuery!(Calendars)  query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDAR_EXISTENCE));
+        EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDAR_EXISTENCE));
         query.setParameter(1, calendarName);
         ResultSet rs = query.getNativeResult();
         return !rs.empty();
@@ -2097,7 +1997,7 @@ implementationMissing(false);
      *           if there were problems deserializing the calendar
      */
     Calendar selectCalendar(Connection conn, string calendarName) {
-        EqlQuery!(Calendars)  query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDAR));
+        EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDAR));
         query.setParameter(1, calendarName);
         ResultSet rs = query.getNativeResult();
         
@@ -2124,7 +2024,7 @@ implementationMissing(false);
      * @return true if any triggers reference the calendar, false otherwise
      */
     bool calendarIsReferenced(Connection conn, string calendarName) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_REFERENCED_CALENDAR));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_REFERENCED_CALENDAR));
         query.setParameter(1, calendarName);
         ResultSet rs = query.getNativeResult();
         return !rs.empty();
@@ -2142,7 +2042,7 @@ implementationMissing(false);
      * @return the number of rows deleted
      */
     int deleteCalendar(Connection conn, string calendarName) {
-        EqlQuery!(Calendars)  query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.DELETE_CALENDAR));
+        EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.DELETE_CALENDAR));
         query.setParameter(1, calendarName);
         return query.exec();
     }
@@ -2157,7 +2057,7 @@ implementationMissing(false);
      * @return the total number of calendars stored
      */
     int selectNumCalendars(Connection conn) {
-        EqlQuery!(Calendars)  query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_NUM_CALENDARS));
+        EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_NUM_CALENDARS));
         query.setParameter(1, calendarName);
         ResultSet rs = query.getNativeResult();
 
@@ -2179,7 +2079,7 @@ implementationMissing(false);
      * @return an array of <code>string</code> calendar names
      */
     List!(string) selectCalendars(Connection conn) {
-        EqlQuery!(Calendars)  query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDARS));
+        EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDARS));
         query.setParameter(1, STATE_WAITING);
         ResultSet rs = query.getNativeResult();
 
@@ -2206,7 +2106,7 @@ implementationMissing(false);
      * @deprecated Does not account for misfires.
      */
     long selectNextFireTime(Connection conn) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NEXT_FIRE_TIME));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NEXT_FIRE_TIME));
         query.setParameter(1, STATE_WAITING);
 
         ResultSet rs = query.getNativeResult();
@@ -2230,7 +2130,7 @@ implementationMissing(false);
      *         trigger will be fired at that time
      */
     TriggerKey selectTriggerForFireTime(Connection conn, long fireTime) {
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_FOR_FIRE_TIME));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_FOR_FIRE_TIME));
         query.setParameter(1, STATE_WAITING);
         query.setParameter(2, fireTime);
 
@@ -2285,7 +2185,7 @@ implementationMissing(false);
      */
     List!(TriggerKey) selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan, int maxCount) {
         List!(TriggerKey) nextTriggers = new LinkedList!(TriggerKey)();
-        EqlQuery!(Triggers)  query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NEXT_TRIGGER_TO_ACQUIRE));
+        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NEXT_TRIGGER_TO_ACQUIRE));
 
         // FIXME: Needing refactor or cleanup -@zhangxueping at 4/4/2019, 11:01:29 AM
         // 
@@ -2472,7 +2372,7 @@ implementationMissing(false);
     List!(FiredTriggerRecord) selectInstancesFiredTriggerRecords(Connection conn, string instanceName) {
         List!(FiredTriggerRecord) lst = new LinkedList!(FiredTriggerRecord)();
 
-        EqlQuery!(FiredTriggers)  query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_INSTANCES_FIRED_TRIGGERS));
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_INSTANCES_FIRED_TRIGGERS));
         query.setParameter(1, instanceName);
         FiredTriggers[] trigers = query.getResultList();
         foreach(FiredTriggers t; trigers) {            
@@ -2496,7 +2396,7 @@ implementationMissing(false);
      */
     Set!(string) selectFiredTriggerInstanceNames(Connection conn) {
         Set!(string) instanceNames = new HashSet!(string)();
-        EqlQuery!(FiredTriggers)  query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_FIRED_TRIGGER_INSTANCE_NAMES));
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_FIRED_TRIGGER_INSTANCE_NAMES));
         ResultSet rs = query.getNativeResult();
         foreach(Row r; rs) {
             instanceNames.add(r[0]);
@@ -2516,13 +2416,13 @@ implementationMissing(false);
      * @return the number of rows deleted
      */
     int deleteFiredTrigger(Connection conn, string entryId) {
-        EqlQuery!(FiredTriggers)  query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_FIRED_TRIGGER));
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_FIRED_TRIGGER));
         query.setParameter(1, entryId);
         return query.exec();
     }
 
     int selectJobExecutionCount(Connection conn, JobKey jobKey) {
-        EqlQuery!(FiredTriggers)  query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_JOB_EXECUTION_COUNT));
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_JOB_EXECUTION_COUNT));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         ResultSet rs = query.getNativeResult();
@@ -2537,7 +2437,7 @@ implementationMissing(false);
     
     int insertSchedulerState(Connection conn, string theInstanceId,
             long checkInTime, long interval) {
-        EqlQuery!(SchedulerState)  query = conn.createQuery!(SchedulerState)(rtp(StdSqlConstants.INSERT_SCHEDULER_STATE));
+        EqlQuery!(SchedulerState) query = conn.createQuery!(SchedulerState)(rtp(StdSqlConstants.INSERT_SCHEDULER_STATE));
         query.setParameter(1, theInstanceId);
         query.setParameter(2, checkInTime);
         query.setParameter(3, interval);
@@ -2545,20 +2445,20 @@ implementationMissing(false);
     }
 
     int deleteSchedulerState(Connection conn, string theInstanceId) {
-        EqlQuery!(SchedulerState)  query = conn.createQuery!(SchedulerState)(rtp(StdSqlConstants.UPDATE_SCHEDULER_STATE));
+        EqlQuery!(SchedulerState) query = conn.createQuery!(SchedulerState)(rtp(StdSqlConstants.UPDATE_SCHEDULER_STATE));
         query.setParameter(1, theInstanceId);
         return query.exec();
     }
 
     int updateSchedulerState(Connection conn, string theInstanceId, long checkInTime) {
-        EqlQuery!(SchedulerState)  query = conn.createQuery!(SchedulerState)(rtp(StdSqlConstants.UPDATE_SCHEDULER_STATE));
+        EqlQuery!(SchedulerState) query = conn.createQuery!(SchedulerState)(rtp(StdSqlConstants.UPDATE_SCHEDULER_STATE));
         query.setParameter(1, checkInTime);
         query.setParameter(2, theInstanceId);
         return query.exec();
     }
         
     List!(SchedulerStateRecord) selectSchedulerStateRecords(Connection conn, string theInstanceId) {
-        EqlQuery!(SchedulerState)  query = conn.createQuery!(SchedulerState)(rtp(StdSqlConstants.SELECT_SCHEDULER_STATE));
+        EqlQuery!(SchedulerState) query = conn.createQuery!(SchedulerState)(rtp(StdSqlConstants.SELECT_SCHEDULER_STATE));
         
         List!(SchedulerStateRecord) lst = new LinkedList!(SchedulerStateRecord)();
 
@@ -2834,7 +2734,7 @@ implementationMissing(false);
     Set!(string) selectPausedTriggerGroups(Connection conn) {
 
         HashSet!(string) set = new HashSet!(string)();
-        EqlQuery!(PausedTriggerGrps)  query = conn.createQuery!(PausedTriggerGrps)(
+        EqlQuery!(PausedTriggerGrps) query = conn.createQuery!(PausedTriggerGrps)(
             rtp(StdSqlConstants.SELECT_PAUSED_TRIGGER_GROUPS));
         PausedTriggerGrps[] rs = query.getResultList();
         foreach(PausedTriggerGrps item; rs) {
