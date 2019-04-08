@@ -950,4 +950,14 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         return copy;
     }
 
+
+    ubyte[] serialize() {
+        implementationMissing(false);
+        return null;
+    }
+
+    void deserialize(ubyte[] data) {
+        implementationMissing(false);
+    }
+
 }

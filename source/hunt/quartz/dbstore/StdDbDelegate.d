@@ -70,7 +70,7 @@ import hunt.String;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;
 import hunt.util.DateTime;
-// import hunt.util.Serialize;
+import hunt.util.Serialize;
 
 import std.array;
 import std.conv;
@@ -995,9 +995,7 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, trigger.getKey().getName());
         query.setParameter(2, trigger.getKey().getGroup());
         query.setParameter(3, cast(ubyte[])[0x11, 0xA1]);
-        // FIXME: Needing refactor or cleanup -@zhangxueping at 4/4/2019, 6:29:23 PM
-        // 
-implementationMissing(false);
+        
         return query.exec();
 
         // ByteArrayOutputStream os = null;
@@ -1914,15 +1912,10 @@ implementationMissing(false);
     int insertCalendar(Connection conn, string calendarName, Calendar calendar) {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.INSERT_CALENDAR));
         query.setParameter(1, calendarName);
-        // TODO: Tasks pending completion -@zhangxueping at 4/3/2019, 6:18:30 PM
-        // 
-        implementationMissing(false);
-        query.setParameter(2, cast(ubyte[])[0x1,0x3]);
+
+        ubyte[] data = calendar.serialize();
+        query.setParameter(2, data);
         return query.exec();
-
-        // ByteArrayOutputStream baos = serializeObject(calendar);
-        //     setBytes(ps, 2, baos);
-
     }
 
     /**
@@ -1942,13 +1935,10 @@ implementationMissing(false);
      */
     int updateCalendar(Connection conn, string calendarName, Calendar calendar) {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.UPDATE_CALENDAR));
-        // TODO: Tasks pending completion -@zhangxueping at 4/3/2019, 6:18:30 PM
-        // 
-        implementationMissing(false);
-        query.setParameter(1, cast(ubyte[])[0x1,0x3]);
+        
+        ubyte[] data = calendar.serialize();
+        query.setParameter(1, data);
         return query.exec();
-
-        // ByteArrayOutputStream baos = serializeObject(calendar);
     }
 
     /**
@@ -1988,15 +1978,17 @@ implementationMissing(false);
     Calendar selectCalendar(Connection conn, string calendarName) {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDAR));
         query.setParameter(1, calendarName);
-        ResultSet rs = query.getNativeResult();
+        Calendars r = query.getSingleResult();
         
         Calendar cal = null;
-        if(rs.empty()) {
+        if(r is null) {
                 warning("Couldn't find calendar with name '" ~ calendarName
                         ~ "'.");
         } else {
-            // cal = cast(Calendar) getObjectFromBlob(rs, COL_CALENDAR);
+            // TODO: Tasks pending completion -@zhangxueping at 4/8/2019, 8:03:43 PM
+            // 
             implementationMissing(false);
+            cal = null; // unserialize!Calendar(cast(byte[])r.calendar);
         }
         return cal;
     }
@@ -2519,18 +2511,18 @@ implementationMissing(false);
      * @throws IOException
      *           if serialization causes an error
      */
-    protected ByteArrayOutputStream serializeObject(Object obj) {
-        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // if (null != obj) {
-        //     ObjectOutputStream out = new ObjectOutputStream(baos);
-        //     out.writeObject(obj);
-        //     out.flush();
-        // }
-        // return baos;
+    // protected ByteArrayOutputStream serializeObject(Object obj) {
+    //     // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    //     // if (null != obj) {
+    //     //     ObjectOutputStream out = new ObjectOutputStream(baos);
+    //     //     out.writeObject(obj);
+    //     //     out.flush();
+    //     // }
+    //     // return baos;
 
-        implementationMissing(false);
-        return null;
-    }
+    //     implementationMissing(false);
+    //     return null;
+    // }
 
     /**
      * <p>
@@ -2550,13 +2542,10 @@ implementationMissing(false);
         }
 
         try {
-            // return serializeObject(data);
-            // import cerealed;
-            // Cerealiser enc = Cerealiser();
-            // enc ~= data;
-            // return enc.bytes;
-            implementationMissing(false);
-            return null;
+            ubyte[] d = cast(ubyte[])serialize(data);
+            return d;
+            // implementationMissing(false);
+            // return null;
         } catch (NotSerializableException e) {
             throw new NotSerializableException(
                 "Unable to serialize JobDataMap for insertion into " ~ 
@@ -2598,11 +2587,7 @@ implementationMissing(false);
      */
     private const(ubyte)[] serializeProperties(JobDataMap data) {
         Properties properties = convertToProperty(data.getWrappedMap());
-        // return  serialize(properties);
-        import cerealed;
-        Cerealiser enc = Cerealiser();
-        enc ~= properties;
-        return enc.bytes;
+        return cast(ubyte[])serialize(properties);
     }
 
     /**

@@ -981,4 +981,14 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
     bool hasAdditionalProperties() {
         return false;
     }
+
+
+    ubyte[] serialize() {
+        implementationMissing(false);
+        return null;
+    }
+
+    void deserialize(ubyte[] data) {
+        implementationMissing(false);
+    }
 }

@@ -977,4 +977,14 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
 
         this.repeatCount = repeatCount;
     }
+
+
+    ubyte[] serialize() {
+        implementationMissing(false);
+        return null;
+    }
+
+    void deserialize(ubyte[] data) {
+        implementationMissing(false);
+    }
 }

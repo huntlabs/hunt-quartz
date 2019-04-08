@@ -51,7 +51,6 @@ import std.datetime;
  */
 class BaseCalendar : QuartzCalendar, Cloneable {
 
-
     // <p>A optional base calendar.</p>
     private QuartzCalendar baseCalendar;
 
@@ -265,5 +264,14 @@ class BaseCalendar : QuartzCalendar, Cloneable {
         LocalDateTime endOfDay = createJavaCalendar(timeInMillis);
         return LocalDateTime.of(endOfDay.getYear(), endOfDay.getMonthValue(), 
             endOfDay.getDayOfMonth, 23, 59, 59, 999*1000_000);
+    }
+
+    ubyte[] serialize() {
+        implementationMissing(false);
+        return null;
+    }
+
+    void deserialize(ubyte[] data) {
+        implementationMissing(false);
     }
 }

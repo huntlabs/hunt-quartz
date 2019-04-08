@@ -28,6 +28,7 @@ import hunt.logging.ConsoleLogger;
 import hunt.time.LocalDateTime;
 import hunt.util.Common;
 import hunt.util.Comparator;
+
 import std.datetime;
 
 
@@ -62,7 +63,7 @@ import std.datetime;
  * 
  * @author James House
  */
-interface Trigger : Comparable!(Trigger) { // Serializable, Cloneable,     
+interface Trigger : Comparable!(Trigger), Serializable { // Serializable, Cloneable,     
     
 
     /**

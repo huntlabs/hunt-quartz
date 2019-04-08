@@ -18,8 +18,9 @@
 
 module hunt.quartz.Calendar;
 
-
 alias QuartzCalendar = Calendar;
+
+import hunt.util.Common;
 
 /**
  * An interface to be implemented by objects that define spaces of time during 
@@ -41,7 +42,7 @@ alias QuartzCalendar = Calendar;
  * @author James House
  * @author Juergen Donnerstag
  */
-interface Calendar  { // : java.io.Serializable, java.lang.Cloneable
+interface Calendar : Serializable { 
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

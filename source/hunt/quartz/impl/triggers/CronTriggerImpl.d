@@ -847,5 +847,13 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     }
 
     
+    ubyte[] serialize() {
+        implementationMissing(false);
+        return null;
+    }
+
+    void deserialize(ubyte[] data) {
+        implementationMissing(false);
+    }
 }
 
