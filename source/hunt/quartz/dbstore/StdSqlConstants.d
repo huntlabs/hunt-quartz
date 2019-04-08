@@ -410,22 +410,26 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_JOB_NAME ~ ", t." ~ ModelConstants.FIELD_JOB_GROUP ~ " FROM "
             ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string SELECT_SIMPLE_TRIGGER = "SELECT *" ~ " FROM "
             ~ ModelConstants.MODEL_SIMPLE_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string SELECT_CRON_TRIGGER = "SELECT *" ~ " FROM "
             ~ ModelConstants.MODEL_CRON_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string SELECT_BLOB_TRIGGER = "SELECT *" ~ " FROM "
             ~ ModelConstants.MODEL_BLOB_TRIGGERS ~ " t WHERE t."
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
+            ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." 
+            ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     enum string SELECT_NUM_TRIGGERS = "SELECT COUNT(t."
             ~ ModelConstants.FIELD_TRIGGER_NAME ~ ") " ~ " FROM " 

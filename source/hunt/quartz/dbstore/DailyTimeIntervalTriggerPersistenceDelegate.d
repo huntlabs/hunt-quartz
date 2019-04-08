@@ -34,6 +34,7 @@ import hunt.collection.Set;
 import hunt.Integer;
 
 import hunt.text.StringBuilder;
+import hunt.Integer;
 
 import std.conv;
 import std.string;
@@ -169,8 +170,7 @@ class DailyTimeIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersi
         import hunt.Exceptions;
         int timesTriggered = props.getInt2();
         string[] statePropertyNames = ["timesTriggered"];
-        implementationMissing(false);
-        Object[] statePropertyValues = []; // [timesTriggered];
+        Object[] statePropertyValues = [Integer.valueOf(timesTriggered)];
 
         return new TriggerPropertyBundle(scheduleBuilder, statePropertyNames, statePropertyValues);
     }

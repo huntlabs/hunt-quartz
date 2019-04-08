@@ -21,8 +21,6 @@ import hunt.quartz.dbstore.StdSqlConstants;
 import hunt.quartz.dbstore.TableConstants;
 import hunt.quartz.dbstore.TriggerPersistenceDelegate;
 
-// import std.datetime : TimeZone;
-
 import hunt.quartz.CalendarIntervalScheduleBuilder;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.DateBuilder;
@@ -30,6 +28,8 @@ import hunt.quartz.impl.triggers.CalendarIntervalTriggerImpl;
 import hunt.quartz.spi.OperableTrigger;
 
 import hunt.Exceptions;
+import hunt.time.ZoneId;
+
 import std.array;
 
 class CalendarIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersistenceDelegateSupport {
@@ -48,18 +48,15 @@ class CalendarIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersis
 
     override
     protected SimplePropertiesTriggerProperties getTriggerProperties(OperableTrigger trigger) {
-
         CalendarIntervalTriggerImpl calTrig = cast(CalendarIntervalTriggerImpl)trigger;
-        
         SimplePropertiesTriggerProperties props = new SimplePropertiesTriggerProperties();
         
-        // props.setInt1(calTrig.getRepeatInterval());
-        // props.setString1(calTrig.getRepeatIntervalUnit().to!string());
-        // props.setInt2(calTrig.getTimesTriggered());
-        // props.setString2(calTrig.getTimeZone().getID());
-        // props.setBoolean1(calTrig.isPreserveHourOfDayAcrossDaylightSavings());
-        // props.setBoolean2(calTrig.isSkipDayIfHourDoesNotExist());
-        implementationMissing(false);
+        props.setInt1(calTrig.getRepeatInterval());
+        props.setString1(calTrig.getRepeatIntervalUnit().to!string());
+        props.setInt2(calTrig.getTimesTriggered());
+        props.setString2(calTrig.getTimeZone().getID());
+        props.setBoolean1(calTrig.isPreserveHourOfDayAcrossDaylightSavings());
+        props.setBoolean2(calTrig.isSkipDayIfHourDoesNotExist());
         
         return props;
     }
@@ -67,26 +64,23 @@ class CalendarIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersis
     override
     protected TriggerPropertyBundle getTriggerPropertyBundle(SimplePropertiesTriggerProperties props) {
 
-        // TimeZone tz = null; // if we use null, that's ok as system default tz will be used
-        // string tzId = props.getString2();
-        // if(tzId.empty) // there could be null entries from previously released versions
-        //     tz = TimeZone.getTimeZone(tzId);
+        ZoneId tz = null; // if we use null, that's ok as system default tz will be used
+        string tzId = props.getString2();
+        if(!tzId.empty) // there could be null entries from previously released versions
+            tz = ZoneId.of(tzId);
         
-        // ScheduleBuilder sb = CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
-        //     .withInterval(props.getInt1(), IntervalUnit.valueOf(props.getString1()))
-        //     .inTimeZone(tz)
-        //     .preserveHourOfDayAcrossDaylightSavings(props.isBoolean1())
-        //     .skipDayIfHourDoesNotExist(props.isBoolean2());
+        ScheduleBuilder sb = CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
+            .withInterval(props.getInt1(), IntervalUnit.valueOf(props.getString1()))
+            .inTimeZone(tz)
+            .preserveHourOfDayAcrossDaylightSavings(props.isBoolean1())
+            .skipDayIfHourDoesNotExist(props.isBoolean2());
         
-        // int timesTriggered = props.getInt2();
+        int timesTriggered = props.getInt2();
+        import hunt.Integer;
         
-        // string[] statePropertyNames = ["timesTriggered" ];
-        // Object[] statePropertyValues = [ timesTriggered ];
+        string[] statePropertyNames = ["timesTriggered" ];
+        Object[] statePropertyValues = [ Integer.valueOf(timesTriggered) ];
 
-        // return new TriggerPropertyBundle(sb, statePropertyNames, statePropertyValues);
-
-        implementationMissing(false);
-        return null;
+        return new TriggerPropertyBundle(sb, statePropertyNames, statePropertyValues);
     }
-
 }
