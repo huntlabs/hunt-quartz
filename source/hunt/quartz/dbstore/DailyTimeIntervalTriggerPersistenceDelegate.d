@@ -105,11 +105,6 @@ class DailyTimeIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersi
         if (days is null || days.size() <= 0)
             return "";
         
-        // Iterator!(Integer) itr = days.iterator();
-        // sb.append(itr.next());
-        // while(itr.hasNext()) {
-        //     sb.append(sep).append(itr.next());
-        // }
         foreach(int v; days) {
             sb.append(sep).append(v);
         }

@@ -15,6 +15,7 @@
  */
 module hunt.quartz.dbstore.SimplePropertiesTriggerPersistenceDelegateSupport;
 
+import hunt.quartz.dbstore.model;
 import hunt.quartz.dbstore.SimplePropertiesTriggerProperties;
 import hunt.quartz.dbstore.StdSqlConstants;
 import hunt.quartz.dbstore.TableConstants;
@@ -26,6 +27,11 @@ import hunt.quartz.TriggerKey;
 import hunt.quartz.spi.OperableTrigger;
 
 import hunt.Exceptions;
+import hunt.entity.EntityManager;
+import hunt.entity.NativeQuery;
+import hunt.entity.eql.EqlQuery;
+import hunt.database.driver.ResultSet;
+import hunt.database.Row;
 
 
 /**
@@ -41,50 +47,39 @@ import hunt.Exceptions;
  */
 abstract class SimplePropertiesTriggerPersistenceDelegateSupport : TriggerPersistenceDelegate {
 
-    
-    // protected enum string TableConstants.COL_STR_PROP_1 = "STR_PROP_1";
-    // protected enum string TableConstants.COL_STR_PROP_2 = "STR_PROP_2";
-    // protected enum string TableConstants.COL_STR_PROP_3 = "STR_PROP_3";
-    // protected enum string TableConstants.COL_INT_PROP_1 = "INT_PROP_1";
-    // protected enum string TableConstants.COL_INT_PROP_2 = "INT_PROP_2";
-    // protected enum string TableConstants.COL_LONG_PROP_1 = "LONG_PROP_1";
-    // protected enum string TableConstants.COL_LONG_PROP_2 = "LONG_PROP_2";
-    // protected enum string TableConstants.COL_DEC_PROP_1 = "DEC_PROP_1";
-    // protected enum string TableConstants.COL_DEC_PROP_2 = "DEC_PROP_2";
-    // protected enum string TableConstants.COL_BOOL_PROP_1 = "BOOL_PROP_1";
-    // protected enum string TableConstants.COL_BOOL_PROP_2 = "BOOL_PROP_2";
-    
     protected enum string SELECT_SIMPLE_PROPS_TRIGGER = "SELECT *" ~ " FROM "
-        ~ TableConstants.TABLE_SIMPLE_PROPERTIES_TRIGGERS ~ " WHERE "
-        ~ TableConstants.COL_SCHEDULER_NAME ~ " = " ~ StdSqlConstants.SCHED_NAME_SUBST
-        ~ " AND " ~ TableConstants.COL_TRIGGER_NAME ~ " = ? AND " ~ TableConstants.COL_TRIGGER_GROUP ~ " = ?";
+        ~ ModelConstants.MODEL_SIMPLE_PROPERTIES_TRIGGERS ~ " t WHERE t."
+        ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ StdSqlConstants.SCHED_NAME_SUBST
+        ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     protected enum string DELETE_SIMPLE_PROPS_TRIGGER = "DELETE FROM "
-        ~ TableConstants.TABLE_SIMPLE_PROPERTIES_TRIGGERS ~ " WHERE "
-        ~ TableConstants.COL_SCHEDULER_NAME ~ " = " ~ StdSqlConstants.SCHED_NAME_SUBST
-        ~ " AND " ~ TableConstants.COL_TRIGGER_NAME ~ " = ? AND " ~ TableConstants.COL_TRIGGER_GROUP ~ " = ?";
+        ~ ModelConstants.MODEL_SIMPLE_PROPERTIES_TRIGGERS ~ " t WHERE t."
+        ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ StdSqlConstants.SCHED_NAME_SUBST
+        ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
     protected enum string INSERT_SIMPLE_PROPS_TRIGGER = "INSERT INTO "
-        ~ TableConstants.TABLE_SIMPLE_PROPERTIES_TRIGGERS ~ " ("
-        ~ TableConstants.COL_SCHEDULER_NAME ~ ", "
-        ~ TableConstants.COL_TRIGGER_NAME ~ ", " ~ TableConstants.COL_TRIGGER_GROUP ~ ", "
-        ~ TableConstants.COL_STR_PROP_1 ~ ", " ~ TableConstants.COL_STR_PROP_2 ~ ", " ~ TableConstants.COL_STR_PROP_3 ~ ", "
-        ~ TableConstants.COL_INT_PROP_1 ~ ", " ~ TableConstants.COL_INT_PROP_2 ~ ", "
-        ~ TableConstants.COL_LONG_PROP_1 ~ ", " ~ TableConstants.COL_LONG_PROP_2 ~ ", "
-        ~ TableConstants.COL_DEC_PROP_1 ~ ", " ~ TableConstants.COL_DEC_PROP_2 ~ ", "
-        ~ TableConstants.COL_BOOL_PROP_1 ~ ", " ~ TableConstants.COL_BOOL_PROP_2 
+        ~ ModelConstants.MODEL_SIMPLE_PROPERTIES_TRIGGERS ~ " t (t."
+        ~ ModelConstants.FIELD_SCHEDULER_NAME ~ ", t."
+        ~ ModelConstants.FIELD_TRIGGER_NAME ~ ", t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ ", t."
+        ~ ModelConstants.FIELD_STR_PROP_1 ~ ", t." ~ ModelConstants.FIELD_STR_PROP_2 ~ ", t." 
+        ~ ModelConstants.FIELD_STR_PROP_3 ~ ", t."
+        ~ ModelConstants.FIELD_INT_PROP_1 ~ ", t." ~ ModelConstants.FIELD_INT_PROP_2 ~ ", t."
+        ~ ModelConstants.FIELD_LONG_PROP_1 ~ ", t." ~ ModelConstants.FIELD_LONG_PROP_2 ~ ", t."
+        ~ ModelConstants.FIELD_DEC_PROP_1 ~ ", t." ~ ModelConstants.FIELD_DEC_PROP_2 ~ ", t."
+        ~ ModelConstants.FIELD_BOOL_PROP_1 ~ ", t." ~ ModelConstants.FIELD_BOOL_PROP_2 
         ~ ") " ~ " VALUES(" ~ StdSqlConstants.SCHED_NAME_SUBST ~ ", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     protected enum string UPDATE_SIMPLE_PROPS_TRIGGER = "UPDATE "
-        ~ TableConstants.TABLE_SIMPLE_PROPERTIES_TRIGGERS ~ " SET "
-        ~ TableConstants.COL_STR_PROP_1 ~ " = ?, " ~ TableConstants.COL_STR_PROP_2 ~ " = ?, " ~ TableConstants.COL_STR_PROP_3 ~ " = ?, "
-        ~ TableConstants.COL_INT_PROP_1 ~ " = ?, " ~ TableConstants.COL_INT_PROP_2 ~ " = ?, "
-        ~ TableConstants.COL_LONG_PROP_1 ~ " = ?, " ~ TableConstants.COL_LONG_PROP_2 ~ " = ?, "
-        ~ TableConstants.COL_DEC_PROP_1 ~ " = ?, " ~ TableConstants.COL_DEC_PROP_2 ~ " = ?, "
-        ~ TableConstants.COL_BOOL_PROP_1 ~ " = ?, " ~ TableConstants.COL_BOOL_PROP_2 
-        ~ " = ? WHERE " ~ TableConstants.COL_SCHEDULER_NAME ~ " = " ~ StdSqlConstants.SCHED_NAME_SUBST
-        ~ " AND " ~ TableConstants.COL_TRIGGER_NAME
-        ~ " = ? AND " ~ TableConstants.COL_TRIGGER_GROUP ~ " = ?";
+        ~ ModelConstants.MODEL_SIMPLE_PROPERTIES_TRIGGERS ~ " t SET t."
+        ~ ModelConstants.FIELD_STR_PROP_1 ~ " = ?, t." ~ ModelConstants.FIELD_STR_PROP_2 ~ " = ?, t." 
+        ~ ModelConstants.FIELD_STR_PROP_3 ~ " = ?, t."
+        ~ ModelConstants.FIELD_INT_PROP_1 ~ " = ?, t." ~ ModelConstants.FIELD_INT_PROP_2 ~ " = ?, t."
+        ~ ModelConstants.FIELD_LONG_PROP_1 ~ " = ?, t." ~ ModelConstants.FIELD_LONG_PROP_2 ~ " = ?, t."
+        ~ ModelConstants.FIELD_DEC_PROP_1 ~ " = ?, t." ~ ModelConstants.FIELD_DEC_PROP_2 ~ " = ?, t."
+        ~ ModelConstants.FIELD_BOOL_PROP_1 ~ " = ?, t." ~ ModelConstants.FIELD_BOOL_PROP_2 
+        ~ " = ? WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ StdSqlConstants.SCHED_NAME_SUBST
+        ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME
+        ~ " = ? AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
     
     protected string tablePrefix;
 
@@ -98,120 +93,99 @@ abstract class SimplePropertiesTriggerPersistenceDelegateSupport : TriggerPersis
     protected abstract SimplePropertiesTriggerProperties getTriggerProperties(OperableTrigger trigger);
     
     protected abstract TriggerPropertyBundle getTriggerPropertyBundle(SimplePropertiesTriggerProperties properties);
+
+    protected final string rtp(string query) {
+        return format(query, schedNameLiteral);
+    }
     
     int deleteExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
-        // PreparedStatement ps = null;
+        EqlQuery!(SimpPropertiesTriggers) query = conn.createQuery!(SimpPropertiesTriggers)(
+            rtp(DELETE_SIMPLE_PROPS_TRIGGER));
 
-        // try {
-        //     ps = conn.prepareStatement(Util.rtp(DELETE_SIMPLE_PROPS_TRIGGER, tablePrefix, schedNameLiteral));
-        //     ps.setString(1, triggerKey.getName());
-        //     ps.setString(2, triggerKey.getGroup());
-
-        //     return ps.executeUpdate();
-        // } finally {
-        //     Util.closeStatement(ps);
-        // }
-
-        implementationMissing(false);
-        return 0;
+        query.setParameter(1, triggerKey.getName());
+        query.setParameter(2, triggerKey.getGroup());
+        return query.exec();
     }
 
-    int insertExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
+    int insertExtendedTriggerProperties(Connection conn, 
+        OperableTrigger trigger, string state, JobDetail jobDetail) {
 
-        // SimplePropertiesTriggerProperties properties = getTriggerProperties(trigger);
+        SimplePropertiesTriggerProperties properties = getTriggerProperties(trigger);
         
-        // PreparedStatement ps = null;
-        
-        // try {
-        //     ps = conn.prepareStatement(Util.rtp(INSERT_SIMPLE_PROPS_TRIGGER, tablePrefix, schedNameLiteral));
-        //     ps.setString(1, trigger.getKey().getName());
-        //     ps.setString(2, trigger.getKey().getGroup());
-        //     ps.setString(3, properties.getString1());
-        //     ps.setString(4, properties.getString2());
-        //     ps.setString(5, properties.getString3());
-        //     ps.setInt(6, properties.getInt1());
-        //     ps.setInt(7, properties.getInt2());
-        //     ps.setLong(8, properties.getLong1());
-        //     ps.setLong(9, properties.getLong2());
-        //     ps.setBigDecimal(10, properties.getDecimal1());
-        //     ps.setBigDecimal(11, properties.getDecimal2());
-        //     ps.setBoolean(12, properties.isBoolean1());
-        //     ps.setBoolean(13, properties.isBoolean2());
+        EqlQuery!(SimpPropertiesTriggers) query = conn.createQuery!(SimpPropertiesTriggers)(
+            rtp(INSERT_SIMPLE_PROPS_TRIGGER));
 
-        //     return ps.executeUpdate();
-        // } finally {
-        //     Util.closeStatement(ps);
-        // }
-        implementationMissing(false);
-        return 0;
+        query.setParameter(1, trigger.getKey().getName());
+        query.setParameter(2, trigger.getKey().getGroup());
+        query.setParameter(3, properties.getString1());
+        query.setParameter(4, properties.getString2());
+        query.setParameter(5, properties.getString3());
+        query.setParameter(6, properties.getInt1());
+        query.setParameter(7, properties.getInt2());
+        query.setParameter(8, properties.getLong1());
+        query.setParameter(9, properties.getLong2());
+        query.setParameter(10, properties.getDecimal1());
+        query.setParameter(11, properties.getDecimal2());
+        query.setParameter(12, properties.isBoolean1());
+        query.setParameter(13, properties.isBoolean2());
+
+        return query.exec();
     }
 
     TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
-
-        // PreparedStatement ps = null;
-        // ResultSet rs = null;
+        EqlQuery!(SimpPropertiesTriggers) query = conn.createQuery!(SimpPropertiesTriggers)(
+            rtp(SELECT_SIMPLE_PROPS_TRIGGER));
         
-        // try {
-        //     ps = conn.prepareStatement(Util.rtp(SELECT_SIMPLE_PROPS_TRIGGER, tablePrefix, schedNameLiteral));
-        //     ps.setString(1, triggerKey.getName());
-        //     ps.setString(2, triggerKey.getGroup());
-        //     rs = ps.executeQuery();
+        query.setParameter(1, triggerKey.getName());
+        query.setParameter(2, triggerKey.getGroup());
+
+        SimpPropertiesTriggers trigger = query.getSingleResult();
     
-        //     if (rs.next()) {
-        //         SimplePropertiesTriggerProperties properties = new SimplePropertiesTriggerProperties();
-                    
-        //         properties.setString1(rs.getString(TableConstants.COL_STR_PROP_1));
-        //         properties.setString2(rs.getString(TableConstants.COL_STR_PROP_2));
-        //         properties.setString3(rs.getString(TableConstants.COL_STR_PROP_3));
-        //         properties.setInt1(rs.getInt(TableConstants.COL_INT_PROP_1));
-        //         properties.setInt2(rs.getInt(TableConstants.COL_INT_PROP_2));
-        //         properties.setLong1(rs.getInt(TableConstants.COL_LONG_PROP_1));
-        //         properties.setLong2(rs.getInt(TableConstants.COL_LONG_PROP_2));
-        //         properties.setDecimal1(rs.getBigDecimal(TableConstants.COL_DEC_PROP_1));
-        //         properties.setDecimal2(rs.getBigDecimal(TableConstants.COL_DEC_PROP_2));
-        //         properties.setBoolean1(rs.getBoolean(TableConstants.COL_BOOL_PROP_1));
-        //         properties.setBoolean2(rs.getBoolean(TableConstants.COL_BOOL_PROP_2));
+        if (trigger !is null) {
+            SimplePropertiesTriggerProperties properties = new SimplePropertiesTriggerProperties();
                 
-        //         return getTriggerPropertyBundle(properties);
-        //     }
+            properties.setString1(trigger.strProp1);
+            properties.setString2(trigger.strProp2);
+            properties.setString3(trigger.strProp3);
+            properties.setInt1(trigger.intProp1);
+            properties.setInt2(trigger.intProp2);
+            properties.setLong1(trigger.longProp1);
+            properties.setLong2(trigger.longProp2);
+            properties.setDecimal1(trigger.decProp1);
+            properties.setDecimal2(trigger.decProp2);
+            properties.setBoolean1(trigger.boolProp1);
+            properties.setBoolean2(trigger.boolProp2);
             
-        //     throw new IllegalStateException("No record found for selection of Trigger with key: '" ~ triggerKey ~ "' and statement: " ~ Util.rtp(SELECT_SIMPLE_TRIGGER, tablePrefix, schedNameLiteral));
-        // } finally {
-        //     Util.closeResultSet(rs);
-        //     Util.closeStatement(ps);
-        // }
-        implementationMissing(false);
-        return null;
+            return getTriggerPropertyBundle(properties);
+        }
+        
+        throw new IllegalStateException("No record found for selection of Trigger with key: '" 
+            ~ triggerKey.toString() ~ "' and statement: " ~ rtp(SELECT_SIMPLE_PROPS_TRIGGER);
+
     }
 
     int updateExtendedTriggerProperties(Connection conn, OperableTrigger trigger, string state, JobDetail jobDetail) {
+        SimplePropertiesTriggerProperties properties = getTriggerProperties(trigger);
 
-        // SimplePropertiesTriggerProperties properties = getTriggerProperties(trigger);
+        EqlQuery!(SimpPropertiesTriggers) query = conn.createQuery!(SimpPropertiesTriggers)(
+            rtp(UPDATE_SIMPLE_PROPS_TRIGGER));
         
-        // PreparedStatement ps = null;
 
-        // try {
-        //     ps = conn.prepareStatement(Util.rtp(UPDATE_SIMPLE_PROPS_TRIGGER, tablePrefix, schedNameLiteral));
-        //     ps.setString(1, properties.getString1());
-        //     ps.setString(2, properties.getString2());
-        //     ps.setString(3, properties.getString3());
-        //     ps.setInt(4, properties.getInt1());
-        //     ps.setInt(5, properties.getInt2());
-        //     ps.setLong(6, properties.getLong1());
-        //     ps.setLong(7, properties.getLong2());
-        //     ps.setBigDecimal(8, properties.getDecimal1());
-        //     ps.setBigDecimal(9, properties.getDecimal2());
-        //     ps.setBoolean(10, properties.isBoolean1());
-        //     ps.setBoolean(11, properties.isBoolean2());
-        //     ps.setString(12, trigger.getKey().getName());
-        //     ps.setString(13, trigger.getKey().getGroup());
+        query.setParameter(1, properties.getString1());
+        query.setParameter(2, properties.getString2());
+        query.setParameter(3, properties.getString3());
+        query.setParameter(4, properties.getInt1());
+        query.setParameter(5, properties.getInt2());
+        query.setParameter(6, properties.getLong1());
+        query.setParameter(7, properties.getLong2());
+        query.setParameter(8, properties.getDecimal1());
+        query.setParameter(9, properties.getDecimal2());
+        query.setParameter(10, properties.isBoolean1());
+        query.setParameter(11, properties.isBoolean2());
+        query.setParameter(12, trigger.getKey().getName());
+        query.setParameter(13, trigger.getKey().getGroup());
 
-        //     return ps.executeUpdate();
-        // } finally {
-        //     Util.closeStatement(ps);
-        // }
-        implementationMissing(false);
-        return 0;
+        return query.exec();
     }
 
 }
