@@ -34,6 +34,7 @@ import hunt.entity.eql.EqlQuery;
 import hunt.database.driver.ResultSet;
 import hunt.database.Row;
 import hunt.time.ZoneId;
+import hunt.time.ZoneRegion;
 
 import std.format;
 
@@ -80,7 +81,7 @@ class CronTriggerPersistenceDelegate : TriggerPersistenceDelegate {
         query.setParameter(1, trigger.getKey().getName());
         query.setParameter(2, trigger.getKey().getGroup());
         query.setParameter(3, cronTrigger.getCronExpression());
-        query.setParameter(4, cronTrigger.getTimeZone().getID());
+        query.setParameter(4, cronTrigger.getTimeZone().getId());
 
         return query.exec();
     }
@@ -102,14 +103,14 @@ class CronTriggerPersistenceDelegate : TriggerPersistenceDelegate {
             CronScheduleBuilder cb = CronScheduleBuilder.cronSchedule(cronExpr);
             
             if (timeZoneId !is null) 
-                cb.inTimeZone(ZoneId.of(timeZoneId));
+                cb.inTimeZone(ZoneRegion.of(timeZoneId));
             
             return new TriggerPropertyBundle(cb, null, null);
         }
         
         throw new IllegalStateException("No record found for selection of Trigger with key: '" 
             ~ triggerKey.toString() ~ "' and statement: " 
-            ~ format(SELECT_CRON_TRIGGER, schedNameLiteral));
+            ~ format(StdSqlConstants.SELECT_CRON_TRIGGER, schedNameLiteral));
     }
 
     int updateExtendedTriggerProperties(Connection conn, 
@@ -120,7 +121,7 @@ class CronTriggerPersistenceDelegate : TriggerPersistenceDelegate {
             format(StdSqlConstants.UPDATE_CRON_TRIGGER, schedNameLiteral));
     
         query.setParameter(1, cronTrigger.getCronExpression());
-        query.setParameter(2, cronTrigger.getTimeZone().getID());
+        query.setParameter(2, cronTrigger.getTimeZone().getId());
         query.setParameter(3, trigger.getKey().getName());
         query.setParameter(4, trigger.getKey().getGroup());
 

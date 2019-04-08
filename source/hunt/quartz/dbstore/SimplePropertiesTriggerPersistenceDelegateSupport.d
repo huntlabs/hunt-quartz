@@ -33,6 +33,7 @@ import hunt.entity.eql.EqlQuery;
 import hunt.database.driver.ResultSet;
 import hunt.database.Row;
 
+import std.format;
 
 /**
  * A base implementation of {@link TriggerPersistenceDelegate} that persists 
@@ -160,7 +161,7 @@ abstract class SimplePropertiesTriggerPersistenceDelegateSupport : TriggerPersis
         }
         
         throw new IllegalStateException("No record found for selection of Trigger with key: '" 
-            ~ triggerKey.toString() ~ "' and statement: " ~ rtp(SELECT_SIMPLE_PROPS_TRIGGER);
+            ~ triggerKey.toString() ~ "' and statement: " ~ rtp(SELECT_SIMPLE_PROPS_TRIGGER));
 
     }
 

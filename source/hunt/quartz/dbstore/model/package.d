@@ -104,6 +104,21 @@ struct ModelConstants {
 
     enum string FIELD_TIMES_TRIGGERED = SimpleTriggers.timesTriggered.stringof; // "TIMES_TRIGGERED";
 
+
+    // TABLE_SIMPLE_PROPERTIES_TRIGGERS columns names
+    enum string FIELD_STR_PROP_1 = SimpPropertiesTriggers.strProp1.stringof;
+    enum string FIELD_STR_PROP_2 = SimpPropertiesTriggers.strProp2.stringof;
+    enum string FIELD_STR_PROP_3 = SimpPropertiesTriggers.strProp3.stringof;
+    enum string FIELD_INT_PROP_1 = SimpPropertiesTriggers.intProp1.stringof;
+    enum string FIELD_INT_PROP_2 = SimpPropertiesTriggers.intProp2.stringof;
+    enum string FIELD_LONG_PROP_1 = SimpPropertiesTriggers.longProp1.stringof;
+    enum string FIELD_LONG_PROP_2 = SimpPropertiesTriggers.longProp2.stringof;
+    enum string FIELD_DEC_PROP_1 = SimpPropertiesTriggers.decProp1.stringof;
+    enum string FIELD_DEC_PROP_2 = SimpPropertiesTriggers.decProp2.stringof;
+    enum string FIELD_BOOL_PROP_1 = SimpPropertiesTriggers.boolProp1.stringof;
+    enum string FIELD_BOOL_PROP_2 = SimpPropertiesTriggers.boolProp2.stringof;
+
+
     // MODEL_CRON_TRIGGERS columns names
     enum string FIELD_CRON_EXPRESSION = CronTriggers.cronExpression.stringof; // "CRON_EXPRESSION";
 

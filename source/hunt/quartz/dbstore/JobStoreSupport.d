@@ -1431,8 +1431,7 @@ abstract class JobStoreSupport : JobStore {
             // this must be called before we delete the trigger, obviously
             JobDetail job = getDelegate().selectJobForTrigger(conn, key, false);
 
-            removedTrigger = 
-                deleteTriggerAndChildren(conn, key);
+            removedTrigger = deleteTriggerAndChildren(conn, key);
 
             if (job !is null && !job.isDurable()) {
                 int numTriggers = getDelegate().selectNumTriggersForJob(conn,

@@ -163,3 +163,11 @@ class JobExecutionException : SchedulerException {
     }
 
 }
+
+class ObjectStreamException : IOException {
+    mixin BasicExceptionCtors;
+}
+
+class NotSerializableException : ObjectStreamException {
+    mixin BasicExceptionCtors;
+}

@@ -48,6 +48,7 @@ import hunt.quartz.impl.matchers.StringMatcher;
 import hunt.quartz.impl.triggers.SimpleTriggerImpl;
 // import hunt.quartz.spi.ClassLoadHelper;
 import hunt.quartz.spi.OperableTrigger;
+import hunt.quartz.utils.PropertiesParser;
 
 import hunt.collection.HashMap;
 import hunt.collection.HashSet;
@@ -65,14 +66,19 @@ import hunt.database.driver.ResultSet;
 import hunt.database.Row;
 import hunt.io.ByteArrayOutputStream;
 import hunt.logging;
+import hunt.String;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;
+import hunt.util.DateTime;
+// import hunt.util.Serialize;
 
+import std.array;
 import std.conv;
 import std.format;
 
 alias triggerKey = TriggerKey.triggerKey;
 alias jobKey = JobKey.jobKey;
+
 
 
 /**
@@ -258,8 +264,8 @@ class StdDbDelegate : DriverDelegate {
         Triggers[] triggers = query.getResultList();
 
         LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
-        foreach(Triggerst t; triggers) {
-            string triggerName = t.trigName;
+        foreach(Triggers t; triggers) {
+            string triggerName = t.triggerName;
             string groupName = t.triggerGroup;
             list.add(triggerKey(triggerName, groupName));
         }
@@ -371,7 +377,7 @@ class StdDbDelegate : DriverDelegate {
 
         if (!rs.empty()) {
             Row r = rs.front;
-            return rs.getAs!int(0);
+            return r.getAs!int(0);
         }
 
         throw new SQLException("No misfired trigger count returned.");
@@ -559,7 +565,7 @@ class StdDbDelegate : DriverDelegate {
      *           if there were problems serializing the JobDataMap
      */
     int insertJobDetail(Connection conn, JobDetail job) {
-        // ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
+        ubyte[] baos = serializeJobData(job.getJobDataMap());
 
         int insertResult = 0;
         EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.INSERT_JOB_DETAIL));
@@ -571,11 +577,7 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(6, job.isConcurrentExectionDisallowed());
         query.setParameter(7, job.isPersistJobDataAfterExecution());
         query.setParameter(8, job.requestsRecovery());
-        // FIXME: Needing refactor or cleanup -@zhangxueping at 3/28/2019, 1:55:07 PM
-        // 
-        query.setParameter(9, cast(ubyte[])[1,2,3]);
-        //     setBytes(ps, 9, baos);
-implementationMissing(false);
+        query.setParameter(9, baos);
         insertResult = query.exec();
 
         return insertResult;
@@ -597,20 +599,17 @@ implementationMissing(false);
     int updateJobDetail(Connection conn, JobDetail job) {
 
         EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.UPDATE_JOB_DETAIL));
-        // ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
+        ubyte[] baos = serializeJobData(job.getJobDataMap());
 
         int insertResult = 0;
 
         query.setParameter(1, job.getDescription());
-        query.setParameter(2, job.getJobClass().getName());
+        query.setParameter(2, job.getJobClass().name);
         query.setParameter(3, job.isDurable());
         query.setParameter(4, job.isConcurrentExectionDisallowed());
         query.setParameter(5, job.isPersistJobDataAfterExecution());
         query.setParameter(6, job.requestsRecovery());
-        // FIXME: Needing refactor or cleanup -@zhangxueping at 4/7/2019, 4:11:43 PM
-        // 
-        // setBytes(ps, 7, baos);
-        query.setParameter(7, cast(ubyte[])([0x1, 0x2]));
+        query.setParameter(7, baos);
         query.setParameter(8, job.getKey().getName());
         query.setParameter(9, job.getKey().getGroup());
 
@@ -717,13 +716,10 @@ implementationMissing(false);
      * @return the number of rows updated
      */
     int updateJobData(Connection conn, JobDetail job) {
-        // ByteArrayOutputStream baos = serializeJobData(job.getJobDataMap());
-// FIXME: Needing refactor or cleanup -@zhangxueping at 4/7/2019, 4:02:53 PM
-// 
+        ubyte[] baos = serializeJobData(job.getJobDataMap());
         EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.UPDATE_JOB_DATA));
 
-        // setBytes(ps, 1, baos);
-        query.setParameter(1, cast(ubyte[])[0x1, 0x2]);
+        query.setParameter(1, baos);
         query.setParameter(2, job.getKey().getName());
         query.setParameter(3, job.getKey().getGroup());
 
@@ -925,10 +921,10 @@ implementationMissing(false);
     int insertTrigger(Connection conn, OperableTrigger trigger,
             string state, JobDetail jobDetail) {
 
-        // ByteArrayOutputStream baos = null;
-        // if(trigger.getJobDataMap().size() > 0) {
-        //     baos = serializeJobData(trigger.getJobDataMap());
-        // }
+        ubyte[] baos = null;
+        if(trigger.getJobDataMap().size() > 0) {
+            baos = serializeJobData(trigger.getJobDataMap());
+        }
         
         int insertResult = 0;
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.INSERT_TRIGGER));
@@ -970,10 +966,7 @@ implementationMissing(false);
         query.setParameter(11, endTime);
         query.setParameter(12, trigger.getCalendarName());
         query.setParameter(13, trigger.getMisfireInstruction());
-        // query.setParameter(14, baos);
-        // TODO: Tasks pending completion -@zhangxueping at 4/2/2019, 3:08:47 PM
-        // 
-        query.setParameter(14, cast(ubyte[])[0x11, 0xA1]);
+        query.setParameter(14, baos);
         query.setParameter(15, trigger.getPriority());
         
         insertResult = query.exec();
@@ -1039,9 +1032,9 @@ implementationMissing(false);
 
         // save some clock cycles by unnecessarily writing job data blob ...
         bool updateJobData = trigger.getJobDataMap().isDirty();
-        ByteArrayOutputStream baos = null;
+        ubyte[] baos = null;
         if(updateJobData) {
-            // baos = serializeJobData(trigger.getJobDataMap());
+            baos = serializeJobData(trigger.getJobDataMap());
             implementationMissing(false);
         }
                 
@@ -1071,28 +1064,24 @@ implementationMissing(false);
         
         TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(trigger);
         
-        string type = TTYPE_BLOB;
+        string type = TableConstants.TTYPE_BLOB;
         if(tDel !is null)
             type = tDel.getHandledTriggerTypeDiscriminator();
 
         query.setParameter(7, type);
         
-        query.setParameter(8, new BigDecimal(to!string(trigger
-                .getStartTime().getTime())));
+        query.setParameter(8, trigger.getStartTime().toEpochMilli());
         long endTime = 0;
         if (trigger.getEndTime() !is null) {
-            endTime = trigger.getEndTime().getTime();
+            endTime = trigger.getEndTime().toEpochMilli();
         }
-        query.setParameter(9, new BigDecimal(to!string(endTime)));
+        query.setParameter(9, endTime);
         query.setParameter(10, trigger.getCalendarName());
-        ps.setInt(11, trigger.getMisfireInstruction());
-        ps.setInt(12, trigger.getPriority());
+        query.setParameter(11, trigger.getMisfireInstruction());
+        query.setParameter(12, trigger.getPriority());
 
         if(updateJobData) {
-            // FIXME: Needing refactor or cleanup -@zhangxueping at 4/4/2019, 6:28:03 PM
-            // 
-            // setBytes(ps, 13, baos);
-            query.setParameter(13, cast(ubyte[])[0x1,0x02]);
+            query.setParameter(13, cast(ubyte[])baos);
             query.setParameter(14, trigger.getKey().getName());
             query.setParameter(15, trigger.getKey().getGroup());
         } else {
@@ -1100,7 +1089,7 @@ implementationMissing(false);
             query.setParameter(14, trigger.getKey().getGroup());
         }
 
-        insertResult = ps.executeUpdate();
+        insertResult = query.exec();
         
         if(tDel is null)
             updateBlobTrigger(conn, trigger);
@@ -1517,7 +1506,7 @@ implementationMissing(false);
 
         LinkedList!(string) list = new LinkedList!(string)();
         foreach(Row r; rs) {
-            trigList.add(r[0], r[1]);
+            trigList.add(selectTrigger(conn, triggerKey(r[0], r[1])));
         }
         return trigList;
     }
@@ -1851,7 +1840,7 @@ implementationMissing(false);
         ResultSet rs = query.getNativeResult();
         Set!(TriggerKey) keys = new HashSet!(TriggerKey)();
         foreach(Row r; rs) {
-            keys.add(triggerKey(rs[0], rs[1]));
+            keys.add(triggerKey(r[0], r[1]));
         }
 
         return keys;
@@ -2058,7 +2047,6 @@ implementationMissing(false);
      */
     int selectNumCalendars(Connection conn) {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_NUM_CALENDARS));
-        query.setParameter(1, calendarName);
         ResultSet rs = query.getNativeResult();
 
         int count = 0;
@@ -2080,7 +2068,7 @@ implementationMissing(false);
      */
     List!(string) selectCalendars(Connection conn) {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDARS));
-        query.setParameter(1, STATE_WAITING);
+        query.setParameter(1, TableConstants.STATE_WAITING);
         ResultSet rs = query.getNativeResult();
 
         LinkedList!(string) list = new LinkedList!(string)();
@@ -2107,7 +2095,7 @@ implementationMissing(false);
      */
     long selectNextFireTime(Connection conn) {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NEXT_FIRE_TIME));
-        query.setParameter(1, STATE_WAITING);
+        query.setParameter(1, TableConstants.STATE_WAITING);
 
         ResultSet rs = query.getNativeResult();
         if(rs.empty)
@@ -2131,7 +2119,7 @@ implementationMissing(false);
      */
     TriggerKey selectTriggerForFireTime(Connection conn, long fireTime) {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_FOR_FIRE_TIME));
-        query.setParameter(1, STATE_WAITING);
+        query.setParameter(1, TableConstants.STATE_WAITING);
         query.setParameter(2, fireTime);
 
         Triggers trigger = query.getSingleResult();
@@ -2198,7 +2186,7 @@ implementationMissing(false);
         // Note: in some jdbc drivers, such as MySQL, you must set maxRows before fetchSize, or you get exception!
         // ps.setFetchSize(maxCount);
             
-        query.setParameter(1, STATE_WAITING);
+        query.setParameter(1, TableConstants.STATE_WAITING);
         query.setParameter(2, noLaterThan);
         query.setParameter(3, noEarlierThan);
         Triggers[] triggers = query.getResultList();
@@ -2248,7 +2236,7 @@ implementationMissing(false);
             query.setParameter(10, false);
             query.setParameter(11, false);
         }
-        ps.setInt(12, trigger.getPriority());
+        query.setParameter(12, trigger.getPriority());
         
         return query.exec();
     }
@@ -2322,9 +2310,9 @@ implementationMissing(false);
         List!(FiredTriggerRecord) lst = new LinkedList!(FiredTriggerRecord)();
 
         EqlQuery!(FiredTriggers)  query;
-        if (!jobName.empty()) {
+        if (!triggerName.empty()) {
             query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_FIRED_TRIGGER));
-            query.setParameter(1, jobName);
+            query.setParameter(1, triggerName);
             query.setParameter(2, groupName);
         } else {
             query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_FIRED_TRIGGER_GROUP));
@@ -2556,23 +2544,26 @@ implementationMissing(false);
      * @throws IOException
      *           if serialization causes an error
      */
-    protected ByteArrayOutputStream serializeJobData(JobDataMap data) {
-        // if (canUseProperties()) {
-        //     return serializeProperties(data);
-        // }
+    protected ubyte[] serializeJobData(JobDataMap data) {
+        if (canUseProperties()) {
+            return cast(ubyte[])serializeProperties(data);
+        }
 
-        // try {
-        //     return serializeObject(data);
-        // } catch (NotSerializableException e) {
-        //     throw new NotSerializableException(
-        //         "Unable to serialize JobDataMap for insertion into " ~ 
-        //         "database because the value of property '" ~ 
-        //         getKeyOfNonSerializableValue(data) + 
-        //         "' is not serializable: " ~ e.getMessage());
-        // }
-
-        implementationMissing(false);
-        return null;
+        try {
+            // return serializeObject(data);
+            // import cerealed;
+            // Cerealiser enc = Cerealiser();
+            // enc ~= data;
+            // return enc.bytes;
+            implementationMissing(false);
+            return null;
+        } catch (NotSerializableException e) {
+            throw new NotSerializableException(
+                "Unable to serialize JobDataMap for insertion into " ~ 
+                "database because the value of property '" ~ 
+                // getKeyOfNonSerializableValue(data) ~ 
+                "' is not serializable: " ~ e.msg);
+        }
     }
 
     /**
@@ -2603,54 +2594,49 @@ implementationMissing(false);
     // }
     
     /**
-     * serialize the java.util.Properties
+     * serialize the Properties
      */
-    // private ByteArrayOutputStream serializeProperties(JobDataMap data) {
-    //     ByteArrayOutputStream ba = new ByteArrayOutputStream();
-    //     if (null != data) {
-    //         Properties properties = convertToProperty(data.getWrappedMap());
-    //         properties.store(ba, "");
-    //     }
+    private const(ubyte)[] serializeProperties(JobDataMap data) {
+        Properties properties = convertToProperty(data.getWrappedMap());
+        // return  serialize(properties);
+        import cerealed;
+        Cerealiser enc = Cerealiser();
+        enc ~= properties;
+        return enc.bytes;
+    }
 
-    //     return ba;
+    /**
+     * convert the JobDataMap into a list of properties
+     */
+    // protected Map!(string, T) convertFromProperty(T)(Properties properties) {
+    //     return new HashMap!(string, Object)(properties);
     // }
 
     /**
      * convert the JobDataMap into a list of properties
      */
-    // protected Map<?, ?> convertFromProperty(Properties properties) {
-    //     return new HashMap!(Object, Object)(properties);
-    // }
-
-    /**
-     * convert the JobDataMap into a list of properties
-     */
-    // protected Properties convertToProperty(Map<?, ?> data) {
-    //     Properties properties = new Properties();
+    protected Properties convertToProperty(K, V)(Map!(K, V) data) if(is(K == string)) {
+        Properties properties;
         
-    //     for (Iterator<?> entryIter = data.entrySet().iterator(); entryIter.hasNext();) {
-    //         Map.Entry<?, ?> entry = (Map.Entry<?, ?>)entryIter.next();
+        foreach(K key, V val; data) {
             
-    //         Object key = entry.getKey();
-    //         Object val = (entry.getValue() is null) ? "" : entry.getValue();
+            // if(!(key instanceof string)) {
+            //     throw new IOException("JobDataMap keys/values must be Strings " 
+            //             ~ "when the 'useProperties' property is set. " 
+            //             ~ " offending Key: " ~ key);
+            // }
+            String v = cast(String)val;
+            if( v is null) {
+                throw new IOException("JobDataMap values must be Strings " 
+                        ~ "when the 'useProperties' property is set. " 
+                        ~ " Key of offending value: " ~ key);
+            }
             
-    //         if(!(key instanceof string)) {
-    //             throw new IOException("JobDataMap keys/values must be Strings " 
-    //                     ~ "when the 'useProperties' property is set. " 
-    //                     ~ " offending Key: " ~ key);
-    //         }
-            
-    //         if(!(val instanceof string)) {
-    //             throw new IOException("JobDataMap values must be Strings " 
-    //                     ~ "when the 'useProperties' property is set. " 
-    //                     ~ " Key of offending value: " ~ key);
-    //         }
-            
-    //         properties.put(key, val);
-    //     }
+            properties[key] =  v.value();
+        }
         
-    //     return properties;
-    // }
+        return properties;
+    }
 
     /**
      * <p>

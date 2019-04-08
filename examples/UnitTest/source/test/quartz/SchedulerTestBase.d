@@ -74,7 +74,7 @@ class SchedulerTestBase {
             .storeDurably()
             .build();
 
-        sched.deleteJob(jobKey("j1"));
+        // sched.deleteJob(jobKey("j1"));
 
         assertFalse("Unexpected existence of job named 'j1'.", 
             sched.checkExists(jobKey("j1")));

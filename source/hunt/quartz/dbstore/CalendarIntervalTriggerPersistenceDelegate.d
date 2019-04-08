@@ -29,8 +29,10 @@ import hunt.quartz.spi.OperableTrigger;
 
 import hunt.Exceptions;
 import hunt.time.ZoneId;
+import hunt.time.ZoneRegion;
 
 import std.array;
+import std.conv;
 
 class CalendarIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersistenceDelegateSupport {
 
@@ -54,7 +56,7 @@ class CalendarIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersis
         props.setInt1(calTrig.getRepeatInterval());
         props.setString1(calTrig.getRepeatIntervalUnit().to!string());
         props.setInt2(calTrig.getTimesTriggered());
-        props.setString2(calTrig.getTimeZone().getID());
+        props.setString2(calTrig.getTimeZone().getId());
         props.setBoolean1(calTrig.isPreserveHourOfDayAcrossDaylightSavings());
         props.setBoolean2(calTrig.isSkipDayIfHourDoesNotExist());
         
@@ -67,10 +69,10 @@ class CalendarIntervalTriggerPersistenceDelegate : SimplePropertiesTriggerPersis
         ZoneId tz = null; // if we use null, that's ok as system default tz will be used
         string tzId = props.getString2();
         if(!tzId.empty) // there could be null entries from previously released versions
-            tz = ZoneId.of(tzId);
+            tz = ZoneRegion.of(tzId);
         
         ScheduleBuilder sb = CalendarIntervalScheduleBuilder.calendarIntervalSchedule()
-            .withInterval(props.getInt1(), IntervalUnit.valueOf(props.getString1()))
+            .withInterval(props.getInt1(), to!(IntervalUnit)(props.getString1()))
             .inTimeZone(tz)
             .preserveHourOfDayAcrossDaylightSavings(props.isBoolean1())
             .skipDayIfHourDoesNotExist(props.isBoolean2());
