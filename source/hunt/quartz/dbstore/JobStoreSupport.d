@@ -1355,7 +1355,6 @@ abstract class JobStoreSupport : JobStore {
      * @see #replaceTrigger(Connection, TriggerKey, OperableTrigger)
      */
     private bool deleteTriggerAndChildren(Connection conn, TriggerKey key) {
-
         return (getDelegate().deleteTrigger(conn, key) > 0);
     }
     

@@ -654,7 +654,7 @@ class StdDbDelegate : DriverDelegate {
      */
     int deleteJobDetail(Connection conn, JobKey jobKey) {
         version(HUNT_DEBUG) {
-            trace("Deleting job: " ~ jobKey.toString());
+            info("Deleting job: " ~ jobKey.toString());
         }
 
         EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.DELETE_JOB_DETAIL));
@@ -1340,7 +1340,7 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteBlobTrigger(Connection conn, TriggerKey triggerKey) {
-        EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.DELETE_BLOB_TRIGGER));
+        EqlQuery!(BlobTriggers) query = conn.createQuery!(BlobTriggers)(rtp(StdSqlConstants.DELETE_BLOB_TRIGGER));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
         return query.exec();
@@ -1356,6 +1356,10 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteTrigger(Connection conn, TriggerKey triggerKey) {
+        version(HUNT_DEBUG) infof("Deleting trigger: %s", triggerKey.toString());
+
+        deleteTriggerExtension(conn, triggerKey);
+
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.DELETE_TRIGGER));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
@@ -1428,12 +1432,14 @@ class StdDbDelegate : DriverDelegate {
     JobDetail selectJobForTrigger(Connection conn, 
             TriggerKey triggerKey, bool loadJobClass) {
         
-        EqlQuery!(JobDetails, Triggers) query = conn.createQuery!(JobDetails, Triggers)(rtp2(StdSqlConstants.SELECT_JOB_FOR_TRIGGER));
+        EqlQuery!(JobDetails, Triggers) query = conn.createQuery!(JobDetails, Triggers)
+            (rtp2(StdSqlConstants.SELECT_JOB_FOR_TRIGGER));
+
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
 
         ResultSet rs = query.getNativeResult();
-        if(rs is null) {
+        if(rs.empty) {
            version(HUNT_DEBUG) {
                 trace("No job for trigger '" ~ triggerKey.toString() ~ "'.");
             }

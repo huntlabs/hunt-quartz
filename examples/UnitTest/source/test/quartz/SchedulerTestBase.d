@@ -103,7 +103,8 @@ class SchedulerTestBase {
 
         sched.scheduleJob(job, trigger);
         
-        assertTrue("Expected existence of trigger named 't1' but checkExists return false.", sched.checkExists(triggerKey("t1")));
+        assertTrue("Expected existence of trigger named 't1' but checkExists return false.", 
+            sched.checkExists(triggerKey("t1")));
 
         job = sched.getJobDetail(jobKey("j1"));
 
@@ -153,7 +154,8 @@ class SchedulerTestBase {
         assertTrue("Trigger group list size expected to be = 2 ", triggerGroups.size() == 2);
         
         Set!(JobKey) jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals(JobKey.DEFAULT_GROUP));
-        Set!(TriggerKey) triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
+        Set!(TriggerKey) triggerKeys = 
+            sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
 
         assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1);
         assertTrue("Number of triggers expected in default group was 1 ", triggerKeys.size() == 1);
@@ -216,22 +218,27 @@ class SchedulerTestBase {
         assertTrue("Size of paused trigger groups list expected to be 0 ", pausedGroups.size() == 0);
 
         
-        assertFalse("Scheduler should have returned 'false' from attempt to unschedule non-existing trigger. ", sched.unscheduleJob(triggerKey("foasldfksajdflk")));
+        assertFalse("Scheduler should have returned 'false' from attempt to unschedule non-existing trigger. ", 
+            sched.unscheduleJob(triggerKey("foasldfksajdflk")));
 
-        assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", sched.unscheduleJob(triggerKey("t3", "g1")));
+        assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", 
+            sched.unscheduleJob(triggerKey("t3", "g1")));
         
         jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals("g1"));
         triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals("g1"));
 
-        assertTrue("Number of jobs expected in 'g1' group was 1 ", jobKeys.size() == 2); // job should have been deleted also, because it is non-durable
+        // job should have been deleted also, because it is non-durable
+        assertTrue("Number of jobs expected in 'g1' group was 1 ", jobKeys.size() == 2); 
         assertTrue("Number of triggers expected in 'g1' group was 1 ", triggerKeys.size() == 2);
 
-        assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", sched.unscheduleJob(triggerKey("t1")));
+        assertTrue("Scheduler should have returned 'true' from attempt to unschedule existing trigger. ", 
+            sched.unscheduleJob(triggerKey("t1")));
         
         jobKeys = sched.getJobKeys(GroupMatcherHelper.jobGroupEquals(JobKey.DEFAULT_GROUP));
         triggerKeys = sched.getTriggerKeys(GroupMatcherHelper.triggerGroupEquals(TriggerKey.DEFAULT_GROUP));
 
-        assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1); // job should have been left in place, because it is non-durable
+        // job should have been left in place, because it is non-durable
+        assertTrue("Number of jobs expected in default group was 1 ", jobKeys.size() == 1); 
         assertTrue("Number of triggers expected in default group was 0 ", triggerKeys.size() == 0);
 
         sched.shutdown(true);
