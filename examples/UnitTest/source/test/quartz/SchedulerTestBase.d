@@ -67,14 +67,18 @@ class SchedulerTestBase {
         Scheduler sched = createScheduler("testBasicStorageFunctions", 2);
 
         // test basic storage functions of scheduler...
+        info("Cleanup test data....");
+        sched.deleteJob(jobKey("j1"));
+        sched.deleteJob(jobKey("j2", "g1"));
+        sched.deleteJob(jobKey("j3", "g1"));
+        sched.deleteJob(jobKey("j4", "g1"));
+        info("Cleanup done.");
         
         JobDetail job = JobBuilder.newJob()
             .ofType(typeid(TestJob))
             .withIdentity("j1")
             .storeDurably()
             .build();
-
-        // sched.deleteJob(jobKey("j1"));
 
         assertFalse("Unexpected existence of job named 'j1'.", 
             sched.checkExists(jobKey("j1")));
@@ -113,6 +117,7 @@ class SchedulerTestBase {
         trigger = sched.getTrigger(triggerKey("t1"));
 
         assertNotNull("Stored trigger not found!", trigger);
+
 
         job = JobBuilder.newJob()
             .ofType(typeid(TestJob))
