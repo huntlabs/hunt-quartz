@@ -2,10 +2,14 @@
 	"name": "unittest",
 	"description": "All the unit tests for hunt-quartz.",
 	"copyright": "Copyright (C) 2018, HuntLabs.net",
-    "homepage": "https://www.huntlabs.net/",
+    "homepage": "https://www.huntlabs.net",
 	"license": "Apache-2.0",
 	"dependencies": {
+		"hunt-entity" : "~>2.3.2",
 		"hunt-quartz" :{"path": "../../"}
+	},
+	"subConfigurations": {
+		"hunt-entity": "postgresql"
 	},
 	"versions": [
 		"HUNT_DEBUG"

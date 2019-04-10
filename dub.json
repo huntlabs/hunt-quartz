@@ -1,12 +1,13 @@
+
 {
 	"name": "hunt-quartz",
-	"authors": ["HuntLabs.net"],
 	"description": "A job scheduling library for D based on Quartz.",
-	"copyright": "Copyright © 2018, HuntLabs.net",
+	"copyright": "Copyright © 2018-2019, HuntLabs.net",
+    "homepage": "https://www.huntlabs.net",
 	"license": "Apache-2.0",
 	"dependencies": {
-		"hunt" : {"path": "../hunt"},
-		"hunt-entity" : {"path": "../hunt-entity"},
-		"hunt-time" : {"path": "../hunt-time"}
+		"hunt": "~>1.2.0-rc.6",
+		"hunt-entity" : "~>2.3.2",
+		"hunt-time" : "~>1.0.0-beta.3"
 	}
 }
