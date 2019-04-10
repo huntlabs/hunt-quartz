@@ -26,6 +26,7 @@ import hunt.time.Instant;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 import hunt.util.Common;
+import hunt.util.Serialize;
 
 import std.datetime;
 
@@ -265,13 +266,6 @@ class BaseCalendar : QuartzCalendar, Cloneable {
         return LocalDateTime.of(endOfDay.getYear(), endOfDay.getMonthValue(), 
             endOfDay.getDayOfMonth, 23, 59, 59, 999*1000_000);
     }
-
-    ubyte[] serialize() {
-        implementationMissing(false);
-        return null;
-    }
-
-    void deserialize(ubyte[] data) {
-        implementationMissing(false);
-    }
+    
+    mixin SerializationMember!(typeof(this));
 }

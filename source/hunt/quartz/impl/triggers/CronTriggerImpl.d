@@ -38,6 +38,7 @@ import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 import hunt.time.ZoneOffset;
 import hunt.time.ZoneRegion;
+import hunt.util.Serialize;
 
 
 /**
@@ -846,14 +847,6 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         return (cronEx is null) ? null : cronEx.getTimeBefore(eTime);
     }
 
-    
-    ubyte[] serialize() {
-        implementationMissing(false);
-        return null;
-    }
-
-    void deserialize(ubyte[] data) {
-        implementationMissing(false);
-    }
+    mixin SerializationMember!(typeof(this));
 }
 

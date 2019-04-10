@@ -39,6 +39,7 @@ import hunt.time.Duration;
 import hunt.time.LocalTime;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;
+import hunt.util.Serialize;
 import hunt.util.Traits;
 
 import hunt.logging.ConsoleLogger;
@@ -950,14 +951,6 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         return copy;
     }
 
-
-    ubyte[] serialize() {
-        implementationMissing(false);
-        return null;
-    }
-
-    void deserialize(ubyte[] data) {
-        implementationMissing(false);
-    }
+    mixin SerializationMember!(typeof(this));
 
 }

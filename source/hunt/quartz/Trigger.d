@@ -63,7 +63,7 @@ import std.datetime;
  * 
  * @author James House
  */
-interface Trigger : Comparable!(Trigger), Serializable { // Serializable, Cloneable,     
+interface Trigger : Comparable!(Trigger), Serializable { // Cloneable,     
     
 
     /**

@@ -761,39 +761,31 @@ class StdDbDelegate : DriverDelegate {
         // TODO: Tasks pending completion -@zhangxueping at 4/1/2019, 4:48:23 PM
         // 
         implementationMissing(false);
-        // Map<?, ?> map = null;
-        // if (canUseProperties()) {
-        //     map = getMapFromProperties(rs);
-        // } else {
-        //     map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
-        // }
+        Map!(string, Object) map = null;
+        if (canUseProperties()) {
+            map = getMapFromProperties(j.jobData);
+        } else {
+            map = unserialize!(JobDataMap)(cast(byte[])j.jobData); //getObjectFromBlob(rs, COL_JOB_DATAMAP);
+        }
 
-        // if (null != map) {
-            // job.setJobDataMap(new JobDataMap(map));
-        // }
+        if (map !is null) {
+            job.setJobDataMap(new JobDataMap(map));
+        }
         return job;
     }
 
     /**
      * build Map from java.util.Properties encoding.
      */
-    // private Map<?, ?> getMapFromProperties(ResultSet rs) {
-    //     Map<?, ?> map;
-    //     InputStream is = (InputStream) getJobDataFromBlob(rs, COL_JOB_DATAMAP);
-    //     if(is is null) {
-    //         return null;
-    //     }
-    //     Properties properties = new Properties();
-    //     if (is !is null) {
-    //         try {
-    //             properties.load(is);
-    //         } finally {
-    //             is.close();
-    //         }
-    //     }
-    //     map = convertFromProperty(properties);
-    //     return map;
-    // }
+    private Map!(string, Object) getMapFromProperties(ubyte[] data) {
+        if(data is null) {
+            return null;
+        }
+
+        Properties properties = unserialize!(Properties)(cast(byte[])data);
+
+        return convertFromProperty(properties);
+    }
 
     /**
      * <p>
@@ -1033,7 +1025,7 @@ class StdDbDelegate : DriverDelegate {
         ubyte[] baos = null;
         if(updateJobData) {
             baos = serializeJobData(trigger.getJobDataMap());
-            implementationMissing(false);
+            // implementationMissing(false);
         }
                 
         int insertResult = 0;
@@ -1979,6 +1971,8 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDAR));
         query.setParameter(1, calendarName);
         Calendars r = query.getSingleResult();
+
+        version(HUNT_DEBUG) infof("try to select the calendar: ", calendarName);
         
         Calendar cal = null;
         if(r is null) {
@@ -2593,9 +2587,13 @@ class StdDbDelegate : DriverDelegate {
     /**
      * convert the JobDataMap into a list of properties
      */
-    // protected Map!(string, T) convertFromProperty(T)(Properties properties) {
-    //     return new HashMap!(string, Object)(properties);
-    // }
+    protected Map!(string, Object) convertFromProperty(Properties properties) {
+        Object[string] map;
+        foreach(string key, string value;  properties) {
+            map[key] = new String(value);
+        }
+        return new HashMap!(string, Object)(map);
+    }
 
     /**
      * convert the JobDataMap into a list of properties

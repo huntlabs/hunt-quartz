@@ -43,7 +43,7 @@ import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 import hunt.time.ZoneOffset;
 import hunt.time.ZoneRegion;
-// import std.datetime;
+import hunt.util.Serialize;
 
 import std.conv;
 
@@ -982,13 +982,5 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         return false;
     }
 
-
-    ubyte[] serialize() {
-        implementationMissing(false);
-        return null;
-    }
-
-    void deserialize(ubyte[] data) {
-        implementationMissing(false);
-    }
+    mixin SerializationMember!(typeof(this));
 }

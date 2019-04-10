@@ -292,7 +292,7 @@ struct StdSqlConstants {
             ~ " = ?";
 
     enum string UPDATE_TRIGGER_STATE = "UPDATE "
-            ~ ModelConstants.MODEL_TRIGGERS ~ " t SET " ~ ModelConstants.FIELD_TRIGGER_STATE
+            ~ ModelConstants.MODEL_TRIGGERS ~ " t SET t." ~ ModelConstants.FIELD_TRIGGER_STATE
             ~ " = ?" ~ " WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ " = ? AND t."
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";

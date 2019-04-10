@@ -38,6 +38,7 @@ import hunt.Exceptions;
 import hunt.time.util.Calendar;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;
+import hunt.util.Serialize;
 
 import std.conv;
 
@@ -979,12 +980,5 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
     }
 
 
-    ubyte[] serialize() {
-        implementationMissing(false);
-        return null;
-    }
-
-    void deserialize(ubyte[] data) {
-        implementationMissing(false);
-    }
+    mixin SerializationMember!(typeof(this));
 }

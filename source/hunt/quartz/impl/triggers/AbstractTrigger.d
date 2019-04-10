@@ -37,6 +37,7 @@ import hunt.quartz.spi.OperableTrigger;
 import hunt.Exceptions;
 import hunt.time.LocalDateTime;
 import hunt.util.Traits;
+import hunt.util.Serialize;
 
 import std.array;
 import std.conv;
@@ -901,4 +902,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     }
 
     abstract ScheduleBuilder getScheduleBuilder(); // !(T)
+
+
+    mixin SerializationMember!(typeof(this));
 }
