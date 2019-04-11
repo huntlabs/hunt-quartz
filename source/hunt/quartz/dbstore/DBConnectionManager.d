@@ -17,12 +17,10 @@
 
 module hunt.quartz.dbstore.DBConnectionManager;
 
-// import hunt.quartz.dbstore.ConnectionProvider;
-
-import hunt.Exceptions;
 import hunt.collection.HashMap;
-
 import hunt.entity;
+import hunt.Exceptions;
+import hunt.logging.ConsoleLogger;
 
 alias Connection = EntityManager;
 
@@ -111,14 +109,8 @@ class DBConnectionManager {
      *              given name.
      */
     Connection getConnection(string dsName, EntityOption option) {
-        // ConnectionProvider provider = providers.get(dsName);
-        // if (provider is null) {
-        //     throw new SQLException("There is no DataSource named '"
-        //             ~ dsName ~ "'");
-        // }
-
-        // return provider.getConnection();
         if (em is null) {
+            version(HUNT_DEBUG) info("creating EntityManager for " ~ dsName);
             EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("postgresql",
                     option);
             em = entityManagerFactory.createEntityManager();
@@ -126,7 +118,7 @@ class DBConnectionManager {
         return em;
     }
 
-    private EntityManager em;
+    private static EntityManager em;
 
     /**
      * Get the class instance.
