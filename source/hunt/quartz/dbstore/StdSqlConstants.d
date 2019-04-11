@@ -53,22 +53,19 @@ struct StdSqlConstants {
     // QUERIES
     enum string UPDATE_TRIGGER_STATES_FROM_OTHER_STATES = "UPDATE "
             ~ ModelConstants.MODEL_TRIGGERS
-            ~ " t SET t."
-            ~ ModelConstants.FIELD_TRIGGER_STATE
-            ~ " = ?"
-            ~ " t WHERE t."
-            ~ ModelConstants.FIELD_SCHEDULER_NAME 
+            ~ " t SET t." ~ ModelConstants.FIELD_TRIGGER_STATE
+            ~ " = ? WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME 
             ~ " = " ~ SCHED_NAME_SUBST ~ " AND (t."
             ~ ModelConstants.FIELD_TRIGGER_STATE
-            ~ " = ? OR t."
-            ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?)";
+            ~ " = ? OR t." ~ ModelConstants.FIELD_TRIGGER_STATE ~ " = ?)";
 
     enum string SELECT_MISFIRED_TRIGGERS = "SELECT * FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t."
         ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
         ~ " AND NOT (t." ~ ModelConstants.FIELD_MISFIRE_INSTRUCTION ~ " = " 
         ~ to!string(Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY) ~ ") AND t." 
         ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " < ? "
-        ~ "ORDER BY t." ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ " ASC, t." ~ ModelConstants.FIELD_PRIORITY ~ " DESC";
+        ~ "ORDER BY t." ~ ModelConstants.FIELD_NEXT_FIRE_TIME ~ 
+        " ASC, t." ~ ModelConstants.FIELD_PRIORITY ~ " DESC";
     
     enum string SELECT_TRIGGERS_IN_STATE = "SELECT t."
             ~ ModelConstants.FIELD_TRIGGER_NAME ~ ", t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " FROM "
@@ -116,8 +113,8 @@ struct StdSqlConstants {
 
 
     enum string DELETE_FIRED_TRIGGERS = "DELETE FROM "
-            ~ ModelConstants.MODEL_FIRED_TRIGGERS
-            ~ " t WHERE t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
+            ~ ModelConstants.MODEL_FIRED_TRIGGERS ~ " t WHERE t." 
+            ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;
             
     enum string INSERT_JOB_DETAIL = "INSERT INTO "
             ~ ModelConstants.MODEL_JOB_DETAILS ~ " t (t." 
@@ -126,7 +123,8 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_JOB_CLASS ~ ", t." ~ ModelConstants.FIELD_IS_DURABLE ~ ", t." 
             ~ ModelConstants.FIELD_IS_NONCONCURRENT ~  ", t." ~ ModelConstants.FIELD_IS_UPDATE_DATA ~ ", t." 
             ~ ModelConstants.FIELD_REQUESTS_RECOVERY ~ ", t."
-            ~ ModelConstants.FIELD_JOB_DATAMAP ~ ") " ~ " VALUES(" ~ SCHED_NAME_SUBST ~ ", ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ~ ModelConstants.FIELD_JOB_DATAMAP ~ ") " 
+            ~ " VALUES(" ~ SCHED_NAME_SUBST ~ ", ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     enum string UPDATE_JOB_DETAIL = "UPDATE "
             ~ ModelConstants.MODEL_JOB_DETAILS ~ " t SET t."

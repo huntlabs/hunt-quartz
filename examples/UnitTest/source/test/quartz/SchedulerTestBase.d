@@ -249,49 +249,49 @@ class SchedulerTestBase {
     //     sched.shutdown(true);
     // }
     
-    @Test
-    void testDurableStorageFunctions(){
-        Scheduler sched = createScheduler("testDurableStorageFunctions", 2);
-        info("Cleanup test data....");
-        sched.deleteJob(jobKey("j1"));
-        sched.deleteJob(jobKey("j2"));
-        info("Cleanup done.");
+    // @Test
+    // void testDurableStorageFunctions(){
+    //     Scheduler sched = createScheduler("testDurableStorageFunctions", 2);
+    //     info("Cleanup test data....");
+    //     sched.deleteJob(jobKey("j1"));
+    //     sched.deleteJob(jobKey("j2"));
+    //     info("Cleanup done.");
 
-        try {
-            // test basic storage functions of scheduler...
+    //     try {
+    //         // test basic storage functions of scheduler...
 
-            JobDetail job = JobBuilder.newJob()
-                    .ofType(typeid(TestJob))
-                    .withIdentity("j1")
-                    .storeDurably()
-                    .build();
+    //         JobDetail job = JobBuilder.newJob()
+    //                 .ofType(typeid(TestJob))
+    //                 .withIdentity("j1")
+    //                 .storeDurably()
+    //                 .build();
 
-            assertFalse("Unexpected existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+    //         assertFalse("Unexpected existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
 
-            sched.addJob(job, false);
+    //         sched.addJob(job, false);
 
-            assertTrue("Unexpected non-existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
+    //         assertTrue("Unexpected non-existence of job named 'j1'.", sched.checkExists(jobKey("j1")));
 
-            JobDetail nonDurableJob = JobBuilder.newJob()
-                    .ofType(typeid(TestJob))
-                    .withIdentity("j2")
-                    .build();
+    //         JobDetail nonDurableJob = JobBuilder.newJob()
+    //                 .ofType(typeid(TestJob))
+    //                 .withIdentity("j2")
+    //                 .build();
 
-            try {
-                sched.addJob(nonDurableJob, false);
-                fail("Storage of non-durable job should not have succeeded.");
-            }
-            catch(SchedulerException expected) {
-                assertFalse("Unexpected existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
-            }
+    //         try {
+    //             sched.addJob(nonDurableJob, false);
+    //             fail("Storage of non-durable job should not have succeeded.");
+    //         }
+    //         catch(SchedulerException expected) {
+    //             assertFalse("Unexpected existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
+    //         }
 
-            sched.addJob(nonDurableJob, false, true);
+    //         sched.addJob(nonDurableJob, false, true);
 
-            assertTrue("Unexpected non-existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
-        } finally {
-            sched.shutdown(true);
-        }
-    }
+    //         assertTrue("Unexpected non-existence of job named 'j2'.", sched.checkExists(jobKey("j2")));
+    //     } finally {
+    //         sched.shutdown(true);
+    //     }
+    // }
 
     // // @Test
     // // void testShutdownWithSleepReturnsAfterAllThreadsAreStopped(){
@@ -354,6 +354,8 @@ class SchedulerTestBase {
         
     //     Thread.yield();
         
+    //     sched.deleteJob(jobKey("job1"));
+
 	// 	JobDetail job1 = JobBuilder.newJob(typeid(TestJobWithSync)).withIdentity("job1").build();
 	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger().forJob(job1).build(); 
 	// 	long sTime = DateTimeHelper.currentTimeMillis();
@@ -487,42 +489,44 @@ class SchedulerTestBase {
     // }
     
 
-    // @Test
-    // void testShutdownWithWaitIsClean(){
-    //     shared bool shutdown = false;
-    //     List!(long) jobExecTimestamps = new ArrayList!(long)(); // Collections.synchronizedList(new ArrayList!(long)());
-    //     Barrier barrier = new Barrier(2);
-    //     Scheduler scheduler = createScheduler("testShutdownWithWaitIsClean", 8);
-    //     try {
-    //         scheduler.getContext().put(BARRIER, barrier);
-    //         scheduler.getContext().put(DATE_STAMPS, cast(Object)jobExecTimestamps);
-    //         scheduler.start();
-    //         scheduler.addJob(JobBuilder.newJob().ofType(typeid(TestJobWithSync))
-    //             .withIdentity("job").storeDurably().build(), false);
-    //         scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
-    //         while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
-    //             Thread.sleep(50.msecs);
-    //         }
-    //     } finally {
-    //         Thread t = new class ThreadEx {
-    //             override
-    //             void run() {
-    //                 try {
-    //                     scheduler.shutdown(true);
-    //                     atomicStore(shutdown, true);
-    //                 } catch (SchedulerException ex) {
-    //                     throw new RuntimeException(ex);
-    //                 }
-    //             }
-    //         };
-    //         t.start();
-    //         Thread.sleep(1000.msecs);
-    //         assertFalse(shutdown);
-    //         barrier.wait();
-    //         // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    //         t.join();
-    //     }
-    // }    
+    @Test
+    void testShutdownWithWaitIsClean(){
+        shared bool shutdown = false;
+        List!(long) jobExecTimestamps = new ArrayList!(long)(); // Collections.synchronizedList(new ArrayList!(long)());
+        Barrier barrier = new Barrier(2);
+        Scheduler scheduler = createScheduler("testShutdownWithWaitIsClean", 8);
+        try {
+            scheduler.deleteJob(jobKey("job"));
+
+            scheduler.getContext().put(BARRIER, barrier);
+            scheduler.getContext().put(DATE_STAMPS, cast(Object)jobExecTimestamps);
+            scheduler.start();
+            scheduler.addJob(JobBuilder.newJob().ofType(typeid(TestJobWithSync))
+                .withIdentity("job").storeDurably().build(), false);
+            scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
+            while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
+                Thread.sleep(50.msecs);
+            }
+        } finally {
+            Thread t = new class ThreadEx {
+                override
+                void run() {
+                    try {
+                        scheduler.shutdown(true);
+                        atomicStore(shutdown, true);
+                    } catch (SchedulerException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            };
+            t.start();
+            // Thread.sleep(1000.msecs);
+            assertFalse(shutdown);
+            barrier.wait();
+            // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            t.join();
+        }
+    }    
 }
 
 

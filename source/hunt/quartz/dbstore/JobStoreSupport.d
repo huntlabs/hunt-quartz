@@ -903,7 +903,8 @@ abstract class JobStoreSupport : JobStore {
                     TableConstants.STATE_WAITING, TableConstants.STATE_ACQUIRED, TableConstants.STATE_BLOCKED);
 
             rows += getDelegate().updateTriggerStatesFromOtherStates(conn,
-                        TableConstants.STATE_PAUSED, TableConstants.STATE_PAUSED_BLOCKED, TableConstants.STATE_PAUSED_BLOCKED);
+                        TableConstants.STATE_PAUSED, TableConstants.STATE_PAUSED_BLOCKED, 
+                        TableConstants.STATE_PAUSED_BLOCKED);
             
             trace("Freed " ~ rows.to!string() ~ " triggers from 'acquired' / 'blocked' state.");
 
@@ -930,15 +931,16 @@ abstract class JobStoreSupport : JobStore {
             foreach(TriggerKey ct; cts) {
                 removeTrigger(conn, ct);
             }
-            trace(
-                "Removed " ~ cts.size().to!string() ~ " 'complete' triggers.");
+            trace("Removed " ~ cts.size().to!string() ~ " 'complete' triggers.");
             
             // clean up any fired trigger entries
             int n = getDelegate().deleteFiredTriggers(conn);
             trace("Removed " ~ n.to!string() ~ " stale fired job entries.");
         } catch (JobPersistenceException e) {
+            warning(e.msg);
             throw e;
         } catch (Exception e) {
+            warning(e.msg);
             throw new JobPersistenceException("Couldn't recover jobs: "
                     ~ e.msg, e);
         }

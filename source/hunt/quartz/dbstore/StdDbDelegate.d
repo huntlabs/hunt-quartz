@@ -484,12 +484,14 @@ class StdDbDelegate : DriverDelegate {
      * @return the number of rows deleted
      */
     int deleteFiredTriggers(Connection conn) {
-        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_FIRED_TRIGGERS));
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(
+            rtp(StdSqlConstants.DELETE_FIRED_TRIGGERS));
         return query.exec();
     }
 
     int deleteFiredTriggers(Connection conn, string theInstanceId) {
-        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.DELETE_INSTANCES_FIRED_TRIGGERS));
+        EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(
+            rtp(StdSqlConstants.DELETE_INSTANCES_FIRED_TRIGGERS));
         query.setParameter(1, theInstanceId);
         return query.exec();
     }
