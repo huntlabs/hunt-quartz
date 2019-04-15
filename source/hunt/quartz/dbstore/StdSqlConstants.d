@@ -530,7 +530,7 @@ struct StdSqlConstants {
     
     
     enum string INSERT_FIRED_TRIGGER = "INSERT INTO "
-            ~ ModelConstants.MODEL_FIRED_TRIGGERS ~ "t (t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ ", t." 
+            ~ ModelConstants.MODEL_FIRED_TRIGGERS ~ " t (t." ~ ModelConstants.FIELD_SCHEDULER_NAME ~ ", t." 
             ~ ModelConstants.FIELD_ENTRY_ID ~ ", t." ~ ModelConstants.FIELD_TRIGGER_NAME ~ ", t." 
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ ", t." ~ ModelConstants.FIELD_INSTANCE_NAME ~ ", t."
             ~ ModelConstants.FIELD_FIRED_TIME ~ ", t." ~ ModelConstants.FIELD_SCHED_TIME ~ ", t." 

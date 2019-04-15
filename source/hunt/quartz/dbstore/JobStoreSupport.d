@@ -76,6 +76,7 @@ import core.atomic;
 import core.thread;
 import core.time;
 
+import std.array;
 import std.algorithm;
 import std.conv;
 import std.datetime;
@@ -951,7 +952,7 @@ abstract class JobStoreSupport : JobStore {
         if (misfireThreshold > 0) {
             misfireTime -= misfireThreshold;
         }
-        version(HUNT_DEBUG) tracef("misfireTime: %d", misfireTime);
+        // version(HUNT_DEBUG) tracef("misfireTime: %d", misfireTime);
         return (misfireTime > 0) ? misfireTime : 0;
     }
     
@@ -1515,7 +1516,6 @@ abstract class JobStoreSupport : JobStore {
     
     protected OperableTrigger retrieveTrigger(Connection conn, TriggerKey key) {
         try {
-
             return getDelegate().selectTrigger(conn, key);
         } catch (Exception e) {
             throw new JobPersistenceException("Couldn't retrieve trigger: "
@@ -2741,6 +2741,9 @@ abstract class JobStoreSupport : JobStore {
         } else {
             lockName = null;
         }
+        version(HUNT_DEBUG) {
+            tracef("remaining triggers: "); 
+        }  
         return executeInNonManagedTXLock(lockName, 
                 new class TransactionCallback!(List!(OperableTrigger)) {
                     List!(OperableTrigger) execute(Connection conn) {
@@ -2750,7 +2753,9 @@ abstract class JobStoreSupport : JobStore {
                 new class TransactionValidator!(List!(OperableTrigger)) {
                     bool validate(Connection conn, List!(OperableTrigger) result) {
                         try {
-                            List!(FiredTriggerRecord) acquired = getDelegate().selectInstancesFiredTriggerRecords(conn, getInstanceId());
+                            List!(FiredTriggerRecord) acquired = 
+                                getDelegate().selectInstancesFiredTriggerRecords(conn, getInstanceId());
+
                             Set!(string) fireInstanceIds = new HashSet!(string)();
                             foreach(FiredTriggerRecord ft ; acquired) {
                                 fireInstanceIds.add(ft.getFireInstanceId());
@@ -2770,7 +2775,9 @@ abstract class JobStoreSupport : JobStore {
     
     // FUTURE_TODO: this really ought to return something like a FiredTriggerBundle,
     // so that the fireInstanceId doesn't have to be on the trigger...
-    protected List!(OperableTrigger) acquireNextTrigger(Connection conn, long noLaterThan, int maxCount, long timeWindow) {
+    protected List!(OperableTrigger) acquireNextTrigger(Connection conn, 
+        long noLaterThan, int maxCount, long timeWindow) {
+
         if (timeWindow < 0) {
           throw new IllegalArgumentException();
         }
@@ -2780,21 +2787,29 @@ abstract class JobStoreSupport : JobStore {
         int MAX_DO_LOOP_RETRY = 3;
         int currentLoopCount = 0;
         do {
-            currentLoopCount ++;
+            currentLoopCount++;
+
+            version(HUNT_DEBUG) {
+                tracef("currentLoopCount=%d", currentLoopCount);
+            }
             try {
                 List!(TriggerKey) keys = getDelegate().selectTriggerToAcquire(conn, 
                     noLaterThan + timeWindow, getMisfireTime(), maxCount);
                 
                 // No trigger is ready to fire yet.
-                if (keys is null || keys.size() == 0)
+                if (keys is null || keys.size() == 0) {
                     return acquiredTriggers;
+                }
 
                 long batchEnd = noLaterThan;
+
+                tracef("TriggerKey size: %d, batchEnd=%d", keys.size(), batchEnd);
 
                 foreach(TriggerKey triggerKey; keys) {
                     // If our trigger is no longer available, try a new one.
                     OperableTrigger nextTrigger = retrieveTrigger(conn, triggerKey);
                     if(nextTrigger is null) {
+                        version(HUNT_DEBUG) trace("nextTrigger is null");
                         continue; // next trigger
                     }
                     
@@ -2822,15 +2837,20 @@ abstract class JobStoreSupport : JobStore {
                         }
                     }
                     
-                    if (nextTrigger.getNextFireTime().toEpochMilli() > batchEnd) {
+                    long nextEpochMilli = nextTrigger.getNextFireTime().toEpochMilli();
+                    version(HUNT_DEBUG) infof("nextEpochMilli=%d, batchEnd=%d", nextEpochMilli, batchEnd);
+                    if (nextEpochMilli > batchEnd) {
                       break;
                     }
                     // We now have a acquired trigger, let's add to return list.
                     // If our trigger was no longer in the expected state, try a new one.
-                    int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, triggerKey, TableConstants.STATE_ACQUIRED, TableConstants.STATE_WAITING);
+                    int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, 
+                        triggerKey, TableConstants.STATE_ACQUIRED, TableConstants.STATE_WAITING);
+                    version(HUNT_DEBUG) infof("rowsUpdated:%d", rowsUpdated);
                     if (rowsUpdated <= 0) {
                         continue; // next trigger
                     }
+
                     nextTrigger.setFireInstanceId(getFiredTriggerRecordId());
                     getDelegate().insertFiredTrigger(conn, nextTrigger, TableConstants.STATE_ACQUIRED, null);
 
@@ -3461,7 +3481,7 @@ abstract class JobStoreSupport : JobStore {
                                                 ~ "_"
                                                 ~ to!string(recoverIds++),
                                         Scheduler.DEFAULT_RECOVERY_GROUP,
-                                        LocalDateTime.ofEpochSecond(ftRec.getScheduleTimestamp(), 0, ZoneOffset.UTC));
+                                        LocalDateTime.ofEpochMilli(ftRec.getScheduleTimestamp()));
                                 rcvryTrig.setJobName(jKey.getName());
                                 rcvryTrig.setJobGroup(jKey.getGroup());
                                 rcvryTrig.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY);
@@ -3727,7 +3747,8 @@ abstract class JobStoreSupport : JobStore {
         bool transOwner = false;
         Connection conn = null;
         try {
-            if (lockName !is null) {
+
+            if (!lockName.empty()) {
                 // If we aren't using db locks, then delay getting DB connection 
                 // until after acquiring the lock since it isn't needed.
                 if (getLockHandler().requiresConnection()) {
@@ -3754,7 +3775,6 @@ abstract class JobStoreSupport : JobStore {
                     signalSchedulingChangeImmediately(sigTime);
                 }
             } else {
-            
                 T result = txCallback.execute(conn);
                 try {
                     commitConnection(conn);

@@ -456,7 +456,7 @@ class StdDbDelegate : DriverDelegate {
             
             SimpleTriggerImpl rcvryTrig = new SimpleTriggerImpl("recover_"
                     ~ instanceId ~ "_" ~ to!string(dumId++),
-                    Scheduler.DEFAULT_RECOVERY_GROUP, LocalDateTime.ofEpochSecond(scheduledTime, 0, ZoneOffset.UTC));
+                    Scheduler.DEFAULT_RECOVERY_GROUP, LocalDateTime.ofEpochMilli(scheduledTime));
             rcvryTrig.setJobName(jobName);
             rcvryTrig.setJobGroup(jobGroup);
             rcvryTrig.setPriority(priority);
@@ -1553,17 +1553,17 @@ class StdDbDelegate : DriverDelegate {
 
         LocalDateTime nft = null;
         if (nextFireTime > 0) {
-            nft = LocalDateTime.ofEpochSecond(nextFireTime, 0, ZoneOffset.UTC);
+            nft = LocalDateTime.ofEpochMilli(nextFireTime);
         }
 
         LocalDateTime pft = null;
         if (prevFireTime > 0) {
-            pft = LocalDateTime.ofEpochSecond(prevFireTime, 0, ZoneOffset.UTC);
+            pft = LocalDateTime.ofEpochMilli(prevFireTime);
         }
-        LocalDateTime startTimeD = LocalDateTime.ofEpochSecond(startTime, 0, ZoneOffset.UTC);
+        LocalDateTime startTimeD = LocalDateTime.ofEpochMilli(startTime);
         LocalDateTime endTimeD = null;
         if (endTime > 0) {
-            endTimeD = LocalDateTime.ofEpochSecond(endTime, 0, ZoneOffset.UTC);
+            endTimeD = LocalDateTime.ofEpochMilli(endTime);
         }
 
         OperableTrigger trigger = null;
@@ -1742,7 +1742,7 @@ class StdDbDelegate : DriverDelegate {
 
             LocalDateTime nft = null;
             if (nextFireTime > 0) {
-                nft = LocalDateTime.ofEpochSecond(nextFireTime, 0, ZoneOffset.UTC);
+                nft = LocalDateTime.ofEpochMilli(nextFireTime);
             }
 
             status = new TriggerStatus(state, nft);

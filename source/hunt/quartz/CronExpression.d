@@ -24,6 +24,7 @@ import hunt.String;
 // import hunt.time.util.Calendar;
 import hunt.time.util.Locale;
 import hunt.time.DayOfWeek;
+import hunt.time.Duration;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 import hunt.time.ZoneRegion;
@@ -378,14 +379,12 @@ final class CronExpression : Cloneable { // Serializable,
             if(newDate is null)
                 break;
             
-            difference = newDate.toEpochSecond(ZoneOffset.UTC) - lastDate.toEpochSecond(ZoneOffset.UTC);
-            
-            if (difference == 1) {
+		    Duration du = Duration.between(lastDate, newDate);
+            if (du.toSeconds() == 1) {
                 lastDate = newDate;
             }
         }
-        
-        return LocalDateTime.ofEpochSecond(lastDate.toEpochSecond(ZoneOffset.UTC) + 1, 0, ZoneOffset.UTC); // new LocalDateTime(lastDate.getTime() + 1000);
+        return lastDate.plusSeconds(1).withNano(0);
     }
     
     /**
