@@ -948,10 +948,10 @@ abstract class JobStoreSupport : JobStore {
 
     protected long getMisfireTime() {
         long misfireTime = DateTimeHelper.currentTimeMillis();
-        if (getMisfireThreshold() > 0) {
-            misfireTime -= getMisfireThreshold();
+        if (misfireThreshold > 0) {
+            misfireTime -= misfireThreshold;
         }
-
+        version(HUNT_DEBUG) tracef("misfireTime: %d", misfireTime);
         return (misfireTime > 0) ? misfireTime : 0;
     }
     
@@ -3171,12 +3171,11 @@ abstract class JobStoreSupport : JobStore {
             int misfireCount = (getDoubleCheckLockMisfireHandler()) ?
                 getDelegate().countMisfiredTriggersInState(
                     conn, TableConstants.STATE_WAITING, getMisfireTime()) : int.max;
-            
-            if (misfireCount == 0) {
-                trace("Found 0 triggers that missed their scheduled fire-time.");
-            } else {
+
+            tracef("Found %d triggers that missed their scheduled fire-time.", misfireCount);
+
+            if (misfireCount != 0) {
                 transOwner = getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
-                
                 result = recoverMisfiredJobs(conn, false);
             }
             

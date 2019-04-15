@@ -442,12 +442,6 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
             ~ " AND t." ~ ModelConstants.FIELD_TRIGGER_GROUP ~ " = ?";
 
-//     enum string SELECT_NUM_TRIGGERS_IN_GROUP = "SELECT COUNT(t."
-//             ~ TableConstants.COL_TRIGGER_NAME ~ ") " ~ " FROM " ~ TABLE_PREFIX_SUBST ~ TableConstants.TABLE_TRIGGERS ~ " WHERE " 
-//             ~ TableConstants.COL_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST
-//             ~ " AND " ~ TableConstants.COL_TRIGGER_GROUP ~ " = ?";
-           
-
     enum string SELECT_TRIGGER_GROUPS = "SELECT DISTINCT(t."
             ~ ModelConstants.FIELD_TRIGGER_GROUP ~ ") FROM " ~ ModelConstants.MODEL_TRIGGERS ~ " t WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST;

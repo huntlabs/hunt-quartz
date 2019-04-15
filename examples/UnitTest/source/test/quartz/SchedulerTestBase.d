@@ -84,12 +84,10 @@ class SchedulerTestBase {
     //         sched.checkExists(jobKey("j1")));
 
     //     sched.addJob(job, false); 
-
     //     assertTrue("Expected existence of job named 'j1' but checkExists return false.", 
     //         sched.checkExists(jobKey("j1")));
 
     //     job = sched.getJobDetail(jobKey("j1"));
-
     //     assertNotNull("Stored job not found!", job);
         
     //     sched.deleteJob(jobKey("j1"));
@@ -111,11 +109,9 @@ class SchedulerTestBase {
     //         sched.checkExists(triggerKey("t1")));
 
     //     job = sched.getJobDetail(jobKey("j1"));
-
     //     assertNotNull("Stored job not found!", job);
         
     //     trigger = sched.getTrigger(triggerKey("t1"));
-
     //     assertNotNull("Stored trigger not found!", trigger);
 
 
@@ -461,72 +457,73 @@ class SchedulerTestBase {
 	// 	sched.shutdown(true);
 	// }
     
-    // @Test
-    // void testShutdownWithoutWaitIsUnclean(){
-    //     Barrier barrier = new Barrier(2);
-    //     Scheduler scheduler = createScheduler("testShutdownWithoutWaitIsUnclean", 8);
-    //     try {
-    //         scheduler.getContext().put(BARRIER, barrier);
-    //         scheduler.start();
-
-    //         scheduler.addJob(JobBuilder.newJob().ofType(typeid(UncleanShutdownJob))
-    //             .withIdentity("job").storeDurably().build(), false);
-
-    //         scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
-    //         while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
-    //             Thread.sleep(50.msecs);
-    //         }
-    //     } finally {
-    //         scheduler.shutdown(false);
-    //     }
-        
-    //     barrier.wait();
-    //     // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        
-    //     Thread jobThread = cast(Thread) scheduler.getContext().get(JOB_THREAD);
-    //     jobThread.join();
-    //     // jobThread.join(TimeUnit.SECONDS.toMillis(TEST_TIMEOUT_SECONDS));
-    // }
-    
-
     @Test
-    void testShutdownWithWaitIsClean(){
-        shared bool shutdown = false;
-        List!(long) jobExecTimestamps = new ArrayList!(long)(); // Collections.synchronizedList(new ArrayList!(long)());
+    void testShutdownWithoutWaitIsUnclean(){
         Barrier barrier = new Barrier(2);
-        Scheduler scheduler = createScheduler("testShutdownWithWaitIsClean", 8);
+        Scheduler scheduler = createScheduler("testShutdownWithoutWaitIsUnclean", 8);
         try {
             scheduler.deleteJob(jobKey("job"));
-
             scheduler.getContext().put(BARRIER, barrier);
-            scheduler.getContext().put(DATE_STAMPS, cast(Object)jobExecTimestamps);
             scheduler.start();
-            scheduler.addJob(JobBuilder.newJob().ofType(typeid(TestJobWithSync))
+
+            scheduler.addJob(JobBuilder.newJob().ofType(typeid(UncleanShutdownJob))
                 .withIdentity("job").storeDurably().build(), false);
+
             scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
             while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
                 Thread.sleep(50.msecs);
             }
         } finally {
-            Thread t = new class ThreadEx {
-                override
-                void run() {
-                    try {
-                        scheduler.shutdown(true);
-                        atomicStore(shutdown, true);
-                    } catch (SchedulerException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            };
-            t.start();
-            // Thread.sleep(1000.msecs);
-            assertFalse(shutdown);
-            barrier.wait();
-            // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            t.join();
+            scheduler.shutdown(false);
         }
-    }    
+        
+        barrier.wait();
+        // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        
+        Thread jobThread = cast(Thread) scheduler.getContext().get(JOB_THREAD);
+        jobThread.join();
+        // jobThread.join(TimeUnit.SECONDS.toMillis(TEST_TIMEOUT_SECONDS));
+    }
+    
+
+    // @Test
+    // void testShutdownWithWaitIsClean(){
+    //     shared bool shutdown = false;
+    //     List!(long) jobExecTimestamps = new ArrayList!(long)(); // Collections.synchronizedList(new ArrayList!(long)());
+    //     Barrier barrier = new Barrier(2);
+    //     Scheduler scheduler = createScheduler("testShutdownWithWaitIsClean", 8);
+    //     try {
+    //         scheduler.deleteJob(jobKey("job"));
+
+    //         scheduler.getContext().put(BARRIER, barrier);
+    //         scheduler.getContext().put(DATE_STAMPS, cast(Object)jobExecTimestamps);
+    //         scheduler.start();
+    //         scheduler.addJob(JobBuilder.newJob().ofType(typeid(TestJobWithSync))
+    //             .withIdentity("job").storeDurably().build(), false);
+    //         scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
+    //         while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
+    //             Thread.sleep(50.msecs);
+    //         }
+    //     } finally {
+    //         Thread t = new class ThreadEx {
+    //             override
+    //             void run() {
+    //                 try {
+    //                     scheduler.shutdown(true);
+    //                     atomicStore(shutdown, true);
+    //                 } catch (SchedulerException ex) {
+    //                     throw new RuntimeException(ex);
+    //                 }
+    //             }
+    //         };
+    //         t.start();
+    //         // Thread.sleep(1000.msecs);
+    //         assertFalse(shutdown);
+    //         barrier.wait();
+    //         // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    //         // t.join();
+    //     }
+    // }    
 }
 
 

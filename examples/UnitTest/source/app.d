@@ -1,5 +1,5 @@
 import hunt.concurrency.thread;
-import hunt.logging;
+import hunt.logging.ConsoleLogger;
 import hunt.util.UnitTest;
 
 import std.stdio;
@@ -15,10 +15,8 @@ import test.quartz.DbSchedulerTest;
 
 import test.quartz.utils.PropertiesParserTest;
 
-
 void main()
 {
-
 	// testUnits!(AnnualCalendarTest);
 	// testUnits!(CronExpressionTest);
 	// testUnits!(CronTriggerTest);
