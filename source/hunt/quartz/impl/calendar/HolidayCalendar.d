@@ -117,11 +117,11 @@ class HolidayCalendar : BaseCalendar {
 
         // Get timestamp for 00:00:00
         LocalDateTime day = getStartOfDayJavaCalendar(timeStamp);
-        while (isTimeIncluded(day.toInstant(ZoneOffset.UTC).toEpochMilli()) == false) {
+        while (isTimeIncluded(day.toEpochMilli()) == false) {
             day = day.plusDays(1);
         }
 
-        return day.toInstant(ZoneOffset.UTC).toEpochMilli();
+        return day.toEpochMilli();
     }
 
     /**

@@ -156,7 +156,7 @@ class CronCalendar : BaseCalendar {
 
             LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(nextIncludedTime), getTimeZone());
             if (cronExpression.isSatisfiedBy(ldt)) {
-                nextIncludedTime = cronExpression.getNextInvalidTimeAfter(ldt).toInstant(ZoneOffset.UTC).toEpochMilli();
+                nextIncludedTime = cronExpression.getNextInvalidTimeAfter(ldt).toEpochMilli();
             } else if ((getBaseCalendar() !is null) && 
                     (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
                 nextIncludedTime = 

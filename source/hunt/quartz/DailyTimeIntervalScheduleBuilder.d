@@ -338,8 +338,8 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder { // !(DailyTimeInterva
         LocalDateTime today = LocalDateTime.now();
         LocalDateTime startTimeOfDayDate = startTimeOfDay.getTimeOfDayForDate(today);
         LocalDateTime maxEndTimeOfDayDate = TimeOfDay.hourMinuteAndSecondOfDay(23, 59, 59).getTimeOfDayForDate(today);
-        long remainingMillisInDay = maxEndTimeOfDayDate.toInstant(ZoneOffset.UTC).toEpochMilli() - 
-            startTimeOfDayDate.toInstant(ZoneOffset.UTC).toEpochMilli();
+        long remainingMillisInDay = maxEndTimeOfDayDate.toEpochMilli() - 
+            startTimeOfDayDate.toEpochMilli();
         long intervalInMillis;
         if (intervalUnit == IntervalUnit.SECOND)
             intervalInMillis = interval * 1000L;
@@ -362,8 +362,8 @@ class DailyTimeIntervalScheduleBuilder : ScheduleBuilder { // !(DailyTimeInterva
         long incrementInMillis = (count - 1) * intervalInMillis;
         LocalDateTime endTimeOfDayDate = startTimeOfDayDate.plusNanos(incrementInMillis * 1000_000);
         
-        long diffInMillis = endTimeOfDayDate.toInstant(ZoneOffset.UTC).toEpochMilli() - 
-            maxEndTimeOfDayDate.toInstant(ZoneOffset.UTC).toEpochMilli();
+        long diffInMillis = endTimeOfDayDate.toEpochMilli() - 
+            maxEndTimeOfDayDate.toEpochMilli();
 
         if (diffInMillis > 0)
             throw new IllegalArgumentException("The given count " ~ count.to!string() ~ 

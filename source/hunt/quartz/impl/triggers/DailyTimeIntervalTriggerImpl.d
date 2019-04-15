@@ -462,7 +462,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         if (instr == MISFIRE_INSTRUCTION_DO_NOTHING) {
             LocalDateTime newFireTime = getFireTimeAfter(LocalDateTime.now());
             while (newFireTime !is null && cal !is null
-                    && !cal.isTimeIncluded(newFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                    && !cal.isTimeIncluded(newFireTime.toEpochMilli())) {
                 newFireTime = getFireTimeAfter(newFireTime);
             }
             setNextFireTime(newFireTime);
@@ -493,7 +493,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         nextFireTime = getFireTimeAfter(nextFireTime);
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -525,7 +525,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         }
         
         LocalDateTime now = LocalDateTime.now();
-        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -538,7 +538,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
             }
 
             if(nextFireTime !is null && nextFireTime.isBefore(now)) {
-                long diff = now.toInstant(ZoneOffset.UTC).toEpochMilli() - nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+                long diff = now.toEpochMilli() - nextFireTime.toEpochMilli();
                 if(diff >= misfireThreshold) {
                     nextFireTime = getFireTimeAfter(nextFireTime);
                 }
@@ -570,7 +570,7 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
       
       // Check calendar for date-time exclusion
       while (nextFireTime !is null && calendar !is null
-              && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+              && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
           
           nextFireTime = getFireTimeAfter(nextFireTime);
           
@@ -679,8 +679,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         // b.Check to see if afterTime is after endTimeOfDay or not. If yes, then we need to advance to next day as well.
         bool afterTimePastEndTimeOfDay = false;
         if (endTimeOfDay !is null) {
-          afterTimePastEndTimeOfDay = afterTime.toInstant(ZoneOffset.UTC).toEpochMilli() > 
-            endTimeOfDay.getTimeOfDayForDate(afterTime).toInstant(ZoneOffset.UTC).toEpochMilli();
+          afterTimePastEndTimeOfDay = afterTime.toEpochMilli() > 
+            endTimeOfDay.getTimeOfDayForDate(afterTime).toEpochMilli();
         }
         // c. now we need to move move to the next valid day of week if either: 
         // the given time is past the end time of day, or given time is not on a valid day of week
@@ -704,8 +704,8 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
         
         // f. Continue to calculate the fireTime by incremental unit of intervals.
         // recall that if fireTime was less that fireTimeStartDate, we didn't get this far
-        long fireMillis = fireTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-        long startMillis = fireTimeStartDate.toInstant(ZoneOffset.UTC).toEpochMilli();
+        long fireMillis = fireTime.toEpochMilli();
+        long startMillis = fireTimeStartDate.toEpochMilli();
         long secondsAfterStart = (fireMillis - startMillis) / 1000L;
         long repeatLong = getRepeatInterval();
         LocalDateTime sTime = fireTimeStartDate;

@@ -500,7 +500,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT) {
             LocalDateTime newFireTime = getFireTimeAfter(LocalDateTime.now());
             while (newFireTime !is null && cal !is null
-                    && !cal.isTimeIncluded(newFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                    && !cal.isTimeIncluded(newFireTime.toEpochMilli())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
                 if(newFireTime is null)
@@ -515,7 +515,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT) {
             LocalDateTime newFireTime = getFireTimeAfter(LocalDateTime.now());
             while (newFireTime !is null && cal !is null
-                    && !cal.isTimeIncluded(newFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                    && !cal.isTimeIncluded(newFireTime.toEpochMilli())) {
                 newFireTime = getFireTimeAfter(newFireTime);
 
                 if(newFireTime is null)
@@ -589,7 +589,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         nextFireTime = getFireTimeAfter(nextFireTime);
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -619,7 +619,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         }
         
         LocalDateTime now = LocalDateTime.now();
-        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -632,7 +632,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             }
 
             if(nextFireTime !is null && nextFireTime.isBefore(now)) {
-                long diff = now.toInstant(ZoneOffset.UTC).toEpochMilli() - nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+                long diff = now.toEpochMilli() - nextFireTime.toEpochMilli();
                 if(diff >= misfireThreshold) {
                     nextFireTime = getFireTimeAfter(nextFireTime);
                 }
@@ -670,7 +670,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         }
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
             
             if(nextFireTime is null)
@@ -782,8 +782,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return getStartTime();
         }
 
-        // long startMillis = getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli();
-        // long afterMillis = afterTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+        // long startMillis = getStartTime().toEpochMilli();
+        // long afterMillis = afterTime.toEpochMilli();
 
         // long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
         Duration dur = Duration.between(getStartTime(), afterTime);        
@@ -831,7 +831,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             return 0;
         }
         
-        long time = end.toInstant(ZoneOffset.UTC).toEpochMilli() - start.toInstant(ZoneOffset.UTC).toEpochMilli();
+        long time = end.toEpochMilli() - start.toEpochMilli();
 
         return cast(int) (time / repeatInterval);
     }

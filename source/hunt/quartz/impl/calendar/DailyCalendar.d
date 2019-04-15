@@ -477,8 +477,8 @@ class DailyCalendar : BaseCalendar {
             return false;
         }
         
-        long startOfDayInMillis = getStartOfDayJavaCalendar(timeInMillis).toInstant(ZoneOffset.UTC).toEpochMilli();
-        long endOfDayInMillis = getEndOfDayJavaCalendar(timeInMillis).toInstant(ZoneOffset.UTC).toEpochMilli();
+        long startOfDayInMillis = getStartOfDayJavaCalendar(timeInMillis).toEpochMilli();
+        long endOfDayInMillis = getEndOfDayJavaCalendar(timeInMillis).toEpochMilli();
         long timeRangeStartingTimeInMillis = 
             getTimeRangeStartingTimeInMillis(timeInMillis);
         long timeRangeEndingTimeInMillis = 
@@ -545,7 +545,7 @@ class DailyCalendar : BaseCalendar {
                 } else if (nextIncludedTime > 
                         getTimeRangeEndingTimeInMillis(nextIncludedTime)) {
                     //(move to start of next day)
-                    nextIncludedTime = getEndOfDayJavaCalendar(nextIncludedTime).toInstant(ZoneOffset.UTC).toEpochMilli();
+                    nextIncludedTime = getEndOfDayJavaCalendar(nextIncludedTime).toEpochMilli();
                     nextIncludedTime++; 
                 } else if ((getBaseCalendar() !is null) && 
                         (!getBaseCalendar().isTimeIncluded(nextIncludedTime))){
@@ -574,7 +574,7 @@ class DailyCalendar : BaseCalendar {
         rangeStartingTime = LocalDateTime.of(rangeStartingTime.getYear(), rangeStartingTime.getMonthValue(), 
             rangeStartingTime.getDayOfMonth(), rangeStartingHourOfDay, rangeStartingMinute, 
             rangeStartingSecond, cast(int)(rangeStartingMillis * LocalTime.NANOS_PER_MILLI));
-        return rangeStartingTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+        return rangeStartingTime.toEpochMilli();
     }
 
     /**
@@ -591,7 +591,7 @@ class DailyCalendar : BaseCalendar {
         rangeEndingTime = LocalDateTime.of(rangeEndingTime.getYear(), rangeEndingTime.getMonthValue(), 
             rangeEndingTime.getDayOfMonth(), rangeEndingHourOfDay, rangeEndingMinute, 
             rangeEndingSecond, cast(int)(rangeEndingMillis * LocalTime.NANOS_PER_MILLI));
-        return rangeEndingTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+        return rangeEndingTime.toEpochMilli();
     }
 
     /**

@@ -492,7 +492,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         if (instr == MISFIRE_INSTRUCTION_DO_NOTHING) {
             LocalDateTime newFireTime = getFireTimeAfter(LocalDateTime.now());
             while (newFireTime !is null && cal !is null
-                    && !cal.isTimeIncluded(newFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                    && !cal.isTimeIncluded(newFireTime.toEpochMilli())) {
                 newFireTime = getFireTimeAfter(newFireTime);
             }
             setNextFireTime(newFireTime);
@@ -523,7 +523,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         nextFireTime = getFireTimeAfter(nextFireTime);
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -551,7 +551,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         }
         
         LocalDateTime now = LocalDateTime.now();
-        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -596,7 +596,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
         nextFireTime = getStartTime();
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             
             nextFireTime = getFireTimeAfter(nextFireTime);
             
@@ -692,9 +692,9 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
             afterTime = LocalDateTime.now();
         }
 
-        long startMillis = getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli();
-        long afterMillis = afterTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-        long endMillis = (getEndTime() is null) ? long.max : getEndTime().toInstant(ZoneOffset.UTC).toEpochMilli();
+        long startMillis = getStartTime().toEpochMilli();
+        long afterMillis = afterTime.toEpochMilli();
+        long endMillis = (getEndTime() is null) ? long.max : getEndTime().toEpochMilli();
 
         if (!ignoreEndTime && (endMillis <= afterMillis)) {
             return null;
@@ -846,7 +846,7 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
             }
         } // case of interval of a day or greater
         
-        if (!ignoreEndTime && (endMillis <= time.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+        if (!ignoreEndTime && (endMillis <= time.toEpochMilli())) {
             return null;
         }
 

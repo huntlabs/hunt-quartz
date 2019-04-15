@@ -100,7 +100,7 @@ class AnnualCalendar : BaseCalendar {
         }
 
          // Check baseCalendar first
-        if (!super.isTimeIncluded(day.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+        if (!super.isTimeIncluded(day.toEpochMilli())) {
          return true;
         } 
         
@@ -267,7 +267,7 @@ class AnnualCalendar : BaseCalendar {
             day.plusDays(1);
         }
 
-        return day.toInstant(ZoneOffset.UTC).toEpochMilli();
+        return day.toEpochMilli();
     }
 }
 

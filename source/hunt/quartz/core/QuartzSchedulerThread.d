@@ -354,7 +354,7 @@ class QuartzSchedulerThread : ThreadEx {
                             continue;
                         }
 
-                        long triggerTime = dt.toInstant(ZoneOffset.UTC).toEpochMilli();
+                        long triggerTime = dt.toEpochMilli();
                         long timeUntilTrigger = triggerTime - now;
                         while(timeUntilTrigger > 2) {
                             sigLock.lock();

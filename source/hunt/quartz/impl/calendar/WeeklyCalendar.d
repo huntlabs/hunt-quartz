@@ -205,6 +205,6 @@ class WeeklyCalendar : BaseCalendar {
             wday = cl.getDayOfWeek().getValue();
         }
 
-        return cl.toInstant(ZoneOffset.UTC).toEpochMilli();
+        return cl.toEpochMilli();
     }
 }

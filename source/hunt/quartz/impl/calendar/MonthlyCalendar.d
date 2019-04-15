@@ -221,6 +221,6 @@ class MonthlyCalendar : BaseCalendar {
             day = cl.getDayOfMonth();
         }
 
-        return cl.toInstant(ZoneOffset.UTC).toEpochMilli();
+        return cl.toEpochMilli();
     }
 }

@@ -617,7 +617,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         if (instr == MISFIRE_INSTRUCTION_DO_NOTHING) {
             LocalDateTime newFireTime = getFireTimeAfter(LocalDateTime.now());
             while (newFireTime !is null && cal !is null
-                    && !cal.isTimeIncluded(newFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                    && !cal.isTimeIncluded(newFireTime.toEpochMilli())) {
                 newFireTime = getFireTimeAfter(newFireTime);
             }
             setNextFireTime(newFireTime);
@@ -714,7 +714,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         nextFireTime = getFireTimeAfter(nextFireTime);
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
         }
     }
@@ -733,7 +733,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         }
         
         LocalDateTime now = LocalDateTime.now();
-        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+        while (nextFireTime !is null && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
 
             nextFireTime = getFireTimeAfter(nextFireTime);
 
@@ -747,7 +747,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
             }
             
             if(nextFireTime !is null && nextFireTime.isBefore(now)) {
-                long diff = now.toInstant(ZoneOffset.UTC).toEpochMilli() - nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+                long diff = now.toEpochMilli() - nextFireTime.toEpochMilli();
                 if(diff >= misfireThreshold) {
                     nextFireTime = getFireTimeAfter(nextFireTime);
                 }
@@ -777,7 +777,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         nextFireTime = getFireTimeAfter(getStartTime().minusSeconds(1));
 
         while (nextFireTime !is null && calendar !is null
-                && !calendar.isTimeIncluded(nextFireTime.toInstant(ZoneOffset.UTC).toEpochMilli())) {
+                && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
         }
 

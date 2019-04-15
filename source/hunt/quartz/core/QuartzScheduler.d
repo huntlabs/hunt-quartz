@@ -877,7 +877,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         resources.getJobStore().storeJobAndTrigger(jobDetail, trig);
         notifySchedulerListenersJobAdded(jobDetail);
-        notifySchedulerThread(trigger.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
+        notifySchedulerThread(trigger.getNextFireTime().toEpochMilli());
         notifySchedulerListenersSchduled(trigger);
 
         return ft;
@@ -921,7 +921,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         }
 
         resources.getJobStore().storeTrigger(trig, false);
-        notifySchedulerThread(trigger.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
+        notifySchedulerThread(trigger.getNextFireTime().toEpochMilli());
         notifySchedulerListenersSchduled(trigger);
 
         return ft;
@@ -1136,7 +1136,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         }
         
         if (resources.getJobStore().replaceTrigger(triggerKey, trig)) {
-            notifySchedulerThread(newTrigger.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
+            notifySchedulerThread(newTrigger.getNextFireTime().toEpochMilli());
             notifySchedulerListenersUnscheduled(triggerKey);
             notifySchedulerListenersSchduled(newTrigger);
         } else {
@@ -1181,7 +1181,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
             }
         }
 
-        notifySchedulerThread(trig.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
+        notifySchedulerThread(trig.getNextFireTime().toEpochMilli());
         notifySchedulerListenersSchduled(trig);
     }
 
@@ -1205,7 +1205,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
             }
         }
 
-        notifySchedulerThread(trig.getNextFireTime().toInstant(ZoneOffset.UTC).toEpochMilli());
+        notifySchedulerThread(trig.getNextFireTime().toEpochMilli());
         notifySchedulerListenersSchduled(trig);
     }
     
