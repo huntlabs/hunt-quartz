@@ -8,6 +8,7 @@
 	"dependencies": {
 		"hunt": "~>1.2.0-rc.6",
 		"hunt-entity" : "~>2.3.2",
-		"hunt-time" : "~>1.0.0-beta.3"
+		"hunt-time" : "~>1.0.0-beta.3",
+		"witchcraft": "~>0.1.9"
 	}
 }
