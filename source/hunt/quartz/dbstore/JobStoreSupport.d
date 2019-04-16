@@ -768,12 +768,17 @@ abstract class JobStoreSupport : JobStore {
      */
     void shutdown() {
         isShutdown = true;
+
+        trace("Shutting down ...");
         
         if (misfireHandler !is null) {
             misfireHandler.shutdown();
             try {
-                misfireHandler.join();
+                // FIXME: Needing refactor or cleanup -@zhangxueping at 4/15/2019, 8:16:47 PM
+                // 
+                // misfireHandler.join();
             } catch (InterruptedException ignore) {
+                info(ignore.msg);
             }
         }
 
@@ -782,6 +787,7 @@ abstract class JobStoreSupport : JobStore {
             try {
                 clusterManagementThread.join();
             } catch (InterruptedException ignore) {
+                info(ignore.msg);
             }
         }
 
@@ -3064,7 +3070,7 @@ abstract class JobStoreSupport : JobStore {
             LOCK_TRIGGER_ACCESS,
             new class VoidTransactionCallback {
                 void execute(Connection conn) {
-                    triggeredJobComplete(conn, trigger, jobDetail,triggerInstCode);
+                    triggeredJobComplete(conn, trigger, jobDetail, triggerInstCode);
                 }
             });    
     }
@@ -3073,6 +3079,7 @@ abstract class JobStoreSupport : JobStore {
             OperableTrigger trigger, JobDetail jobDetail,
             CompletedExecutionInstruction triggerInstCode) {
         try {
+            infof("triggerInstCode=%s", triggerInstCode);
             if (triggerInstCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
                 if(trigger.getNextFireTime() is null) { 
                     // double check for possible reschedule within job 
@@ -3711,17 +3718,21 @@ abstract class JobStoreSupport : JobStore {
     }
     
     protected T retryExecuteInNonManagedTXLock(T)(string lockName, TransactionCallback!(T) txCallback) {
+        tracef("isShutdown: %s", isShutdown);
         for (int retry = 1; !isShutdown; retry++) {
             try {
-                return executeInNonManagedTXLock(lockName, txCallback, cast(TransactionValidator!(T))null);
+                tracef("retry=%d", retry);
+                return executeInNonManagedTXLock!(T)(lockName, txCallback, cast(TransactionValidator!(T))null);
             } catch (JobPersistenceException jpe) {
                 if(retry % 4 == 0) {
                     schedSignaler.notifySchedulerListenersError("An error occurred while " ~ 
                         (cast(Object)txCallback).toString(), jpe);
                 }
             } catch (RuntimeException e) {
-                error("retryExecuteInNonManagedTXLock: RuntimeException " ~ e.msg, e);
+                error("retryExecuteInNonManagedTXLock: RuntimeException " ~ e.msg);
+                error(e);
             }
+
             try {
                 Duration dr = dur!(TimeUnit.Millisecond)(getDbRetryInterval());
                 Thread.sleep(dr); // retry every N seconds (the db connection must be failed)

@@ -480,8 +480,8 @@ class SchedulerTestBase {
         barrier.wait();
         // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         
-        Thread jobThread = cast(Thread) scheduler.getContext().get(JOB_THREAD);
-        jobThread.join();
+        // Thread jobThread = cast(Thread) scheduler.getContext().get(JOB_THREAD);
+        // jobThread.join();
         // jobThread.join(TimeUnit.SECONDS.toMillis(TEST_TIMEOUT_SECONDS));
     }
     

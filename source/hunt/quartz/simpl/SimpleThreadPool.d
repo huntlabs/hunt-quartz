@@ -348,7 +348,8 @@ class SimpleThreadPool : ThreadPool {
         if(workers is null) // case where the pool wasn't even initialize()ed
             return;
 
-        version(HUNT_DEBUG) {
+        // version(HUNT_DEBUG) 
+        {
             tracef("available workers: %d, workers: %d", availWorkers.size(), workers.size());
         }
 
@@ -596,10 +597,12 @@ warningf("removing=>", wt.name);
                     }
 
                     if (runnable !is null) {
-                        version(HUNT_DEBUG) infof("start to run a job: %s", this.name);
+                        // version(HUNT_DEBUG) 
+                        infof("start to run a job: %s", this.name);
                         ran = true;
                         runnable.run();
-                        version(HUNT_DEBUG) infof("finished to run a job: %s", this.name);
+                        // version(HUNT_DEBUG) 
+                        infof("finished to run a job: %s", this.name);
                     }
                     lock.unlock();
                 } catch (InterruptedException unblock) {
@@ -608,6 +611,7 @@ warningf("removing=>", wt.name);
                 } catch (Throwable exceptionInRunnable) {
                     error("Error while executing the Runnable: ",
                             exceptionInRunnable.msg);
+                    version(HUNT_DEBUG) warning(exceptionInRunnable);
                 } finally {
                     synchronized(lock) {
                         runnable = null;
@@ -630,7 +634,7 @@ warningf("removing=>", wt.name);
                 }
             }
 
-            version(HUNT_DEBUG)
+            // version(HUNT_DEBUG)
             tracef("WorkerThread [%s] is shut down.", this.name);
         }
     }
