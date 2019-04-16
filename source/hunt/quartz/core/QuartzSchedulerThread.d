@@ -328,13 +328,11 @@ class QuartzSchedulerThread : ThreadEx {
                                 qsRsrcs.getBatchTimeWindow());
                         acquiresFailed = 0;
                         int n = triggers is null ? 0 : triggers.size();
-                        version(HUNT_DEBUG) 
-                        {
-                            trace("batch acquisition of " ~  
-                                std.conv.to!string(n) ~ " triggers");
+                        version(HUNT_DEBUG) {
+                            info("batch acquisition of " ~  std.conv.to!string(n) ~ " triggers");
                         } else {
                             if (n > 0) {
-                                trace("batch acquisition of " ~ std.conv.to!string(n) ~ " triggers");
+                                info("batch acquisition of " ~ std.conv.to!string(n) ~ " triggers");
                             }
                         }
                     } catch (JobPersistenceException jpe) {

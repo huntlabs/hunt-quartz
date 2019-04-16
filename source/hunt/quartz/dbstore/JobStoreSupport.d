@@ -2747,36 +2747,39 @@ abstract class JobStoreSupport : JobStore {
         } else {
             lockName = null;
         }
-        version(HUNT_DEBUG) {
-            tracef("remaining triggers: "); 
-        }  
-        return executeInNonManagedTXLock(lockName, 
-                new class TransactionCallback!(List!(OperableTrigger)) {
-                    List!(OperableTrigger) execute(Connection conn) {
-                        return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
-                    }
-                },
-                new class TransactionValidator!(List!(OperableTrigger)) {
-                    bool validate(Connection conn, List!(OperableTrigger) result) {
-                        try {
-                            List!(FiredTriggerRecord) acquired = 
-                                getDelegate().selectInstancesFiredTriggerRecords(conn, getInstanceId());
 
-                            Set!(string) fireInstanceIds = new HashSet!(string)();
-                            foreach(FiredTriggerRecord ft ; acquired) {
-                                fireInstanceIds.add(ft.getFireInstanceId());
-                            }
-                            foreach(OperableTrigger tr ; result) {
-                                if (fireInstanceIds.contains(tr.getFireInstanceId())) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        } catch (SQLException e) {
-                            throw new JobPersistenceException("error validating trigger acquisition", e);
+        List!(OperableTrigger) triggers = executeInNonManagedTXLock(lockName, 
+            new class TransactionCallback!(List!(OperableTrigger)) {
+                List!(OperableTrigger) execute(Connection conn) {
+                    return acquireNextTrigger(conn, noLaterThan, maxCount, timeWindow);
+                }
+            },
+            new class TransactionValidator!(List!(OperableTrigger)) {
+                bool validate(Connection conn, List!(OperableTrigger) result) {
+                    try {
+                        List!(FiredTriggerRecord) acquired = 
+                            getDelegate().selectInstancesFiredTriggerRecords(conn, getInstanceId());
+
+                        Set!(string) fireInstanceIds = new HashSet!(string)();
+                        foreach(FiredTriggerRecord ft ; acquired) {
+                            fireInstanceIds.add(ft.getFireInstanceId());
                         }
+                        foreach(OperableTrigger tr ; result) {
+                            if (fireInstanceIds.contains(tr.getFireInstanceId())) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    } catch (SQLException e) {
+                        throw new JobPersistenceException("error validating trigger acquisition", e);
                     }
-                });
+                }
+            });
+        
+        version(HUNT_DEBUG) {
+            tracef("remaining triggers: %d", triggers.size()); 
+        }  
+        return triggers;
     }
     
     // FUTURE_TODO: this really ought to return something like a FiredTriggerBundle,
@@ -2794,10 +2797,9 @@ abstract class JobStoreSupport : JobStore {
         int currentLoopCount = 0;
         do {
             currentLoopCount++;
-
-            version(HUNT_DEBUG) {
-                tracef("currentLoopCount=%d", currentLoopCount);
-            }
+            // version(HUNT_DEBUG) {
+            //     tracef("currentLoopCount=%d", currentLoopCount);
+            // }
             try {
                 List!(TriggerKey) keys = getDelegate().selectTriggerToAcquire(conn, 
                     noLaterThan + timeWindow, getMisfireTime(), maxCount);
@@ -2844,7 +2846,7 @@ abstract class JobStoreSupport : JobStore {
                     }
                     
                     long nextEpochMilli = nextTrigger.getNextFireTime().toEpochMilli();
-                    version(HUNT_DEBUG) infof("nextEpochMilli=%d, batchEnd=%d", nextEpochMilli, batchEnd);
+                    // version(HUNT_DEBUG) infof("nextEpochMilli=%d, batchEnd=%d", nextEpochMilli, batchEnd);
                     if (nextEpochMilli > batchEnd) {
                       break;
                     }
@@ -2852,7 +2854,7 @@ abstract class JobStoreSupport : JobStore {
                     // If our trigger was no longer in the expected state, try a new one.
                     int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, 
                         triggerKey, TableConstants.STATE_ACQUIRED, TableConstants.STATE_WAITING);
-                    version(HUNT_DEBUG) infof("rowsUpdated:%d", rowsUpdated);
+                    version(HUNT_DEBUG) infof("rowsUpdated: %d", rowsUpdated);
                     if (rowsUpdated <= 0) {
                         continue; // next trigger
                     }
@@ -3079,7 +3081,7 @@ abstract class JobStoreSupport : JobStore {
             OperableTrigger trigger, JobDetail jobDetail,
             CompletedExecutionInstruction triggerInstCode) {
         try {
-            infof("triggerInstCode=%s", triggerInstCode);
+            version(HUNT_DEBUG) tracef("triggerInstCode=%s", triggerInstCode);
             if (triggerInstCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
                 if(trigger.getNextFireTime() is null) { 
                     // double check for possible reschedule within job 
@@ -3718,10 +3720,9 @@ abstract class JobStoreSupport : JobStore {
     }
     
     protected T retryExecuteInNonManagedTXLock(T)(string lockName, TransactionCallback!(T) txCallback) {
-        tracef("isShutdown: %s", isShutdown);
         for (int retry = 1; !isShutdown; retry++) {
             try {
-                tracef("retry=%d", retry);
+                version(HUNT_DEBUG) tracef("retry=%d", retry);
                 return executeInNonManagedTXLock!(T)(lockName, txCallback, cast(TransactionValidator!(T))null);
             } catch (JobPersistenceException jpe) {
                 if(retry % 4 == 0) {

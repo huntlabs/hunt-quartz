@@ -342,7 +342,7 @@ class SimpleThreadPool : ThreadPool {
         nextRunnableLock.lock();
         scope(exit) nextRunnableLock.unlock();
 
-        trace("Shutting down thread pool...");
+        info("Shutting down thread pool...");
 
         isShutdown = true;
         if(workers is null) // case where the pool wasn't even initialize()ed
@@ -381,7 +381,7 @@ class SimpleThreadPool : ThreadPool {
                 while (busyWorkers.size() > 0) {
                     WorkerThread wt = cast(WorkerThread) busyWorkers.getFirst();
                     try {
-                        trace("Waiting for thread " ~ wt.name ~ " to shut down");
+                        info("Waiting for thread " ~ wt.name ~ " to shut down");
                         // note: with waiting infinite time the
                         // application may appear to 'hang'.
                         nextRunnableCondition.wait(seconds(2));
@@ -405,9 +405,9 @@ class SimpleThreadPool : ThreadPool {
                 }
             }
 
-            trace("No executing jobs remaining, all threads stopped.");
+            info("No executing jobs remaining, all threads stopped.");
         }
-        trace("Shutdown of threadpool complete.");
+        info("Shutdown of threadpool complete.");
     }
 
     /**
@@ -597,12 +597,12 @@ warningf("removing=>", wt.name);
                     }
 
                     if (runnable !is null) {
-                        // version(HUNT_DEBUG) 
+                        version(HUNT_DEBUG) 
                         infof("start to run a job: %s", this.name);
                         ran = true;
                         runnable.run();
-                        // version(HUNT_DEBUG) 
-                        infof("finished to run a job: %s", this.name);
+                        version(HUNT_DEBUG) 
+                        infof("finished running a job: %s", this.name);
                     }
                     lock.unlock();
                 } catch (InterruptedException unblock) {

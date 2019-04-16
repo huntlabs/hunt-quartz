@@ -91,13 +91,18 @@ class SimpleTriggerPersistenceDelegate : TriggerPersistenceDelegate {
     }
 
     TriggerPropertyBundle loadExtendedTriggerProperties(Connection conn, TriggerKey triggerKey) {
-        EqlQuery!(SimpleTriggers)  query = conn.createQuery!(SimpleTriggers)(rtp(StdSqlConstants.SELECT_SIMPLE_TRIGGER));
+        EqlQuery!(SimpleTriggers)  query = conn.createQuery!(SimpleTriggers)(
+            rtp(StdSqlConstants.SELECT_SIMPLE_TRIGGER));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
         SimpleTriggers rt = query.getSingleResult();
-
     
-        if (rt !is null) {
+        if (rt is null) {
+            throw new IllegalStateException("No record found for selection of Trigger with key: '" 
+                ~ triggerKey.toString() 
+                ~ "' and statement: " 
+                ~ rtp(StdSqlConstants.SELECT_SIMPLE_TRIGGER));
+        } else {
             int repeatCount = cast(int)rt.repeatCount;
             long repeatInterval = rt.repeatInterval;
             int timesTriggered = cast(int)rt.timesTriggered;
@@ -111,9 +116,6 @@ class SimpleTriggerPersistenceDelegate : TriggerPersistenceDelegate {
             
             return new TriggerPropertyBundle(sb, statePropertyNames, statePropertyValues);
         }
-        
-        throw new IllegalStateException("No record found for selection of Trigger with key: '" ~ triggerKey.toString() 
-            ~ "' and statement: " ~ rtp(StdSqlConstants.SELECT_SIMPLE_TRIGGER));
         
     }
 

@@ -702,7 +702,9 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         JobDetails r = query.getSingleResult();
-        version(HUNT_DEBUG) trace("The result is ", r !is null);
+        version(HUNT_DEBUG) {
+            trace("The job %s exists: %s ", jobKey.toString(), r !is null);
+        }
         return r !is null;
     }
 
@@ -760,9 +762,9 @@ class StdDbDelegate : DriverDelegate {
 
         job.setDurability(j.isDurable.to!bool());
         job.setRequestsRecovery(j.requestsRecovery.to!bool());
-        // TODO: Tasks pending completion -@zhangxueping at 4/1/2019, 4:48:23 PM
-        // 
-        implementationMissing(false);
+        // FIXME: Needing refactor or cleanup -@zhangxueping at 4/16/2019, 12:26:07 PM
+        // to check
+        // implementationMissing(false);
         Map!(string, Object) map = null;
         if (canUseProperties()) {
             map = getMapFromProperties(j.jobData);
@@ -1587,13 +1589,18 @@ class StdDbDelegate : DriverDelegate {
             TriggerPersistenceDelegate tDel = findTriggerPersistenceDelegate(triggerType);
             
             if(tDel is null)
-                throw new JobPersistenceException("No TriggerPersistenceDelegate for trigger discriminator type: " ~ triggerType);
+                throw new JobPersistenceException(
+                    "No TriggerPersistenceDelegate for trigger discriminator type: " ~ triggerType);
 
             TriggerPropertyBundle triggerProps = null;
             try {
                 triggerProps = tDel.loadExtendedTriggerProperties(conn, triggerKey);
             } catch (IllegalStateException isex) {
-                warning(isex.msg);
+                version(HUNT_DEBUG) {
+                    warning(isex);
+                } else {
+                    warning(isex.msg);
+                }
                 return null;
                 // if (isTriggerStillPresent(ps)) {
                 //     throw isex;
