@@ -132,7 +132,7 @@ struct StdSqlConstants {
             ~ ModelConstants.FIELD_IS_DURABLE ~ " = ?, t." 
             ~ ModelConstants.FIELD_IS_NONCONCURRENT ~ " = ?, t." ~ ModelConstants.FIELD_IS_UPDATE_DATA ~ " = ?, t." 
             ~ ModelConstants.FIELD_REQUESTS_RECOVERY ~ " = ?, t."
-            ~ ModelConstants.FIELD_JOB_DATAMAP ~ " = ? " ~ " t WHERE t." 
+            ~ ModelConstants.FIELD_JOB_DATAMAP ~ " = ? " ~ " WHERE t." 
             ~ ModelConstants.FIELD_SCHEDULER_NAME ~ " = " ~ SCHED_NAME_SUBST 
             ~ " AND t." ~ ModelConstants.FIELD_JOB_NAME
             ~ " = ? AND t." ~ ModelConstants.FIELD_JOB_GROUP ~ " = ?";

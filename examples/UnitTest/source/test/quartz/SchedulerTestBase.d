@@ -424,66 +424,66 @@ class SchedulerTestBase {
 	// 	assertTrue("Immediate trigger did not fire within a reasonable amount of time.", (fTime - sTime  < 7000L));  
     // }
     
-    // @Test
-	// void testScheduleMultipleTriggersForAJob(){
-		
-	// 	JobDetail job = JobBuilder.newJob(typeid(TestJob)).withIdentity("job1", "group1").build();
-	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger()
-	// 			.withIdentity("trigger1", "group1")
-	// 			.startNow()
-	// 			.withSchedule(
-	// 					SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
-	// 							.repeatForever())
-	// 			.build();
-	// 	Trigger trigger2 = TriggerBuilderHelper.newTrigger!Trigger()
-	// 			.withIdentity("trigger2", "group1")
-	// 			.startNow()
-	// 			.withSchedule(
-	// 					SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
-	// 							.repeatForever())
-	// 			.build();
-	// 	Set!(Trigger) triggersForJob = new HashSet!(Trigger)(); 
-	// 	triggersForJob.add(trigger1);
-	// 	triggersForJob.add(trigger2);
-		
-	// 	Scheduler sched = createScheduler("testScheduleMultipleTriggersForAJob", 5);
-	// 	sched.scheduleJob(job,triggersForJob, true);
-		
-	// 	List!(OperableTrigger) triggersOfJob = sched.getTriggersOfJob(job.getKey());
-	// 	assertEquals(2,triggersOfJob.size());
-	// 	assertTrue(triggersOfJob.contains(cast(OperableTrigger)trigger1));
-	// 	assertTrue(triggersOfJob.contains(cast(OperableTrigger)trigger2));
-		
-	// 	sched.shutdown(true);
-	// }
-    
     @Test
-    void testShutdownWithoutWaitIsUnclean(){
-        Barrier barrier = new Barrier(2);
-        Scheduler scheduler = createScheduler("testShutdownWithoutWaitIsUnclean", 8);
-        try {
-            scheduler.deleteJob(jobKey("job"));
-            scheduler.getContext().put(BARRIER, barrier);
-            scheduler.start();
+	void testScheduleMultipleTriggersForAJob(){
+		// scheduler.deleteJob(jobKey("job", "group1"));
+		JobDetail job = JobBuilder.newJob(typeid(TestJob)).withIdentity("job1", "group1").build();
+		Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger()
+				.withIdentity("trigger1", "group1")
+				.startNow()
+				.withSchedule(
+						SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
+								.repeatForever())
+				.build();
+		Trigger trigger2 = TriggerBuilderHelper.newTrigger!Trigger()
+				.withIdentity("trigger2", "group1")
+				.startNow()
+				.withSchedule(
+						SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
+								.repeatForever())
+				.build();
+		Set!(Trigger) triggersForJob = new HashSet!(Trigger)(); 
+		triggersForJob.add(trigger1);
+		triggersForJob.add(trigger2);
+		
+		Scheduler sched = createScheduler("testScheduleMultipleTriggersForAJob", 5);
+		sched.scheduleJob(job,triggersForJob, true);
+		
+		List!(OperableTrigger) triggersOfJob = sched.getTriggersOfJob(job.getKey());
+		assertEquals(2,triggersOfJob.size());
+		assertTrue(triggersOfJob.contains(cast(OperableTrigger)trigger1));
+		assertTrue(triggersOfJob.contains(cast(OperableTrigger)trigger2));
+		
+		sched.shutdown(true);
+	}
+    
+    // @Test
+    // void testShutdownWithoutWaitIsUnclean(){
+    //     Barrier barrier = new Barrier(2);
+    //     Scheduler scheduler = createScheduler("testShutdownWithoutWaitIsUnclean", 8);
+    //     try {
+    //         scheduler.deleteJob(jobKey("job"));
+    //         scheduler.getContext().put(BARRIER, barrier);
+    //         scheduler.start();
 
-            scheduler.addJob(JobBuilder.newJob().ofType(typeid(UncleanShutdownJob))
-                .withIdentity("job").storeDurably().build(), false);
+    //         scheduler.addJob(JobBuilder.newJob().ofType(typeid(UncleanShutdownJob))
+    //             .withIdentity("job").storeDurably().build(), false);
 
-            scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
-            while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
-                Thread.sleep(50.msecs);
-            }
-        } finally {
-            scheduler.shutdown(false);
-        }
+    //         scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
+    //         while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
+    //             Thread.sleep(50.msecs);
+    //         }
+    //     } finally {
+    //         scheduler.shutdown(false);
+    //     }
         
-        barrier.wait();
-        // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    //     barrier.wait();
+    //     // barrier.await(TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         
-        // Thread jobThread = cast(Thread) scheduler.getContext().get(JOB_THREAD);
-        // jobThread.join();
-        // jobThread.join(TimeUnit.SECONDS.toMillis(TEST_TIMEOUT_SECONDS));
-    }
+    //     // Thread jobThread = cast(Thread) scheduler.getContext().get(JOB_THREAD);
+    //     // jobThread.join();
+    //     // jobThread.join(TimeUnit.SECONDS.toMillis(TEST_TIMEOUT_SECONDS));
+    // }
     
 
     // @Test
