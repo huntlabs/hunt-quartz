@@ -18,14 +18,13 @@
 
 module hunt.quartz.impl.JobDetailImpl;
 
-import hunt.quartz.DisallowConcurrentExecution;
+import hunt.quartz.Annotations;
 import hunt.quartz.Job;
 import hunt.quartz.JobBuilder;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobDetail;
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.JobKey;
-import hunt.quartz.PersistJobDataAfterExecution;
 import hunt.quartz.Scheduler;
 import hunt.quartz.StatefulJob;
 import hunt.quartz.Trigger;

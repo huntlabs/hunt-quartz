@@ -17,7 +17,7 @@
 
 module hunt.quartz.jobs.ee.jms.JmsJobException;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 
 
 /**

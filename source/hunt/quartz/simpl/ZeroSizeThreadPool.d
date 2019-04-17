@@ -21,7 +21,7 @@ import hunt.Exceptions;
 import hunt.logging;
 import hunt.util.Common;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.spi.ThreadPool;
 
 /**

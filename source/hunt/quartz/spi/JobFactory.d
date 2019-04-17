@@ -20,7 +20,7 @@ import hunt.quartz.spi.TriggerFiredBundle;
 
 import hunt.quartz.Job;
 import hunt.quartz.Scheduler;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 
 /**
  * <p>

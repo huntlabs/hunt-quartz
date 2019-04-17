@@ -18,7 +18,7 @@
 
 module hunt.quartz.SchedulerMetaData;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 
 import hunt.text;
 import hunt.time.LocalDateTime;

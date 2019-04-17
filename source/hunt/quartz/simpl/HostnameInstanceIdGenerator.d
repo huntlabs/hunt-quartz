@@ -17,8 +17,8 @@
 module hunt.quartz.simpl.HostnameInstanceIdGenerator;
 
 // import java.net.InetAddress;
-import hunt.quartz.exception;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
+import hunt.quartz.Exceptions;
 import hunt.quartz.spi.InstanceIdGenerator;
 
 import std.socket;

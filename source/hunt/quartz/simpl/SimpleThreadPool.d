@@ -17,7 +17,7 @@
 
 module hunt.quartz.simpl.SimpleThreadPool;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.spi.ThreadPool;
 
 import hunt.concurrency.thread;

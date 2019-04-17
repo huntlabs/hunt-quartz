@@ -31,7 +31,7 @@ import hunt.quartz.dbstore.TriggerStatus;
 import hunt.quartz.dbstore.TriggerPersistenceDelegate;
 
 import hunt.quartz.Calendar;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobDetail;

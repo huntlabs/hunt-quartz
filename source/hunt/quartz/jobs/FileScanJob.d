@@ -21,14 +21,11 @@ module hunt.quartz.jobs.FileScanJob;
 // import java.net.URL;
 // import java.net.URLDecoder;
 
-import hunt.quartz.DisallowConcurrentExecution;
+import hunt.quartz.Exceptions;
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.exception;
-import hunt.quartz.PersistJobDataAfterExecution;
 import hunt.quartz.SchedulerContext;
-import hunt.quartz.exception;
 
 import hunt.logging;
 

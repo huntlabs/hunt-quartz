@@ -19,8 +19,8 @@
 module hunt.quartz.ee.jta.JTAJobRunShellFactory;
 
 import hunt.quartz.Scheduler;
-import hunt.quartz.exception;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
+import hunt.quartz.Exceptions;
 import hunt.quartz.core.JobRunShell;
 import hunt.quartz.core.JobRunShellFactory;
 import hunt.quartz.spi.TriggerFiredBundle;

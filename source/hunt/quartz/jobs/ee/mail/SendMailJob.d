@@ -35,7 +35,7 @@ module hunt.quartz.jobs.ee.mail.SendMailJob;
 // import hunt.quartz.Job;
 // import hunt.quartz.JobDataMap;
 // import hunt.quartz.JobExecutionContext;
-// import hunt.quartz.exception;
+// import hunt.quartz.Exceptions;
 
 // /**
 //  * <p>

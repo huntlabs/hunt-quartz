@@ -33,7 +33,7 @@ import hunt.quartz.JobDetail;
 import hunt.quartz.JobKey;
 // import hunt.quartz.JobPersistenceException;
 // import hunt.quartz.ObjectAlreadyExistsException;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerKey;
 import hunt.quartz.Trigger : CompletedExecutionInstruction;

@@ -20,7 +20,7 @@ module hunt.quartz.dbstore.JobStoreTX;
 // import java.sql.Connection;
 import hunt.quartz.dbstore.JobStoreSupport;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.spi.ClassLoadHelper;
 import hunt.quartz.spi.SchedulerSignaler;
 

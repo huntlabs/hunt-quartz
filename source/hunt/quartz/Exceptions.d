@@ -1,6 +1,10 @@
-module hunt.quartz.exception;
+module hunt.quartz.Exceptions;
 
 import hunt.Exceptions;
+
+import hunt.quartz.Exceptions;
+import hunt.quartz.JobDetail;
+import hunt.quartz.Trigger;
 
 
 class SchedulerException : Exception {
@@ -170,4 +174,70 @@ class ObjectStreamException : IOException {
 
 class NotSerializableException : ObjectStreamException {
     mixin BasicExceptionCtors;
+}
+
+
+/**
+ * An exception that is thrown to indicate that an attempt to store a new
+ * object (i.e. <code>{@link hunt.quartz.JobDetail}</code>,<code>{@link Trigger}</code>
+ * or <code>{@link Calendar}</code>) in a <code>{@link Scheduler}</code>
+ * failed, because one with the same name & group already exists.
+ * 
+ * @author James House
+ */
+class ObjectAlreadyExistsException : JobPersistenceException {
+  
+
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 
+     * Constructors.
+     * 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+    /**
+     * <p>
+     * Create a <code>ObjectAlreadyExistsException</code> with the given
+     * message.
+     * </p>
+     */
+    this(string msg) {
+        super(msg);
+    }
+
+    /**
+     * <p>
+     * Create a <code>ObjectAlreadyExistsException</code> and auto-generate a
+     * message using the name/group from the given <code>JobDetail</code>.
+     * </p>
+     * 
+     * <p>
+     * The message will read: <BR>"Unable to store Job with name: '__' and
+     * group: '__', because one already exists with this identification."
+     * </p>
+     */
+    this(JobDetail offendingJob) {
+        super("Unable to store Job : '" ~ offendingJob.getKey().toString()
+                ~ "', because one already exists with this identification.");
+    }
+
+    /**
+     * <p>
+     * Create a <code>ObjectAlreadyExistsException</code> and auto-generate a
+     * message using the name/group from the given <code>Trigger</code>.
+     * </p>
+     * 
+     * <p>
+     * The message will read: <BR>"Unable to store Trigger with name: '__' and
+     * group: '__', because one already exists with this identification."
+     * </p>
+     */
+    this(Trigger offendingTrigger) {
+        super("Unable to store Trigger with name: '"
+                ~ offendingTrigger.getKey().getName() ~ "' and group: '"
+                ~ offendingTrigger.getKey().getGroup()
+                ~ "', because one already exists with this identification.");
+    }
+
 }

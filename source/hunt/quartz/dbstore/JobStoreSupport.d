@@ -42,12 +42,11 @@ import hunt.collection.Map;
 import hunt.collection.Set;
 
 import hunt.quartz.Calendar;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.JobDetail;
 import hunt.quartz.JobKey;
-import hunt.quartz.ObjectAlreadyExistsException;
 import hunt.quartz.Scheduler;
 import hunt.quartz.SimpleTrigger;
 import hunt.quartz.Trigger;
@@ -1163,8 +1162,7 @@ abstract class JobStoreSupport : JobStore {
      *           if a <code>Trigger</code> with the same name/group already
      *           exists, and replaceExisting is set to false.
      */
-    void storeTrigger(OperableTrigger newTrigger,
-        bool replaceExisting) {
+    void storeTrigger(OperableTrigger newTrigger, bool replaceExisting) {
         executeInLock(
             (isLockOnInsert() || replaceExisting) ? LOCK_TRIGGER_ACCESS : null,
             new class VoidTransactionCallback {
@@ -1180,9 +1178,9 @@ abstract class JobStoreSupport : JobStore {
      * Insert or update a trigger.
      * </p>
      */
-    
     protected void storeTrigger(Connection conn,
-            OperableTrigger newTrigger, JobDetail job, bool replaceExisting, string state,
+            OperableTrigger newTrigger, JobDetail job, 
+            bool replaceExisting, string state,
             bool forceState, bool recovering) {
 
         bool existingTrigger = triggerExists(conn, newTrigger.getKey());

@@ -25,7 +25,7 @@ import hunt.quartz.CronExpression;
 import hunt.quartz.CronScheduleBuilder;
 import hunt.quartz.CronTrigger;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.ScheduleBuilder;
 import hunt.quartz.Scheduler;
 import hunt.quartz.Trigger;

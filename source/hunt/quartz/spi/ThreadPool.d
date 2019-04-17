@@ -17,7 +17,7 @@
 
 module hunt.quartz.spi.ThreadPool;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 
 import hunt.util.Common;
 

@@ -19,7 +19,7 @@ import hunt.logging;
 
 import hunt.quartz.JobListener;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 
 /**
  * A helpful abstract base class for implementors of 

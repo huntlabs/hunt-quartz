@@ -16,7 +16,7 @@
  */
 module hunt.quartz.simpl.SimpleInstanceIdGenerator;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.spi.InstanceIdGenerator;
 import hunt.util.DateTime;
 

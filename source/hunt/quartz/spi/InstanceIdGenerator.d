@@ -16,7 +16,7 @@
  */
 module hunt.quartz.spi.InstanceIdGenerator;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 
 /**
  * <p>

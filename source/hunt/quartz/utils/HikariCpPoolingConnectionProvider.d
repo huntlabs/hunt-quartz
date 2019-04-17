@@ -18,7 +18,7 @@
 module hunt.quartz.utils.HikariCpPoolingConnectionProvider;
 
 // import com.zaxxer.hikari.HikariDataSource;
-// import hunt.quartz.exception;
+// import hunt.quartz.Exceptions;
 
 // import java.sql.Connection;
 // import java.sql.SQLException;

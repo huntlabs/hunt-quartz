@@ -22,7 +22,7 @@ import hunt.quartz.core.QuartzScheduler;
 import hunt.quartz.core.QuartzSchedulerThread;
 
 import hunt.quartz.JobKey;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.Trigger;
 import hunt.quartz.spi.SchedulerSignaler;
 

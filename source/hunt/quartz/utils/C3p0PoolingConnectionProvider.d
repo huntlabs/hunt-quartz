@@ -22,7 +22,7 @@ module hunt.quartz.utils.C3p0PoolingConnectionProvider;
 // import java.sql.SQLException;
 // import java.util.Properties;
 
-// import hunt.quartz.exception;
+// import hunt.quartz.Exceptions;
 
 // import com.mchange.v2.c3p0.ComboPooledDataSource;
 

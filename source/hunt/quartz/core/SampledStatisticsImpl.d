@@ -6,7 +6,7 @@ import hunt.quartz.core.SampledStatistics;
 
 import hunt.quartz.JobDetail;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.JobListener;
 import hunt.quartz.SchedulerListener;
 import hunt.quartz.Trigger;

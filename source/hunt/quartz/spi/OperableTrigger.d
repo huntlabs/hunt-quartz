@@ -5,7 +5,7 @@ import hunt.quartz.spi.MutableTrigger;
 import hunt.quartz.Calendar;
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.Trigger;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.Scheduler;
 
 import hunt.time.LocalDateTime;

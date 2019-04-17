@@ -21,7 +21,7 @@ module hunt.quartz.core.JobRunShellFactory;
 import hunt.quartz.core.JobRunShell;
 
 import hunt.quartz.Scheduler;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.spi.TriggerFiredBundle;
 
 /**

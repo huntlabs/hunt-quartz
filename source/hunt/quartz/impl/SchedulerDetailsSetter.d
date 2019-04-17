@@ -21,7 +21,7 @@ module hunt.quartz.impl.SchedulerDetailsSetter;
 
 import hunt.logging;
 import hunt.Exceptions;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 
 import hunt.util.Traits;
 

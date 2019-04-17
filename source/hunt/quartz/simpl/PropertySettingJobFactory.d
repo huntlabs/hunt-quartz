@@ -33,7 +33,7 @@ import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;
 import hunt.quartz.Scheduler;
 import hunt.quartz.SchedulerContext;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.spi.TriggerFiredBundle;
 
 

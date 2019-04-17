@@ -19,7 +19,7 @@ module hunt.quartz.jobs.NoOpJob;
 
 import hunt.quartz.Job;
 import hunt.quartz.JobExecutionContext;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 
 /**
  * <p>

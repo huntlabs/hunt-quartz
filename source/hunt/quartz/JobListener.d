@@ -18,7 +18,7 @@
 
 module hunt.quartz.JobListener;
 
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.JobExecutionContext;
 
 /**

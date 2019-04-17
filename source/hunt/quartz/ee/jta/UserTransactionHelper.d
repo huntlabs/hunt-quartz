@@ -26,7 +26,7 @@ module hunt.quartz.ee.jta.UserTransactionHelper;
 // import javax.transaction.SystemException;
 // import javax.transaction.UserTransaction;
 
-// import hunt.quartz.exception;
+// import hunt.quartz.Exceptions;
 // import hunt.logging;
 
 

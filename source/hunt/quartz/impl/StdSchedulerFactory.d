@@ -25,7 +25,7 @@ import hunt.quartz.impl.StdScheduler;
 
 import hunt.quartz.JobListener;
 import hunt.quartz.Scheduler;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.SchedulerFactory;
 import hunt.quartz.TriggerListener;
 import hunt.quartz.core.JobRunShellFactory;

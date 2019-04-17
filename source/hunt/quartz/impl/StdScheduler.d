@@ -28,7 +28,7 @@ import hunt.quartz.JobKey;
 import hunt.quartz.ListenerManager;
 import hunt.quartz.Scheduler;
 import hunt.quartz.SchedulerContext;
-import hunt.quartz.exception;
+import hunt.quartz.Exceptions;
 import hunt.quartz.SchedulerMetaData;
 import hunt.quartz.Trigger;
 import hunt.quartz.TriggerKey;
