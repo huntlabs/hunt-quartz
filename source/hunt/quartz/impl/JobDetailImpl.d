@@ -30,11 +30,14 @@ import hunt.quartz.StatefulJob;
 import hunt.quartz.Trigger;
 import hunt.quartz.utils.ClassUtils;
 
-import hunt.util.Traits;
 import hunt.Exceptions;
+import hunt.util.Traits;
+import hunt.logging.ConsoleLogger;
 
 import std.array;
 import std.conv;
+
+import witchcraft;
 
 /**
  * <p>
@@ -67,7 +70,6 @@ import std.conv;
  */
 
 class JobDetailImpl : JobDetail {
-
     
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -228,8 +230,7 @@ class JobDetailImpl : JobDetail {
      */
     void setGroup(string group) {
         if (group.empty()) {
-            throw new IllegalArgumentException(
-                    "Group name cannot be empty.");
+            throw new IllegalArgumentException("Group name cannot be empty.");
         }
 
         if (group is null) {
@@ -315,6 +316,15 @@ class JobDetailImpl : JobDetail {
         //             "Job class must implement the Job interface.");
         // }
 
+        ClassAccessor accessor = cast(ClassAccessor)(jobClass.create());
+        if(accessor is null) {
+            warningf("%s is not a ClassAccessor");
+        } else {
+            Class classInfo = accessor.getMetaType;
+            _isPersistJobDataAfterExecution = classInfo.hasAttribute!(PersistJobDataAfterExecution);
+            _isConcurrentExectionDisallowed = classInfo.hasAttribute!(DisallowConcurrentExecution);
+        }
+
         this.jobClass = jobClass;
     }
 
@@ -379,19 +389,23 @@ class JobDetailImpl : JobDetail {
      * @return whether the associated Job class carries the {@link PersistJobDataAfterExecution} annotation.
      */
     bool isPersistJobDataAfterExecution() {
-        implementationMissing(false);
-        return false;
+        // implementationMissing(false);
+        // return false;
         // return ClassUtils.isAnnotationPresent(jobClass, PersistJobDataAfterExecution.class);
+        return _isPersistJobDataAfterExecution;
     }
+    private bool _isPersistJobDataAfterExecution = false;
 
     /**
      * @return whether the associated Job class carries the {@link DisallowConcurrentExecution} annotation.
      */
     bool isConcurrentExectionDisallowed() {
-        implementationMissing(false);
-        return false;        
+        // implementationMissing(false);
+        // return false;        
         // return ClassUtils.isAnnotationPresent(jobClass, DisallowConcurrentExecution.class);
+        return _isConcurrentExectionDisallowed;
     }
+    private bool _isConcurrentExectionDisallowed = false;
 
     /* (non-Javadoc)
      * @see hunt.quartz.JobDetailI#requestsRecovery()

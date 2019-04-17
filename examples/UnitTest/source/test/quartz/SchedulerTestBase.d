@@ -1,6 +1,6 @@
 module test.quartz.SchedulerTestBase;
 
-
+import hunt.quartz.Annotations;
 import hunt.quartz.Exceptions;
 import hunt.quartz.impl.matchers.GroupMatcher;
 import hunt.quartz.impl.StdScheduler;
@@ -32,6 +32,9 @@ import hunt.util.DateTime;
 import hunt.util.Traits;
 import hunt.util.UnitTest;
 
+
+import witchcraft;
+    
 import std.conv;
 import core.atomic;
 import core.thread;
@@ -527,8 +530,6 @@ class SchedulerTestBase {
 }
 
 
-import witchcraft;
-    
 class TestStatefulJob : StatefulJob {
     void execute(JobExecutionContext context){
         info("executing the job...");
@@ -541,6 +542,8 @@ class TestJob : Job {
     }
 }
     
+@PersistJobDataAfterExecution
+@DisallowConcurrentExecution    
 class TestJobWithSync : Job, ClassAccessor  {
 
     mixin Witchcraft;
