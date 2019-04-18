@@ -40,11 +40,7 @@ class SchedulerDetailsSetter {
         //
     }
 
-    static void setDetails(T)(T target, string schedulerName,
-            string schedulerId) {
-        // implementationMissing(false);
-        // set(target, "setInstanceName", schedulerName);
-        // set(target, "setInstanceId", schedulerId);
+    static void setDetails(T)(T target, string schedulerName, string schedulerId) {
         setProperty(target, "InstanceName", schedulerName);
         setProperty(target, "InstanceId", schedulerId);
     }

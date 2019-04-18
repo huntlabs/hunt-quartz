@@ -44,6 +44,7 @@ import hunt.util.Traits;
 
 import hunt.logging.ConsoleLogger;
 
+import witchcraft;
 
 /**
  * <p>
@@ -102,6 +103,8 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
     private int timesTriggered = 0;
 
     private bool complete = false;
+    
+    mixin Witchcraft;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

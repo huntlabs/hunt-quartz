@@ -389,9 +389,6 @@ class JobDetailImpl : JobDetail {
      * @return whether the associated Job class carries the {@link PersistJobDataAfterExecution} annotation.
      */
     bool isPersistJobDataAfterExecution() {
-        // implementationMissing(false);
-        // return false;
-        // return ClassUtils.isAnnotationPresent(jobClass, PersistJobDataAfterExecution.class);
         return _isPersistJobDataAfterExecution;
     }
     private bool _isPersistJobDataAfterExecution = false;
@@ -400,9 +397,6 @@ class JobDetailImpl : JobDetail {
      * @return whether the associated Job class carries the {@link DisallowConcurrentExecution} annotation.
      */
     bool isConcurrentExectionDisallowed() {
-        // implementationMissing(false);
-        // return false;        
-        // return ClassUtils.isAnnotationPresent(jobClass, DisallowConcurrentExecution.class);
         return _isConcurrentExectionDisallowed;
     }
     private bool _isConcurrentExectionDisallowed = false;

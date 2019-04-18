@@ -41,8 +41,8 @@ import hunt.time.ZoneOffset;
 import hunt.util.Serialize;
 
 import std.conv;
+import witchcraft;
 
-// import std.datetime;
 
 /**
  * A concrete implementation of DailyTimeIntervalTrigger that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>
@@ -128,6 +128,9 @@ class DailyTimeIntervalTriggerImpl : AbstractTrigger!(DailyTimeIntervalTrigger),
     private int timesTriggered = 0;
 
     private bool complete = false;
+    
+    mixin Witchcraft;
+    
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

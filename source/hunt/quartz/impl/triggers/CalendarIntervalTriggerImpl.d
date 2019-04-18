@@ -47,6 +47,8 @@ import hunt.util.Serialize;
 
 import std.conv;
 
+import witchcraft;
+
 /**
  * <p>A concrete <code>{@link Trigger}</code> that is used to fire a <code>{@link hunt.quartz.JobDetail}</code>
  * based upon repeating calendar time intervals.</p>
@@ -118,6 +120,9 @@ class CalendarIntervalTriggerImpl : AbstractTrigger!(CalendarIntervalTrigger), C
 
     private bool complete = false;
     
+
+    mixin Witchcraft;
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 

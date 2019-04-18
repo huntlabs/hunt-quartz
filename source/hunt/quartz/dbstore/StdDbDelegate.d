@@ -72,6 +72,8 @@ import hunt.time.ZoneOffset;
 import hunt.util.DateTime;
 import hunt.util.Serialize;
 
+import witchcraft;
+
 import std.array;
 import std.conv;
 import std.format;
@@ -616,8 +618,6 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(9, job.getKey().getGroup());
 
         insertResult = query.exec();
-        implementationMissing(false);
-
         return insertResult;
         
     }
@@ -727,7 +727,6 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(2, job.getKey().getName());
         query.setParameter(3, job.getKey().getGroup());
 
-        implementationMissing(false);
         return query.exec();
     }
 
@@ -1543,15 +1542,13 @@ class StdDbDelegate : DriverDelegate {
         string calendarName = t.calendarName;
         int misFireInstr = t.misfireInstruction;
         int priority = t.priority;
-// TODO: Tasks pending completion -@zhangxueping at 4/1/2019, 5:18:17 PM
-// 
-        // Map<?, ?> map = null;
-        // if (canUseProperties()) {
-        //     map = getMapFromProperties(rs);
-        // } else {
-        //     map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
-        // }
-                
+
+        Map!(string, Object) map = null;
+        if (canUseProperties()) {
+            map = getMapFromProperties(t.jobData);
+        } else {
+            map = unserialize!(JobDataMap)(cast(byte[])t.jobData); 
+        }
 
         LocalDateTime nft = null;
         if (nextFireTime > 0) {
@@ -1578,8 +1575,11 @@ class StdDbDelegate : DriverDelegate {
             BlobTriggers r = blobTriggersQuery.getSingleResult();
 
             if (r !is null) {
+                
+                // unserialize!(JobDataMap)(cast(byte[])r.blogData); 
                 // TODO: Tasks pending completion -@zhangxueping at 4/1/2019, 5:38:10 PM
                 // 
+                warningf("trigger: %s", triggerKey.getName());
                 implementationMissing(false);
                 // trigger = cast(OperableTrigger) getObjectFromBlob(rs, COL_BLOB);
             } else {
@@ -1601,13 +1601,13 @@ class StdDbDelegate : DriverDelegate {
                 } else {
                     warning(isex.msg);
                 }
-                return null;
-                // if (isTriggerStillPresent(ps)) {
-                //     throw isex;
-                // } else {
-                //     // QTZ-386 Trigger has been deleted
-                //     return null;
-                // }
+                // return null;
+                if (isTriggerStillPresent(query)) {
+                    throw isex;
+                } else {
+                    // QTZ-386 Trigger has been deleted
+                    return null;
+                }
             }
 
             TriggerBuilder!Trigger tb = TriggerBuilderHelper.newTrigger!Trigger()
@@ -1620,9 +1620,9 @@ class StdDbDelegate : DriverDelegate {
                 .withSchedule(triggerProps.getScheduleBuilder())
                 .forJob(jobKey(jobName, jobGroup));
 
-            // if (map !is null) {
-            //     tb.usingJobData(new JobDataMap(map));
-            // }
+            if (map !is null) {
+                tb.usingJobData(new JobDataMap(map));
+            }
 
             trigger = cast(OperableTrigger) tb.build();
             
@@ -1637,25 +1637,32 @@ class StdDbDelegate : DriverDelegate {
     }
 
 
-    // private bool isTriggerStillPresent(PreparedStatement ps) {
-    //     ResultSet rs = null;
-    //     try {
-    //         rs = ps.executeQuery();
-    //         return rs.next();
-    //     } finally {
-    //         closeResultSet(rs);
-    //     }
-    // }
+    private bool isTriggerStillPresent(EqlQuery!(Triggers) query) {
+        warning("check trigger again");
+        ResultSet rs = query.getNativeResult();
+        return !rs.empty;
+    }
 
     private void setTriggerStateProperties(OperableTrigger trigger, TriggerPropertyBundle props) {
-        
-        if(props.getStatePropertyNames() is null)
+        setBeanProps(trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
+    }
+
+    static void setBeanProps(ClassAccessor accessor, string[] propNames, Object[] propValues) {
+        if(accessor is null) {
+            warning("The object is not a ClassAccessor");
+            return ;
+        }
+
+        if(propNames is null)
             return;
         
-        // Util.setBeanProps(trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
+        foreach(size_t i; 0..propNames.length) {
+            tracef("name: %s, value: %s", propNames[i], propValues[i]);
+        }
 
-        implementationMissing(false);
+
     }
+    
 
     /**
      * <p>
@@ -1672,27 +1679,27 @@ class StdDbDelegate : DriverDelegate {
      * never null, but possibly empty.
      */
     JobDataMap selectTriggerJobDataMap(Connection conn, string triggerName, string groupName) {
-
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_DATA));
         query.setParameter(1, triggerName);
         query.setParameter(2, groupName);
         
         ResultSet rs = query.getNativeResult();
-        if(rs.empty()) {
+        Map!(string, Object) map = null;
+        if(!rs.empty()) {
+            Row r = rs.front;
+            ubyte[] data = r.getAs!(ubyte[])(0);
+            tracef("%(%02X %)", data);
+            if (canUseProperties()) {
+                map = getMapFromProperties(data);
+            } else {
+                map = unserialize!(JobDataMap)(cast(byte[])data); 
+            }
+        }
+
+        if (map is null) {
             return new JobDataMap();
         } else {
-            implementationMissing(false);
-            return new JobDataMap();
-            // Map<?, ?> map = null;
-            // if (canUseProperties()) { 
-            //     map = getMapFromProperties(rs);
-            // } else {
-            //     map = (Map<?, ?>) getObjectFromBlob(rs, COL_JOB_DATAMAP);
-            // }
-            
-            // if (null != map) {
-            //     return new JobDataMap(map);
-            // }
+            return new JobDataMap(map);
         }
     }
             
@@ -2547,14 +2554,15 @@ class StdDbDelegate : DriverDelegate {
      */
     protected ubyte[] serializeJobData(JobDataMap data) {
         if (canUseProperties()) {
-            return cast(ubyte[])serializeProperties(data);
+            ubyte[] d = cast(ubyte[])serializeProperties(data);
+            tracef("%(%02X %)", d);
+            return d;
         }
 
         try {
             ubyte[] d = cast(ubyte[])serialize(data);
+            tracef("%(%02X %)", d);
             return d;
-            // implementationMissing(false);
-            // return null;
         } catch (NotSerializableException e) {
             throw new NotSerializableException(
                 "Unable to serialize JobDataMap for insertion into " ~ 

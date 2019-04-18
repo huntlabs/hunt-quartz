@@ -10,8 +10,9 @@ import hunt.quartz.Scheduler;
 
 import hunt.time.LocalDateTime;
 import std.datetime;
+import witchcraft.classes;
 
-interface OperableTrigger : MutableTrigger {
+interface OperableTrigger : MutableTrigger, ClassAccessor {
 
     /**
      * <p>

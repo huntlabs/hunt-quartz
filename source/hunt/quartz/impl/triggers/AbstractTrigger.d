@@ -43,6 +43,7 @@ import std.array;
 import std.conv;
 import std.datetime;
 
+import witchcraft;
 
 
 /**
@@ -104,6 +105,8 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     private int priority = DEFAULT_PRIORITY;
 
     private TriggerKey key = null;
+
+    mixin Witchcraft;
 
     /*
     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

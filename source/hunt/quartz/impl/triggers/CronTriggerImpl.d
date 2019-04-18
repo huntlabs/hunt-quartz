@@ -40,6 +40,7 @@ import hunt.time.ZoneOffset;
 import hunt.time.ZoneRegion;
 import hunt.util.Serialize;
 
+import witchcraft;
 
 /**
  * <p>
@@ -86,6 +87,9 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     private LocalDateTime nextFireTime;// = null;
     private LocalDateTime previousFireTime;// = null;
     private ZoneId timeZone = null;
+    
+    mixin Witchcraft;
+    
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
