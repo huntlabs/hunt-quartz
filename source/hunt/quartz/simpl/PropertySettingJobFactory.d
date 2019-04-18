@@ -18,12 +18,6 @@ module hunt.quartz.simpl.PropertySettingJobFactory;
 
 import hunt.quartz.simpl.SimpleJobFactory;
 
-// import java.beans.BeanInfo;
-// import java.beans.IntrospectionException;
-// import java.beans.Introspector;
-// import java.beans.PropertyDescriptor;
-// import java.lang.reflect.InvocationTargetException;
-
 import hunt.collection.Map;
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
@@ -36,6 +30,7 @@ import hunt.quartz.SchedulerContext;
 import hunt.quartz.Exceptions;
 import hunt.quartz.spi.TriggerFiredBundle;
 
+import witchcraft;
 
 
 /**
@@ -77,150 +72,151 @@ class PropertySettingJobFactory : SimpleJobFactory {
         jobDataMap.putAll(bundle.getJobDetail().getJobDataMap());
         jobDataMap.putAll(bundle.getTrigger().getJobDataMap());
 
-        setBeanProps(cast(Object)job, jobDataMap);
+        setBeanProps(job, jobDataMap);
         
         return job;
     }
     
-    protected void setBeanProps(Object obj, JobDataMap data) {
-        implementationMissing(false);
-        
-        // BeanInfo bi = null;
-        // try {
-        //     bi = Introspector.getBeanInfo(obj.getClass());
-        // } catch (IntrospectionException e) {
-        //     handleError("Unable to introspect Job class.", e);
-        // }
-        
-        // PropertyDescriptor[] propDescs = bi.getPropertyDescriptors();
-        
-        // // Get the wrapped entry set so don't have to incur overhead of wrapping for
-        // // dirty flag checking since this is read only access
-        // for (Iterator<?> entryIter = data.getWrappedMap().entrySet().iterator(); entryIter.hasNext();) {
-        //     Map.Entry<?,?> entry = (Map.Entry<?,?>)entryIter.next();
-            
-        //     string name = (string)entry.getKey();
-        //     string c = name.substring(0, 1).toUpperCase(Locale.US);
-        //     string methName = "set" ~ c + name.substring(1);
-        
-        //     java.lang.reflect.Method setMeth = getSetMethod(methName, propDescs);
-        
-        //     TypeInfo_Class paramType = null;
-        //     Object o = null;
-            
-        //     try {
-        //         if (setMeth is null) {
-        //             handleError(
-        //                 "No setter on Job class " ~ obj.getClass().getName() + 
-        //                 " for property '" ~ name ~ "'");
-        //             continue;
-        //         }
-                
-        //         paramType = setMeth.getParameterTypes()[0];
-        //         o = entry.getValue();
-                
-        //         Object parm = null;
-        //         if (paramType.isPrimitive()) {
-        //             if (o is null) {
-        //                 handleError(
-        //                     "Cannot set primitive property '" ~ name + 
-        //                     "' on Job class " ~ obj.getClass().getName() + 
-        //                     " to null.");
-        //                 continue;
-        //             }
+    protected void setBeanProps(ClassAccessor accessor, JobDataMap data) {
+        if(accessor is null) {
+            warning("The object is not a ClassAccessor");
+            return ;
+        }
 
-        //             if (paramType== int.class) {
-        //                 if (o instanceof string) {                            
-        //                     parm = Integer.valueOf((string)o);
-        //                 } else if (o instanceof Integer) {
-        //                     parm = o;
-        //                 }
-        //             } else if (paramType== long.class) {
-        //                 if (o instanceof string) {
-        //                     parm = Long.valueOf((string)o);
-        //                 } else if (o instanceof Long) {
-        //                     parm = o;
-        //                 }
-        //             } else if (paramType== float.class) {
-        //                 if (o instanceof string) {
-        //                     parm = Float.valueOf((string)o);
-        //                 } else if (o instanceof Float) {
-        //                     parm = o;
-        //                 }
-        //             } else if (paramType== double.class) {
-        //                 if (o instanceof string) {
-        //                     parm = Double.valueOf((string)o);
-        //                 } else if (o instanceof Double) {
-        //                     parm = o;
-        //                 }
-        //             } else if (paramType== bool.class) {
-        //                 if (o instanceof string) {
-        //                     parm = Boolean.valueOf((string)o);
-        //                 } else if (o instanceof Boolean) {
-        //                     parm = o;
-        //                 }
-        //             } else if (paramType== byte.class) {
-        //                 if (o instanceof string) {
-        //                     parm = Byte.valueOf((string)o);
-        //                 } else if (o instanceof Byte) {
-        //                     parm = o;
-        //                 }
-        //             } else if (paramType== short.class) {
-        //                 if (o instanceof string) {
-        //                     parm = Short.valueOf((string)o);
-        //                 } else if (o instanceof Short) {
-        //                     parm = o;
-        //                 }
-        //             } else if (paramType== char.class) {
-        //                 if (o instanceof string) {
-        //                     string str = (string)o;
-        //                     if (str.length() == 1) {
-        //                         parm = Character.valueOf(str[0]);
-        //                     }
-        //                 } else if (o instanceof Character) {
-        //                     parm = o;
-        //                 }
-        //             }
-        //         } else if ((o !is null) && (paramType.isAssignableFrom(o.getClass()))) {
-        //             parm = o;
-        //         }
+        
+        const Class metaInfo = accessor.getMetaType();
+        version(HUNT_DEBUG) trace("job: ", metaInfo.toString());
+        
+        // Get the wrapped entry set so don't have to incur overhead of wrapping for
+        // dirty flag checking since this is read only access
+        import std.ascii;
+        foreach(string name, Object o; data) {
+            char c = name[0].toUpper();
+            string methName = "set" ~ c ~ name[1 .. $];
+            version(HUNT_DEBUG) trace("checking method: ", methName);
+
+            const Method setMeth = metaInfo.getMethod(methName);
+            if (setMeth is null) {
+                handleError("No setter on Job class " ~ metaInfo.getFullName() ~ 
+                    " for property '" ~ name ~ "'");
+                continue;
+            }            
+
+            const(TypeInfo) paramType = setMeth.getParameterTypeInfos()[0];
+            tracef("parameter: %s, argement: %s", paramType, typeid(o));
+            
+            try {
+
+                implementationMissing(false);
+        
+                if(paramType == typeid(o)) {
+
+                }
                 
-        //         // If the parameter wasn't originally null, but we didn't find a 
-        //         // matching parameter, then we are stuck.
-        //         if ((o !is null) && (parm is null)) {
-        //             handleError(
-        //                 "The setter on Job class " ~ obj.getClass().getName() + 
-        //                 " for property '" ~ name + 
-        //                 "' expects a " ~ paramType + 
-        //                 " but was given " ~ o.getClass().getName());
-        //             continue;
-        //         }
+                // Object parm = null;
+                // if (paramType.isPrimitive()) {
+                //     if (o is null) {
+                //         handleError(
+                //             "Cannot set primitive property '" ~ name ~
+                //             "' on Job class " ~ metaInfo.getFullName() ~ 
+                //             " to null.");
+                //         continue;
+                //     }
+
+                //     if (paramType== int.class) {
+                //         if (o instanceof string) {                            
+                //             parm = Integer.valueOf((string)o);
+                //         } else if (o instanceof Integer) {
+                //             parm = o;
+                //         }
+                //     } else if (paramType== long.class) {
+                //         if (o instanceof string) {
+                //             parm = Long.valueOf((string)o);
+                //         } else if (o instanceof Long) {
+                //             parm = o;
+                //         }
+                //     } else if (paramType== float.class) {
+                //         if (o instanceof string) {
+                //             parm = Float.valueOf((string)o);
+                //         } else if (o instanceof Float) {
+                //             parm = o;
+                //         }
+                //     } else if (paramType== double.class) {
+                //         if (o instanceof string) {
+                //             parm = Double.valueOf((string)o);
+                //         } else if (o instanceof Double) {
+                //             parm = o;
+                //         }
+                //     } else if (paramType== bool.class) {
+                //         if (o instanceof string) {
+                //             parm = Boolean.valueOf((string)o);
+                //         } else if (o instanceof Boolean) {
+                //             parm = o;
+                //         }
+                //     } else if (paramType== byte.class) {
+                //         if (o instanceof string) {
+                //             parm = Byte.valueOf((string)o);
+                //         } else if (o instanceof Byte) {
+                //             parm = o;
+                //         }
+                //     } else if (paramType== short.class) {
+                //         if (o instanceof string) {
+                //             parm = Short.valueOf((string)o);
+                //         } else if (o instanceof Short) {
+                //             parm = o;
+                //         }
+                //     } else if (paramType== char.class) {
+                //         if (o instanceof string) {
+                //             string str = (string)o;
+                //             if (str.length() == 1) {
+                //                 parm = Character.valueOf(str[0]);
+                //             }
+                //         } else if (o instanceof Character) {
+                //             parm = o;
+                //         }
+                //     }
+                // } else if ((o !is null) && (paramType.isAssignableFrom(o.getClass()))) {
+                //     parm = o;
+                // }
+                
+                // // If the parameter wasn't originally null, but we didn't find a 
+                // // matching parameter, then we are stuck.
+                // if ((o !is null) && (parm is null)) {
+                //     handleError(
+                //         "The setter on Job class " ~ metaInfo.getFullName() ~ 
+                //         " for property '" ~ name ~
+                //         "' expects a " ~ paramType + 
+                //         " but was given " ~ typeid(o).name);
+                //     continue;
+                // }
                                 
-        //         setMeth.invoke(obj, new Object[]{ parm });
-        //     } catch (NumberFormatException nfe) {
-        //         handleError(
-        //             "The setter on Job class " ~ obj.getClass().getName() + 
-        //             " for property '" ~ name + 
-        //             "' expects a " ~ paramType + 
-        //             " but was given " ~ o.getClass().getName(), nfe);
-        //     } catch (IllegalArgumentException e) {
-        //         handleError(
-        //             "The setter on Job class " ~ obj.getClass().getName() + 
-        //             " for property '" ~ name + 
-        //             "' expects a " ~ paramType + 
-        //             " but was given " ~ o.getClass().getName(), e);
-        //     } catch (IllegalAccessException e) {
-        //         handleError(
-        //             "The setter on Job class " ~ obj.getClass().getName() + 
-        //             " for property '" ~ name + 
-        //             "' could not be accessed.", e);
-        //     } catch (InvocationTargetException e) {
-        //         handleError(
-        //             "The setter on Job class " ~ obj.getClass().getName() + 
-        //             " for property '" ~ name + 
-        //             "' could not be invoked.", e);
-        //     }
-        // }
+                // setMeth.invoke(obj, new Object[]{ parm });
+            } catch (NumberFormatException nfe) {
+                handleError(
+                    "The setter on Job class " ~ metaInfo.getFullName() ~ 
+                    " for property '" ~ name ~
+                    "' expects a " ~ paramType.toString() ~ 
+                    " but was given " ~ typeid(o).name, nfe);
+            } catch (IllegalArgumentException e) {
+                handleError(
+                    "The setter on Job class " ~ metaInfo.getFullName() ~ 
+                    " for property '" ~ name ~
+                    "' expects a " ~ paramType.toString() ~ 
+                    " but was given " ~ typeid(o).name, e);
+            // } catch (IllegalAccessException e) {
+            //     handleError(
+            //         "The setter on Job class " ~ metaInfo.getFullName() ~ 
+            //         " for property '" ~ name ~
+            //         "' could not be accessed.", e);
+            // } catch (InvocationTargetException e) {
+            //     handleError(
+            //         "The setter on Job class " ~ metaInfo.getFullName() ~ 
+            //         " for property '" ~ name ~
+            //         "' could not be invoked.", e);
+            } catch(Exception ex) {
+                handleError("Unhandled error.", ex);
+            }
+        }
     }
      
     private void handleError(string message) {

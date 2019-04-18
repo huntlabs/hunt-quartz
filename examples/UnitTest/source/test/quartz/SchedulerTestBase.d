@@ -531,12 +531,18 @@ class SchedulerTestBase {
 
 
 class TestStatefulJob : StatefulJob {
+
+    mixin Witchcraft;
+
     void execute(JobExecutionContext context){
         info("executing the job...");
     }
 }
 
 class TestJob : Job {
+
+    mixin Witchcraft;
+
     void execute(JobExecutionContext context){
         info("executing the job...");
     }
@@ -544,7 +550,7 @@ class TestJob : Job {
     
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution    
-class TestJobWithSync : Job, ClassAccessor  {
+class TestJobWithSync : Job {
 
     mixin Witchcraft;
     
@@ -566,6 +572,8 @@ class TestJobWithSync : Job, ClassAccessor  {
 }
     
 class TestAnnotatedJob : Job {
+    mixin Witchcraft;
+
     void execute(JobExecutionContext context){
         info("executing the job...");
     }
@@ -573,6 +581,9 @@ class TestAnnotatedJob : Job {
     
 
 class UncleanShutdownJob : Job {
+
+    mixin Witchcraft;
+    
     void execute(JobExecutionContext context){
         try {
             SchedulerContext schedulerContext = context.getScheduler().getContext();

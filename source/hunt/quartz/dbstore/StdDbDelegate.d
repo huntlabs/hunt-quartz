@@ -1644,7 +1644,7 @@ class StdDbDelegate : DriverDelegate {
     }
 
     private void setTriggerStateProperties(OperableTrigger trigger, TriggerPropertyBundle props) {
-        setBeanProps(cast(ClassAccessor)trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
+        setBeanProps(trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
     }
 
     static void setBeanProps(ClassAccessor accessor, string[] propNames, Object[] propValues) {
@@ -1655,12 +1655,36 @@ class StdDbDelegate : DriverDelegate {
 
         if(propNames is null)
             return;
+
+        const Class metaInfo = accessor.getMetaType();
         
+        import std.ascii;
         foreach(size_t i; 0..propNames.length) {
-            tracef("name: %s, value: %s", propNames[i], propValues[i]);
+            string propName = propNames[i];
+            Object o = propValues[i];
+            tracef("name: %s, value: %s", propName, o);
+            
+            char c = propName[0].toUpper();
+            string methName = "set" ~ c ~ propName[1 .. $];
+            version(HUNT_DEBUG) trace("checking method: ", methName);
+
+            const Method setMeth = metaInfo.getMethod(methName);
+            if (setMeth is null) {
+                warning("No setter on class " ~ metaInfo.getFullName() ~ 
+                    " for property '" ~ name ~ "'");
+                continue;
+            }
+            
+            const(TypeInfo) paramType = setMeth.getParameterTypeInfos()[0];
+            tracef("parameter: %s, argement: %s", paramType, typeid(o));
+            if(paramType == typeid(o)) {
+                setMeth.invoke(accessor, o);
+            } else {
+                // TODO: Tasks pending completion -@zhangxueping at 4/18/2019, 7:57:10 PM
+                // 
+                implementationMissing(false);
+            }
         }
-
-
     }
     
 

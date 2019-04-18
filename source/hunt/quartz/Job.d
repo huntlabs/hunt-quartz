@@ -19,6 +19,7 @@
 module hunt.quartz.Job;
 
 import hunt.quartz.JobExecutionContext;
+import witchcraft.classes;
 
 /**
  * <p>
@@ -46,7 +47,7 @@ import hunt.quartz.JobExecutionContext;
  * 
  * @author James House
  */
-interface Job {
+interface Job : ClassAccessor {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

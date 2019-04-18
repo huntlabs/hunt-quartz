@@ -21,6 +21,8 @@ import hunt.quartz.Job;
 import hunt.quartz.JobExecutionContext;
 import hunt.quartz.Exceptions;
 
+import witchcraft;
+
 /**
  * <p>
  * An implementation of Job, that does absolutely nothing - useful for system
@@ -33,7 +35,8 @@ import hunt.quartz.Exceptions;
  */
 class NoOpJob : Job {
 
-
+    mixin Witchcraft;
+    
     /*
      *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      *

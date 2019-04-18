@@ -605,7 +605,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
             }
         }
 
-        version(HUNT_DEBUG) tracef("nextFireTime is null: %s", nextFireTime is null);
+        // version(HUNT_DEBUG) tracef("nextFireTime is null: %s", nextFireTime is null);
     }
 
     /**
