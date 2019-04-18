@@ -1644,7 +1644,7 @@ class StdDbDelegate : DriverDelegate {
     }
 
     private void setTriggerStateProperties(OperableTrigger trigger, TriggerPropertyBundle props) {
-        setBeanProps(trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
+        setBeanProps(cast(ClassAccessor)trigger, props.getStatePropertyNames(), props.getStatePropertyValues());
     }
 
     static void setBeanProps(ClassAccessor accessor, string[] propNames, Object[] propValues) {

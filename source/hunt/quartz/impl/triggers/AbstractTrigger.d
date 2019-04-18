@@ -106,7 +106,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
 
     private TriggerKey key = null;
 
-    mixin Witchcraft;
+    // mixin Witchcraft;
 
     /*
     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

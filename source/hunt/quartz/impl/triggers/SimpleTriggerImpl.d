@@ -144,7 +144,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * 
      * @deprecated use a TriggerBuilder instead
      */
-    deprecated("")
+    // deprecated("")
     this(string name, string group) {
         this(name, group, LocalDateTime.now(), null, 0, 0);
     }
@@ -157,7 +157,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * 
      * @deprecated use a TriggerBuilder instead
      */
-    deprecated("")
+    // deprecated("")
     this(string name, int repeatCount, long repeatInterval) {
         this(name, null, repeatCount, repeatInterval);
     }
@@ -170,7 +170,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * 
      * @deprecated use a TriggerBuilder instead
      */
-    deprecated("")
+    // deprecated("")
     this(string name, string group, int repeatCount,
             long repeatInterval) {
         this(name, group, LocalDateTime.now(), null, repeatCount, repeatInterval);
@@ -184,7 +184,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * 
      * @deprecated use a TriggerBuilder instead
      */
-    deprecated("")
+    // deprecated("")
     this(string name, LocalDateTime startTime) {
         this(name, null, startTime);
     }
@@ -197,7 +197,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * 
      * @deprecated use a TriggerBuilder instead
      */
-    deprecated("")
+    // deprecated("")
     this(string name, string group, LocalDateTime startTime) {
         this(name, group, startTime, null, 0, 0);
     }
@@ -223,7 +223,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * 
      * @deprecated use a TriggerBuilder instead
      */
-    deprecated("")
+    // deprecated("")
     this(string name, LocalDateTime startTime,
             LocalDateTime endTime, int repeatCount, long repeatInterval) {
         this(name, null, startTime, endTime, repeatCount, repeatInterval);
@@ -250,7 +250,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * 
      * @deprecated use a TriggerBuilder instead
      */
-    deprecated("")
+    // deprecated("")
     this(string name, string group, LocalDateTime startTime,
             LocalDateTime endTime, int repeatCount, long repeatInterval) {
         super(name, group);
@@ -282,7 +282,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      * 
      * @deprecated use a TriggerBuilder instead
      */
-    deprecated("")
+    // deprecated("")
     this(string name, string group, string jobName,
             string jobGroup, LocalDateTime startTime, LocalDateTime endTime, int repeatCount,
             long repeatInterval) {

@@ -12,8 +12,9 @@ import hunt.time.LocalDateTime;
 import std.datetime;
 import witchcraft.classes;
 
-interface OperableTrigger : MutableTrigger, ClassAccessor {
-
+/**
+*/
+interface OperableTrigger : MutableTrigger, ClassAccessor { 
     /**
      * <p>
      * This method should not be used by the Quartz client.
