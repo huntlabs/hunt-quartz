@@ -221,8 +221,6 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
     override
     // suppress warnings on generic cast of super.clone() and map.clone() lines.
     Object clone() {
-        // implementationMissing(false);
-        // return this;
         DirtyFlagMap!(K,V) copy;
         try {
             copy = cast(DirtyFlagMap!(K,V)) super.clone();

@@ -48,9 +48,6 @@ class SimpleJobFactory : JobFactory {
                     "', class=" ~ jobClass.name);
             }
             
-            // implementationMissing(false);
-            // return jobClass.newInstance();
-            // return null;
             Job j = cast(Job)Object.factory(jobClass.name);
             if(j is null) {
                 warningf("Failed to create JobFactory instance from %s", jobClass.name);

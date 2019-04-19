@@ -1109,20 +1109,8 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(BlobTriggers) query = conn.createQuery!(BlobTriggers)(
             rtp(StdSqlConstants.UPDATE_BLOB_TRIGGER)); 
 
-        // ByteArrayOutputStream os = null;
-
-        //     // update the blob
-        //     os = new ByteArrayOutputStream();
-        //     ObjectOutputStream oos = new ObjectOutputStream(os);
-        //     oos.writeObject(trigger);
-        //     oos.close();
-
-        //     byte[] buf = os.toByteArray();
-        //     ByteArrayInputStream is = new ByteArrayInputStream(buf);
-        // FIXME: Needing refactor or cleanup -@zhangxueping at 4/4/2019, 6:17:11 PM
-        // 
-        implementationMissing(false);
-        query.setParameter(1, cast(ubyte[])[0x1]);
+        ubyte[] buf = trigger.serialize();
+        query.setParameter(1, buf);
         query.setParameter(2, trigger.getKey().getName());
         query.setParameter(3, trigger.getKey().getGroup());
         
@@ -1671,7 +1659,7 @@ class StdDbDelegate : DriverDelegate {
             const Method setMeth = metaInfo.getMethod(methName);
             if (setMeth is null) {
                 warning("No setter on class " ~ metaInfo.getFullName() ~ 
-                    " for property '" ~ name ~ "'");
+                    " for property '" ~ methName ~ "'");
                 continue;
             }
             
@@ -2022,8 +2010,7 @@ class StdDbDelegate : DriverDelegate {
         
         Calendar cal = null;
         if(r is null) {
-                warning("Couldn't find calendar with name '" ~ calendarName
-                        ~ "'.");
+                warning("Couldn't find calendar with name '" ~ calendarName ~ "'.");
         } else {
             // TODO: Tasks pending completion -@zhangxueping at 4/8/2019, 8:03:43 PM
             // 

@@ -868,7 +868,6 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
 
     // override
     Object clone() {
-        // implementationMissing(false);
         AbstractTrigger!T copy;
         try {
             copy = cast(AbstractTrigger!T)typeid(this).create();
