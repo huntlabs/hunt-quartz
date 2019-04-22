@@ -18,9 +18,7 @@
 module hunt.quartz.utils.PropertiesParser;
 
 import hunt.collection.ArrayList;
-// import java.util.Enumeration;
 import hunt.collection.HashSet;
-// import java.util.Properties;
 import hunt.text.StringTokenizer;
 
 import hunt.Exceptions;
@@ -63,6 +61,9 @@ class PropertiesParser {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
+    this() {
+
+    }
 
     this(Properties props) {
         this.props = props;
@@ -341,7 +342,9 @@ class PropertiesParser {
             if (key.startsWith(prefix)) {
                 ptrdiff_t endIndex = key.indexOf('.', prefix.length);
                 size_t beginIndex = prefix.length;
-                string groupName = key[beginIndex .. beginIndex+endIndex];
+                // import hunt.logging.ConsoleLogger;
+                // infof("key=%s, prefix=%s, beginIndex=%d, endIndex=%d", key, prefix, beginIndex, endIndex);
+                string groupName = key[beginIndex .. endIndex];
                 groups.add(groupName);
             }
         }

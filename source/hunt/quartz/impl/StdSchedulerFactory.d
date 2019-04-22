@@ -56,12 +56,19 @@ import hunt.quartz.utils.PropertiesParser;
 
 import hunt.collection.Collection;
 import hunt.Exceptions;
-import hunt.logging;
+import hunt.logging.ConsoleLogger;
 import hunt.time.util.Locale;
 import hunt.util.Traits;
+import hunt.util.Configuration;
 
 import std.array;
+import std.exception;
+import std.file;
 import std.format;
+import std.path;
+import std.process;
+import std.string;
+        
 
 /**
  * <p>
@@ -326,9 +333,9 @@ class StdSchedulerFactory : SchedulerFactory {
      *
      * @see #initialize(string)
      */
-    // this(string fileName) {
-    //     initialize(fileName);
-    // }
+    this(string fileName) {
+        initialize(fileName);
+    }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -372,11 +379,11 @@ class StdSchedulerFactory : SchedulerFactory {
             throw initException;
         }
 
-        implementationMissing(false);
+        string requestedFile = environment.get(PROPERTIES_FILE, "");
+        string propFileName = requestedFile.empty ? "quartz.properties"
+                : requestedFile;
+        initialize(propFileName);
 
-        // string requestedFile = System.getProperty(PROPERTIES_FILE);
-        // string propFileName = requestedFile !is null ? requestedFile
-        //         : "quartz.properties";
         // File propFile = new File(propFileName);
 
         // Properties props = new Properties();
@@ -490,86 +497,88 @@ class StdSchedulerFactory : SchedulerFactory {
 //         return props;
 //     }
 
-//     /**
-//      * <p>
-//      * Initialize the <code>{@link hunt.quartz.SchedulerFactory}</code> with
-//      * the contents of the <code>Properties</code> file with the given
-//      * name.
-//      * </p>
-//      */
-//     void initialize(string filename) {
-//         // short-circuit if already initialized
-//         if (cfg !is null) {
-//             return;
-//         }
+    private string[string] loadConfig(string filename) {
+        string[string] props; 
+        import std.stdio;
 
-//         if (initException !is null) {
-//             throw initException;
-//         }
+        auto f = File(filename, "r");
+        if (!f.isOpen())
+            return null;
+        scope (exit)
+            f.close();
 
-//         InputStream is = null;
-//         Properties props = new Properties();
+        int line = 1;
+        while (!f.eof()) {
+            scope (exit)
+                line += 1;
+            string str = f.readln();
+            str = strip(str);
+            if (str.length == 0)
+                continue;
+            if (str[0] == '#' || str[0] == ';')
+                continue;
+            auto len = str.length - 1;
+            if (str[0] == '[' && str[len] == ']') {
+                // skip section []
+                continue;
+            }
 
-//         is = Thread.getThis().getContextClassLoader().getResourceAsStream(filename);
+            str = stripInlineComment(str);
+            auto site = str.indexOf("=");
+            enforce!BadFormatException((site > 0),
+                    format("Bad format in file %s, at line %d", filename, line));
+            string key = str[0 .. site].strip;
+            string value = str[site + 1 .. $].strip;
+            // tracef("key=%s, value=%s", key, value);
+            props[key] = value;
+        }
+        return props;
+    }
 
-//         try {
-//             if(is !is null) {
-//                 is = new BufferedInputStream(is);
-//                 propSrc = "the specified file : '" ~ filename ~ "' from the class resource path.";
-//             } else {
-//                 is = new BufferedInputStream(new FileInputStream(filename));
-//                 propSrc = "the specified file : '" ~ filename ~ "'";
-//             }
-//             props.load(is);
-//         } catch (IOException ioe) {
-//             initException = new SchedulerException("Properties file: '"
-//                     + filename ~ "' could not be read.", ioe);
-//             throw initException;
-//         }
-//         finally {
-//             if(is !is null)
-//                 try { is.close(); } catch(IOException ignore) {}
-//         }
+    private static string stripInlineComment(string line) {
+        ptrdiff_t index = indexOf(line, "# ");
 
-//         initialize(props);
-//     }
+        if (index == -1)
+            return line;
+        else
+            return line[0 .. index];
+    }
 
-//     /**
-//      * <p>
-//      * Initialize the <code>{@link hunt.quartz.SchedulerFactory}</code> with
-//      * the contents of the <code>Properties</code> file opened with the
-//      * given <code>InputStream</code>.
-//      * </p>
-//      */
-//     void initialize(InputStream propertiesStream) {
-//         // short-circuit if already initialized
-//         if (cfg !is null) {
-//             return;
-//         }
+    /**
+     * <p>
+     * Initialize the <code>{@link hunt.quartz.SchedulerFactory}</code> with
+     * the contents of the <code>Properties</code> file with the given
+     * name.
+     * </p>
+     */
+    void initialize(string filename) {
+        // short-circuit if already initialized
+        if (cfg !is null) {
+            return;
+        }
 
-//         if (initException !is null) {
-//             throw initException;
-//         }
+        if (initException !is null) {
+            throw initException;
+        }
 
-//         Properties props = new Properties();
 
-//         if (propertiesStream !is null) {
-//             try {
-//                 props.load(propertiesStream);
-//                 propSrc = "an externally opened InputStream.";
-//             } catch (IOException e) {
-//                 initException = new SchedulerException(
-//                         "Error loading property data from InputStream", e);
-//                 throw initException;
-//             }
-//         } else {
-//             initException = new SchedulerException(
-//                     "Error loading property data from InputStream - InputStream is null.");
-//             throw initException;
-//         }
+        Properties props;
+        string appRoot = dirName(thisExePath());
+        string fullFileName = buildPath(appRoot, filename);
 
-//         initialize(props);
-//     }
+        try {
+            props = loadConfig(fullFileName);
+            
+        } catch (Exception ioe) {
+            warning(ioe.msg);
+            initException = new SchedulerException("Properties file: '"
+                    ~ filename ~ "' could not be read.", ioe);
+            throw initException;
+        }
+
+        initialize(props);
+    }
+
 
     /**
      * <p>
@@ -866,11 +875,10 @@ class StdSchedulerFactory : SchedulerFactory {
             throw initException;
         }
 
-        try {
-            js = cast(JobStore)Object.factory(jsClass);
-        } catch (Exception e) {
+        js = cast(JobStore)Object.factory(jsClass);
+        if(js is null)  {
             initException = new SchedulerException("JobStore class '" ~ jsClass
-                    ~ "' could not be instantiated.", e);
+                    ~ "' could not be instantiated.");
             throw initException;
         }
 
@@ -1428,7 +1436,7 @@ class StdSchedulerFactory : SchedulerFactory {
 
     private void setBeanProps(T)(T obj, Properties props) {
         foreach(string key, string value; props) {
-            // infof("key=%s, value=%s", key, value);
+            infof("key=%s, value=%s", key, value);
             setProperty(obj, key, value);
         }
     }
