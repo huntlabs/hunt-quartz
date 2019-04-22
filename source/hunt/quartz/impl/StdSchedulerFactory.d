@@ -842,8 +842,7 @@ class StdSchedulerFactory : SchedulerFactory {
         string tpClass = cfg.getStringProperty(PROP_THREAD_POOL_CLASS, typeid(SimpleThreadPool).name);
 
         if (tpClass.empty()) {
-            initException = new SchedulerException(
-                    "ThreadPool class not specified. ");
+            initException = new SchedulerException("ThreadPool class not specified. ");
             throw initException;
         }
 
@@ -1435,8 +1434,11 @@ class StdSchedulerFactory : SchedulerFactory {
     }
 
     private void setBeanProps(T)(T obj, Properties props) {
+        props.remove("class");
+        props.remove("provider");
+
         foreach(string key, string value; props) {
-            infof("key=%s, value=%s", key, value);
+            // infof("key=%s, value=%s", key, value);
             setProperty(obj, key, value);
         }
     }
