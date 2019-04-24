@@ -2,6 +2,7 @@ module hunt.quartz;
 
 
 public import hunt.quartz.Annotations;
+public import hunt.quartz.CronExpression;
 public import hunt.quartz.CronScheduleBuilder;
 public import hunt.quartz.Exceptions;
 public import hunt.quartz.impl.StdSchedulerFactory;

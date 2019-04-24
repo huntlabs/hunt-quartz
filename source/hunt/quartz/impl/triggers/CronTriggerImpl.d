@@ -39,6 +39,7 @@ import hunt.time.ZoneId;
 import hunt.time.ZoneOffset;
 import hunt.time.ZoneRegion;
 import hunt.util.Serialize;
+import hunt.logging.ConsoleLogger;
 
 import witchcraft;
 
@@ -443,6 +444,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
     override
     LocalDateTime getNextFireTime() {
+        infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
         return this.nextFireTime;
     }
 
@@ -717,10 +719,14 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
         previousFireTime = nextFireTime;
         nextFireTime = getFireTimeAfter(nextFireTime);
 
+        // infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
+
         while (nextFireTime !is null && calendar !is null
                 && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
         }
+
+        infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
     }
 
     /**
@@ -731,6 +737,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     void updateWithNewCalendar(QuartzCalendar calendar, long misfireThreshold)
     {
         nextFireTime = getFireTimeAfter(previousFireTime);
+
+        infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
         
         if (nextFireTime is null || calendar is null) {
             return;
@@ -757,6 +765,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
                 }
             }
         }
+        
+        infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
     }
 
     /**
@@ -784,6 +794,8 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
                 && !calendar.isTimeIncluded(nextFireTime.toEpochMilli())) {
             nextFireTime = getFireTimeAfter(nextFireTime);
         }
+
+        infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
 
         return nextFireTime;
     }

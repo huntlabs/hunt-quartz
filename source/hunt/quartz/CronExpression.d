@@ -17,11 +17,6 @@
 
 module hunt.quartz.CronExpression;
 
-import hunt.collection;
-import hunt.text;
-import hunt.Exceptions;
-import hunt.String;
-// import hunt.time.util.Calendar;
 import hunt.time.util.Locale;
 import hunt.time.DayOfWeek;
 import hunt.time.Duration;
@@ -30,22 +25,18 @@ import hunt.time.ZoneId;
 import hunt.time.ZoneRegion;
 import hunt.time.ZoneOffset;
 import hunt.util.Common;
-// import std.datetime;
-// import hunt.collection.HashMap;
-// import hunt.collection.Iterator;
-// import hunt.collection.Map;
-// import java.util.SortedSet;
-// import hunt.text.StringTokenizer;
-// import java.util.TreeSet;
 
+import hunt.collection;
+import hunt.Exceptions;
+import hunt.String;
+import hunt.text;
+import hunt.logging.ConsoleLogger;
 
 import std.conv;
-// import std.datetime;
 import std.range;
 import std.regex;
 import std.string;
 
-version (HUNT_DEBUG) import hunt.logging.ConsoleLogger;
 
 /**
  * Provides a parser and evaluator for unix-like cron expressions. Cron 
@@ -313,6 +304,7 @@ final class CronExpression : Cloneable { // Serializable,
         try {
             buildExpression(cronExpression);
         } catch (ParseException ex) {
+            version(HUNT_DEBUG) warning(ex);
             throw new Error("Building error: " ~ ex.msg);
         }
         if (expression.getTimeZone() !is null) {
@@ -1155,23 +1147,17 @@ final class CronExpression : Cloneable { // Serializable,
     }
 
     protected int getMonthNumber(string s) {
-        int integer = monthMap.get(s);
-
-        // if (integer is null) {
-        //     return -1;
-        // }
-
-        return integer;
+        if(monthMap.containsKey(s))
+            return monthMap.get(s);
+        else
+            return -1;
     }
 
     protected int getDayOfWeekNumber(string s) {
-        int integer = dayMap.get(s);
-
-        // if (integer is null) {
-        //     return -1;
-        // }
-
-        return integer;
+        if(dayMap.containsKey(s))
+            return dayMap.get(s);
+        else 
+            return -1;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1188,10 +1174,10 @@ final class CronExpression : Cloneable { // Serializable,
         bool gotOne = false;
         // loop until we've computed the next time, or we've past the endTime
         while (!gotOne) {
-            //if (endTime !is null && cl.getTime().isAfter(endTime)) return null;
             if(afterTime.getYear() > 2999) { // prevent endless loop...
                 return null;
             }
+            // tracef("afterTime=%s", afterTime.toString());
 
             SortedSet!(int) st = null;
             int t = 0;
@@ -1205,8 +1191,7 @@ final class CronExpression : Cloneable { // Serializable,
                 sec = st.first();
             } else {
                 sec = seconds.first();
-                min++;
-                afterTime.withMinute(min);
+                afterTime = afterTime.plusMinutes(1);
             }
             afterTime.withSecond(sec);
 
@@ -1221,14 +1206,15 @@ final class CronExpression : Cloneable { // Serializable,
                 min = st.first();
             } else {
                 min = minutes.first();
-                hr++;
+                // hr++;
+                afterTime = afterTime.plusHours(1);
             }
+
+            // version (HUNT_DEBUG) tracef("t:%d, min:%d", t, min);
             if (min != t) {
-                afterTime = LocalDateTime.of(afterTime.getYear(), afterTime.getMonthValue(), 
-                    afterTime.getDayOfMonth(), hr, min, 0);
-                // cl.set(Calendar.SECOND, 0);
-                // cl.set(Calendar.MINUTE, min);
-                // setCalendarHour(cl, hr);
+                // afterTime = LocalDateTime.of(afterTime.getYear(), afterTime.getMonthValue(), 
+                //     afterTime.getDayOfMonth(), hr, min, 0);
+                afterTime = afterTime.withMinute(min).withSecond(0);
                 continue;
             }
             afterTime = afterTime.withMinute(min);
@@ -1244,11 +1230,14 @@ final class CronExpression : Cloneable { // Serializable,
                 hr = st.first();
             } else {
                 hr = hours.first();
-                day++;
+                // day++;
+                afterTime = afterTime.plusDays(1);
             }
+
+            // version (HUNT_DEBUG) tracef("hr:%d, t:%d", hr, t);
+
             if (hr != t) {
-                afterTime = LocalDateTime.of(afterTime.getYear(), afterTime.getMonthValue(), day, hr, 0, 0);
-                // setCalendarHour(cl, hr);
+                afterTime = afterTime.withHour(hr).withMinute(0).withSecond(0);
                 continue;
             }
             afterTime = afterTime.withHour(hr);
@@ -1263,7 +1252,6 @@ final class CronExpression : Cloneable { // Serializable,
             // get day...................................................
             bool dayOfMSpec = !daysOfMonth.contains(NO_SPEC);
             bool dayOfWSpec = !daysOfWeek.contains(NO_SPEC);
-            // version (HUNT_DEBUG) tracef("dayOfMSpec=%s, dayOfWSpec=%s", dayOfMSpec, dayOfWSpec);
             if (dayOfMSpec && !dayOfWSpec) { // get day by day of month rule
                 st = daysOfMonth.tailSet(day);
                 if (lastdayOfMonth) {
@@ -1346,7 +1334,7 @@ final class CronExpression : Cloneable { // Serializable,
                     mon++;
                 }
                 
-                    // version (HUNT_DEBUG) tracef("day:%d, t:%d, mon:%d, tmon:%d=>", day, t, mon, tmon);
+                // version (HUNT_DEBUG) tracef("day:%d, t:%d, mon:%d, tmon:%d", day, t, mon, tmon);
 
                 if (day != t || mon != tmon) {
                     afterTime = LocalDateTime.of(afterTimeYear, mon, day, 0, 0, 0);

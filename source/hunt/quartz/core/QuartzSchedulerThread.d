@@ -324,7 +324,8 @@ class QuartzSchedulerThread : ThreadEx {
                     clearSignaledSchedulingChange();
                     try {
                         triggers = qsRsrcs.getJobStore().acquireNextTriggers(
-                                now + idleWaitTime, min(availThreadCount, qsRsrcs.getMaxBatchSize()), 
+                                now + idleWaitTime, 
+                                min(availThreadCount, qsRsrcs.getMaxBatchSize()), 
                                 qsRsrcs.getBatchTimeWindow());
                         acquiresFailed = 0;
                         int n = triggers is null ? 0 : triggers.size();

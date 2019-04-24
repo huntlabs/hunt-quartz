@@ -1453,21 +1453,24 @@ class RAMJobStore : JobStore {
                 }
 
                 version(HUNT_DEBUG) {
-                    tracef("current trigger: %s, remaining triggers: %d", 
-                        tw.trigger.getJobKey().toString(), timeTriggers.size());
+                    tracef("current trigger: %s, remaining: %d, type: %s", 
+                        tw.trigger.getJobKey().toString(), 
+                        timeTriggers.size(), typeid(cast(Object)tw.trigger));
                 }
-                if (tw.trigger.getNextFireTime() is null) {
+
+                LocalDateTime nextFireTime = tw.trigger.getNextFireTime();
+                if (nextFireTime is null) {
                     continue;
                 }
 
                 if (applyMisfire(tw)) {
-                    if (tw.trigger.getNextFireTime() !is null) {
+                    if (nextFireTime !is null) {
                         timeTriggers.add(tw);
                     }
                     continue;
                 }
 
-                if (tw.getTrigger().getNextFireTime().toEpochMilli() > batchEnd) {
+                if (nextFireTime.toEpochMilli() > batchEnd) {
                     timeTriggers.add(tw);
                     break;
                 }
@@ -1493,7 +1496,7 @@ class RAMJobStore : JobStore {
                 // OperableTrigger trig = cast(OperableTrigger) tw.trigger;
                 assert(trig !is null);
                 if (result.isEmpty()) {
-                    batchEnd = max(tw.trigger.getNextFireTime().toEpochMilli(), 
+                    batchEnd = max(nextFireTime.toEpochMilli(), 
                         DateTimeHelper.currentTimeMillis()) + timeWindow;
                 }
                 result.add(trig);
@@ -1813,6 +1816,9 @@ class JobWrapper {
     }
 }
 
+
+/**
+*/
 class TriggerWrapper {
 
     TriggerKey key;
