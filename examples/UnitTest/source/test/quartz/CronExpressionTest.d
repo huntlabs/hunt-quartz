@@ -81,24 +81,6 @@ class CronExpressionTest  { // : SerializationTestSupport
     //     assertEquals(targetCronExpression.getCronExpression(), deserializedCronExpression.getCronExpression());
     //     assertEquals(targetCronExpression.getTimeZone(), deserializedCronExpression.getTimeZone());
     // }
-
- 	void testQtz259LW_xxx() {
- 		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule("0 0 0 LW * ? *");
- 		Trigger trigger = TriggerBuilderHelper
-            .newTrigger!Trigger()
-            .withIdentity("test")
-            .withSchedule(schedBuilder)
-            .build();
- 				
- 		int i = 0;
- 		LocalDateTime pdate = trigger.getFireTimeAfter(LocalDateTime.of(2019, 4, 25, 17, 59, 57));
- 		while (++i < 26) {
- 			LocalDateTime date = trigger.getFireTimeAfter(pdate);
- 			trace("index: " ~ i.to!string() ~ ", fireTime: " ~ date.toString() ~ ", previousFireTime: " ~ pdate.toString());
- 			assertFalse("Next fire time is the same as previous fire time!", pdate == date);
- 			pdate = date;
- 		}
- 	}
     
     /*
      * Test method for 'org.quartz.CronExpression.isSatisfiedBy(Date)'.
@@ -163,6 +145,24 @@ class CronExpressionTest  { // : SerializationTestSupport
     //     // if broken, this will throw an exception
     //     newExpression.getNextValidTimeAfter(new Date());
     // }
+
+ 	void testQtzSeconds() {
+ 		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule("0/6 * * * * ?");
+ 		Trigger trigger = TriggerBuilderHelper
+            .newTrigger!Trigger()
+            .withIdentity("test")
+            .withSchedule(schedBuilder)
+            .build();
+ 		
+ 		int i = 0;
+ 		LocalDateTime pdate = trigger.getFireTimeAfter(LocalDateTime.of(2019, 4, 25, 17, 59, 57));
+ 		while (++i < 5) {
+ 			LocalDateTime date = trigger.getFireTimeAfter(pdate);
+ 			trace("index: " ~ i.to!string() ~ ", fireTime: " ~ date.toString() ~ ", previousFireTime: " ~ pdate.toString());
+ 			assertFalse("Next fire time is the same as previous fire time!", pdate == date);
+ 			pdate = date;
+ 		}
+ 	}
 
     /**
      * QTZ-259 : last day offset causes repeating fire time

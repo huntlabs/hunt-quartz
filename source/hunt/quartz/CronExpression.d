@@ -534,7 +534,6 @@ final class CronExpression : Cloneable { // Serializable,
     }
 
     protected int storeExpressionVals(int pos, string s, int type) {
-
         int incr = 0;
         int i = skipWhiteSpace(pos, s);
         if (i >= s.length) {
@@ -1177,7 +1176,7 @@ final class CronExpression : Cloneable { // Serializable,
             if(afterTime.getYear() > 2999) { // prevent endless loop...
                 return null;
             }
-            // tracef("afterTime=%s", afterTime.toString());
+            tracef("loop start: %s", afterTime.toString());
 
             SortedSet!(int) st = null;
             int t = 0;
@@ -1193,7 +1192,7 @@ final class CronExpression : Cloneable { // Serializable,
                 sec = seconds.first();
                 afterTime = afterTime.plusMinutes(1);
             }
-            afterTime.withSecond(sec);
+            afterTime = afterTime.withSecond(sec);
 
             min = afterTime.getMinute();
             int hr = afterTime.getHour();
@@ -1489,6 +1488,8 @@ final class CronExpression : Cloneable { // Serializable,
             afterTime = afterTime.withYear(year);
             gotOne = true;
         } // while( !done )
+
+        info("loop end: ", afterTime.toString());
 
         return afterTime; 
     }
