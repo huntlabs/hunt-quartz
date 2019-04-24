@@ -32,13 +32,15 @@ import hunt.quartz.Trigger;
 import hunt.quartz.TriggerBuilder;
 import hunt.quartz.TriggerUtils;
 
-import hunt.Exceptions;
 // import hunt.time.util.Calendar;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneId;
 import hunt.time.ZoneOffset;
 import hunt.time.ZoneRegion;
+
+import hunt.Exceptions;
 import hunt.util.Serialize;
+import hunt.util.Traits;
 import hunt.logging.ConsoleLogger;
 
 import witchcraft;
@@ -344,7 +346,10 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
     
     override
     Object clone() {
+
         CronTriggerImpl copy = cast(CronTriggerImpl) super.clone();
+        enum string s = generateObjectClone!(typeof(this), "this", copy.stringof);
+        mixin(s);
         if (cronEx !is null) {
             copy.setCronExpression(new CronExpression(cronEx));
         }
