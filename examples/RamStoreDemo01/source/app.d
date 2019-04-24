@@ -32,6 +32,8 @@ void main() {
 	
 	scheduler.start();
 	info("Launched");
+	// import core.thread;
+	// thread_joinAll();
 }
 
 

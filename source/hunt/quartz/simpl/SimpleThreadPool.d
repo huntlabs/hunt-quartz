@@ -617,9 +617,9 @@ warningf("removing=>", wt.name);
                         runnable = null;
                     }
                     // repair the thread in case the runnable mucked it up...
-                    if(this.priority != tp.getThreadPriority()) {
-                        this.priority = tp.getThreadPriority();
-                    }
+                    // if(this.priority != tp.getThreadPriority()) {
+                    //     this.priority = tp.getThreadPriority();
+                    // }
 
                     // trace("runOnce=%s, ran=%s, thread: %s", runOnce, ran, this.name);
 

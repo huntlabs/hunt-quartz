@@ -449,7 +449,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      */
     override
     LocalDateTime getNextFireTime() {
-        infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
+        // infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
         return this.nextFireTime;
     }
 
