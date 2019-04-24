@@ -218,25 +218,33 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
     }
 
 
-    override
-    // suppress warnings on generic cast of super.clone() and map.clone() lines.
-    Object clone() {
-        DirtyFlagMap!(K,V) copy;
-        try {
-            copy = cast(DirtyFlagMap!(K,V)) super.clone();
+    // override
+    // // suppress warnings on generic cast of super.clone() and map.clone() lines.
+    // Object clone() {
+    //     DirtyFlagMap!(K,V) copy;
+    //     try {
+    //         copy = cast(DirtyFlagMap!(K,V)) super.clone();
 
-            enum string s = generateObjectClone!(DirtyFlagMap!(K,V), this.stringof, copy.stringof);
-            mixin(s);
+    //         enum string s = generateObjectClone!(DirtyFlagMap!(K,V), this.stringof, copy.stringof);
+    //         mixin(s);
 
-            HashMap!(K,V) hashMap = cast(HashMap!(K,V))map;
-            if (hashMap !is null) {
-                copy.map = cast(Map!(K,V))(hashMap.clone());
-            }
-        } catch (CloneNotSupportedException ex) {
-            throw new IncompatibleClassChangeError("Not Cloneable.");
+    //         HashMap!(K,V) hashMap = cast(HashMap!(K,V))map;
+    //         if (hashMap !is null) {
+    //             copy.map = cast(Map!(K,V))(hashMap.clone());
+    //         }
+    //     } catch (CloneNotSupportedException ex) {
+    //         throw new IncompatibleClassChangeError("Not Cloneable.");
+    //     }
+
+    //     return copy;
+    // }
+
+
+    mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
+        HashMap!(K,V) hashMap = cast(HashMap!(K,V))from.map;
+        if (hashMap !is null) {
+            to.map = cast(Map!(K,V))(hashMap.clone());
         }
-
-        return copy;
-    }
+    }); 
 
 }

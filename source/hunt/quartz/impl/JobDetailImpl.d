@@ -458,22 +458,28 @@ class JobDetailImpl : JobDetail {
 
     alias opCmp = Object.opCmp;
     
-    Object clone() {
-        JobDetailImpl copy;
-        try {
-            copy = cast(JobDetailImpl)typeid(this).create();
-            assert(copy !is null);
-            enum string s = generateObjectClone!(JobDetailImpl, this.stringof, copy.stringof);
-            mixin(s);
-            if (jobDataMap !is null) {
-                copy.jobDataMap = cast(JobDataMap) jobDataMap.clone();
-            }
-        } catch (CloneNotSupportedException ex) {
-            throw new IncompatibleClassChangeError("Not Cloneable.");
-        }
+    // Object clone() {
+    //     JobDetailImpl copy;
+    //     try {
+    //         copy = cast(JobDetailImpl)typeid(this).create();
+    //         assert(copy !is null);
+    //         enum string s = generateObjectClone!(JobDetailImpl, this.stringof, copy.stringof);
+    //         mixin(s);
+    //         if (jobDataMap !is null) {
+    //             copy.jobDataMap = cast(JobDataMap) jobDataMap.clone();
+    //         }
+    //     } catch (CloneNotSupportedException ex) {
+    //         throw new IncompatibleClassChangeError("Not Cloneable.");
+    //     }
 
-        return copy;
-    }
+    //     return copy;
+    // }
+
+    mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
+        if (from.jobDataMap !is null) {
+            to.jobDataMap = cast(JobDataMap) from.jobDataMap.clone();
+        }
+    });    
 
     JobBuilder getJobBuilder() {
         JobBuilder b = JobBuilder.newJob()

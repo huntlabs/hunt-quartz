@@ -470,8 +470,7 @@ final class CronExpression : Cloneable { // Serializable,
             int exprOn = SECOND;
             version (HUNT_DEBUG) tracef(expression);
 
-            StringTokenizer exprsTok = new StringTokenizer(expression, " \t",
-                    false);
+            StringTokenizer exprsTok = new StringTokenizer(expression, " \t", false);
                 
             while (exprsTok.hasMoreTokens() && exprOn <= YEAR) {
                 string expr = exprsTok.nextToken().strip();
@@ -1176,7 +1175,7 @@ final class CronExpression : Cloneable { // Serializable,
             if(afterTime.getYear() > 2999) { // prevent endless loop...
                 return null;
             }
-            tracef("loop start: %s", afterTime.toString());
+            // tracef("loop start: %s", afterTime.toString());
 
             SortedSet!(int) st = null;
             int t = 0;
@@ -1489,7 +1488,7 @@ final class CronExpression : Cloneable { // Serializable,
             gotOne = true;
         } // while( !done )
 
-        info("loop end: ", afterTime.toString());
+        // info("loop end: ", afterTime.toString());
 
         return afterTime; 
     }

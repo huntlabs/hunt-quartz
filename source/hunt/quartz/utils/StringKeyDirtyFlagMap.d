@@ -390,10 +390,12 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
         }
     }
 
-    override Object clone() { 
-        StringKeyDirtyFlagMap copy = cast(StringKeyDirtyFlagMap)super.clone();
-        enum string s = generateObjectClone!(StringKeyDirtyFlagMap, this.stringof, copy.stringof);
-        mixin(s);
-        return copy;
-    }
+    // override Object clone() { 
+    //     StringKeyDirtyFlagMap copy = cast(StringKeyDirtyFlagMap)super.clone();
+    //     enum string s = generateObjectClone!(StringKeyDirtyFlagMap, this.stringof, copy.stringof);
+    //     mixin(s);
+    //     return copy;
+    // }
+
+    mixin CloneMemberTemplate!(typeof(this));  
 }

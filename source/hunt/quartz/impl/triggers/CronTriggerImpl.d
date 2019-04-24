@@ -344,17 +344,11 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    override
-    Object clone() {
-
-        CronTriggerImpl copy = cast(CronTriggerImpl) super.clone();
-        enum string s = generateObjectClone!(typeof(this), "this", copy.stringof);
-        mixin(s);
-        if (cronEx !is null) {
-            copy.setCronExpression(new CronExpression(cronEx));
+    mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
+        if (from.cronEx !is null) {
+            to.setCronExpression(new CronExpression(from.cronEx));
         }
-        return copy;
-    }
+    });
 
     void setCronExpression(string cronExpression) {
         ZoneId origTz = getTimeZone();
