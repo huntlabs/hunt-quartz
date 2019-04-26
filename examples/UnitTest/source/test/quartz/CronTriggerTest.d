@@ -98,7 +98,6 @@ class CronTriggerTest {
     //     }
 
     void testClone() {
-        implementationMissing(false);
         CronTriggerImpl trigger = new CronTriggerImpl();
         trigger.setName("test");
         trigger.setGroup("testGroup");

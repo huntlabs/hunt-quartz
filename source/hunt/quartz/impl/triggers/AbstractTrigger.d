@@ -866,30 +866,6 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
         return key.toHash();
     }
 
-    // override
-    // Object clone() {
-    //     AbstractTrigger!T copy;
-    //     try {
-    //         copy = cast(AbstractTrigger!T)typeid(this).create();
-    //         enum string s = generateObjectClone!(AbstractTrigger!T, this.stringof, copy.stringof);
-    //         mixin(s);
-
-    //         // Shallow copy the jobDataMap.  Note that this means that if a user
-    //         // modifies a value object in this map from the cloned Trigger
-    //         // they will also be modifying this Trigger. 
-    //         if (jobDataMap !is null) {
-    //             copy.jobDataMap = cast(JobDataMap)jobDataMap.clone();
-    //         }
-
-    //     } catch (CloneNotSupportedException ex) {
-    //         throw new IncompatibleClassChangeError("Not Cloneable.");
-    //     }
-
-    //     return copy;
-
-    //     // return this;
-    // }
-
     mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
 
         // Shallow copy the jobDataMap.  Note that this means that if a user

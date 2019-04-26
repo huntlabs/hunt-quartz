@@ -204,8 +204,7 @@ import std.string;
  * @author Contributions from Mads Henderson
  * @author Refactoring from CronTrigger to CronExpression by Aaron Craven
  */
-final class CronExpression : Cloneable { // Serializable,
-
+final class CronExpression  { // : Cloneable Serializable,
     
     protected enum int SECOND = 0;
     protected enum int MINUTE = 1;

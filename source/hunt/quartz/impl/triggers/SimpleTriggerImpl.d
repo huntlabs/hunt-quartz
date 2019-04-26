@@ -947,13 +947,6 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         return sb;
     }
 
-    // override Object clone() { 
-    //     SimpleTriggerImpl copy = cast(SimpleTriggerImpl)super.clone();
-    //     enum string s = generateObjectClone!(SimpleTriggerImpl, this.stringof, copy.stringof);
-    //     mixin(s);
-    //     return copy;
-    // }
-
     mixin CloneMemberTemplate!(typeof(this));   
 
     mixin SerializationMember!(typeof(this));
