@@ -21,7 +21,7 @@ import hunt.quartz.simpl.SimpleJobFactory;
 import hunt.collection.Map;
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
-import hunt.time.util.Locale;
+import hunt.util.Locale;
 
 import hunt.quartz.Job;
 import hunt.quartz.JobDataMap;

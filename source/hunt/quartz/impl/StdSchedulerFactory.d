@@ -57,7 +57,7 @@ import hunt.quartz.utils.PropertiesParser;
 import hunt.collection.Collection;
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
-import hunt.time.util.Locale;
+import hunt.util.Locale;
 import hunt.util.Traits;
 import hunt.util.Configuration;
 

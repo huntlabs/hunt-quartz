@@ -17,7 +17,7 @@
 
 module hunt.quartz.CronExpression;
 
-import hunt.time.util.Locale;
+import hunt.util.Locale;
 import hunt.time.DayOfWeek;
 import hunt.time.Duration;
 import hunt.time.LocalDateTime;
