@@ -3,7 +3,7 @@
 -- In your Quartz properties file, you'll need to set 
 -- org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 
-DROP TABLE IF EXISTS  qrtz_fired_trigger`s;
+DROP TABLE IF EXISTS  qrtz_fired_triggers;
 DROP TABLE IF EXISTS  QRTZ_PAUSED_TRIGGER_GRPS;
 DROP TABLE IF EXISTS  QRTZ_SCHEDULER_STATE;
 DROP TABLE IF EXISTS  QRTZ_LOCKS;
