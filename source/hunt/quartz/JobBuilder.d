@@ -209,6 +209,11 @@ class JobBuilder {
         return this;
     }
 
+    JobBuilder ofType(T)() if(is(T : Job)) {
+        this.jobClass = typeid(T);
+        return this;
+    }
+
     /**
      * Instructs the <code>Scheduler</code> whether or not the <code>Job</code>
      * should be re-executed if a 'recovery' or 'fail-over' situation is

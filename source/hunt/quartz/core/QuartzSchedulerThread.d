@@ -283,7 +283,11 @@ class QuartzSchedulerThread : ThreadEx {
 
         while (!halted) {
             import core.time;
-            // Thread.sleep(1.seconds); // xxxxxx
+            version(HUNT_DEBUG) {
+                Thread.sleep(1.seconds); // slow down the process
+                trace("scheduling...");
+            }
+
             try {
                 // check if we're supposed to pause...
                 sigLock.lock(); 
@@ -324,14 +328,16 @@ class QuartzSchedulerThread : ThreadEx {
                     clearSignaledSchedulingChange();
                     try {
                         triggers = qsRsrcs.getJobStore().acquireNextTriggers(
-                                now + idleWaitTime, 
-                                min(availThreadCount, qsRsrcs.getMaxBatchSize()), 
-                                qsRsrcs.getBatchTimeWindow());
+                                        now + idleWaitTime, 
+                                        min(availThreadCount, qsRsrcs.getMaxBatchSize()), 
+                                        qsRsrcs.getBatchTimeWindow()
+                                    );
+
                         acquiresFailed = 0;
                         int n = triggers is null ? 0 : triggers.size();
                         version(HUNT_DEBUG) {
-                            info("batch acquisition of " ~  std.conv.to!string(n) ~ " triggers");
-                        } else {
+                            // info("batch acquisition of " ~  std.conv.to!string(n) ~ " triggers");
+                        // } else {
                             if (n > 0) {
                                 info("batch acquisition of " ~ std.conv.to!string(n) ~ " triggers");
                             }

@@ -679,9 +679,9 @@ abstract class JobStoreSupport : JobStore {
      */
     void initialize(SchedulerSignaler signaler) { // ClassLoadHelper loadHelper,
 
-        if (dsName is null) { 
-            throw new SchedulerConfigException("DataSource name not set."); 
-        }
+        // if (dsName is null) { 
+        //     throw new SchedulerConfigException("DataSource name not set."); 
+        // }
 
         // classLoadHelper = loadHelper;
         if(isThreadsInheritInitializersClassLoadContext()) {
@@ -847,9 +847,11 @@ abstract class JobStoreSupport : JobStore {
 
         // Set any connection connection attributes we are to override.
         try {
-            // if (!isDontSetAutoCommitFalse()) {
-            //     conn.setAutoCommit(false);
-            // }
+            if (!isDontSetAutoCommitFalse()) {
+                // FIXME: Needing refactor or cleanup -@zhangxueping at 2019/6/13 下午8:41:05
+                // 
+                // conn.setAutoCommit(false);
+            }
 
             // if(isTxIsolationLevelSerializable()) {
             //     conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
@@ -2774,7 +2776,8 @@ abstract class JobStoreSupport : JobStore {
             });
         
         version(HUNT_DEBUG) {
-            tracef("remaining triggers: %d", triggers.size()); 
+            if(triggers.size() > 0)
+                tracef("remaining triggers: %d", triggers.size()); 
         }  
         return triggers;
     }
@@ -2807,8 +2810,7 @@ abstract class JobStoreSupport : JobStore {
                 }
 
                 long batchEnd = noLaterThan;
-
-                tracef("TriggerKey size: %d, batchEnd=%d", keys.size(), batchEnd);
+                version(HUNT_DEBUG) tracef("TriggerKey size: %d, batchEnd=%d", keys.size(), batchEnd);
 
                 foreach(TriggerKey triggerKey; keys) {
                     // If our trigger is no longer available, try a new one.
@@ -3263,6 +3265,7 @@ abstract class JobStoreSupport : JobStore {
 
         Connection conn = getNonManagedTXConnection();
         try {
+            beginTransaction(conn);
             // Other than the first time, always checkin first to make sure there is 
             // work to be done before we acquire the lock (since that is expensive, 
             // and is almost never necessary).  This must be done in a separate
@@ -3610,8 +3613,10 @@ abstract class JobStoreSupport : JobStore {
             //     }
             // }
             
-            // // Wan't a Proxy, or was a Proxy, but wasn't ours.
-            // closeConnection(conn);
+            // FIXME: Needing refactor or cleanup -@zhangxueping at 2019/6/13 下午8:52:11
+            // 
+            // Wan't a Proxy, or was a Proxy, but wasn't ours.
+            // closeConnection(conn); // can't enable this
         }
     }
     
@@ -3669,18 +3674,27 @@ abstract class JobStoreSupport : JobStore {
      * connection is committed
      */
     protected void commitConnection(Connection conn) {
-
         if (conn !is null) {
             try {
                 // conn.commit();
                 conn.getSession().commit();
             } catch (SQLException e) {
                 throw new JobPersistenceException(
-                    "Couldn't commit jdbc connection. "~ e.msg, e);
+                    "Couldn't commit db connection. "~ e.msg, e);
             }
         }
     }
     
+    protected void beginTransaction(Connection conn) {
+        if (conn !is null) {
+            try {
+                conn.getSession().beginTransaction();
+            } catch (SQLException e) {
+                throw new JobPersistenceException(
+                    "Couldn't start a transaction for a connection. " ~ e.msg, e);
+            }
+        }
+    }
 
     /**
      * Execute the given callback in a transaction. Depending on the JobStore, 
@@ -3771,9 +3785,14 @@ abstract class JobStoreSupport : JobStore {
                 conn = getNonManagedTXConnection();
             }
 
+            version(HUNT_DEBUG) info("start transaction");
+            beginTransaction(conn);
+
             static if(is(T == void)) {
                     txCallback.execute(conn);
                 try {
+
+                    version(HUNT_DEBUG) info("commit transaction");                    
                     commitConnection(conn);
                 } catch (JobPersistenceException e) {
                     rollbackConnection(conn);
@@ -3786,6 +3805,7 @@ abstract class JobStoreSupport : JobStore {
             } else {
                 T result = txCallback.execute(conn);
                 try {
+                    version(HUNT_DEBUG) info("commit transaction"); 
                     commitConnection(conn);
                 } catch (JobPersistenceException e) {
                     rollbackConnection(conn);

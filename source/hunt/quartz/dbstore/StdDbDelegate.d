@@ -195,7 +195,7 @@ class StdDbDelegate : DriverDelegate {
     }
     
     void addTriggerPersistenceDelegate(TriggerPersistenceDelegate d) {
-        trace("Adding TriggerPersistenceDelegate of type: " ~ typeid(d).name); // d.getClass().getCanonicalName()
+        version(HUNT_DEBUG_MORE) trace("Adding TriggerPersistenceDelegate of type: " ~ typeid(d).name);
         d.initialize(tablePrefix, schedName);
         this.triggerPersistenceDelegates.add(d);
     }
@@ -703,7 +703,7 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(2, jobKey.getGroup());
         JobDetails r = query.getSingleResult();
         version(HUNT_DEBUG) {
-            trace("The job %s exists: %s ", jobKey.toString(), r !is null);
+            tracef("The job %s exists: %s ", jobKey.toString(), r !is null);
         }
         return r !is null;
     }
@@ -2191,6 +2191,9 @@ class StdDbDelegate : DriverDelegate {
      * @return A (never null, possibly empty) list of the identifiers (Key objects) of the next triggers to be fired.
      */
     List!(TriggerKey) selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan, int maxCount) {
+        version(HUNT_DEBUG) {
+            tracef("noLaterThan=%d, noEarlierThan=%d", noLaterThan, noEarlierThan);
+        }
         List!(TriggerKey) nextTriggers = new LinkedList!(TriggerKey)();
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NEXT_TRIGGER_TO_ACQUIRE));
 
