@@ -382,6 +382,9 @@ class StringKeyDirtyFlagMap : DirtyFlagMap!(string, Object) {
      */
     string getString(string key) {
         Object obj = get(key);
+
+        if(obj is null)
+            throw new NullPointerException("key: " ~ key);
     
         try {
             return obj.toString();

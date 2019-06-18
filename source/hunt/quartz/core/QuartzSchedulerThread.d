@@ -311,6 +311,7 @@ class QuartzSchedulerThread : ThreadEx {
                 // wait a bit, if reading from job store is consistently
                 // failing (e.g. DB is down or restarting)..
                 if (acquiresFailed > 1) {
+                    info("acquiresFailed=%d", acquiresFailed);
                     try {
                         long delay = computeDelayForRepeatedErrors(qsRsrcs.getJobStore(), acquiresFailed);
                         Thread.sleep(delay.msecs);
@@ -334,19 +335,20 @@ class QuartzSchedulerThread : ThreadEx {
                                     );
 
                         acquiresFailed = 0;
+                        // version(HUNT_QUARTZ_DEBUG) 
+                        {
                         int n = triggers is null ? 0 : triggers.size();
-                        version(HUNT_DEBUG) {
                             // info("batch acquisition of " ~  std.conv.to!string(n) ~ " triggers");
                         // } else {
                             if (n > 0) {
-                                info("batch acquisition of " ~ std.conv.to!string(n) ~ " triggers");
+                                info("batch acquisition of " ~ std.conv.to!string(n) ~ 
+                                    " triggers, thread: " ~ this.name() );
                             }
                         }
                     } catch (JobPersistenceException jpe) {
                         if (acquiresFailed == 0) {
                             qs.notifySchedulerListenersError(
-                                "An error occurred while scanning for the next triggers to fire.",
-                                jpe);
+                                "An error occurred while scanning for the next triggers to fire.", jpe);
                         }
                         if (acquiresFailed < int.max)
                             acquiresFailed++;

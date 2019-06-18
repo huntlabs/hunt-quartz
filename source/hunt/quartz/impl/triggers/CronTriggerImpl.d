@@ -725,7 +725,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
             nextFireTime = getFireTimeAfter(nextFireTime);
         }
 
-        infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
+        version(HUNT_QUARTZ_DEBUG_MORE) infof("nextFireTime %s null", this.nextFireTime is null ? "is" : "is not");
     }
 
     /**

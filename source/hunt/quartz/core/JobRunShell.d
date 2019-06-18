@@ -268,10 +268,10 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                             ~ ": couldn't finalize execution.", se);
                     continue;
                 }
-                version(HUNT_DEBUG) 
+                version(HUNT_QUARTZ_DEBUG) 
                     trace("start to notify JobStore that a job completed.");
                 qs.notifyJobStoreJobComplete(trigger, jobDetail, instCode);
-                version(HUNT_DEBUG) 
+                version(HUNT_QUARTZ_DEBUG) 
                     trace("notifying JobStore ended.");
                 break;
             } while (true);

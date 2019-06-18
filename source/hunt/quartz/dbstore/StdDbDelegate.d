@@ -66,6 +66,7 @@ import hunt.database.driver.ResultSet;
 import hunt.database.Row;
 import hunt.io.ByteArrayOutputStream;
 import hunt.logging;
+import hunt.serialization.JsonSerializer;
 import hunt.String;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;
@@ -701,11 +702,14 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_EXISTENCE));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
-        JobDetails r = query.getSingleResult();
+        // JobDetails r = query.getSingleResult();
+        // return r !is null;
+        
+        ResultSet rs = query.getNativeResult();
         version(HUNT_DEBUG) {
-            tracef("The job %s exists: %s ", jobKey.toString(), r !is null);
+            tracef("The job %s exists: %s ", jobKey.toString(), !rs.empty());
         }
-        return r !is null;
+        return !rs.empty();
     }
 
     /**
@@ -745,12 +749,15 @@ class StdDbDelegate : DriverDelegate {
      *           if deserialization causes an error
      */
     JobDetail selectJobDetail(Connection conn, JobKey jobKey) {
+        version(HUNT_QUARTZ_DEBUG_MORE) tracef("job: %s", jobKey.toString());
+        
         EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_DETAIL));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
         JobDetails j = query.getSingleResult();
         if(j is null)
             return null;
+        version(HUNT_QUARTZ_DEBUG) tracef("%(%02X %)", j.jobData);
 
         JobDetailImpl job = new JobDetailImpl();
         job.setName(j.jobName);
@@ -761,14 +768,17 @@ class StdDbDelegate : DriverDelegate {
 
         job.setDurability(j.isDurable.to!bool());
         job.setRequestsRecovery(j.requestsRecovery.to!bool());
-        // FIXME: Needing refactor or cleanup -@zhangxueping at 4/16/2019, 12:26:07 PM
-        // to check
-        // implementationMissing(false);
+
         Map!(string, Object) map = null;
         if (canUseProperties()) {
             map = getMapFromProperties(j.jobData);
         } else {
-            map = unserialize!(JobDataMap)(cast(byte[])j.jobData); //getObjectFromBlob(rs, COL_JOB_DATAMAP);
+            string json = cast(string)j.jobData;
+            version(HUNT_QUARTZ_DEBUG) tracef("job data: %s", json);
+
+            if(!json.empty()) {
+                map = JsonSerializer.fromJson!(JobDataMap)(json);
+            }
         }
 
         if (map !is null) {
@@ -786,6 +796,7 @@ class StdDbDelegate : DriverDelegate {
         }
 
         Properties properties = unserialize!(Properties)(cast(byte[])data);
+        trace(properties);
 
         return convertFromProperty(properties);
     }
@@ -989,6 +1000,8 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(BlobTriggers) query = conn.createQuery!(BlobTriggers)(rtp(StdSqlConstants.INSERT_BLOB_TRIGGER));
         query.setParameter(1, trigger.getKey().getName());
         query.setParameter(2, trigger.getKey().getGroup());
+// TODO: Tasks pending completion -@zhangxueping at 2019/6/17 下午5:54:21        
+// 
         query.setParameter(3, cast(ubyte[])[0x11, 0xA1]);
         
         return query.exec();
@@ -1130,8 +1143,11 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_EXISTENCE));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
-        Triggers r = query.getSingleResult();
-        return r !is null;
+        ResultSet rs = query.getNativeResult();
+        version(HUNT_DEBUG_MORE) {
+            tracef("The triger %s exists: %s ", triggerKey.toString(), !rs.empty());
+        }
+        return !rs.empty();
     }
 
     /**
@@ -1509,6 +1525,7 @@ class StdDbDelegate : DriverDelegate {
      * @throws JobPersistenceException 
      */
     OperableTrigger selectTrigger(Connection conn, TriggerKey triggerKey) {
+        version(HUNT_QUARTZ_DEBUG_MORE) tracef("triger: %s", triggerKey.toString());
 
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER));
         query.setParameter(1, triggerKey.getName());
@@ -1535,7 +1552,12 @@ class StdDbDelegate : DriverDelegate {
         if (canUseProperties()) {
             map = getMapFromProperties(t.jobData);
         } else {
-            map = unserialize!(JobDataMap)(cast(byte[])t.jobData); 
+            // map = unserialize!(JobDataMap)(cast(byte[])t.jobData); 
+            string json = cast(string)t.jobData;
+            version(HUNT_QUARTZ_DEBUG) tracef("triger data: %s", json);
+            if(!json.empty()) {
+                map = JsonSerializer.fromJson!(JobDataMap)(json);
+            }
         }
 
         LocalDateTime nft = null;
@@ -1650,15 +1672,15 @@ class StdDbDelegate : DriverDelegate {
         foreach(size_t i; 0..propNames.length) {
             string propName = propNames[i];
             Object o = propValues[i];
-            tracef("name: %s, value: %s", propName, o);
+            version(HUNT_QUARTZ_DEBUG) tracef("name: %s, value: %s", propName, o);
             
             char c = propName[0].toUpper();
             string methName = "set" ~ c ~ propName[1 .. $];
-            version(HUNT_DEBUG) trace("checking method: ", methName);
+            version(HUNT_QUARTZ_DEBUG) trace("checking method: ", methName);
 
             const Method setMeth = metaInfo.getMethod(methName);
             if (setMeth is null) {
-                warning("No setter on class " ~ metaInfo.getFullName() ~ 
+                version(HUNT_QUARTZ_DEBUG) warning("No setter on class " ~ metaInfo.getFullName() ~ 
                     " for property '" ~ methName ~ "'");
                 continue;
             }
@@ -1704,7 +1726,10 @@ class StdDbDelegate : DriverDelegate {
             if (canUseProperties()) {
                 map = getMapFromProperties(data);
             } else {
-                map = unserialize!(JobDataMap)(cast(byte[])data); 
+                // map = unserialize!(JobDataMap)(cast(byte[])data); 
+                string json = cast(string)data;
+                trace(json);
+                map = JsonSerializer.fromJson!(JobDataMap)(json);
             }
         }
 
@@ -2191,7 +2216,7 @@ class StdDbDelegate : DriverDelegate {
      * @return A (never null, possibly empty) list of the identifiers (Key objects) of the next triggers to be fired.
      */
     List!(TriggerKey) selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan, int maxCount) {
-        version(HUNT_DEBUG) {
+        version(HUNT_QUARTZ_DEBUG_MORE) {
             tracef("noLaterThan=%d, noEarlierThan=%d", noLaterThan, noEarlierThan);
         }
         List!(TriggerKey) nextTriggers = new LinkedList!(TriggerKey)();
@@ -2574,9 +2599,9 @@ class StdDbDelegate : DriverDelegate {
         }
 
         try {
-            ubyte[] d = cast(ubyte[])serialize(data);
-            tracef("%(%02X %)", d);
-            return d;
+            string json = data.jsonSerialize().toString();
+            trace(json);
+            return cast(ubyte[])json;
         } catch (NotSerializableException e) {
             throw new NotSerializableException(
                 "Unable to serialize JobDataMap for insertion into " ~ 

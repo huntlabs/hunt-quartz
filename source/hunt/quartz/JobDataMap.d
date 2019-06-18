@@ -84,13 +84,17 @@ class JobDataMap : StringKeyDirtyFlagMap {
         super(15);
     }
 
+    this(int initialCapacity) {
+        super(initialCapacity);
+    }
+
     /**
      * <p>
      * Create a <code>JobDataMap</code> with the given data.
      * </p>
      */
-    this(Map!(string, Object) mapTyped) {
-        this();
+    this(Map!(string, Object) mapTyped, int initialCapacity = 15) {
+        super(initialCapacity);
          // casting to keep API compatible and avoid compiler errors/warnings.
         // Map!(string, Object) mapTyped = (Map!(string, Object))map;
         putAll(mapTyped);

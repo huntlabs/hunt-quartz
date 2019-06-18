@@ -27,9 +27,16 @@ import hunt.collection.Map;
 import hunt.collection.Set;
 
 import hunt.Exceptions;
+import hunt.logging.ConsoleLogger;
 import hunt.Object;
+import hunt.util.Common;
+import hunt.util.Serialize;
 import hunt.util.Traits;
 
+import hunt.serialization.JsonSerializer;
+
+import std.algorithm;
+import std.array;
 import std.range;
 
 /**
@@ -40,7 +47,7 @@ import std.range;
  *
  * @author James House
  */
-class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializable //  Map
+class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,6 +58,8 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
      */
 
     private bool dirty = false;
+
+    @Exclude
     protected Map!(K, V) map;
 
     /*
@@ -162,15 +171,21 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         return map.byValue();
     }
 
+    bool opEquals(IObject o) {
+        return opEquals(cast(Object) o);
+    }
 
-    // override
-    // bool opEquals(Object o) {
-    //     if (obj is null || !(obj instanceof DirtyFlagMap)) {
-    //         return false;
-    //     }
+    override
+    bool opEquals(Object o) {
+        if (o is null) {
+            return false;
+        }
+        DirtyFlagMap dfMap = cast(DirtyFlagMap)o;
+        if(dfMap is null)
+            return false;
 
-    //     return map.equals(((DirtyFlagMap<?,?>) obj).getWrappedMap());
-    // }
+        return map == dfMap.getWrappedMap();
+    }
 
     override size_t toHash() @trusted nothrow {
         return map.toHash();
@@ -217,6 +232,32 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         return map.values();
     }
 
+
+    V opIndex(K key) {
+        return map.opIndex(key);
+    }
+
+
+    V putIfAbsent(K key, V value) {
+        return map.putIfAbsent(key, value);
+    }
+
+    bool remove(K key, V value) {
+        return map.remove(key, value);
+    }
+    
+    V replace(K key, V value) {
+        return map.replace(key, value);
+    }
+
+    bool replace(K key, V oldValue, V newValue) {
+        return map.replace(key, oldValue, newValue);
+    }
+
+    override string toString() {
+        return map.toString();
+    }
+
     mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
         HashMap!(K,V) hashMap = cast(HashMap!(K,V))from.map;
         if (hashMap !is null) {
@@ -224,4 +265,30 @@ class DirtyFlagMap(K, V) : AbstractMap!(K, V) { // , Cloneable, java.io.Serializ
         }
     }); 
 
+
+    JSONValue jsonSerialize() {
+        JSONValue r = JsonSerializer.serializeObject!(typeof(this), false)(this);
+        JSONValue mapJson;
+
+        foreach(K key, V value; map) {
+            mapJson[key] = value.toString();
+        }
+
+        r["map"] = mapJson;
+        trace(r.toPrettyString());
+        return r;
+    }
+
+    void jsonDeserialize(const(JSONValue) value) {
+        import hunt.String;
+
+        // version(HUNT_DEBUG) trace(value.toPrettyString());
+        JsonSerializer.deserializeObject!(typeof(this), false)(this, value);
+
+        const(JSONValue) mapJson = value["map"];
+
+        foreach(string key, ref const JSONValue value; mapJson.object) {
+            map.put(key, new String(value.str));
+        }
+    }   
 }

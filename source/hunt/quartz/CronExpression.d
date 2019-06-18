@@ -303,7 +303,7 @@ final class CronExpression  { // : Cloneable Serializable,
         try {
             buildExpression(cronExpression);
         } catch (ParseException ex) {
-            version(HUNT_DEBUG) warning(ex);
+            version(HUNT_QUARTZ_DEBUG) warning(ex);
             throw new Error("Building error: " ~ ex.msg);
         }
         if (expression.getTimeZone() !is null) {
@@ -467,13 +467,13 @@ final class CronExpression  { // : Cloneable Serializable,
             }
 
             int exprOn = SECOND;
-            version (HUNT_DEBUG) tracef(expression);
+            version (HUNT_QUARTZ_DEBUG) tracef(expression);
 
             StringTokenizer exprsTok = new StringTokenizer(expression, " \t", false);
                 
             while (exprsTok.hasMoreTokens() && exprOn <= YEAR) {
                 string expr = exprsTok.nextToken().strip();
-                // version (HUNT_DEBUG) tracef(expr);
+                // version (HUNT_QUARTZ_DEBUG) tracef(expr);
 
                 // throw an exception if L is used with other days of the month
                 if(exprOn == DAY_OF_MONTH && expr.indexOf('L') != -1 && expr.length > 1 && expr.contains(",")) {
@@ -512,7 +512,7 @@ final class CronExpression  { // : Cloneable Serializable,
             bool dayOfMSpec = !dom.contains(NO_SPEC);
             bool dayOfWSpec = !dow.contains(NO_SPEC);
             
-            // version (HUNT_DEBUG) {
+            // version (HUNT_QUARTZ_DEBUG) {
             //     tracef("dayOfMSpec: %d, exprOn: %d", dow.size(), exprOn);
             //     tracef("dayOfMSpec: %s, dayOfWSpec: %s", dayOfMSpec, dayOfWSpec);
             // }
@@ -1207,7 +1207,7 @@ final class CronExpression  { // : Cloneable Serializable,
                 afterTime = afterTime.plusHours(1);
             }
 
-            // version (HUNT_DEBUG) tracef("t:%d, min:%d", t, min);
+            // version (HUNT_QUARTZ_DEBUG) tracef("t:%d, min:%d", t, min);
             if (min != t) {
                 // afterTime = LocalDateTime.of(afterTime.getYear(), afterTime.getMonthValue(), 
                 //     afterTime.getDayOfMonth(), hr, min, 0);
@@ -1231,7 +1231,7 @@ final class CronExpression  { // : Cloneable Serializable,
                 afterTime = afterTime.plusDays(1);
             }
 
-            // version (HUNT_DEBUG) tracef("hr:%d, t:%d", hr, t);
+            // version (HUNT_QUARTZ_DEBUG) tracef("hr:%d, t:%d", hr, t);
 
             if (hr != t) {
                 afterTime = afterTime.withHour(hr).withMinute(0).withSecond(0);
@@ -1331,7 +1331,7 @@ final class CronExpression  { // : Cloneable Serializable,
                     mon++;
                 }
                 
-                // version (HUNT_DEBUG) tracef("day:%d, t:%d, mon:%d, tmon:%d", day, t, mon, tmon);
+                // version (HUNT_QUARTZ_DEBUG) tracef("day:%d, t:%d, mon:%d, tmon:%d", day, t, mon, tmon);
 
                 if (day != t || mon != tmon) {
                     afterTime = LocalDateTime.of(afterTimeYear, mon, day, 0, 0, 0);

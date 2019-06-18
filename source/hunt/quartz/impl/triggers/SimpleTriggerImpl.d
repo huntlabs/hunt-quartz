@@ -731,7 +731,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
      */
     void setNextFireTime(LocalDateTime nextFireTime) {
         this.nextFireTime = nextFireTime;        
-        version(HUNT_DEBUG) tracef("nextFireTime is null: %s", nextFireTime is null);
+        version(HUNT_QUARTZ_DEBUG_MORE) tracef("nextFireTime is null: %s", nextFireTime is null);
         
     }
 
@@ -791,7 +791,7 @@ class SimpleTriggerImpl : AbstractTrigger!(SimpleTrigger), SimpleTrigger, CoreTr
         // long numberOfTimesExecuted = ((afterMillis - startMillis) / repeatInterval) + 1;
         Duration dur = Duration.between(getStartTime(), afterTime);        
         long numberOfTimesExecuted = (dur.toMillis() / repeatInterval) + 1;
-        version(HUNT_DEBUG) {
+        version(HUNT_QUARTZ_DEBUG_MORE) {
             tracef("sec: %d, nano: %d , mi:%d", dur.getSeconds, dur.getNano, dur.toMillis());
             tracef("numberOfTimesExecuted: %d, repeatCount: %d", numberOfTimesExecuted, repeatCount);
         }

@@ -43,7 +43,7 @@ class SimpleJobFactory : JobFactory {
         JobDetail jobDetail = bundle.getJobDetail();
         TypeInfo_Class jobClass = jobDetail.getJobClass();
         try {
-            version(HUNT_DEBUG) {
+            version(HUNT_QUARTZ_DEBUG) {
                 trace("Producing instance of Job '" ~ jobDetail.getKey().toString() ~ 
                     "', class=" ~ jobClass.name);
             }

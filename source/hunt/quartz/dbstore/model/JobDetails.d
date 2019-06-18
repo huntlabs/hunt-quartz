@@ -36,4 +36,8 @@ class JobDetails : Model {
 
     @Column(TableConstants.COL_JOB_DATAMAP)
     ubyte[] jobData;
+
+    // override string toString() {
+    //     return cast(string)jobData;
+    // }
 }

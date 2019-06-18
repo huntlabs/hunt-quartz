@@ -112,6 +112,20 @@ class TriggerBuilder(T) if(is(T : Trigger)) {
     }
     
     /**
+     * Create a new TriggerBuilder with which to define a 
+     * specification for a Trigger.
+     * 
+     * @return the new TriggerBuilder
+     */
+    static TriggerBuilder!(T) newTrigger()  {
+        return new TriggerBuilder!(T)();
+    }
+
+    // static TriggerBuilder!(Trigger) newTrigger() {
+    //     return new TriggerBuilder!(Trigger)();
+    // }
+
+    /**
      * Produce the <code>Trigger</code>.
      * 
      * @return a Trigger that meets the specifications of the builder.

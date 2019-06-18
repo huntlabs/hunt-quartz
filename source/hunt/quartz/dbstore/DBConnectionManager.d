@@ -110,7 +110,7 @@ class DBConnectionManager {
      */
     Connection getConnection(string dsName, EntityOption option) {
         if (em is null) {
-            version(HUNT_DEBUG) trace("creating EntityManager for " ~ dsName);
+            version(HUNT_QUARTZ_DEBUG) trace("creating EntityManager for " ~ dsName);
             EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("postgresql",
                     option);
             em = entityManagerFactory.createEntityManager();

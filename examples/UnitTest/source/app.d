@@ -7,6 +7,7 @@ import std.stdio;
 import test.quartz.AnnualCalendarTest;
 import test.quartz.CronExpressionTest;
 import test.quartz.CronTriggerTest;
+import test.quartz.JobDataMapTest;
 import test.quartz.RAMSchedulerTest;
 import test.quartz.SimpleTriggerTest;
 import test.quartz.VersionTest;
@@ -20,9 +21,10 @@ import hunt.time;
 void main()
 {
 	// testUnits!(AnnualCalendarTest);
-	testUnits!(CronExpressionTest);
+	// testUnits!(CronExpressionTest);
 	// testUnits!(CronTriggerTest);
-	// testUnits!(DbSchedulerTest);
+	testUnits!(DbSchedulerTest);
+	// testUnits!(JobDataMapTest);
 	// testUnits!(RAMSchedulerTest);
 	// testUnits!(SimpleTriggerTest);
 	// testUnits!(VersionTest);

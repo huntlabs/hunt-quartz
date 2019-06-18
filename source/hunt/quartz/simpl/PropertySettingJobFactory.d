@@ -85,7 +85,7 @@ class PropertySettingJobFactory : SimpleJobFactory {
 
         
         const Class metaInfo = accessor.getMetaType();
-        version(HUNT_DEBUG) trace("job: ", metaInfo.toString());
+        version(HUNT_QUARTZ_DEBUG) trace("job: ", metaInfo.toString());
         
         // Get the wrapped entry set so don't have to incur overhead of wrapping for
         // dirty flag checking since this is read only access
@@ -93,7 +93,7 @@ class PropertySettingJobFactory : SimpleJobFactory {
         foreach(string name, Object o; data) {
             char c = name[0].toUpper();
             string methName = "set" ~ c ~ name[1 .. $];
-            version(HUNT_DEBUG) trace("checking method: ", methName);
+            version(HUNT_QUARTZ_DEBUG) trace("checking method: ", methName);
 
             const Method setMeth = metaInfo.getMethod(methName);
             if (setMeth is null) {

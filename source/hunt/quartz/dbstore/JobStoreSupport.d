@@ -913,7 +913,8 @@ abstract class JobStoreSupport : JobStore {
                         TableConstants.STATE_PAUSED, TableConstants.STATE_PAUSED_BLOCKED, 
                         TableConstants.STATE_PAUSED_BLOCKED);
             
-            trace("Freed " ~ rows.to!string() ~ " triggers from 'acquired' / 'blocked' state.");
+            version(HUNT_QUARTZ_DEBUG) 
+                trace("Freed " ~ rows.to!string() ~ " triggers from 'acquired' / 'blocked' state.");
 
             // clean up misfired jobs
             recoverMisfiredJobs(conn, true);
@@ -921,7 +922,7 @@ abstract class JobStoreSupport : JobStore {
             // recover jobs marked for recovery that were not fully executed
             List!(OperableTrigger) recoveringJobTriggers = getDelegate()
                     .selectTriggersForRecoveringJobs(conn);
-            trace("Recovering " ~ recoveringJobTriggers.size().to!string()
+            version(HUNT_DEBUG) trace("Recovering " ~ recoveringJobTriggers.size().to!string()
                     ~ " jobs that were in-progress at the time of the last shut-down.");
 
             foreach(OperableTrigger recoveringJobTrigger; recoveringJobTriggers) {
@@ -931,18 +932,18 @@ abstract class JobStoreSupport : JobStore {
                             TableConstants.STATE_WAITING, false, true);
                 }
             }
-            trace("Recovery complete.");
+            version(HUNT_DEBUG) trace("Recovery complete.");
 
             // remove lingering 'complete' triggers...
             List!(TriggerKey) cts = getDelegate().selectTriggersInState(conn, TableConstants.STATE_COMPLETE);
             foreach(TriggerKey ct; cts) {
                 removeTrigger(conn, ct);
             }
-            trace("Removed " ~ cts.size().to!string() ~ " 'complete' triggers.");
+            version(HUNT_DEBUG) trace("Removed " ~ cts.size().to!string() ~ " 'complete' triggers.");
             
             // clean up any fired trigger entries
             int n = getDelegate().deleteFiredTriggers(conn);
-            trace("Removed " ~ n.to!string() ~ " stale fired job entries.");
+            version(HUNT_DEBUG) trace("Removed " ~ n.to!string() ~ " stale fired job entries.");
         } catch (JobPersistenceException e) {
             warning(e.msg);
             throw e;
@@ -979,14 +980,14 @@ abstract class JobStoreSupport : JobStore {
                 maxMisfiresToHandleAtATime, misfiredTriggers);
 
         if (hasMoreMisfiredTriggers) {
-            trace("Handling the first " ~ misfiredTriggers.size().to!string() ~
+            version(HUNT_DEBUG) trace("Handling the first " ~ misfiredTriggers.size().to!string() ~
                 " triggers that missed their scheduled fire-time.  " ~
                 "More misfired triggers remain to be processed.");
         } else if (misfiredTriggers.size() > 0) { 
-            trace("Handling " ~ misfiredTriggers.size().to!string() ~
+            version(HUNT_DEBUG) trace("Handling " ~ misfiredTriggers.size().to!string() ~
                 " trigger(s) that missed their scheduled fire-time.");
         } else {
-            trace("Found 0 triggers that missed their scheduled fire-time.");
+            version(HUNT_DEBUG) trace("Found 0 triggers that missed their scheduled fire-time.");
             return RecoverMisfiredJobsResult.NO_OP; 
         }
 
@@ -2775,7 +2776,7 @@ abstract class JobStoreSupport : JobStore {
                 }
             });
         
-        version(HUNT_DEBUG) {
+        version(HUNT_QUARTZ_DEBUG) {
             if(triggers.size() > 0)
                 tracef("remaining triggers: %d", triggers.size()); 
         }  
@@ -2810,13 +2811,13 @@ abstract class JobStoreSupport : JobStore {
                 }
 
                 long batchEnd = noLaterThan;
-                version(HUNT_DEBUG) tracef("TriggerKey size: %d, batchEnd=%d", keys.size(), batchEnd);
+                version(HUNT_QUARTZ_DEBUG) tracef("TriggerKey size: %d, batchEnd=%d", keys.size(), batchEnd);
 
                 foreach(TriggerKey triggerKey; keys) {
                     // If our trigger is no longer available, try a new one.
                     OperableTrigger nextTrigger = retrieveTrigger(conn, triggerKey);
                     if(nextTrigger is null) {
-                        version(HUNT_DEBUG) trace("nextTrigger is null");
+                        version(HUNT_QUARTZ_DEBUG) trace("nextTrigger is null");
                         continue; // next trigger
                     }
                     
@@ -2853,7 +2854,7 @@ abstract class JobStoreSupport : JobStore {
                     // If our trigger was no longer in the expected state, try a new one.
                     int rowsUpdated = getDelegate().updateTriggerStateFromOtherState(conn, 
                         triggerKey, TableConstants.STATE_ACQUIRED, TableConstants.STATE_WAITING);
-                    version(HUNT_DEBUG) infof("rowsUpdated: %d", rowsUpdated);
+                    version(HUNT_QUARTZ_DEBUG) infof("rowsUpdated: %d", rowsUpdated);
                     if (rowsUpdated <= 0) {
                         continue; // next trigger
                     }
@@ -3080,7 +3081,7 @@ abstract class JobStoreSupport : JobStore {
             OperableTrigger trigger, JobDetail jobDetail,
             CompletedExecutionInstruction triggerInstCode) {
         try {
-            version(HUNT_DEBUG) tracef("triggerInstCode=%s", triggerInstCode);
+            version(HUNT_QUARTZ_DEBUG_MORE) tracef("triggerInstCode=%s", triggerInstCode);
             if (triggerInstCode == CompletedExecutionInstruction.DELETE_TRIGGER) {
                 if(trigger.getNextFireTime() is null) { 
                     // double check for possible reschedule within job 
@@ -3191,6 +3192,7 @@ abstract class JobStoreSupport : JobStore {
         bool transOwner = false;
         Connection conn = getNonManagedTXConnection();
         try {
+            beginTransaction(conn);
             RecoverMisfiredJobsResult result = RecoverMisfiredJobsResult.NO_OP;
             
             // Before we make the potentially expensive call to acquire the 
@@ -3200,7 +3202,8 @@ abstract class JobStoreSupport : JobStore {
                 getDelegate().countMisfiredTriggersInState(
                     conn, TableConstants.STATE_WAITING, getMisfireTime()) : int.max;
 
-            tracef("Found %d triggers that missed their scheduled fire-time.", misfireCount);
+            version(HUNT_QUARTZ_DEBUG) 
+                tracef("Found %d triggers that missed their scheduled fire-time.", misfireCount);
 
             if (misfireCount != 0) {
                 transOwner = getLockHandler().obtainLock(conn, LOCK_TRIGGER_ACCESS);
@@ -3733,7 +3736,7 @@ abstract class JobStoreSupport : JobStore {
     protected T retryExecuteInNonManagedTXLock(T)(string lockName, TransactionCallback!(T) txCallback) {
         for (int retry = 1; !isShutdown; retry++) {
             try {
-                version(HUNT_DEBUG) tracef("retry=%d", retry);
+                version(HUNT_QUARTZ_DEBUG_MORE) tracef("retry=%d", retry);
                 return executeInNonManagedTXLock!(T)(lockName, txCallback, cast(TransactionValidator!(T))null);
             } catch (JobPersistenceException jpe) {
                 if(retry % 4 == 0) {
@@ -3785,14 +3788,14 @@ abstract class JobStoreSupport : JobStore {
                 conn = getNonManagedTXConnection();
             }
 
-            version(HUNT_DEBUG) info("start transaction");
+            version(HUNT_QUARTZ_DEBUG) info("start transaction");
             beginTransaction(conn);
 
             static if(is(T == void)) {
                     txCallback.execute(conn);
                 try {
 
-                    version(HUNT_DEBUG) info("commit transaction");                    
+                    version(HUNT_QUARTZ_DEBUG) info("commit transaction");                    
                     commitConnection(conn);
                 } catch (JobPersistenceException e) {
                     rollbackConnection(conn);
@@ -3805,7 +3808,7 @@ abstract class JobStoreSupport : JobStore {
             } else {
                 T result = txCallback.execute(conn);
                 try {
-                    version(HUNT_DEBUG) info("commit transaction"); 
+                    version(HUNT_QUARTZ_DEBUG) info("commit transaction"); 
                     commitConnection(conn);
                 } catch (JobPersistenceException e) {
                     rollbackConnection(conn);
@@ -4001,7 +4004,7 @@ class MisfireHandler : ThreadEx {
 
     private RecoverMisfiredJobsResult manage() {
         try {
-            trace("MisfireHandler: scanning for misfires...");
+            version(HUNT_QUARTZ_DEBUG) trace("MisfireHandler: scanning for misfires...");
 
             RecoverMisfiredJobsResult res = jobStoreSupport.doRecoverMisfires();
             numFails = 0;

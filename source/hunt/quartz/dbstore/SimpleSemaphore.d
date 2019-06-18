@@ -92,13 +92,13 @@ class SimpleSemaphore : Semaphore {
             _locker.unlock();
         }
 
-        version(HUNT_DEBUG) {
+        version(HUNT_QUARTZ_DEBUG) {
             trace("Lock '" ~ lockName ~ "' is desired by: "
                         ~ ThreadEx.getThis().name());
         }
 
         if (!isLockOwner(lockName)) {
-            version(HUNT_DEBUG) {
+            version(HUNT_QUARTZ_DEBUG) {
                 trace("Lock '" ~ lockName ~ "' is being obtained: "
                             ~ ThreadEx.getThis().name());
             }
@@ -113,7 +113,7 @@ class SimpleSemaphore : Semaphore {
                 }
             }
 
-            version(HUNT_DEBUG) {
+            version(HUNT_QUARTZ_DEBUG) {
                 trace("Lock '" ~ lockName ~ "' given to: "
                             ~ ThreadEx.getThis().name());
             }
@@ -142,7 +142,7 @@ class SimpleSemaphore : Semaphore {
         }
 
         if (isLockOwner(lockName)) {
-            version(HUNT_DEBUG) {
+            version(HUNT_QUARTZ_DEBUG) {
                 trace("Lock '" ~ lockName ~ "' retuned by: "
                             ~ ThreadEx.getThis().name());
             }
@@ -150,7 +150,7 @@ class SimpleSemaphore : Semaphore {
             locks.remove(lockName);
             _lockerCondition.notifyAll();
         } else {
-            version(HUNT_DEBUG) {
+            version(HUNT_QUARTZ_DEBUG) {
                 trace(
                 "Lock '" ~ lockName ~ "' attempt to retun by: "
                         ~ ThreadEx.getThis().name()

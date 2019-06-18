@@ -32,7 +32,8 @@ alias assertNull = Assert.assertNull;
 import std.conv;
 import std.regex;
 
-
+/**
+*/
 class VersionTest  {
     
     private enum string SNAPSHOT_SUFFIX = "-SNAPSHOT";
