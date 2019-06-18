@@ -12,10 +12,13 @@ void main() {
 	Scheduler scheduler = sf.getScheduler();
 	
 	
-	JobDetail jb = JobBuilder.newJob(RAMJob.classinfo)
+	JobDetail job = JobBuilder.newJob(RAMJob.classinfo)
 			.withDescription("this is a ram job") 
 			.withIdentity("ramJob", "ramGroup") 
+			.usingJobData("jobDetail1", "job's data")
 			.build();
+	JobDataMap dataMap = job.getJobDataMap();
+	dataMap.putAsString("url", "http://127.0.0.1");
 	
 	LocalDateTime statTime = LocalDateTime.now; 
 	statTime.plusSeconds(3);
@@ -23,12 +26,13 @@ void main() {
 	Trigger t = TriggerBuilderHelper.newTrigger!Trigger()
 				.withDescription("Demo for RAM store")
 				.withIdentity("ramTrigger", "ramTriggerGroup")
+				.usingJobData("trigger1", "trigger1's data")
 				.withSchedule(SimpleScheduleBuilder.simpleSchedule())
 				.startAt(statTime)  
 				.withSchedule(CronScheduleBuilder.cronSchedule("0/2 * * * * ?")) 
 				.build();
 	
-	scheduler.scheduleJob(jb, t);
+	scheduler.scheduleJob(job, t);
 	
 	scheduler.start();
 	info("Launched");
@@ -42,8 +46,17 @@ class RAMJob : Job {
     mixin Witchcraft;
 
 	public void execute(JobExecutionContext context) {
-		
 		info("Say hello to Quartz ");
+		trace(context.getJobDetail().getJobDataMap().get("jobDetail1"));
+		trace(context.getTrigger().getJobDataMap().get("trigger1"));
+
+
+        JobDetail job = context.getJobDetail();
+        JobDataMap dataMap = job.getJobDataMap();
+		string url = dataMap.getString("url");
+		info("url=", url);
+
+		info("execute done.");
 	}
 	
 }
