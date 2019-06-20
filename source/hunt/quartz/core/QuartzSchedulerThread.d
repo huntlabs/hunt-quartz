@@ -458,7 +458,8 @@ class QuartzSchedulerThread : ThreadEx {
                                 shell.initialize(qs);
                             } catch (SchedulerException se) {
                                 qsRsrcs.getJobStore().triggeredJobComplete(triggers.get(i), 
-                                    bndle.getJobDetail(), CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
+                                    bndle.getJobDetail(), 
+                                    CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
                                 continue;
                             }
 
@@ -468,7 +469,10 @@ class QuartzSchedulerThread : ThreadEx {
                                 // a thread pool being used concurrently - which the docs
                                 // say not to do...
                                 error("ThreadPool.runInThread() return false!");
-                                qsRsrcs.getJobStore().triggeredJobComplete(triggers.get(i), bndle.getJobDetail(), CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
+                                qsRsrcs.getJobStore()
+                                    .triggeredJobComplete(triggers.get(i), 
+                                                        bndle.getJobDetail(), 
+                                                        CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
                             }
 
                         }

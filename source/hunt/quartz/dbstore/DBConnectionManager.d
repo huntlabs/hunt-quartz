@@ -65,8 +65,6 @@ class DBConnectionManager {
         instance = new DBConnectionManager();
     }
 
-    // private HashMap!(string, ConnectionProvider) providers;
-
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -82,10 +80,14 @@ class DBConnectionManager {
      *  
      */
     private this() {
-        // providers = new HashMap!(string, ConnectionProvider)();
 
     }
 
+    void initialize(EntityOption option) {
+        _option = option;
+    }
+
+    private EntityOption _option;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,11 +110,11 @@ class DBConnectionManager {
      *              if an error occurs, or there is no DataSource with the
      *              given name.
      */
-    Connection getConnection(string dsName, EntityOption option) {
+    Connection getConnection() {
         if (em is null) {
-            version(HUNT_QUARTZ_DEBUG) trace("creating EntityManager for " ~ dsName);
-            EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("postgresql",
-                    option);
+            version(HUNT_QUARTZ_DEBUG) trace("creating EntityManager for " ~ _option.database.database);
+            EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(_option.database.driver,
+                    _option);
             em = entityManagerFactory.createEntityManager();
         }
         return em;

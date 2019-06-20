@@ -2594,13 +2594,13 @@ class StdDbDelegate : DriverDelegate {
     protected ubyte[] serializeJobData(JobDataMap data) {
         if (canUseProperties()) {
             ubyte[] d = cast(ubyte[])serializeProperties(data);
-            tracef("%(%02X %)", d);
+            version(HUNT_QUARTZ_DEBUG_MORE) tracef("%(%02X %)", d);
             return d;
         }
 
         try {
             string json = data.jsonSerialize().toString();
-            trace(json);
+            version(HUNT_QUARTZ_DEBUG_MORE) trace(json);
             return cast(ubyte[])json;
         } catch (NotSerializableException e) {
             throw new NotSerializableException(

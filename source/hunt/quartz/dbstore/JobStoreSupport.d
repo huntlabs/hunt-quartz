@@ -86,7 +86,7 @@ alias Connection = EntityManager;
 
 /**
  * <p>
- * Contains base functionality for JDBC-based JobStore implementations.
+ * Contains base functionality for db-based JobStore implementations.
  * </p>
  * 
  * @author <a href="mailto:jeff@binaryfeed.org">Jeffrey Wescott</a>
@@ -113,7 +113,7 @@ abstract class JobStoreSupport : JobStore {
      * 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    protected EntityOption entityOption;
+    // protected EntityOption entityOption;
     protected string dsName;
 
     protected string tablePrefix = TableConstants.DEFAULT_TABLE_PREFIX;
@@ -177,6 +177,7 @@ abstract class JobStoreSupport : JobStore {
     
     private bool schedulerRunning = false;
     private bool isShutdown= false;
+    private DBConnectionManager dbManager;
 
 
     private shared static long ftrCtr;
@@ -187,11 +188,22 @@ abstract class JobStoreSupport : JobStore {
 
 
     this() {
+        defaultInitialize();
+    }
+    
+    this(EntityOption option) {
+        defaultInitialize();
+        // this.entityOption = option;
+        dbManager = DBConnectionManager.getInstance();
+        dbManager.initialize(option);
+        setTablePrefix(option.database.prefix);
+    }
+
+    private void defaultInitialize() {
         calendarCache = new HashMap!(string, Calendar)();
         threadExecutor = new DefaultThreadExecutor();
         lastCheckin = DateTimeHelper.currentTimeMillis();
     }
-    
 
     protected string getFiredTriggerRecordId() {
         long d = atomicOp!"+="(ftrCtr, 1);
@@ -226,13 +238,13 @@ abstract class JobStoreSupport : JobStore {
         return dsName;
     }
 
-    void setEntityOption(EntityOption option) {
-        entityOption = option;
-    }
+    // void setEntityOption(EntityOption option) {
+    //     entityOption = option;
+    // }
 
-    EntityOption getEntityOption() {
-        return entityOption;
-    }
+    // EntityOption getEntityOption() {
+    //     return entityOption;
+    // }
 
     /**
      * <p>
@@ -790,7 +802,7 @@ abstract class JobStoreSupport : JobStore {
         }
 
         try {
-            DBConnectionManager.getInstance().shutdown(getDataSource());
+            dbManager.shutdown(getDataSource());
         } catch (SQLException sqle) {
             warning("Database connection shutdown unsuccessful.", sqle);
         }        
@@ -806,7 +818,9 @@ abstract class JobStoreSupport : JobStore {
     // helper methods for subclasses
     //---------------------------------------------------------------------------
 
-    protected abstract Connection getNonManagedTXConnection();
+    protected Connection getNonManagedTXConnection() {
+        return getConnection();
+    }
 
     /**
      * Wrap the given <code>Connection</code> in a Proxy such that attributes 
@@ -823,8 +837,7 @@ abstract class JobStoreSupport : JobStore {
     protected Connection getConnection() {
         Connection conn;
         try {
-            conn = DBConnectionManager.getInstance().getConnection(
-                    getDataSource(), getEntityOption());
+            conn = dbManager.getConnection();
         } catch (DatabaseException sqle) {
             string msg = "Failed to obtain DB connection from data source '"
                     ~ getDataSource() ~ "': " ~ sqle.msg;
@@ -861,8 +874,7 @@ abstract class JobStoreSupport : JobStore {
         } catch (Throwable e) {
             try { conn.close(); } catch(Throwable ignored) {}
             
-            throw new JobPersistenceException(
-                "Failure setting up connection.", e);
+            throw new JobPersistenceException("Failure setting up connection.", e);
         }
     
         return conn;
@@ -1180,10 +1192,8 @@ abstract class JobStoreSupport : JobStore {
      * Insert or update a trigger.
      * </p>
      */
-    protected void storeTrigger(Connection conn,
-            OperableTrigger newTrigger, JobDetail job, 
-            bool replaceExisting, string state,
-            bool forceState, bool recovering) {
+    protected void storeTrigger(Connection conn, OperableTrigger newTrigger, JobDetail job, 
+            bool replaceExisting, string state, bool forceState, bool recovering) {
 
         bool existingTrigger = triggerExists(conn, newTrigger.getKey());
 
@@ -1646,8 +1656,8 @@ abstract class JobStoreSupport : JobStore {
      *           if a <code>Calendar</code> with the same name already
      *           exists, and replaceExisting is set to false.
      */
-    void storeCalendar(string calName,
-        Calendar calendar, bool replaceExisting, bool updateTriggers) {
+    void storeCalendar(string calName, Calendar calendar, 
+            bool replaceExisting, bool updateTriggers) {
         executeInLock(
             (isLockOnInsert() || updateTriggers) ? LOCK_TRIGGER_ACCESS : null,
             new class VoidTransactionCallback {

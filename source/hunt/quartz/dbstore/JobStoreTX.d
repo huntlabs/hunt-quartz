@@ -25,6 +25,7 @@ import hunt.quartz.spi.ClassLoadHelper;
 import hunt.quartz.spi.SchedulerSignaler;
 
 import hunt.logging.ConsoleLogger;
+import hunt.entity;
 
 /**
  * <p>
@@ -44,6 +45,14 @@ import hunt.logging.ConsoleLogger;
  */
 class JobStoreTX : JobStoreSupport {
 
+    this() {
+        super();
+    }
+
+    this(EntityOption option) {
+        super(option);
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * 
@@ -52,11 +61,8 @@ class JobStoreTX : JobStoreSupport {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    override
-    void initialize(SchedulerSignaler schedSignaler) {
-
+    override void initialize(SchedulerSignaler schedSignaler) {
         super.initialize(schedSignaler);
-
         trace("JobStoreTX initialized.");
     }
 
@@ -66,10 +72,10 @@ class JobStoreTX : JobStoreSupport {
      * 
      * @see JobStoreSupport#getConnection()
      */
-    override
-    protected Connection getNonManagedTXConnection() {
-        return getConnection();
-    }
+    // override
+    // protected Connection getNonManagedTXConnection() {
+    //     return getConnection();
+    // }
     
     /**
      * Execute the given callback having optionally aquired the given lock.
@@ -93,4 +99,3 @@ class JobStoreTX : JobStoreSupport {
     //     return executeInNonManagedTXLock(lockName, txCallback, null);
     // }
 }
-// EOF

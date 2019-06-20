@@ -493,13 +493,10 @@ class DirectSchedulerFactory : SchedulerFactory {
         // cch.initialize();
 
         SchedulerDetailsSetter.setDetails(jobStore, schedulerName, schedulerInstanceId);
-
         jobStore.initialize(qs.getSchedulerSignaler());
-
         Scheduler scheduler = new StdScheduler(qs);
 
         jrsf.initialize(scheduler);
-
         qs.initialize();
         
 
@@ -519,7 +516,6 @@ class DirectSchedulerFactory : SchedulerFactory {
         // garbage collected
 
         schedRep.bind(scheduler);
-        
         initialized = true;
     }
 

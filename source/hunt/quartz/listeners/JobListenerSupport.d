@@ -15,7 +15,7 @@
  */
 module hunt.quartz.listeners.JobListenerSupport;
 
-import hunt.logging;
+import hunt.logging.ConsoleLogger;
 
 import hunt.quartz.JobListener;
 import hunt.quartz.JobExecutionContext;

@@ -183,9 +183,9 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
     private JobFactory jobFactory; 
     
-    ExecutingJobsManager jobMgr = null;
+    private ExecutingJobsManager jobMgr = null;
 
-    ErrorLogger errLogger = null;
+    private ErrorLogger errLogger = null;
 
     private SchedulerSignaler signaler;
 
@@ -236,6 +236,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         this.schedThread = new QuartzSchedulerThread(this, resources);
         ThreadExecutor schedThreadExecutor = resources.getThreadExecutor();
         schedThreadExecutor.execute(this.schedThread);
+
         if (idleWaitTime > 0) {
             this.schedThread.setIdleWaitTime(idleWaitTime);
         }
@@ -607,7 +608,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     void standby() {
         resources.getJobStore().schedulerPaused();
         schedThread.togglePause(true);
-        trace("Scheduler " ~ resources.getUniqueIdentifier() ~ " paused.");
+        version(HUNT_DEBUG) trace("Scheduler " ~ resources.getUniqueIdentifier() ~ " paused.");
         notifySchedulerListenersInStandbyMode();        
     }
 
@@ -687,7 +688,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
         
         shuttingDown = true;
 
-        trace("Scheduler " ~ resources.getUniqueIdentifier()
+        version(HUNT_DEBUG) trace("Scheduler " ~ resources.getUniqueIdentifier()
                         ~ " shutting down.");
         // bool removeMgmtSvr = false;
         // if (registeredManagementServerBind !is null) {
@@ -759,7 +760,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
 
         holdToPreventGC.clear();
         
-        trace("Scheduler " ~ resources.getUniqueIdentifier()
+        version(HUNT_DEBUG) trace("Scheduler " ~ resources.getUniqueIdentifier()
                         ~ " shutdown complete.");
     }
 
@@ -1949,8 +1950,7 @@ J     *
         }
     }
 
-    void notifyJobListenersWasExecuted(JobExecutionContext jec,
-            JobExecutionException je) {
+    void notifyJobListenersWasExecuted(JobExecutionContext jec, JobExecutionException je) {
         // build a list of all job listeners that are to be notified...
         List!(JobListener) jobListeners = buildJobListenerList();
 
@@ -2360,6 +2360,10 @@ J     *
         foreach(SchedulerPlugin plugin; resources.getSchedulerPlugins()) {
             plugin.start();
         }
+    }
+
+    QuartzSchedulerResources getResources() {
+        return this.resources;
     }
 
 }
