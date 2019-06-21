@@ -757,7 +757,6 @@ class StdDbDelegate : DriverDelegate {
         JobDetails j = query.getSingleResult();
         if(j is null)
             return null;
-        version(HUNT_QUARTZ_DEBUG) tracef("%(%02X %)", j.jobData);
 
         JobDetailImpl job = new JobDetailImpl();
         job.setName(j.jobName);
