@@ -40,7 +40,7 @@ import hunt.time.ZoneRegion;
 
 import hunt.Exceptions;
 import hunt.util.Serialize;
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 import hunt.logging.ConsoleLogger;
 
 import witchcraft;
@@ -344,7 +344,7 @@ class CronTriggerImpl : AbstractTrigger!(CronTrigger), CronTrigger, CoreTrigger 
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
     
-    mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
+    mixin CloneMemberTemplate!(typeof(this), TopLevel.no, (typeof(this) from, typeof(this) to) {
         if (from.cronEx !is null) {
             to.setCronExpression(new CronExpression(from.cronEx));
         }

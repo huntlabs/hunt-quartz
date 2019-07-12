@@ -23,7 +23,7 @@ import hunt.logging;
 import hunt.Exceptions;
 import hunt.quartz.Exceptions;
 
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 
 /**
  * This utility calls methods reflectively on the given objects even though the

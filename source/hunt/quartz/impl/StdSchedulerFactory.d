@@ -58,7 +58,7 @@ import hunt.collection.Collection;
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
 import hunt.util.Locale;
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 import hunt.util.Configuration;
 
 import std.array;

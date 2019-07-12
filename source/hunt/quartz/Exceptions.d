@@ -37,7 +37,7 @@ class SchedulerException : Exception {
 
     override string toString() {
         Throwable cause = getUnderlyingException(); 
-        if (cause is null || cause == this) {
+        if (cause is null || cause is this) {
             return super.toString();
         } else {
             return super.toString() ~ " [See nested exception: " ~ cause.toString() ~ "]";

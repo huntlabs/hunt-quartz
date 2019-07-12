@@ -218,6 +218,7 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                     qs.notifySchedulerListenersError("Job ("
                             ~ jec.getJobDetail().getKey().toString()
                             ~ " threw an exception.", se);
+
                     jobExEx = new JobExecutionException(se, false);
                 }
 

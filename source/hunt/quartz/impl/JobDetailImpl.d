@@ -31,7 +31,7 @@ import hunt.quartz.Trigger;
 import hunt.quartz.utils.ClassUtils;
 
 import hunt.Exceptions;
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 import hunt.logging.ConsoleLogger;
 
 import std.array;
@@ -458,7 +458,7 @@ class JobDetailImpl : JobDetail {
 
     alias opCmp = Object.opCmp;
 
-    mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
+    mixin CloneMemberTemplate!(typeof(this), TopLevel.yes, (typeof(this) from, typeof(this) to) {
         if (from.jobDataMap !is null) {
             to.jobDataMap = cast(JobDataMap) from.jobDataMap.clone();
         }

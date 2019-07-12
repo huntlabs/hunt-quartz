@@ -1036,11 +1036,11 @@ class StdDbDelegate : DriverDelegate {
             JobDetail jobDetail) {
 
         // save some clock cycles by unnecessarily writing job data blob ...
-        bool updateJobData = trigger.getJobDataMap().isDirty();
+        JobDataMap triggerMap = trigger.getJobDataMap();
+        bool updateJobData = triggerMap.isDirty();
         ubyte[] baos = null;
         if(updateJobData) {
-            baos = serializeJobData(trigger.getJobDataMap());
-            // implementationMissing(false);
+            baos = serializeJobData(triggerMap);
         }
                 
         int insertResult = 0;

@@ -284,7 +284,10 @@ class SchedulerMetaData {
      * <pre>
      * 
      * 
-     *  Quartz Scheduler 'SchedulerName' with instanceId 'SchedulerInstanceId' Scheduler class: 'hunt.quartz.impl.StdScheduler' - running locally. Running since: '11:33am on Jul 19, 2002' Not currently paused. Number of Triggers fired: '123' Using thread pool 'hunt.quartz.simpl.SimpleThreadPool' - with '8' threads Using job-store 'hunt.quartz.impl.JDBCJobStore' - which supports persistence.
+     *  Quartz Scheduler 'SchedulerName' with instanceId 'SchedulerInstanceId' Scheduler class: 'hunt.quartz.impl.StdScheduler' 
+     *  - running locally. Running since: '11:33am on Jul 19, 2002' Not currently paused. Number of Triggers fired: '123' 
+     *  Using thread pool 'hunt.quartz.simpl.SimpleThreadPool' - with '8' threads Using job-store 'hunt.quartz.impl.JDBCJobStore' 
+     *  - which supports persistence.
      * </pre>
      * 
      * </p>

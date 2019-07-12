@@ -26,7 +26,7 @@ import hunt.Integer;
 import hunt.Long;
 import hunt.Number;
 import hunt.String;
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 
 /**
  * <p>

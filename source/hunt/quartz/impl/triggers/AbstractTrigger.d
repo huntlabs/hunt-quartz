@@ -36,7 +36,7 @@ import hunt.quartz.spi.OperableTrigger;
 
 import hunt.Exceptions;
 import hunt.time.LocalDateTime;
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 import hunt.util.Serialize;
 
 import std.array;
@@ -866,7 +866,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
         return key.toHash();
     }
 
-    mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
+    mixin CloneMemberTemplate!(typeof(this), TopLevel.yes, (typeof(this) from, typeof(this) to) {
 
         // Shallow copy the jobDataMap.  Note that this means that if a user
         // modifies a value object in this map from the cloned Trigger

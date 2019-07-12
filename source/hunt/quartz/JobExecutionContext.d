@@ -252,13 +252,13 @@ interface JobExecutionContext {
      * @param key the key for the associated value
      * @param value the value to store
      */
-    void put(Object key, Object value);
+    void put(string key, Object value);
 
     /**
      * Get the value with the given key from the context's data map.
      * 
      * @param key the key for the desired value
      */
-    Object get(Object key);
+    Object get(string key);
 
 }

@@ -31,7 +31,7 @@ import hunt.logging.ConsoleLogger;
 import hunt.Object;
 import hunt.util.Common;
 import hunt.util.Serialize;
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 
 import hunt.serialization;
 
@@ -140,34 +140,34 @@ class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
         return map;
     }
 
-    override void clear() {
+    void clear() {
         if (!map.isEmpty()) {
             dirty = true;
         }
         map.clear();
     }
 
-    override bool containsKey(K key) {
+    bool containsKey(K key) {
         return map.containsKey(key);
     }
 
-    override bool containsValue(V val) {
+    bool containsValue(V val) {
         return map.containsValue(val);
     }
     
-    override int opApply(scope int delegate(ref K, ref V) dg) {
+    int opApply(scope int delegate(ref K, ref V) dg) {
         return map.opApply(dg);
     }
 
-    override int opApply(scope int delegate(MapEntry!(K, V) entry) dg) {
+    int opApply(scope int delegate(MapEntry!(K, V) entry) dg) {
         return map.opApply(dg);
     }
 
-    override InputRange!K byKey() {
+    InputRange!K byKey() {
         return map.byKey();
     }
 
-    override InputRange!V byValue() {
+    InputRange!V byValue() {
         return map.byValue();
     }
 
@@ -191,22 +191,21 @@ class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
         return map.toHash();
     }
 
-    override V get(K key) {
+    V get(K key) {
         return map.get(key);
     }
 
-    override bool isEmpty() {
+    bool isEmpty() {
         return map.isEmpty();
     }
 
 
-    override V put(K key, V val) {
+    V put(K key, V val) {
         dirty = true;
-
         return map.put(key, val);
     }
 
-    override void putAll(Map!(K, V) t) {
+    void putAll(Map!(K, V) t) {
         if (!t.isEmpty()) {
             dirty = true;
         }
@@ -214,7 +213,7 @@ class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
         map.putAll(t);
     }
 
-    override V remove(K key) {
+    V remove(K key) {
         V obj = map.remove(key);
 
         if (obj !is null) {
@@ -224,11 +223,11 @@ class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
         return obj;
     }
 
-    override int size() {
+    int size() {
         return map.size();
     }
 
-    override V[] values() {
+    V[] values() {
         return map.values();
     }
 
@@ -258,7 +257,7 @@ class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
         return map.toString();
     }
 
-    mixin CloneMemberTemplate!(typeof(this), (typeof(this) from, typeof(this) to) {
+    mixin CloneMemberTemplate!(typeof(this), TopLevel.yes, (typeof(this) from, typeof(this) to) {
         HashMap!(K,V) hashMap = cast(HashMap!(K,V))from.map;
         if (hashMap !is null) {
             to.map = cast(Map!(K,V))(hashMap.clone());

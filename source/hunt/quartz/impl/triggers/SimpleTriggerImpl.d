@@ -40,7 +40,7 @@ import hunt.time.LocalTime;
 import hunt.time.LocalDateTime;
 import hunt.time.ZoneOffset;
 import hunt.util.Serialize;
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 
 import hunt.logging.ConsoleLogger;
 

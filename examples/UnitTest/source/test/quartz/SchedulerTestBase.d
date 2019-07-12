@@ -30,7 +30,7 @@ import hunt.concurrency.thread;
 import hunt.Exceptions;
 import hunt.logging.ConsoleLogger;
 import hunt.util.DateTime;
-import hunt.util.Traits;
+import hunt.util.ObjectUtils;
 import hunt.util.UnitTest;
 
 

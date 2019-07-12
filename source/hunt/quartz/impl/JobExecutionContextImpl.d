@@ -77,7 +77,7 @@ class JobExecutionContextImpl : JobExecutionContext {
     
     private Object result;
     
-    private HashMap!(Object, Object) data;
+    private HashMap!(string, Object) data;
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,7 +94,7 @@ class JobExecutionContextImpl : JobExecutionContext {
      */
     this(Scheduler scheduler,
             TriggerFiredBundle firedBundle, Job job) {
-        data = new HashMap!(Object, Object)();
+        data = new HashMap!(string, Object)();
         this.scheduler = scheduler;
         this.trigger = firedBundle.getTrigger();
         this.calendar = firedBundle.getCalendar();
@@ -258,14 +258,14 @@ class JobExecutionContextImpl : JobExecutionContext {
     /**
      * {@inheritDoc}
      */
-    void put(Object key, Object value) {
+    void put(string key, Object value) {
         data.put(key, value);
     }
     
     /**
      * {@inheritDoc}
      */
-    Object get(Object key) {
+    Object get(string key) {
         return data.get(key);
     }
 
