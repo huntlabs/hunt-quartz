@@ -590,8 +590,12 @@ warningf("removing=>", wt.name);
             bool ran = false;
             
             while (_run) {
+                lock.lock(); 
+                scope(exit) {
+                    lock.unlock();
+                }
+
                 try {
-                    lock.lock(); 
                     while (runnable is null && _run) {
                         lockCondition.wait(msecs(500));
                     }
@@ -604,18 +608,15 @@ warningf("removing=>", wt.name);
                         version(HUNT_DEBUG) 
                             infof("finished a job: %s", this.name);
                     }
-                    lock.unlock();
                 } catch (InterruptedException unblock) {
                     // do nothing (loop will terminate if shutdown() was called
                     error("Worker thread was interrupt()'ed.", unblock.msg);
-                } catch (Throwable exceptionInRunnable) {
+                } catch (Exception exceptionInRunnable) {
                     error("Error while executing the Runnable: ",
                             exceptionInRunnable.msg);
                     version(HUNT_DEBUG) warning(exceptionInRunnable);
                 } finally {
-                    synchronized(lock) {
-                        runnable = null;
-                    }
+                    runnable = null;
                     // repair the thread in case the runnable mucked it up...
                     // if(this.priority != tp.getThreadPriority()) {
                     //     this.priority = tp.getThreadPriority();

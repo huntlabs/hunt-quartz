@@ -320,184 +320,182 @@ class QuartzSchedulerThread : ThreadEx {
                 }
 
                 int availThreadCount = qsRsrcs.getThreadPool().blockForAvailableThreads();
-                if(availThreadCount > 0) { // will always be true, due to semantics of blockForAvailableThreads...
-
-                    List!(OperableTrigger) triggers;
-
-                    long now = DateTimeHelper.currentTimeMillis();
-
-                    clearSignaledSchedulingChange();
-                    try {
-                        triggers = qsRsrcs.getJobStore().acquireNextTriggers(
-                                        now + idleWaitTime, 
-                                        min(availThreadCount, qsRsrcs.getMaxBatchSize()), 
-                                        qsRsrcs.getBatchTimeWindow()
-                                    );
-
-                        acquiresFailed = 0;
-                        // version(HUNT_QUARTZ_DEBUG) 
-                        {
-                        int n = triggers is null ? 0 : triggers.size();
-                            // info("batch acquisition of " ~  std.conv.to!string(n) ~ " triggers");
-                        // } else {
-                            if (n > 0) {
-                                info("batch acquisition of " ~ std.conv.to!string(n) ~ 
-                                    " triggers, thread: " ~ this.name() );
-                            }
-                        }
-                    } catch (JobPersistenceException jpe) {
-                        if (acquiresFailed == 0) {
-                            qs.notifySchedulerListenersError(
-                                "An error occurred while scanning for the next triggers to fire.", jpe);
-                        }
-                        if (acquiresFailed < int.max)
-                            acquiresFailed++;
-                        continue;
-                    } catch (RuntimeException e) {
-                        if (acquiresFailed == 0) {
-                            error("quartzSchedulerThreadLoop: RuntimeException "
-                                    ~ e.msg, e);
-                        }
-                        if (acquiresFailed < int.max)
-                            acquiresFailed++;
-                        continue;
-                    }
-
-                    if (triggers !is null && !triggers.isEmpty()) {
-
-                        now = DateTimeHelper.currentTimeMillis();
-                        LocalDateTime dt = triggers.get(0).getNextFireTime();
-                        if(dt is null) {
-                            warning("getNextFireTime is null");
-                            continue;
-                        }
-
-                        long triggerTime = dt.toEpochMilli();
-                        long timeUntilTrigger = triggerTime - now;
-                        while(timeUntilTrigger > 2) {
-                            sigLock.lock();
-                            {
-                                if (halted) {
-                                    sigLock.unlock();
-                                    break;
-                                }
-                                if (!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) {
-                                    try {
-                                        // we could have blocked a long while
-                                        // on 'synchronize', so we must recompute
-                                        now = DateTimeHelper.currentTimeMillis();
-                                        timeUntilTrigger = triggerTime - now;
-                                        if(timeUntilTrigger >= 1)
-                                            sigCondition.wait(msecs(timeUntilTrigger));
-                                    } catch (InterruptedException ignore) {
-                                    }
-                                }
-                            }
-                            sigLock.unlock();
-
-                            if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
-                                break;
-                            }
-                            now = DateTimeHelper.currentTimeMillis();
-                            timeUntilTrigger = triggerTime - now;
-                        }
-
-                        // this happens if releaseIfScheduleChangedSignificantly decided to release triggers
-                        if(triggers.isEmpty())
-                            continue;
-
-                        // set triggers to 'executing'
-                        List!(TriggerFiredResult) bndles = new ArrayList!(TriggerFiredResult)();
-
-                        bool goAhead = true;
-                            goAhead = !AtomicHelper.load(halted);
-
-
-                        if(goAhead) {
-                            try {
-                                List!(TriggerFiredResult) res = qsRsrcs.getJobStore().triggersFired(triggers);
-                                if(res !is null)
-                                    bndles = res;
-                            } catch (SchedulerException se) {
-                                qs.notifySchedulerListenersError(
-                                        "An error occurred while firing triggers '"
-                                                ~ triggers.toString() ~ "'", se);
-                                //QTZ-179 : a problem occurred interacting with the triggers from the db
-                                //we release them and loop again
-                                for (int i = 0; i < triggers.size(); i++) {
-                                    qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
-                                }
-                                continue;
-                            }
-
-                        }
-
-                        for (int i = 0; i < bndles.size(); i++) {
-                            TriggerFiredResult result =  bndles.get(i);
-                            TriggerFiredBundle bndle =  result.getTriggerFiredBundle();
-                            RuntimeException exception = cast(RuntimeException)result.getException();
-
-                            if (exception !is null) {
-                                error("RuntimeException while firing trigger " ~ (cast(Object)triggers.get(i)).toString(), exception.msg);
-                                qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
-                                continue;
-                            }
-
-                            // it's possible to get 'null' if the triggers was paused,
-                            // blocked, or other similar occurrences that prevent it being
-                            // fired at this time...  or if the scheduler was shutdown (halted)
-                            if (bndle is null) {
-                                qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
-                                continue;
-                            }
-
-                            JobRunShell shell = null;
-                            try {
-                                shell = qsRsrcs.getJobRunShellFactory().createJobRunShell(bndle);
-                                // shell = new JobRunShell(scheduler, bndle);
-                                shell.initialize(qs);
-                            } catch (SchedulerException se) {
-                                qsRsrcs.getJobStore().triggeredJobComplete(triggers.get(i), 
-                                    bndle.getJobDetail(), 
-                                    CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
-                                continue;
-                            }
-
-                            if (qsRsrcs.getThreadPool().runInThread(shell) == false) {
-                                // this case should never happen, as it is indicative of the
-                                // scheduler being shutdown or a bug in the thread pool or
-                                // a thread pool being used concurrently - which the docs
-                                // say not to do...
-                                error("ThreadPool.runInThread() return false!");
-                                qsRsrcs.getJobStore()
-                                    .triggeredJobComplete(triggers.get(i), 
-                                                        bndle.getJobDetail(), 
-                                                        CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
-                            }
-
-                        }
-
-                        continue; // while (!halted)
-                    }
-                } else { // if(availThreadCount > 0)
+                if(availThreadCount <= 0) { 
+                    version(HUNT_DEBUG) warning("no thread available.");
                     // should never happen, if threadPool.blockForAvailableThreads() follows contract
                     continue; // while (!halted)
                 }
+                    
+                // will always be true, due to semantics of blockForAvailableThreads...
 
+                List!(OperableTrigger) triggers;
                 long now = DateTimeHelper.currentTimeMillis();
+                clearSignaledSchedulingChange();
+                try {
+                    triggers = qsRsrcs.getJobStore().acquireNextTriggers(
+                                    now + idleWaitTime, 
+                                    min(availThreadCount, qsRsrcs.getMaxBatchSize()), 
+                                    qsRsrcs.getBatchTimeWindow()
+                                );
+
+                    acquiresFailed = 0;
+                    // version(HUNT_QUARTZ_DEBUG) 
+                    {
+                    int n = triggers is null ? 0 : triggers.size();
+                        // info("batch acquisition of " ~  std.conv.to!string(n) ~ " triggers");
+                    // } else {
+                        if (n > 0) {
+                            info("batch acquisition of " ~ std.conv.to!string(n) ~ 
+                                " triggers, thread: " ~ this.name() );
+                        }
+                    }
+                } catch (JobPersistenceException jpe) {
+                    if (acquiresFailed == 0) {
+                        qs.notifySchedulerListenersError(
+                            "An error occurred while scanning for the next triggers to fire.", jpe);
+                    }
+                    if (acquiresFailed < int.max)
+                        acquiresFailed++;
+                    continue;
+                } catch (RuntimeException e) {
+                    if (acquiresFailed == 0) {
+                        error("quartzSchedulerThreadLoop: RuntimeException "
+                                ~ e.msg, e);
+                    }
+                    if (acquiresFailed < int.max)
+                        acquiresFailed++;
+                    continue;
+                }
+
+                if (triggers !is null && !triggers.isEmpty()) {
+
+                    now = DateTimeHelper.currentTimeMillis();
+                    LocalDateTime dt = triggers.get(0).getNextFireTime();
+                    if(dt is null) {
+                        warning("getNextFireTime is null");
+                        continue;
+                    }
+
+                    long triggerTime = dt.toEpochMilli();
+                    long timeUntilTrigger = triggerTime - now;
+                    while(timeUntilTrigger > 2) {
+                        sigLock.lock();
+                        {
+                            if (halted) {
+                                sigLock.unlock();
+                                break;
+                            }
+                            if (!isCandidateNewTimeEarlierWithinReason(triggerTime, false)) {
+                                try {
+                                    // we could have blocked a long while
+                                    // on 'synchronize', so we must recompute
+                                    now = DateTimeHelper.currentTimeMillis();
+                                    timeUntilTrigger = triggerTime - now;
+                                    if(timeUntilTrigger >= 1)
+                                        sigCondition.wait(msecs(timeUntilTrigger));
+                                } catch (InterruptedException ignore) {
+                                }
+                            }
+                        }
+                        sigLock.unlock();
+
+                        if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
+                            break;
+                        }
+                        now = DateTimeHelper.currentTimeMillis();
+                        timeUntilTrigger = triggerTime - now;
+                    }
+
+                    // this happens if releaseIfScheduleChangedSignificantly decided to release triggers
+                    if(triggers.isEmpty())
+                        continue;
+
+                    // set triggers to 'executing'
+                    List!(TriggerFiredResult) bndles = new ArrayList!(TriggerFiredResult)();
+
+                    bool goAhead = true;
+                        goAhead = !AtomicHelper.load(halted);
+
+
+                    if(goAhead) {
+                        try {
+                            List!(TriggerFiredResult) res = qsRsrcs.getJobStore().triggersFired(triggers);
+                            if(res !is null)
+                                bndles = res;
+                        } catch (SchedulerException se) {
+                            qs.notifySchedulerListenersError(
+                                    "An error occurred while firing triggers '"
+                                            ~ triggers.toString() ~ "'", se);
+                            //QTZ-179 : a problem occurred interacting with the triggers from the db
+                            //we release them and loop again
+                            for (int i = 0; i < triggers.size(); i++) {
+                                qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
+                            }
+                            continue;
+                        }
+
+                    }
+
+                    for (int i = 0; i < bndles.size(); i++) {
+                        TriggerFiredResult result =  bndles.get(i);
+                        TriggerFiredBundle bndle =  result.getTriggerFiredBundle();
+                        RuntimeException exception = cast(RuntimeException)result.getException();
+
+                        if (exception !is null) {
+                            error("RuntimeException while firing trigger " ~ (cast(Object)triggers.get(i)).toString(), exception.msg);
+                            qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
+                            continue;
+                        }
+
+                        // it's possible to get 'null' if the triggers was paused,
+                        // blocked, or other similar occurrences that prevent it being
+                        // fired at this time...  or if the scheduler was shutdown (halted)
+                        if (bndle is null) {
+                            qsRsrcs.getJobStore().releaseAcquiredTrigger(triggers.get(i));
+                            continue;
+                        }
+
+                        JobRunShell shell = null;
+                        try {
+                            shell = qsRsrcs.getJobRunShellFactory().createJobRunShell(bndle);
+                            // shell = new JobRunShell(scheduler, bndle);
+                            shell.initialize(qs);
+                        } catch (SchedulerException se) {
+                            qsRsrcs.getJobStore().triggeredJobComplete(triggers.get(i), 
+                                bndle.getJobDetail(), 
+                                CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
+                            continue;
+                        }
+
+                        if (qsRsrcs.getThreadPool().runInThread(shell) == false) {
+                            // this case should never happen, as it is indicative of the
+                            // scheduler being shutdown or a bug in the thread pool or
+                            // a thread pool being used concurrently - which the docs
+                            // say not to do...
+                            error("ThreadPool.runInThread() return false!");
+                            qsRsrcs.getJobStore()
+                                .triggeredJobComplete(triggers.get(i), 
+                                                    bndle.getJobDetail(), 
+                                                    CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
+                        }
+                    }
+
+                    continue; // while (!halted)
+                }
+
+                now = DateTimeHelper.currentTimeMillis();
                 long waitTime = now + getRandomizedIdleWaitTime();
                 long timeUntilContinue = waitTime - now;
-                sigLock.lock(); {
+                sigLock.lock();
+                if(!halted) {
+                    // QTZ-336 A job might have been completed in the mean time and we might have
+                    // missed the scheduled changed signal by not waiting for the notify() yet
+                    // Check that before waiting for too long in case this very job needs to be
+                    // scheduled very soon
                     try {
-                      if(!halted) {
-                        // QTZ-336 A job might have been completed in the mean time and we might have
-                        // missed the scheduled changed signal by not waiting for the notify() yet
-                        // Check that before waiting for too long in case this very job needs to be
-                        // scheduled very soon
                         if (!isScheduleChanged()) {
-                          sigCondition.wait(msecs(timeUntilContinue));
+                            sigCondition.wait(msecs(timeUntilContinue));
                         }
-                      }
                     } catch (InterruptedException ignore) {
                     }
                 }

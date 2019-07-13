@@ -200,8 +200,13 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                 long endTime = startTime;
 
                 // execute the job
+                version(HUNT_DEBUG) {
+                    trace("Calling execute on job " ~ jobDetail.getKey().toString());
+                    scope(exit) {
+                        trace("A job done: " ~ jobDetail.getKey().toString());
+                    }
+                }
                 try {
-                    version(HUNT_DEBUG) trace("Calling execute on job " ~ jobDetail.getKey().toString());
                     job.execute(jec);
                     endTime = DateTimeHelper.currentTimeMillis();
                 } catch (JobExecutionException jee) {
@@ -260,6 +265,7 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                     }
                     continue;
                 }
+
                 try {
                     complete(true);
                 } catch (SchedulerException se) {
