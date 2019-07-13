@@ -877,7 +877,7 @@ abstract class AbstractTrigger(T) : OperableTrigger if(is(T : Trigger)) {
     });    
     
     TriggerBuilder!(T) getTriggerBuilder() {
-        return TriggerBuilderHelper.newTrigger!T()
+        return newTrigger!T()
             .forJob(getJobKey())
             .modifiedByCalendar(getCalendarName())
             .usingJobData(getJobDataMap())

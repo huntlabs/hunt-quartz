@@ -23,7 +23,7 @@ void main() {
 	LocalDateTime statTime = LocalDateTime.now; 
 	statTime.plusSeconds(3);
 	
-	Trigger t = TriggerBuilderHelper.newTrigger!Trigger()
+	Trigger t = newTrigger!Trigger()
 				.withDescription("Demo for RAM store")
 				.withIdentity("ramTrigger", "ramTriggerGroup")
 				.usingJobData("trigger1", "trigger1's data")

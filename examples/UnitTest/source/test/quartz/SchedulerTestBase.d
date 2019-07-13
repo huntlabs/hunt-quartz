@@ -96,7 +96,7 @@ class SchedulerTestBase {
         
     //     sched.deleteJob(jobKey("j1"));
         
-    //     Trigger trigger = TriggerBuilderHelper.newTrigger!Trigger()
+    //     Trigger trigger = newTrigger!Trigger()
     //         .withIdentity("t1")
     //         .forJob(job)
     //         .startNow()
@@ -124,7 +124,7 @@ class SchedulerTestBase {
     //         .withIdentity("j2", "g1")
     //         .build();
     
-    //     trigger = TriggerBuilderHelper.newTrigger!Trigger()
+    //     trigger = newTrigger!Trigger()
     //         .withIdentity("t2", "g1")
     //         .forJob(job)
     //         .startNow()
@@ -140,7 +140,7 @@ class SchedulerTestBase {
     //         .withIdentity("j3", "g1")
     //         .build();
     
-    //     trigger = TriggerBuilderHelper.newTrigger!Trigger()
+    //     trigger = newTrigger!Trigger()
     //         .withIdentity("t3", "g1")
     //         .forJob(job)
     //         .startNow()
@@ -194,7 +194,7 @@ class SchedulerTestBase {
     //         .withIdentity("j4", "g1")
     //         .build();
     
-    //     trigger = TriggerBuilderHelper.newTrigger!Trigger()
+    //     trigger = newTrigger!Trigger()
     //         .withIdentity("t4", "g1")
     //         .forJob(job)
     //         .startNow()
@@ -427,7 +427,7 @@ class SchedulerTestBase {
     //     sched.getContext().put(DATE_STAMPS, cast(Object)jobExecTimestamps);
         
 	// 	JobDetail job1 = JobBuilder.newJob!(TestJobWithSync).withIdentity("job1").build();
-	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger().forJob(job1).build(); 
+	// 	Trigger trigger1 = newTrigger!Trigger().forJob(job1).build(); 
 		
 	// 	long sTime = DateTimeHelper.currentTimeMillis();
 		
@@ -448,14 +448,14 @@ class SchedulerTestBase {
 	// void testScheduleMultipleTriggersForAJob(){
 	// 	// scheduler.deleteJob(jobKey("job", "group1"));
 	// 	JobDetail job = JobBuilder.newJob(typeid(TestJob)).withIdentity("job1", "group1").build();
-	// 	Trigger trigger1 = TriggerBuilderHelper.newTrigger!Trigger()
+	// 	Trigger trigger1 = newTrigger!Trigger()
 	// 			.withIdentity("trigger1", "group1")
 	// 			.startNow()
 	// 			.withSchedule(
 	// 					SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)
 	// 							.repeatForever())
 	// 			.build();
-	// 	Trigger trigger2 = TriggerBuilderHelper.newTrigger!Trigger()
+	// 	Trigger trigger2 = newTrigger!Trigger()
 	// 			.withIdentity("trigger2", "group1")
 	// 			.startNow()
 	// 			.withSchedule(
@@ -489,7 +489,7 @@ class SchedulerTestBase {
     //         scheduler.addJob(JobBuilder.newJob().ofType(typeid(UncleanShutdownJob))
     //             .withIdentity("job").storeDurably().build(), false);
 
-    //         scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
+    //         scheduler.scheduleJob(newTrigger!Trigger().forJob("job").startNow().build());
     //         while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
     //             Thread.sleep(50.msecs);
     //         }
@@ -520,7 +520,7 @@ class SchedulerTestBase {
     //         scheduler.start();
     //         scheduler.addJob(JobBuilder.newJob().ofType(typeid(TestJobWithSync))
     //             .withIdentity("job").storeDurably().build(), false);
-    //         scheduler.scheduleJob(TriggerBuilderHelper.newTrigger!Trigger().forJob("job").startNow().build());
+    //         scheduler.scheduleJob(newTrigger!Trigger().forJob("job").startNow().build());
     //         while (scheduler.getCurrentlyExecutingJobs().isEmpty()) {
     //             Thread.sleep(50.msecs);
     //         }

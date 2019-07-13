@@ -38,21 +38,18 @@ import hunt.time.LocalDateTime;
 
 import std.datetime;
 
-class TriggerBuilderHelper {
 
-    /**
-     * Create a new TriggerBuilder with which to define a 
-     * specification for a Trigger.
-     * 
-     * @return the new TriggerBuilder
-     */
-    static TriggerBuilder!(T) newTrigger(T)() if(is(T : Trigger)) {
-        return new TriggerBuilder!(T)();
-    }
-    // static TriggerBuilder!(Trigger) newTrigger() {
-    //     return new TriggerBuilder!(Trigger)();
-    // }
+/**
+ * Create a new TriggerBuilder with which to define a 
+ * specification for a Trigger.
+ * 
+ * @return the new TriggerBuilder
+ */
+static TriggerBuilder!(T) newTrigger(T)() if(is(T : Trigger)) {
+    return new TriggerBuilder!(T)();
 }
+
+
 
 /**
  * <code>TriggerBuilder</code> is used to instantiate {@link Trigger}s.

@@ -93,6 +93,7 @@ import std.array;
 import std.conv;
 import std.datetime;
 import std.random;
+import std.stdio;
 
 alias RandomLong = Mt19937_64;
 
@@ -322,13 +323,14 @@ class QuartzScheduler : RemotableQuartzScheduler {
         // }
 
         
-        trace("Scheduler meta-data: " ~
-                (new SchedulerMetaData(getSchedulerName(),
+        trace("Scheduler meta-data: ");
+        SchedulerMetaData data = new SchedulerMetaData(getSchedulerName(),
                         getSchedulerInstanceId(), typeid(this), boundRemotely, runningSince() !is null, 
                         isInStandbyMode(), isShutdown(), runningSince(), 
                         numJobsExecuted(), getJobStoreClass(), 
                         supportsPersistence(), isClustered(), getThreadPoolClass(), 
-                        getThreadPoolSize(), getVersion())).toString());
+                        getThreadPoolSize(), getVersion());
+        writeln(data.toString());
     }
     
     /*
@@ -630,7 +632,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     }
 
     TypeInfo_Class getJobStoreClass() {
-        return typeid(resources.getJobStore());
+        return typeid(cast(Object)resources.getJobStore());
     }
 
     bool supportsPersistence() {
@@ -1162,7 +1164,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     void triggerJob(JobKey jobKey, JobDataMap data) {
         validateState();
 
-        OperableTrigger trig = cast(OperableTrigger) TriggerBuilderHelper.newTrigger!(OperableTrigger)().withIdentity(newTriggerId(), 
+        OperableTrigger trig = cast(OperableTrigger) newTrigger!(OperableTrigger)().withIdentity(newTriggerId(), 
             Scheduler.DEFAULT_GROUP).forJob(jobKey).build();
         trig.computeFirstFireTime(null);
         if(data !is null) {

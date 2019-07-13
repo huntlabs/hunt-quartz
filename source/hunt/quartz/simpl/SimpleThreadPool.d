@@ -602,7 +602,7 @@ warningf("removing=>", wt.name);
                         ran = true;
                         runnable.run();
                         version(HUNT_DEBUG) 
-                            infof("finished running a job: %s", this.name);
+                            infof("finished a job: %s", this.name);
                     }
                     lock.unlock();
                 } catch (InterruptedException unblock) {

@@ -929,6 +929,9 @@ class StdDbDelegate : DriverDelegate {
         ubyte[] baos = null;
         if(trigger.getJobDataMap().size() > 0) {
             baos = serializeJobData(trigger.getJobDataMap());
+            version(HUNT_DEBUG) {
+                trace("DataMap: %(%02X %)", baos);
+            }
         }
         
         int insertResult = 0;
@@ -1551,7 +1554,6 @@ class StdDbDelegate : DriverDelegate {
         if (canUseProperties()) {
             map = getMapFromProperties(t.jobData);
         } else {
-            // map = unserialize!(JobDataMap)(cast(byte[])t.jobData); 
             string json = cast(string)t.jobData;
             version(HUNT_QUARTZ_DEBUG) tracef("triger data: %s", json);
             if(!json.empty()) {
@@ -1619,7 +1621,7 @@ class StdDbDelegate : DriverDelegate {
                 }
             }
 
-            TriggerBuilder!Trigger tb = TriggerBuilderHelper.newTrigger!Trigger()
+            TriggerBuilder!Trigger tb = newTrigger!Trigger()
                 .withDescription(description)
                 .withPriority(priority)
                 .startAt(startTimeD)
@@ -1721,11 +1723,13 @@ class StdDbDelegate : DriverDelegate {
         if(!rs.empty()) {
             Row r = rs.front;
             ubyte[] data = r.getAs!(ubyte[])(0);
-            tracef("%(%02X %)", data);
+            version(HUNT_DEBUG) tracef("%(%02X %)", data);
             if (canUseProperties()) {
                 map = getMapFromProperties(data);
             } else {
                 // map = unserialize!(JobDataMap)(cast(byte[])data); 
+                // FIXME: Needing refactor or cleanup -@zhangxueping at 2019-7-13 10:43:48
+                // 
                 string json = cast(string)data;
                 trace(json);
                 map = JsonSerializer.fromJson!(JobDataMap)(json);
