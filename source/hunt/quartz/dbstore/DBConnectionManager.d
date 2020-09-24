@@ -115,7 +115,7 @@ class DBConnectionManager {
             version(HUNT_QUARTZ_DEBUG) trace("creating EntityManager for " ~ _option.database.database);
             EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(_option.database.driver,
                     _option);
-            em = entityManagerFactory.createEntityManager();
+            em = entityManagerFactory.currentEntityManager();
         }
         return em;
     }

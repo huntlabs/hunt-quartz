@@ -36,6 +36,7 @@ import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.logging.ConsoleLogger;
 import hunt.util.DateTime;
 import hunt.util.Common;
+import hunt.util.Runnable;
 
 
 /**
@@ -196,7 +197,7 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                     break;
                 }
 
-                long startTime = DateTimeHelper.currentTimeMillis();
+                long startTime = DateTime.currentTimeMillis();
                 long endTime = startTime;
 
                 // execute the job
@@ -208,14 +209,14 @@ class JobRunShell : SchedulerListenerSupport, Runnable {
                 }
                 try {
                     job.execute(jec);
-                    endTime = DateTimeHelper.currentTimeMillis();
+                    endTime = DateTime.currentTimeMillis();
                 } catch (JobExecutionException jee) {
-                    endTime = DateTimeHelper.currentTimeMillis();
+                    endTime = DateTime.currentTimeMillis();
                     jobExEx = jee;
                     warning("Job " ~ jobDetail.getKey().toString() ~
                             " threw a JobExecutionException: ", jee.msg);
                 } catch (Throwable e) {
-                    endTime = DateTimeHelper.currentTimeMillis();
+                    endTime = DateTime.currentTimeMillis();
                     error("Job " ~ jobDetail.getKey().toString() ~
                             " threw an unhandled Exception: ", e.msg);
                     SchedulerException se = new SchedulerException(

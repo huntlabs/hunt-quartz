@@ -91,7 +91,7 @@ import core.time;
 
 import std.array;
 import std.conv;
-import std.datetime;
+// import std.datetime;
 import std.random;
 import std.stdio;
 
@@ -644,7 +644,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     }
 
     TypeInfo_Class getThreadPoolClass() {
-        return typeid(resources.getThreadPool());
+        return typeid(cast(Object)resources.getThreadPool());
     }
 
     int getThreadPoolSize() {
@@ -1151,7 +1151,7 @@ class QuartzScheduler : RemotableQuartzScheduler {
     private string newTriggerId() {
         ulong r = random.front();
         random.popFront();
-        return "MT_" ~ to!string(r, 30 + cast(int) (DateTimeHelper.currentTimeMillis() % 7));
+        return "MT_" ~ to!string(r, 30 + cast(int) (DateTime.currentTimeMillis() % 7));
     }
 
     /**

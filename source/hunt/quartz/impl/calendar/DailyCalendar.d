@@ -5,7 +5,7 @@ import hunt.quartz.Calendar;
 
 // import java.text.NumberFormat;
 import hunt.collection.ArrayList;
-import hunt.collection.StringBuffer;
+import hunt.util.StringBuilder;
 import hunt.Exceptions;
 import hunt.text.StringTokenizer;
 // import hunt.time.util.Calendar;
@@ -624,8 +624,8 @@ class DailyCalendar : BaseCalendar {
     string toString() {
         // NumberFormat numberFormatter = NumberFormat.getNumberInstance();
         // numberFormatter.setMaximumFractionDigits(0);
-        // numberFormatter.setMinimumIntegerDigits(2);
-        StringBuffer buffer = new StringBuffer();
+        // numberFormatter.setMinimumIntegerDigits(2);        
+        StringBuilder buffer = new StringBuilder();
         buffer.append("base calendar: [");
         if (getBaseCalendar() !is null) {
             buffer.append((cast(Object)getBaseCalendar()).toString());

@@ -24,9 +24,10 @@ import hunt.concurrency.thread;
 import hunt.collection.Iterator;
 import hunt.collection.LinkedList;
 import hunt.collection.List;
-import hunt.util.Common;
 import hunt.Exceptions;
 import hunt.logging;
+import hunt.util.Common;
+import hunt.util.Runnable;
 
 import core.atomic;
 import core.sync.condition;
@@ -465,6 +466,7 @@ class SimpleThreadPool : ThreadPool {
 
         while((availWorkers.size() < 1 || handoffPending) && !isShutdown) {
             try {
+                version(HUNT_DEBUG) trace("waitting for available threads...");
                 nextRunnableCondition.wait(500.msecs());
             } catch (InterruptedException ignore) {
             }

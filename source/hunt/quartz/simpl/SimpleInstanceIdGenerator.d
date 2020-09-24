@@ -37,7 +37,7 @@ class SimpleInstanceIdGenerator : InstanceIdGenerator {
     }
     string generateInstanceId() {
         try {
-            return Socket.hostName() ~ DateTimeHelper.currentTimeMillis().to!string();
+            return Socket.hostName() ~ DateTime.currentTimeMillis().to!string();
         } catch (Exception e) {
             throw new SchedulerException("Couldn't get host name!", e);
         }

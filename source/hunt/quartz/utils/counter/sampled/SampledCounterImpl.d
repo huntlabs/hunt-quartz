@@ -126,7 +126,7 @@ class SampledCounterImpl : CounterImpl, SampledCounter {
             sample = getValue();
         }
 
-        long now = DateTimeHelper.currentTimeMillis();
+        long now = DateTime.currentTimeMillis();
         TimeStampedCounterValue timedSample = new TimeStampedCounterValue(now, sample);
 
         history.push(timedSample);

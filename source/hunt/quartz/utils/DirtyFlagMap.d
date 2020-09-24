@@ -59,7 +59,7 @@ class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
 
     private bool dirty = false;
 
-    @Exclude
+    @Ignore
     protected Map!(K, V) map;
 
     /*
@@ -266,7 +266,7 @@ class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
 
 
     JSONValue jsonSerialize() {
-        JSONValue r = JsonSerializer.serializeObject!(typeof(this), TraverseBase.no)(this);
+        JSONValue r = JsonSerializer.serializeObject!(SerializationOptions.Default.traverseBase(false), typeof(this))(this);
         JSONValue mapJson;
 
         foreach(K key, V value; map) {
@@ -282,7 +282,7 @@ class DirtyFlagMap(K, V) : Map!(K, V), Cloneable, JsonSerializable {
         import hunt.String;
 
         // version(HUNT_DEBUG) trace(value.toPrettyString());
-        JsonSerializer.deserializeObject!(typeof(this), TraverseBase.no)(this, value);
+        JsonSerializer.deserializeObject!(typeof(this), SerializationOptions.Default.traverseBase(false))(this, value);
 
         const(JSONValue) mapJson = value["map"];
 

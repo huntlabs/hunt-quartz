@@ -1371,7 +1371,7 @@ class RAMJobStore : JobStore {
 
     protected bool applyMisfire(TriggerWrapper tw) {
 
-        LocalDateTime misfireTime = LocalDateTime.now(); // DateTimeHelper.currentTimeMillis();
+        LocalDateTime misfireTime = LocalDateTime.now(); // DateTime.currentTimeMillis();
         if (getMisfireThreshold() > 0) {
             misfireTime = misfireTime.minusMilliseconds(getMisfireThreshold());
         }
@@ -1408,7 +1408,7 @@ class RAMJobStore : JobStore {
     private shared static long ftrCtr;
 
     shared static this() {
-        ftrCtr = DateTimeHelper.currentTimeMillis();
+        ftrCtr = DateTime.currentTimeMillis();
     }
 
     protected string getFiredTriggerRecordId() {
@@ -1497,7 +1497,7 @@ class RAMJobStore : JobStore {
                 assert(trig !is null);
                 if (result.isEmpty()) {
                     batchEnd = max(nextFireTime.toEpochMilli(), 
-                        DateTimeHelper.currentTimeMillis()) + timeWindow;
+                        DateTime.currentTimeMillis()) + timeWindow;
                 }
                 result.add(trig);
                 if (result.size() == maxCount)

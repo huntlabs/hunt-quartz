@@ -64,7 +64,7 @@ import hunt.quartz.spi.TriggerFiredBundle;
 import hunt.quartz.spi.TriggerFiredResult;
 
 import hunt.concurrency.thread;
-import hunt.database.DatabaseException;
+import hunt.database.base.Exceptions;
 import hunt.entity.EntityManager;
 import hunt.entity.EntityOption;
 import hunt.Exceptions;
@@ -80,7 +80,7 @@ import core.time;
 import std.array;
 import std.algorithm;
 import std.conv;
-import std.datetime;
+// import std.datetime;
 
 alias Connection = EntityManager;
 
@@ -183,7 +183,7 @@ abstract class JobStoreSupport : JobStore {
     private shared static long ftrCtr;
 
     shared static this() {
-        ftrCtr = DateTimeHelper.currentTimeMillis();
+        ftrCtr = DateTime.currentTimeMillis();
     }
 
 
@@ -202,7 +202,7 @@ abstract class JobStoreSupport : JobStore {
     private void defaultInitialize() {
         calendarCache = new HashMap!(string, Calendar)();
         threadExecutor = new DefaultThreadExecutor();
-        lastCheckin = DateTimeHelper.currentTimeMillis();
+        lastCheckin = DateTime.currentTimeMillis();
     }
 
     protected string getFiredTriggerRecordId() {
@@ -967,7 +967,7 @@ abstract class JobStoreSupport : JobStore {
     }
 
     protected long getMisfireTime() {
-        long misfireTime = DateTimeHelper.currentTimeMillis();
+        long misfireTime = DateTime.currentTimeMillis();
         if (misfireThreshold > 0) {
             misfireTime -= misfireThreshold;
         }
@@ -1028,7 +1028,7 @@ abstract class JobStoreSupport : JobStore {
 
             OperableTrigger trig = retrieveTrigger(conn, triggerKey);
 
-            long misfireTime = DateTimeHelper.currentTimeMillis();
+            long misfireTime = DateTime.currentTimeMillis();
             if (getMisfireThreshold() > 0) {
                 misfireTime -= getMisfireThreshold();
             }
@@ -2600,7 +2600,7 @@ abstract class JobStoreSupport : JobStore {
              * 
              * if(res > 0) {
              * 
-             * long misfireTime = DateTimeHelper.currentTimeMillis();
+             * long misfireTime = DateTime.currentTimeMillis();
              * if(getMisfireThreshold() > 0) misfireTime -=
              * getMisfireThreshold();
              * 
@@ -2874,7 +2874,7 @@ abstract class JobStoreSupport : JobStore {
 
                     if(acquiredTriggers.isEmpty()) {
                         batchEnd = max(nextTrigger.getNextFireTime().toEpochMilli(), 
-                            DateTimeHelper.currentTimeMillis()) + timeWindow;
+                            DateTime.currentTimeMillis()) + timeWindow;
                     }
                     acquiredTriggers.add(nextTrigger);
                 }
@@ -3269,7 +3269,7 @@ abstract class JobStoreSupport : JobStore {
 
     protected bool firstCheckIn = true;
 
-    protected long lastCheckin; // = DateTimeHelper.currentTimeMillis();
+    protected long lastCheckin; // = DateTime.currentTimeMillis();
     
     protected bool doCheckin() {
         bool transOwner = false;
@@ -3336,7 +3336,7 @@ abstract class JobStoreSupport : JobStore {
         try {
             List!(SchedulerStateRecord) failedInstances = new LinkedList!(SchedulerStateRecord)();
             bool foundThisScheduler = false;
-            long timeNow = DateTimeHelper.currentTimeMillis();
+            long timeNow = DateTime.currentTimeMillis();
             
             List!(SchedulerStateRecord) states = getDelegate().selectSchedulerStateRecords(conn, null);
 
@@ -3373,7 +3373,7 @@ abstract class JobStoreSupport : JobStore {
             
             return failedInstances;
         } catch (Exception e) {
-            lastCheckin = DateTimeHelper.currentTimeMillis();
+            lastCheckin = DateTime.currentTimeMillis();
             throw new JobPersistenceException("Failure identifying failed instances when checking-in: "
                     ~ e.msg, e);
         }
@@ -3416,7 +3416,7 @@ abstract class JobStoreSupport : JobStore {
     protected long calcFailedIfAfter(SchedulerStateRecord rec) {
         return rec.getCheckinTimestamp() +
             max(rec.getCheckinInterval(), 
-                    (DateTimeHelper.currentTimeMillis() - lastCheckin)) + 7500L;
+                    (DateTime.currentTimeMillis() - lastCheckin)) + 7500L;
     }
     
     protected List!(SchedulerStateRecord) clusterCheckIn(Connection conn) {
@@ -3427,7 +3427,7 @@ abstract class JobStoreSupport : JobStore {
             // FUTURE_TODO: handle self-failed-out
 
             // check in...
-            lastCheckin = DateTimeHelper.currentTimeMillis();
+            lastCheckin = DateTime.currentTimeMillis();
             if(getDelegate().updateSchedulerState(conn, getInstanceId(), lastCheckin) == 0) {
                 getDelegate().insertSchedulerState(conn, getInstanceId(),
                         lastCheckin, getClusterCheckinInterval());
@@ -3446,7 +3446,7 @@ abstract class JobStoreSupport : JobStore {
 
         if (failedInstances.size() > 0) {
 
-            long recoverIds = DateTimeHelper.currentTimeMillis();
+            long recoverIds = DateTime.currentTimeMillis();
 
             logWarnIfNonZero(failedInstances.size(),
                     "ClusterManager: detected " ~ failedInstances.size().to!string()
@@ -3954,7 +3954,7 @@ class ClusterManager : ThreadEx {
 
             if (!isShutdown) {
                 long timeToSleep = jobStoreSupport.getClusterCheckinInterval();
-                long transpiredTime = (DateTimeHelper.currentTimeMillis() - jobStoreSupport.lastCheckin);
+                long transpiredTime = (DateTime.currentTimeMillis() - jobStoreSupport.lastCheckin);
                 timeToSleep = timeToSleep - transpiredTime;
                 if (timeToSleep <= 0) {
                     timeToSleep = 100L;
@@ -4034,7 +4034,7 @@ class MisfireHandler : ThreadEx {
         
         while (!isShutdown) {
 
-            long sTime = DateTimeHelper.currentTimeMillis();
+            long sTime = DateTime.currentTimeMillis();
 
             RecoverMisfiredJobsResult recoverMisfiredJobsResult = manage();
 
@@ -4045,7 +4045,7 @@ class MisfireHandler : ThreadEx {
             if (!isShutdown) {
                 long timeToSleep = 50;  // At least a short pause to help balance threads
                 if (!recoverMisfiredJobsResult.hasMoreMisfiredTriggers()) {
-                    timeToSleep = jobStoreSupport.getMisfireThreshold() - (DateTimeHelper.currentTimeMillis() - sTime);
+                    timeToSleep = jobStoreSupport.getMisfireThreshold() - (DateTime.currentTimeMillis() - sTime);
                     if (timeToSleep <= 0) {
                         timeToSleep = 50;
                     }

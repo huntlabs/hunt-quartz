@@ -62,9 +62,9 @@ import hunt.Exceptions;
 import hunt.entity.EntityManager;
 import hunt.entity.NativeQuery;
 import hunt.entity.eql.EqlQuery;
-import hunt.database.driver.ResultSet;
-import hunt.database.Row;
-import hunt.io.ByteArrayOutputStream;
+import hunt.database.base.Row;
+import hunt.database.base.RowSet;
+import hunt.stream.ByteArrayOutputStream;
 import hunt.logging;
 import hunt.serialization.JsonSerializer;
 import hunt.String;
@@ -292,11 +292,11 @@ class StdDbDelegate : DriverDelegate {
             rtp(StdSqlConstants.SELECT_TRIGGERS_IN_STATE));
 
         query.setParameter(1, state);
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         
         LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
         foreach(Row r; rs) {
-            list.add(triggerKey(r[0], r[1]));
+            list.add(triggerKey(r[0].get!string(), r[1].get!string()));
         }
 
         return list;
@@ -311,10 +311,10 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(2, state);
 
         LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         foreach(Row r; rs) {
-            string triggerName = r[0];
-            string groupName = r[1];
+            string triggerName = r[0].get!string();
+            string groupName = r[1].get!string();
             list.add(triggerKey(triggerName, groupName));
         }
         return list;
@@ -344,7 +344,7 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, ts);
         query.setParameter(2, state1);
         
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         bool hasReachedLimit = false;
         foreach(Row r; rs) {
@@ -352,8 +352,8 @@ class StdDbDelegate : DriverDelegate {
                 hasReachedLimit = true;
                 break;
             } else {
-                string triggerName = r[0];
-                string groupName = r[1];
+                string triggerName = r[0].get!string();
+                string groupName = r[1].get!string();
                 resultList.add(triggerKey(triggerName, groupName));
             }
         }
@@ -376,11 +376,11 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, ts);
         query.setParameter(2, state1);
         
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
-        if (!rs.empty()) {
-            Row r = rs.front;
-            return r.getAs!int(0);
+        if (rs.size() > 0) {
+            Row r = rs.firstRow();
+            return r.getInteger(0);
         }
 
         throw new SQLException("No misfired trigger count returned.");
@@ -407,11 +407,11 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(2, groupName);
         query.setParameter(3, state);
         
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         LinkedList!(TriggerKey) list = new LinkedList!(TriggerKey)();
         foreach(Row r; rs) {
-            list.add(triggerKey(r[0], groupName));
+            list.add(triggerKey(r[0].get!string(), groupName));
         }
         return list;
     }
@@ -446,7 +446,7 @@ class StdDbDelegate : DriverDelegate {
         
         FiredTriggers[] triggers = query.getResultList();
 
-        long dumId = DateTimeHelper.currentTimeMillis();
+        long dumId = DateTime.currentTimeMillis();
         LinkedList!(OperableTrigger) list = new LinkedList!(OperableTrigger)();
         foreach(FiredTriggers t; triggers) {
             string jobName = t.jobName;
@@ -680,10 +680,10 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
 
-        ResultSet rs = query.getNativeResult();
-        if (!rs.empty) { 
-            Row r = rs.front;
-            return r.getAs!bool(0);
+        RowSet rs = query.getNativeResult();
+        if (rs.size() > 0) { 
+            Row r = rs.firstRow();
+            return r.getBoolean(0);
         }
         
         return false; 
@@ -705,11 +705,11 @@ class StdDbDelegate : DriverDelegate {
         // JobDetails r = query.getSingleResult();
         // return r !is null;
         
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         version(HUNT_DEBUG) {
-            tracef("The job %s exists: %s ", jobKey.toString(), !rs.empty());
+            tracef("The job %s exists: %s ", jobKey.toString(), rs.size() > 0);
         }
-        return !rs.empty();
+        return rs.size() > 0;
     }
 
     /**
@@ -776,7 +776,7 @@ class StdDbDelegate : DriverDelegate {
             version(HUNT_QUARTZ_DEBUG) tracef("job data: %s", json);
 
             if(!json.empty()) {
-                map = JsonSerializer.fromJson!(JobDataMap)(json);
+                map = JsonSerializer.toObject!(JobDataMap)(json);
             }
         }
 
@@ -811,12 +811,12 @@ class StdDbDelegate : DriverDelegate {
      */
     int selectNumJobs(Connection conn) {
         EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_NUM_JOBS));
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         int count = 0;
-        if(!rs.empty){
-            Row r = rs.front;
-            count = r.getAs!int(0);
+        if(rs.size() > 0){
+            Row r = rs.firstRow();
+            count = r.getInteger(0);
         }
 
         return count;
@@ -833,12 +833,12 @@ class StdDbDelegate : DriverDelegate {
      */
     List!(string) selectJobGroups(Connection conn) {
         EqlQuery!(JobDetails) query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOB_GROUPS));
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         assert(rs !is null);
 
         LinkedList!(string) list = new LinkedList!(string)();
         foreach(Row r; rs) {
-            list.add(r[0]);
+            list.add(r[0].get!string());
         }
 
         return list;
@@ -865,11 +865,11 @@ class StdDbDelegate : DriverDelegate {
             query = conn.createQuery!(JobDetails)(rtp(StdSqlConstants.SELECT_JOBS_IN_GROUP_LIKE));
             query.setParameter(1, toSqlLikeClause(matcher));
         }
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         LinkedList!(JobKey) list = new LinkedList!(JobKey)();
         foreach(Row r; rs) {
-            list.add(jobKey(r[0], r[1]));
+            list.add(jobKey(r[0].get!string(), r[1].get!string()));
         }
 
         return new HashSet!(JobKey)(list);
@@ -1145,11 +1145,11 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_EXISTENCE));
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         version(HUNT_DEBUG_MORE) {
-            tracef("The triger %s exists: %s ", triggerKey.toString(), !rs.empty());
+            tracef("The triger %s exists: %s ", triggerKey.toString(), rs.size() > 0);
         }
-        return !rs.empty();
+        return rs.size() > 0;
     }
 
     /**
@@ -1398,12 +1398,12 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS_FOR_JOB));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         int count = 0;
-        if(!rs.empty()) {
-            Row r = rs.front();
-            count = r.getAs!int(0);
+        if(rs.size() > 0) {
+            Row r = rs.firstRow();
+            count = r.getInteger(0);
         }
         return count;
     }
@@ -1447,8 +1447,8 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
 
-        ResultSet rs = query.getNativeResult();
-        if(rs.empty) {
+        RowSet rs = query.getNativeResult();
+        if(rs.size() == 0) {
            version(HUNT_DEBUG) {
                 trace("No job for trigger '" ~ triggerKey.toString() ~ "'.");
             }
@@ -1456,15 +1456,16 @@ class StdDbDelegate : DriverDelegate {
         } 
         
         JobDetailImpl job = new JobDetailImpl();
-        Row r = rs.front();
+        Row r = rs.firstRow();
 
-        job.setName(r[0]);
-        job.setGroup(r[1]);
-        job.setDurability(r.getAs!bool(2));
+        job.setName(r[0].get!string());
+        job.setGroup(r[1].get!string());
+        job.setDurability(r.getBoolean(2));
         if (loadJobClass) {
-            job.setJobClass(cast(TypeInfo_Class)TypeInfo_Class.find(r[3]));
+            // job.setJobClass(cast(TypeInfo_Class)TypeInfo_Class.find(r[3]));
+            job.setJobClass(cast(TypeInfo_Class)(r[3].type));
         }
-        job.setRequestsRecovery(r.getAs!bool(4));
+        job.setRequestsRecovery(r.getBoolean(4));
         
         return job;
     }
@@ -1507,11 +1508,11 @@ class StdDbDelegate : DriverDelegate {
         LinkedList!(OperableTrigger) trigList = new LinkedList!(OperableTrigger)();
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGERS_FOR_CALENDAR));
         query.setParameter(1, calName);
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         LinkedList!(string) list = new LinkedList!(string)();
         foreach(Row r; rs) {
-            trigList.add(selectTrigger(conn, triggerKey(r[0], r[1])));
+            trigList.add(selectTrigger(conn, triggerKey(r[0].get!string(), r[1].get!string())));
         }
         return trigList;
     }
@@ -1557,7 +1558,7 @@ class StdDbDelegate : DriverDelegate {
             string json = cast(string)t.jobData;
             version(HUNT_QUARTZ_DEBUG) tracef("triger data: %s", json);
             if(!json.empty()) {
-                map = JsonSerializer.fromJson!(JobDataMap)(json);
+                map = JsonSerializer.toObject!(JobDataMap)(json);
             }
         }
 
@@ -1650,8 +1651,8 @@ class StdDbDelegate : DriverDelegate {
 
     private bool isTriggerStillPresent(EqlQuery!(Triggers) query) {
         warning("check trigger again");
-        ResultSet rs = query.getNativeResult();
-        return !rs.empty;
+        RowSet rs = query.getNativeResult();
+        return rs.size() > 0;
     }
 
     private void setTriggerStateProperties(OperableTrigger trigger, TriggerPropertyBundle props) {
@@ -1718,11 +1719,11 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, triggerName);
         query.setParameter(2, groupName);
         
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         Map!(string, Object) map = null;
-        if(!rs.empty()) {
-            Row r = rs.front;
-            ubyte[] data = r.getAs!(ubyte[])(0);
+        if(rs.size() > 0) {
+            Row r = rs.firstRow();
+            ubyte[] data = r[0].get!(ubyte[])();
             version(HUNT_DEBUG) tracef("%(%02X %)", data);
             if (canUseProperties()) {
                 map = getMapFromProperties(data);
@@ -1732,7 +1733,7 @@ class StdDbDelegate : DriverDelegate {
                 // 
                 string json = cast(string)data;
                 trace(json);
-                map = JsonSerializer.fromJson!(JobDataMap)(json);
+                map = JsonSerializer.toObject!(JobDataMap)(json);
             }
         }
 
@@ -1758,14 +1759,14 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(1, triggerKey.getName());
         query.setParameter(2, triggerKey.getGroup());
 
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         string state = null;
 
-        if(rs.empty()) {
+        if(rs.size() == 0) {
             state = TableConstants.STATE_DELETED;
         } else {
-            Row r = rs.front;
-            state = r[0];
+            Row r = rs.firstRow();
+            state = r[0].get!string();
         }
 
         return state;
@@ -1818,12 +1819,12 @@ class StdDbDelegate : DriverDelegate {
      */
     int selectNumTriggers(Connection conn) {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS));
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         int count = 0;
-        if(!rs.empty()) {
-            Row r = rs.front();
-            count = r.getAs!int(0);
+        if(rs.size() > 0) {
+            Row r = rs.firstRow();
+            count = r.getInteger(0);
         }
         return count;
     }
@@ -1840,11 +1841,11 @@ class StdDbDelegate : DriverDelegate {
     List!(string) selectTriggerGroups(Connection conn) {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_GROUPS));
 
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         LinkedList!(string) list = new LinkedList!(string)();
         foreach(Row r; rs) {
-            list.add(r[0]);
+            list.add(r[0].get!string());
         }
         return list;
     }
@@ -1854,12 +1855,12 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_TRIGGER_GROUPS_FILTERED));
         query.setParameter(1, toSqlLikeClause(matcher));
 
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         assert(rs !is null);
 
         LinkedList!(string) list = new LinkedList!(string)();
         foreach(Row r; rs) {
-            list.add(r[0]);
+            list.add(r[0].get!string());
         }
 
         return list;
@@ -1889,10 +1890,10 @@ class StdDbDelegate : DriverDelegate {
             query.setParameter(1, toSqlLikeClause(matcher));
         }
 
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         Set!(TriggerKey) keys = new HashSet!(TriggerKey)();
         foreach(Row r; rs) {
-            keys.add(triggerKey(r[0], r[1]));
+            keys.add(triggerKey(r[0].get!string(), r[1].get!string()));
         }
 
         return keys;
@@ -1929,19 +1930,18 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(PausedTriggerGrps) query = conn.createQuery!(PausedTriggerGrps)(rtp(StdSqlConstants.SELECT_PAUSED_TRIGGER_GROUP));
         query.setParameter(1, groupName);
 
-        ResultSet rs = query.getNativeResult();
-        int r = rs.rows();
-        return r>0;
+        RowSet rs = query.getNativeResult();
+        return rs.size()>0;
     }
 
     bool isExistingTriggerGroup(Connection conn, string groupName) {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NUM_TRIGGERS_IN_GROUP));
         query.setParameter(1, groupName);
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         assert(rs !is null);
-        assert(!rs.empty);
-        return !rs.empty();
+        assert(rs.size() > 0);
+        return rs.size() > 0;
     }
 
     //---------------------------------------------------------------------------
@@ -2009,8 +2009,8 @@ class StdDbDelegate : DriverDelegate {
     bool calendarExists(Connection conn, string calendarName) {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDAR_EXISTENCE));
         query.setParameter(1, calendarName);
-        ResultSet rs = query.getNativeResult();
-        return !rs.empty();
+        RowSet rs = query.getNativeResult();
+        return rs.size() > 0;
     }
 
     /**
@@ -2062,8 +2062,8 @@ class StdDbDelegate : DriverDelegate {
     bool calendarIsReferenced(Connection conn, string calendarName) {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_REFERENCED_CALENDAR));
         query.setParameter(1, calendarName);
-        ResultSet rs = query.getNativeResult();
-        return !rs.empty();
+        RowSet rs = query.getNativeResult();
+        return rs.size() > 0;
     }
 
     /**
@@ -2094,12 +2094,12 @@ class StdDbDelegate : DriverDelegate {
      */
     int selectNumCalendars(Connection conn) {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_NUM_CALENDARS));
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         int count = 0;
-        if(!rs.empty()) {
-            Row r = rs.front();
-            count = r.getAs!int(0);
+        if(rs.size() > 0) {
+            Row r = rs.firstRow();
+            count = r.getInteger(0);
         }
         return count;
     }
@@ -2116,11 +2116,11 @@ class StdDbDelegate : DriverDelegate {
     List!(string) selectCalendars(Connection conn) {
         EqlQuery!(Calendars) query = conn.createQuery!(Calendars)(rtp(StdSqlConstants.SELECT_CALENDARS));
         query.setParameter(1, TableConstants.STATE_WAITING);
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         LinkedList!(string) list = new LinkedList!(string)();
         foreach(Row r; rs) {
-            list.add(r[0]);
+            list.add(r[0].get!string());
         }
         return list;
     }
@@ -2144,11 +2144,11 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(Triggers) query = conn.createQuery!(Triggers)(rtp(StdSqlConstants.SELECT_NEXT_FIRE_TIME));
         query.setParameter(1, TableConstants.STATE_WAITING);
 
-        ResultSet rs = query.getNativeResult();
-        if(rs.empty)
+        RowSet rs = query.getNativeResult();
+        if(rs.size() == 0)
             return 0;
-        Row r = rs.front();
-        return r.getAs!int(0);
+        Row r = rs.firstRow();
+        return r.getInteger(0);
     }
 
     /**
@@ -2272,7 +2272,7 @@ class StdDbDelegate : DriverDelegate {
         query.setParameter(2, trigger.getKey().getName());
         query.setParameter(3, trigger.getKey().getGroup());
         query.setParameter(4, instanceId);
-        query.setParameter(5, DateTimeHelper.currentTimeMillis());
+        query.setParameter(5, DateTime.currentTimeMillis());
         query.setParameter(6, trigger.getNextFireTime().toEpochMilli());
         query.setParameter(7, state);
         if (job !is null) {
@@ -2310,7 +2310,7 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.UPDATE_FIRED_TRIGGER));
         query.setParameter(1, instanceId);
 
-        query.setParameter(2, DateTimeHelper.currentTimeMillis());
+        query.setParameter(2, DateTime.currentTimeMillis());
         query.setParameter(3, trigger.getNextFireTime().toEpochMilli());
         query.setParameter(4, state);
 
@@ -2435,9 +2435,9 @@ class StdDbDelegate : DriverDelegate {
     Set!(string) selectFiredTriggerInstanceNames(Connection conn) {
         Set!(string) instanceNames = new HashSet!(string)();
         EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_FIRED_TRIGGER_INSTANCE_NAMES));
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
         foreach(Row r; rs) {
-            instanceNames.add(r[0]);
+            instanceNames.add(r[0].get!string());
         }
         return instanceNames;
     }
@@ -2463,12 +2463,12 @@ class StdDbDelegate : DriverDelegate {
         EqlQuery!(FiredTriggers) query = conn.createQuery!(FiredTriggers)(rtp(StdSqlConstants.SELECT_JOB_EXECUTION_COUNT));
         query.setParameter(1, jobKey.getName());
         query.setParameter(2, jobKey.getGroup());
-        ResultSet rs = query.getNativeResult();
+        RowSet rs = query.getNativeResult();
 
         int count = 0;
-        if(!rs.empty()) {
-            Row r = rs.front();
-            count = r.getAs!int(0);
+        if(rs.size() > 0) {
+            Row r = rs.firstRow();
+            count = r.getInteger(0);
         }
         return count;
     }
@@ -2697,13 +2697,13 @@ class StdDbDelegate : DriverDelegate {
      *          the result set, already queued to the correct row
      * @param colName
      *          the column name for the BLOB
-     * @return the deserialized Object from the ResultSet BLOB
+     * @return the deserialized Object from the RowSet BLOB
      * @throws ClassNotFoundException
      *           if a class found during deserialization cannot be found
      * @throws IOException
      *           if deserialization causes an error
      */
-    // protected Object getObjectFromBlob(ResultSet rs, string colName) {
+    // protected Object getObjectFromBlob(RowSet rs, string colName) {
     //     // Object obj = null;
 
     //     // Blob blobLocator = rs.getBlob(colName);
@@ -2742,13 +2742,13 @@ class StdDbDelegate : DriverDelegate {
      *          the result set, already queued to the correct row
      * @param colName
      *          the column name for the BLOB
-     * @return the deserialized Object from the ResultSet BLOB
+     * @return the deserialized Object from the RowSet BLOB
      * @throws ClassNotFoundException
      *           if a class found during deserialization cannot be found
      * @throws IOException
      *           if deserialization causes an error
      */
-    // protected Object getJobDataFromBlob(ResultSet rs, string colName) {
+    // protected Object getJobDataFromBlob(RowSet rs, string colName) {
     //     if (canUseProperties()) {
     //         Blob blobLocator = rs.getBlob(colName);
     //         if (blobLocator !is null) {
@@ -2778,10 +2778,10 @@ class StdDbDelegate : DriverDelegate {
     }
 
     /**
-     * Cleanup helper method that closes the given <code>ResultSet</code>
+     * Cleanup helper method that closes the given <code>RowSet</code>
      * while ignoring any errors.
      */
-    // protected static void closeResultSet(ResultSet rs) {
+    // protected static void closeResultSet(RowSet rs) {
     //     if (null != rs) {
     //         try {
     //             rs.close();
@@ -2817,22 +2817,22 @@ class StdDbDelegate : DriverDelegate {
     /**
      * Retrieves the value of the designated column in the current row as
      * a <code>bool</code>.
-     * This just wraps <code>{@link ResultSet#getBoolean(java.lang.string)}</code>
+     * This just wraps <code>{@link RowSet#getBoolean(java.lang.string)}</code>
      * by default, but it can be overloaded by subclass delegates for databases that
      * don't explicitly support the bool type.
      */
-    // protected bool getBoolean(ResultSet rs, string columnName) {
+    // protected bool getBoolean(RowSet rs, string columnName) {
     //     return rs.getBoolean(columnName);
     // }
     
     /**
      * Retrieves the value of the designated column index in the current row as
      * a <code>bool</code>.
-     * This just wraps <code>{@link ResultSet#getBoolean(java.lang.string)}</code>
+     * This just wraps <code>{@link RowSet#getBoolean(java.lang.string)}</code>
      * by default, but it can be overloaded by subclass delegates for databases that
      * don't explicitly support the bool type.
      */
-    // protected bool getBoolean(ResultSet rs, int columnIndex) {
+    // protected bool getBoolean(RowSet rs, int columnIndex) {
     //     return rs.getBoolean(columnIndex);
     // }
     

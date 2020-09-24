@@ -4,7 +4,8 @@ import hunt.quartz.impl.calendar.BaseCalendar;
 import hunt.quartz.Calendar;
 import hunt.quartz.CronExpression;
 
-import hunt.collection.StringBuffer;
+import hunt.util.StringBuilder;
+
 import hunt.Exceptions;
 import hunt.time.Instant;
 import hunt.time.LocalDateTime;
@@ -177,7 +178,7 @@ class CronCalendar : BaseCalendar {
      */
     override
     string toString() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("base calendar: [");
         if (getBaseCalendar() !is null) {
             buffer.append((cast(Object)getBaseCalendar()).toString());

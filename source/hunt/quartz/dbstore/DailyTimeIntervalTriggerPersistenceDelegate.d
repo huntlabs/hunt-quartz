@@ -33,7 +33,7 @@ import hunt.collection.Iterator;
 import hunt.collection.Set;
 import hunt.Integer;
 
-import hunt.text.StringBuilder;
+import hunt.util.StringBuilder;
 import hunt.Integer;
 
 import std.conv;

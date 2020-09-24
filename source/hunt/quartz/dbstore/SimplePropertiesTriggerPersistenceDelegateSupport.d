@@ -30,8 +30,7 @@ import hunt.Exceptions;
 import hunt.entity.EntityManager;
 import hunt.entity.NativeQuery;
 import hunt.entity.eql.EqlQuery;
-import hunt.database.driver.ResultSet;
-import hunt.database.Row;
+import hunt.database;
 
 import std.format;
 

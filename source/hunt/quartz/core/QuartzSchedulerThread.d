@@ -83,7 +83,7 @@ class QuartzSchedulerThread : ThreadEx {
 
     private shared bool halted;
 
-    // private Random random = new Random(DateTimeHelper.currentTimeMillis());
+    // private Random random = new Random(DateTime.currentTimeMillis());
 
     // When the scheduler finds there is no current trigger to fire, how long
     // it should wait until checking again...
@@ -325,11 +325,11 @@ class QuartzSchedulerThread : ThreadEx {
                     // should never happen, if threadPool.blockForAvailableThreads() follows contract
                     continue; // while (!halted)
                 }
-                    
+                  
                 // will always be true, due to semantics of blockForAvailableThreads...
 
                 List!(OperableTrigger) triggers;
-                long now = DateTimeHelper.currentTimeMillis();
+                long now = DateTime.currentTimeMillis();
                 clearSignaledSchedulingChange();
                 try {
                     triggers = qsRsrcs.getJobStore().acquireNextTriggers(
@@ -369,7 +369,7 @@ class QuartzSchedulerThread : ThreadEx {
 
                 if (triggers !is null && !triggers.isEmpty()) {
 
-                    now = DateTimeHelper.currentTimeMillis();
+                    now = DateTime.currentTimeMillis();
                     LocalDateTime dt = triggers.get(0).getNextFireTime();
                     if(dt is null) {
                         warning("getNextFireTime is null");
@@ -389,10 +389,11 @@ class QuartzSchedulerThread : ThreadEx {
                                 try {
                                     // we could have blocked a long while
                                     // on 'synchronize', so we must recompute
-                                    now = DateTimeHelper.currentTimeMillis();
+                                    now = DateTime.currentTimeMillis();
                                     timeUntilTrigger = triggerTime - now;
-                                    if(timeUntilTrigger >= 1)
+                                    if(timeUntilTrigger >= 1) {
                                         sigCondition.wait(msecs(timeUntilTrigger));
+                                    }
                                 } catch (InterruptedException ignore) {
                                 }
                             }
@@ -402,7 +403,7 @@ class QuartzSchedulerThread : ThreadEx {
                         if(releaseIfScheduleChangedSignificantly(triggers, triggerTime)) {
                             break;
                         }
-                        now = DateTimeHelper.currentTimeMillis();
+                        now = DateTime.currentTimeMillis();
                         timeUntilTrigger = triggerTime - now;
                     }
 
@@ -461,6 +462,7 @@ class QuartzSchedulerThread : ThreadEx {
                             // shell = new JobRunShell(scheduler, bndle);
                             shell.initialize(qs);
                         } catch (SchedulerException se) {
+                            warning(se);
                             qsRsrcs.getJobStore().triggeredJobComplete(triggers.get(i), 
                                 bndle.getJobDetail(), 
                                 CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
@@ -478,12 +480,13 @@ class QuartzSchedulerThread : ThreadEx {
                                                     bndle.getJobDetail(), 
                                                     CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
                         }
+
                     }
 
                     continue; // while (!halted)
                 }
 
-                now = DateTimeHelper.currentTimeMillis();
+                now = DateTime.currentTimeMillis();
                 long waitTime = now + getRandomizedIdleWaitTime();
                 long timeUntilContinue = waitTime - now;
                 sigLock.lock();
@@ -581,7 +584,7 @@ class QuartzSchedulerThread : ThreadEx {
 
             if(earlier) {
                 // so the new time is considered earlier, but is it enough earlier?
-                long diff = oldTime - DateTimeHelper.currentTimeMillis();
+                long diff = oldTime - DateTime.currentTimeMillis();
                 if(diff < (qsRsrcs.getJobStore().supportsPersistence() ? 70L : 7L))
                     earlier = false;
             }
